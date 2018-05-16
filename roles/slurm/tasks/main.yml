@@ -3,14 +3,18 @@
 - name: Install yum dependencies
   yum: name={{ item }} state=latest update_cache=yes
   with_items:
-      - docker-ce
-      - docker-python
       - ntp
+      - MySQL-python
 
 - name: set selinux in permissive mode to allow docker volumes
   selinux:
     policy: targeted
     state: permissive
+
+- name: make sure the database user is present
+  mysql_user:
+      name: "{{ slurm_storage_user }}"
+      password: "{{ slurm_storage_pass }}"
 
 - name: install docker config
   template:

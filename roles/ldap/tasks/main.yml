@@ -9,7 +9,7 @@
     - openldap-clients
     - nss-pam-ldapd
     - openssh-ldap
-    - pam_script.x86_64
+    - pam_script
 
 - name: install nslcd.conf
   template:

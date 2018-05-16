@@ -1,11 +1,16 @@
 ---
 - name: Include secrets
-  include_vars: secrets.yml
+  include_vars: "{{playbook_dir}}/secrets.yml"
 
 - name: Install spacewalk client repo.
   yum:
    name: http://yum.spacewalkproject.org/2.4-client/RHEL/7/x86_64/spacewalk-client-repo-2.4-3.el7.noarch.rpm
    state: present
+
+   #- name: hack to patch spacewalk client
+   #  get_url:
+   #   url: https://raw.githubusercontent.com/spacewalkproject/spacewalk/361efdfda34b381157b11bde1e7fcd06c64347c9/client/rhel/rhn-client-tools/src/up2date_client/hardware_gudev.py
+   #   dest: /usr/share/rhn/up2date_client/hardware_gudev.py
 
 - name: install spacewalk client packages.
   yum:
@@ -19,4 +24,13 @@
    - yum-rhn-plugin
 
 - name: register at the spacewalk server
-  command: rhnreg_ks --force --serverUrl={{server_url}} --activationkey={{activation_key}}
+  rhn_register:
+   state: present
+   activationkey: "{{activation_key}}"
+   server_url: "{{server_url}}"
+   channels: "{{rhn_channels}}"
+
+- name: upgrade all packages
+  yum:
+   name: '*'
+   state: latest

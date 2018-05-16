@@ -1,0 +1,20 @@
+# Install a nginx reverse proxy with a systemd unit file.
+# See https://github.com/jwilder/nginx-proxy
+---
+- name: install service file.
+  template:
+    src: templates/nginx-proxy.service
+    dest: /etc/systemd/system/nginx-proxy.service
+    mode: 644
+    owner: root
+    group: root
+
+- command: systemctl daemon-reload
+
+- name: start service at boot.
+  command: systemctl reenable nginx-proxy.service
+
+- name: make sure service is started
+  systemd:
+    name: nginx-proxy.service
+    state: restarted

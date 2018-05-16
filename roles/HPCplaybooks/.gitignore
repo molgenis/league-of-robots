@@ -1,0 +1,13 @@
+*.retry
+*.pyc
+.vault_pass.txt
+# ---> Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+*.swp
+.vault_pass.txt
+promtools/results

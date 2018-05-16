@@ -1,0 +1,16 @@
+[Unit]
+Description=nginx reverse proxy for docker containers.
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run --name %n \
+    --rm -d -p 80:80 -p 443:443 -v /srv/certs:/etc/nginx/certs \
+    -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
+
+[Install]
+WantedBy=multi-user.target

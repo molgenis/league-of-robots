@@ -1,0 +1,100 @@
+# SSH keys of HPC colleagues.
+# for more advanced examples, see:
+# http://docs.ansible.com/ansible/latest/authorized_key_module.html
+---
+- name: Initial setup
+  hosts: all
+  become: True
+
+  tasks:
+    - group:
+        name: admin
+        state: present
+
+    - name: Passwordless sudo for admins
+      lineinfile: dest=/etc/sudoers line="%admin  ALL=(ALL:ALL) NOPASSWD:ALL"
+
+    - user:
+        name: wim
+        comment: "Wim Nap"
+        group: admin
+
+    - authorized_key:
+        user: wim
+        key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPcJbucOFOFrPZwM1DKOvscYpDGYXKsgeh3/6skmZn/IhLWYHY6oanm4ifmY3kU0oNXpKgHR43x3JdkIRKmrEpYULspwdlj/ZKPYxFWhVaSTjJvmSJEgy7ET1xk+eVoKV1xRWm/BugWpbseFAOcI9ZwfH++S8JhfX6GgCIy06RUpM8EcFAWb/GO699ZnQ67qMxNdSWYHtK1zu+9svWgEzPk4zc2TihJsc7DxcfQCNfQ4vKH1Im3+QfG5bRtdyVl9yjbE+o4EWhPEWsTBgBosJfbqfywsuzibhTgyybR0Zzm4JN6Wh5wVazvNutAB291dIJt22XEx5tCyOAjLPybLy3 wim@wim-HP-Compaq-Elite-8300-MT'
+        state: present
+
+    - user:
+        name: egon
+        comment: "Egon Rijpkema"
+        group: admin
+
+    - authorized_key:
+        user: egon
+        key: '{{ item }}'
+        state: present
+      with_items:
+          - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKUBdTEHUj6MxvfEU7KcI+UPAvqJ9jGJ7hHm3e7XFTb9 egon@egon-pc'
+          - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDStPUPXkcu81onUm/le54JCu174yXJJDsthDr96Mv8irBVBWuy5FxnaASuDpmC4QE4s0UAIg1iq/SWrr8qdBQ4OVuYFiW0S7ZJvcoKr/40Wh+T5MeltGQfmkDp6kBsfaMSo6M4tF1c8i+XgOgxb4fxHYb8mFhseztRLx6McxJJJLB0nu+T12WQ01nl0XtwD+3EsZWfxRH0KA59VHZSe3Anc5z+Fm7WU+1Vzy6/pkiIhVReI1L6VVhZsIdSu3fQK6fHQcujtfuw6RKEpisZQqnxMUviWQ98yeQXHk6Nx840WCh3vvKveEAoC4Y/UEZa1TMe6PczfUaLjaidUkpulJsP egon@egon-pc'
+
+    - user:
+        name: hopko
+        comment: "Hopko Meijering"
+        group: admin
+
+    - authorized_key:
+        user: hopko
+        key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArQsJ0g/a5YOHlk7xcMpHNxiN+up4syzLZfgiICECET/SCDXUN4Xh3BlSWng8hMQMD5sNSADF4AghdLKfuqXG1MMSvzGSVTcRwiZ+Hq6YCoiinpQw0qu7LOZVZeoG8f7sGwhBqe0wKeyPe6Q7nRe0CXvM+aU4XfZz18O/d3mU1S7cEiue02MgH6ff6VTJFqOtLGpL1rILJn3t58N+2CCWxJwGplkp7hRJ9TnhQqCO+PN/p/4neusjembRu5lX+AKX1mv91WYURkxfLE3CWe9V9YJVG0lLgfXDMyghqkTwf8UsMHS5FBy8oTvuC55EhX+xm2Peo1lZlzy7t5Hg2fWYFQ== h.meijering@rug.nl'
+        state: present
+
+    - user:
+        name: alex
+        comment: "Alex Pothaar"
+        group: admin
+
+    - authorized_key:
+        user: alex
+        key: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF8v6azPTTY4q00JUqLaMo6lT1WONNS959muBgzfgwd2 alex@cit'
+        state: present
+
+    - user:
+        name: fokke
+        comment: "Fokke Dijkstra"
+        group: admin
+        state: present
+
+    - authorized_key:
+        user: fokke
+        key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAyYiso9uP84+Lzdp8O4VBvP9taN2PS8J9S93JPhDdS451EVeXj58sLQjA+YCbTKgJwNDkg38ya4GJZQIqLGEcZX2Yke3d+CP1Aab2e26wtaP3k/nwdpr3dsZJTa7rjf+qNrQVKvkjJApU0CNaFhTcd3I9k6AO0lVikdM0BZYP1/HeffA90lMgyB/vFkSAa5KISP2WfbkP06/b+g6eCMCzWZVCrI6wDjymB5GQGU9u3k/ucNAFVNk6EkuwQi1n2hwHaQlG3O2NqrjRFVA3KPMtrBlyY5oqfIHeErVCHk8+hHsm2UDuwB//zh+HJYVIpOKEp1JHV1ISK08pGd44fbOmBw== fokke@markol'
+        state: present
+
+    - user:
+        name: bob
+        comment: "Bob Dröge"
+        group: admin
+
+    - authorized_key:
+        user: bob
+        key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIA3kaXuLTQ12lx0GocmbNKKarl3KTwTTQDG4S5RCu8Yyytub+CNs04OG2cXNHgW/7qKsVjIMphNj/gVJz//TeQvyiIGuHhezCQE291U6xzl/xbuDHUVvsBYKdCesEA/sHJc+cx1/gBPMIoT0jMITyJffHEaTw455aPRSWJ00jplJ4uyxeanNrJMGPiYD8mqY4ZJ3u6PovxLtnfBZqzb0s5zoGLU32SP3+hQrhvkU31+imfcXl8vaUyIrcRyDDAipHaruCgqH2A/NAT2MYf2QcRx8US6OWAP//CpW9sqjlG37BecPCXdYclNnqfC8qB+Q7+h+RgKTLqxD6w5p7yqRB bob@bob-XPS-13-9360'
+        state: present
+
+    - user:
+        name: cristian
+        comment: "Cristian A. Marocico"
+        group: admin
+
+    - authorized_key:
+        user: cristian
+        key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSwGsrMj9NqSukZKo1AP7phcKTbPf1v/uMCX2pyTtgOdz2gmFpw1ZvR7We8V/cnY+FegZ9ttkoIJ697uyDv0s8lf/5Iv291P696iLKrL9yrRdnCiuU7HwCqCIiJz0QrIm5/9bCRecRRn2LUrMPfCZz/s+FVoGpgWMwe1NPY+TzTNZ/De8YYt/rU/74TDuG8c/yjMDpjjxdrFtAnesNABrXZF7c5bwTUphFB5nPRamQPi/vZAACilLe2Mc75d8fh4UVITKJbM6KJjj3dRwmWiU03+hlKMaHm9gPUR8EClx7SsxCABC621RIVmYDEvoXbigM33rJ6O+kAJh5HvcJxHmF marocico@marocico-HP-Z230-Tower-Workstation'
+        state: present
+
+    - user:
+        name: ger
+        comment: "Ger Strikwerda"
+        group: admin
+        state: present
+
+    - authorized_key:
+        user: ger
+        key: 'ssh-dss AAAAB3NzaC1kc3MAAACBAMJfiOS0W95C1+r7IBgBR8CqEGpJZ8viv4bpzXWNtDTYLFbfb4rL/PgzlCQqhqJbKCkHluJPHPNAeaW8KalHvqUrtD5xciX8PovcMhkg9Dksp9P5WGKCVfJb5MKwfdtEM9tgq9OjNZFN0nF3R6oW42DvxDKu3mXWiH1PH1I4arQdAAAAFQDxHkrRaQ/t4wH2nO6WN9jWEUNiAwAAAIBR5zi9P3JudJu3dddweDaXlVXY51cGQjXvxFJtFv1d5/jI2gCxcah1dLqkJMwGgFowF4imqUXFit20kNQiG5bUnuGEJWfTg/BkaM7W3ujRxDK6wIQCvAnQ0+zJR/qMqqH7MFlutcEm+uVuACs5abvDOp0scHaOuvGfIyf+qegvLAAAAIB577xm9csmftKclreLmigUksY4zlWoIVYsjgB4ofDVemtHTGYWFBSxQsbhhUrUhB6+AcTRGJnvLyJSaEQdCghVJKEIrGl9YA9lgztd8YAHsG2iVve1mMiFI/8NYJHMWJLuFratq5eC5tpBaW+MTm21NqHKD5Ry88Ul04n+sv5lfw== ger@rc-514'
+        state: present

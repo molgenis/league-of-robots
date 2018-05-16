@@ -1,3 +1,4 @@
 ---
-
-server_url: http://172.23.40.239/XMLRPC
+server_url: 'http://172.23.40.239/XMLRPC'
+rhn_channels:
+    - centos7_gearshift
