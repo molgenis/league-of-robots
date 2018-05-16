@@ -3,3 +3,5 @@
 documentation/.~lock.UMCG Research IT HPC cluster technical design.docx#
 .vault_pass.txt
 roles/hpc-cloud
+roles/geerlingguy.firewall
+roles/HPCplaybooks
