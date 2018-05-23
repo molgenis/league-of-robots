@@ -190,8 +190,8 @@ login_actions () {
    # Create account in SLURM accounting db
    add_user_to_slurm
 
-   # set lustre-quota:
-   set_quota 20G 22G 200k 220k /home
+   # set homedir-quota:
+   set_quota 1G 2G 200k 220k /home
 
    # Final action: create file with username in /var directory
    echo $( /usr/bin/getent passwd $PAM_USER | /bin/awk -F ':' '{print $5}' ) > $VARLOG
