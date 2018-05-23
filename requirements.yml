@@ -1,5 +1,4 @@
 ---
-- src: hrisgavin.ansible-ssh-host-signer
 # pull down common roles from the HPC cloud repo
 - src: ssh://git@git.webhosting.rug.nl:222/HPC/hpc-cloud.git
   name: hpc-cloud
@@ -11,10 +10,3 @@
   name: HPCplaybooks
   version: master
   scm: git
-
-  # From galaxy
-#
-- src: geerlingguy.firewall
-
-# 
-- src: chrisgavin.ansible-ssh-host-signer
