@@ -59,11 +59,6 @@ ADD slurm.conf /etc/slurm/slurm.conf
 ADD slurmdbd.conf /etc/slurm/slurmdbd.conf
 ADD job_submit.lua /etc/slurm/job_submit.lua
 
-RUN groupadd -g 500 beheer
-
-RUN groupadd -g 1001 monk
-RUN useradd -u 2071 -g monk monk
-
 ADD runslurmctld.sh /runslurmctld.sh
 RUN chmod +x /runslurmctld.sh
 
