@@ -32,6 +32,29 @@ resources:
         - network: vlan13
           fixed_ip: 129.125.60.196
 
+  imperator_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 2900
+
+  imperator:
+    type: OS::Nova::Server
+    properties:
+      key_name: adminkey
+      image: {get_param: image_name}
+      flavor: Compute
+      networks:
+        - network: vlan983
+          fixed_ip: 172.23.40.34
+        - network: vlan985
+          fixed_ip: 172.23.34.34
+
+  volume_attachment:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      volume_id: {get_resource: imperator_volume}
+      instance_uuid: {get_resource: imperator}
+
   sugarsnax_volume:
     type: OS::Cinder::Volume
     properties:
