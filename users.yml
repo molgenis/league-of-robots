@@ -20,3 +20,13 @@
         user: pieter
         key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCdOt9U8m3oa/ka8vRTOWxU9uh13hR9F5FoW7SRbrQMWX3XYCEF1mFSTU0WHqYlkOm5atbkqRnR2WUOuG2YjCDJ6KqvpYGjITqHilBCINkWuXozoT5HkGbMtcN1nYDh4b+lGhg3ttfTBKBPusLz0Mca68EL6MjmSsgbRSIceNqFrfbjcc/YhJo7Kn769RW6W/ToClVHNHqgC47ZGXDc5acUrcfiaPNFSlyUjqCMKyO7sGOm/o4TTLffznH4A4iNn+/IX+7dGZRlwcmPjsBlpMk8zjQQqDE6l/UykbwKgYBJRO02PeNg3bqDAwSGR5+e4raJ3/mN3tkQqC/cAD3h4eWaRTBJdnLltkOFFeXux4jvuMFCjLYslxHK/LH//GziarA0OQVqA+9LWkwtLx1rKtNW6OaZd45iandwUuDVzlbADxwXtqjjnoy1ZUsAR83YVyhN/fqgOe2i34Q48h27rdkwRwAINuqnoJLufaXyZdYi4QintKOScp3ps/lSXUJq+zn7yh54JCz2l/MhDNUBpBWvZevJTXxqQBszAp5gv0KE2VuPOyrmzo+QeBxKqglMSonguoVolfb9sEYT5Xhu1zR6thRtoBT813kzpeVSzMUAr/KOD+ILSjWKUNT0JuiCXsEDD7Zqx/kspTsHpi/+2irAdcXgAEA+fiJqxsNfV4cpQw== pneerincx'
         state: present
+
+    - user:
+        name: remco
+        comment: "Remco Rohde"
+        group: admin
+
+    - authorized_key:
+        user: remco
+        key: 'ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAA+J5Kn81H0o8tr8W+m31E6OOmPpEqH5/48XRKy/qa6x1phGwobFAdLO8VtnsidjVEb1fpbHCArPQM3T2xjRBnCPAF7XNTm6S/nyrBk522yYOz1dTYUc7mTKACvKTqwEPwtA7sUZz61u+joFY4UajcVszJAuaLZCNRaSzLO1vx3ML571w== remco@tnt7'
+        state: present
