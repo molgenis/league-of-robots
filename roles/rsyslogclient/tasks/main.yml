@@ -1,0 +1,17 @@
+---
+- name: Install rsyslog on centos
+  yum: name=rsyslog state=latest update_cache=yes
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install rsyslog on ubuntu
+  apt: name=rsyslog state=latest update_cache=yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: configure rsyslog server.
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    line: "*.* @{{ item }}:514"
+  with_items: "{{ rsyslog_remote_servers }}"
+
+- name: restart rsyslog
+  systemd: name=rsyslog state=restarted

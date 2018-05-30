@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - roles/rsyslogclient
+  vars:
+    rsyslog_remote_servers:
+      - 172.23.47.250
