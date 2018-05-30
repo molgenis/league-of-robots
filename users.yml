@@ -9,7 +9,6 @@
   hosts: all
   become: True
 
-
   tasks:
     - user:
         name: pieter

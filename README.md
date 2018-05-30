@@ -17,10 +17,14 @@ These roles install various docker images built and hosted by RuG webhosting. Th
 The steps below describe how to get from machines with a bare ubuntu 16.04 installed to a running openstack installation.
 
 
-1. First inport the HPC openstack roles into this playbook:
+1. First import the required roles into this playbook:
 
    ```bash
    ansible-galaxy install -r requirements.yml --force -p roles
+   ```
+
+   ```bash
+   ansible-galaxy install -r galaxy-requirements.yml
    ```
 
 2. Generate an ansible vault password and put it in `.vault_pass.txt`. This could be done by running the following oneliner:

@@ -44,7 +44,18 @@ airlock.hpc.rug.nl
 [interface]
 gearshift
 
+[slurm]
+imperator
+
+[administration]
+airlock
+gearshift
+imperator
+sugarsnax
+
 [compute-vms]
 gs-vcompute01 ansible_ssh_user=centos
 gs-vcompute[03:11] ansible_ssh_user=centos
 
+[cluster:children]
+compute-vms

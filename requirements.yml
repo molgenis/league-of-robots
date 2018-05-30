@@ -10,10 +10,3 @@
   name: HPCplaybooks
   version: master
   scm: git
-
-  # From galaxy
-#
-- src: geerlingguy.firewall
-
-# 
-- src: chrisgavin.ansible-ssh-host-signer

@@ -1,0 +1,16 @@
+[Unit]
+Description=prometheus node exporter
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStart=/usr/local/prometheus/node_exporter \
+ --collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)" \
+{% if 'login' in role_names %}
+    --collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue|overlay)(fs|)$$"
+{% else %}
+    --collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue|overlay|lustre)(fs|)$$"
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

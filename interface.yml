@@ -1,0 +1,9 @@
+---
+- hosts: interface
+  become: True
+  roles:
+     - spacewalk_client
+     - ldap
+  vars:
+     hostname_node0: "{{ ansible_hostname }}"
+     ip_node0: "{{ ansible_default_ipv4['address'] }}"
