@@ -1,0 +1,9 @@
+---
+- name: Set /etc/hosts
+  template:
+    src: templates/hosts
+    dest: /etc/hosts
+    mode: 0644
+    owner: root
+    group: root
+    backup: yes
