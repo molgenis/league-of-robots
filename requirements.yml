@@ -2,7 +2,7 @@
 # pull down common roles from the HPC cloud repo
 - src: ssh://git@git.webhosting.rug.nl:222/HPC/hpc-cloud.git
   name: hpc-cloud
-  version: umcg-0.1
+  version: umcg-0.2
   scm: git
 
 # Mostly user accounts of hpc playbooks.
