@@ -1,0 +1,89 @@
+#
+# Disable protocol version 1
+#
+Protocol 2
+
+#
+# Supported HostKey algorithms by order of preference.
+# Do not use (EC)DSA keys!
+#
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+
+#
+# Supported KEX (Key Exchange) algorithms.
+#
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+
+# ToDo: All Diffie-Hellman moduli used for diffie-hellman-group-exchange-sha256 should be at least 3072-bit-long
+#       See also man moduli. Moduli are stored in file: /etc/ssh/moduli
+#       The 5th column od this file contains the length of the moduli.
+#       To remove short moduli:
+# if [[ ! -e /etc/ssh/moduli.original ]]; then
+#     cp /etc/ssh/moduli > /etc/ssh/moduli.original
+# fi
+# awk '$5 >= 3071' /etc/ssh/moduli.original > /etc/ssh/moduli
+#
+
+#
+# Supported ciphers.
+#
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+#RekeyLimit default none
+
+#
+# Supported MAC (message authentication code) algorithms.
+# Ciphers and MACs can be combined in multiple ways,
+# but only Encrypt-then-MAC (EtM) should be used.
+#
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
+#
+# Logging
+#
+# LogLevel VERBOSE logs user's key fingerprint on login.
+# Required to have a clear audit trail of which key was used to log in.
+#
+SyslogFacility AUTHPRIV
+LogLevel VERBOSE
+
+# Authentication:
+
+#LoginGraceTime 2m
+#
+PermitRootLogin no
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2, 
+# but we disable this by default as public keys for regular users come from LDAP.
+AuthorizedKeysFile /dev/null
+
+PasswordAuthentication no
+
+ChallengeResponseAuthentication no
+
+GSSAPIAuthentication yes
+GSSAPICleanupCredentials no
+
+UsePAM yes
+
+X11Forwarding yes
+ClientAliveInterval 300
+
+#
+# Override default of no subsystems
+# and log sftp level file access that would not be easily logged otherwise.
+#
+Subsystem sftp /usr/libexec/openssh/sftp-server -f AUTHPRIV -l INFO
+
+#
+# 129.125.249.0/24   # RUG BeheersWerkPlek
+# 172.23.40.1/24     # Management VLAN 983
+#
+Match Address 129.125.249.0/24,172.23.40.1/24
+    PermitRootLogin without-password
+    AuthorizedKeysFile .ssh/authorized_keys
+    AllowGroups admin,root
+
+AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper
+AuthorizedKeysCommandUser root
+PubkeyAuthentication yes
