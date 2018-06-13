@@ -3,3 +3,5 @@
   hosts: all
   roles:
   - cluster
+
+- import_playbook: users.yml
