@@ -48,9 +48,9 @@ SyslogFacility AUTHPRIV
 LogLevel VERBOSE
 
 # Authentication:
-
-#LoginGraceTime 2m
 #
+# Never allow this. We have admin users who can sudo
+# (see users.yml in the gearshift repo)
 PermitRootLogin no
 
 # The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2, 
@@ -75,15 +75,14 @@ ClientAliveInterval 300
 #
 Subsystem sftp /usr/libexec/openssh/sftp-server -f AUTHPRIV -l INFO
 
+PubkeyAuthentication yes
+
+Match Group !admin
+    AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper
+    AuthorizedKeysCommandUser root
 #
 # 129.125.249.0/24   # RUG BeheersWerkPlek
 # 172.23.40.1/24     # Management VLAN 983
 #
-Match Address 129.125.249.0/24,172.23.40.1/24
-    PermitRootLogin without-password
+Match Group admin
     AuthorizedKeysFile .ssh/authorized_keys
-    AllowGroups admin,root
-
-AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper
-AuthorizedKeysCommandUser root
-PubkeyAuthentication yes
