@@ -1,5 +1,5 @@
 ---
-- hosts: login
+- hosts: jumphost
   become: True
   roles:
      - roles/ldap

@@ -82,13 +82,10 @@
     group: root
     mode: '0600'
 
-- name: update sshd.conf
-  blockinfile:
-    path: /etc/ssh/sshd_config
-    block: |
-      AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper
-      AuthorizedKeysCommandUser root
-      PubkeyAuthentication yes
+- name: set sshd config
+  template:
+    src: templates/sshd_config
+    dest: /etc/ssh/sshd_config
 
 - name: restart daemons
   service:

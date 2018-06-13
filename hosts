@@ -38,7 +38,7 @@ gs-compute[01:11] storage_volume=/dev/sdb
 [nova-compute]
 gs-compute[01:11] physical_interface_mappings=provider:enp130s0f0
 
-[proxy]
+[jumphost]
 airlock.hpc.rug.nl
 
 [interface]
