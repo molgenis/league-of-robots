@@ -1,7 +1,4 @@
 ---
-
-target_address: 129.125.60.196
-
 networks:
   management: "172.23.40.0"
   storage: "172.23.34.0"

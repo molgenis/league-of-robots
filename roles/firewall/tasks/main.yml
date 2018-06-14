@@ -14,8 +14,21 @@
 - debug:
     msg: >
       found interface for {{ item }}
-      with address {{ hostvars[item] }}
+      {{ hostvars[inventory_hostname][item]| default(None) }}
   with_items:
     - management_interface
     - storage_interface
     - external_interface
+
+
+- name: Kernel tweaks
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_dict:
+    net.ipv4.icmp_echo_ignore_broadcasts: 1
+    net.ipv4.conf.all.accept_source_route: 0
+    net.ipv4.ip_forward: 0
