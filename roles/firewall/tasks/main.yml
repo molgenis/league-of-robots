@@ -1,17 +1,21 @@
 ---
-
-- set_fact:
-    target_interface: "{{ item }}"
+- name: >
+    Set the various interfaces in facts. This step will result in
+    variables like external_interface and management_interface
+    which contain the interfcace name. e.g. eth0
+  set_fact: {"{{ item[1] + '_interface' }}":"{{ item[0] }}"}
   when: >
-    (hostvars[inventory_hostname]['ansible_%s' % item]|default({}))
-    .get('ipv4', {}).get('address') == target_address
-    or
-    target_address in ((hostvars[inventory_hostname]['ansible_%s' % item]|default({}))
-    .get('ipv4_secondaries'))|map(attribute='address')|list
-  with_items:
+    (hostvars[inventory_hostname]['ansible_%s' % item[0]]|default({}))
+    .get('ipv4', {}).get('network') == item[2]
+  with_nested:
     - "{{ ansible_interfaces }}"
+    - "{{ networks | dictsort}}"
 
 - debug:
     msg: >
-      found interface {{ target_interface }}
-      with address {{ target_address }}
+      found interface for {{ item }}
+      with address {{ hostvars[item] }}
+  with_items:
+    - management_interface
+    - storage_interface
+    - external_interface

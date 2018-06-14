@@ -2,9 +2,10 @@
 
 target_address: 129.125.60.196
 
-management_range: "172.23.40.0/24"
-storage_range: "172.23.34.0/24"
-external_range: "129.125.60.0/24"
+networks:
+  management: "172.23.40.0"
+  storage: "172.23.34.0"
+  external: "129.125.60.0"
 
 firewall_allowed_tcp_ports:
   - "22"
