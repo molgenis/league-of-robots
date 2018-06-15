@@ -1,0 +1,40 @@
+---
+- name: >
+    Set the various interfaces in facts. This step will result in
+    variables like external_interface and management_interface
+    which contain the interfcace name. e.g. eth0
+  set_fact: {"{{ item[1] + '_interface' }}":"{{ item[0] }}"}
+  when: >
+    (hostvars[inventory_hostname]['ansible_%s' % item[0]]|default({}))
+    .get('ipv4', {}).get('network') == item[2]
+  with_nested:
+    - "{{ ansible_interfaces }}"
+    - "{{ networks | dictsort}}"
+
+- debug:
+    msg: >
+      found interface for {{ item }}
+      {{ hostvars[inventory_hostname][item]| default(None) }}
+  with_items:
+    - management_interface
+    - storage_interface
+    - external_interface
+
+
+- name: Kernel tweaks
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_dict:
+    net.ipv4.icmp_echo_ignore_broadcasts: 1
+    net.ipv4.conf.all.accept_source_route: 0
+    net.ipv4.icmp_ignore_bogus_error_responses: 0
+    net.ipv4.conf.all.log_martians: 0
+    net.ipv4.ip_forward: 0
+
+
+- set_fact:
+    firewall_additional_rules: "{{ firewall_additional_rules + ['iptables -A INPUT -i {{ management_interface }} -p tcp -s {{ operator }} -j ACCEPT '] }}"
