@@ -31,4 +31,10 @@
   with_dict:
     net.ipv4.icmp_echo_ignore_broadcasts: 1
     net.ipv4.conf.all.accept_source_route: 0
+    net.ipv4.icmp_ignore_bogus_error_responses: 0
+    net.ipv4.conf.all.log_martians: 0
     net.ipv4.ip_forward: 0
+
+
+- set_fact:
+    firewall_additional_rules: "{{ firewall_additional_rules + ['iptables -A INPUT -i {{ management_interface }} -p tcp -s {{ operator }} -j ACCEPT '] }}"
