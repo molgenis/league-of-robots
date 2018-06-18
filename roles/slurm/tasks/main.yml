@@ -1,10 +1,17 @@
 # Build and install a docker image for slurm.
 ---
+- name: Include vars and secrets from the ldap role.
+  include_vars:
+    file: "{{ item }}"
+  with_items:
+    - ../ldap/vars/main.yml
+    - ../ldap/vars/secrets.yml
+
 - name: Install yum dependencies
   yum: name={{ item }} state=latest update_cache=yes
   with_items:
-      - ntp
-      - MySQL-python
+    - ntp
+    - MySQL-python
 
 - group:
     name: slurm
