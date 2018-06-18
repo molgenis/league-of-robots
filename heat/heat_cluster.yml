@@ -15,7 +15,7 @@ resources:
     properties:
       key_name: adminkey
       image: {get_param: image_name}
-      flavor: Molgenis
+      flavor: auxiliary
       networks:
         - network: vlan983
           fixed_ip: 172.23.40.33
@@ -25,7 +25,7 @@ resources:
     properties:
       key_name: adminkey
       image: {get_param: image_name}
-      flavor: Molgenis
+      flavor: auxiliary
       networks:
         - network: vlan983
           fixed_ip: 172.23.40.36
@@ -42,7 +42,7 @@ resources:
     properties:
       key_name: adminkey
       image: {get_param: image_name}
-      flavor: Compute
+      flavor: auxiliary
       networks:
         - network: vlan983
           fixed_ip: 172.23.40.34

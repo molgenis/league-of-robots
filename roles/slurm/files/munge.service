@@ -1,0 +1,17 @@
+[Unit]
+Description=Munge auth daemon
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run  --name munge --rm --name %n \
+          --volume /srv/slurm/volumes/etc/munge:/etc/munge \
+          --volume /srv/slurm/volumes/etc/munge:/var/run/munge/ \
+          hpc/slurm /usr/sbin/munged -f -F
+
+[Install]
+WantedBy=multi-user.target
