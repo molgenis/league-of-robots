@@ -30,6 +30,9 @@
   include_vars:
     file: ../../secrets.yml
     name: secrets
+  tags:
+    - backup
+    - build
 
 - name: make sure the database user is present
   mysql_user:
@@ -146,3 +149,37 @@
       - slurm.service  #slurmctl
   tags:
       - start-service
+
+- name: Make backup dir
+  file:
+    path: /srv/slurm/backup
+    state: directory
+    owner: slurm
+    mode: 0755
+  tags:
+    - backup
+
+- name: run an initial backup
+  shell: >
+             /bin/docker run --network host --rm
+             mariadb mysqldump --all-databases -uroot
+             -p{{ secrets['MYSQL_ROOT_PASSWORD'] }} -h 127.0.0.1
+             > /srv/slurm/backup/slurm.sql
+  tags:
+    - backup
+
+- name: Dump the database every night. Keep 7 backups.
+  cron:
+    name: "Slurm database backup"
+    minute: "11"
+    hour: "3"
+    job: >
+           /bin/cp --backup=numbered /srv/slurm/backup/slurm.sql
+           /srv/slurm/backup/slurm_bak.sql &&
+           /bin/docker run --network host --rm
+           mariadb mysqldump --all-databases -uroot
+           -p{{ secrets['MYSQL_ROOT_PASSWORD'] }} -h 127.0.0.1
+           > /srv/slurm/backup/slurm.sql &&
+           /bin/find /srv/slurm/backup/slurm_bak.sql.* -mtime 7 -delete
+  tags:
+    - backup
