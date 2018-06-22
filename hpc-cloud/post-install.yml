@@ -25,13 +25,17 @@
             openstack subnet create --subnet-range 172.23.34.0/22 --gateway 172.23.34.1
             --network vlan985 --allocation-pool start=172.23.34.21,end=172.23.34.32
             --dns-nameserver 172.23.32.248 vlan985_subnet
+        - >
+            openstack subnet create --subnet-range 172.23.56.0/22 --gateway 172.23.56.1
+            --network vlan985 --allocation-pool start=172.23.57.41,end=172.23.57.51
+            --dns-nameserver 172.23.32.248 lustre_subnet
         - openstack network create --share --external --provider-physical-network provider --provider-network-type vlan --provider-segment 13 vlan13
         - >
             openstack subnet create --subnet-range 129.125.60.0/24 --gateway 129.125.60.251
             --network vlan13 --allocation-pool start=129.125.60.195,end=129.125.60.196
             --dns-nameserver 129.125.4.6 vlan13_subnet
 
-        - openstack flavor create --ram 4096 --disk 40 --vcpus 2  "Molgenis Dual"
+        - openstack flavor create --ram 4096 --disk 40 --vcpus 2  "auxiliary"
         - openstack flavor create --ram 245760 --disk 40 --vcpus 48  "Compute"
 
         - openstack keypair create --public-key /root/id_rsa.pub adminkey
