@@ -6,7 +6,7 @@
 - hosts: all
   become: True
   roles:
-     - roles/ansible-ssh-host-signer/
+     - chrisgavin.ansible-ssh-host-signer
 
   vars:
      ssh_host_signer_ca_key: "ssh-host-ca/umcg-hpc-ca"
