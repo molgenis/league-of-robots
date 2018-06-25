@@ -59,7 +59,9 @@
   stat:
     path: /root/rpmbuild/RPMS/noarch/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
   become: true
+  delegate_to: sugarsnax
   register: remote_file
+  when: local_file.stat.exists == false
 
 - name: build the lustre client.
   block:
@@ -72,7 +74,7 @@
       command: rpmbuild --rebuild --without servers /tmp/lustre-client-dkms-2.11.0-1.el7.src.rpm
 
   delegate_to: sugarsnax
-  when: remote_file.stat.exists == false
+  when: local_file.stat.exists == false and  remote_file.stat.exists == false
 
 - name: fetch lustre client from build server
   fetch:
@@ -84,8 +86,8 @@
 
 - name: copy the lustre client to the remote machine
   copy:
-    src: /tmp/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
-    dest: /tmp/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
+    src: "{{ local_file.stat.path }}"
+    dest: /tmp
 
 - name: install lustre client
   yum:

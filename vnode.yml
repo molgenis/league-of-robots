@@ -4,8 +4,8 @@
     - cluster
   become: True
   roles:
+    - spacewalk_client
     - cluster
-     - spacewalk_client
-     - ldap
+    - ldap
 
 # - import_playbook: users.yml
