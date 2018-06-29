@@ -94,6 +94,8 @@ resources:
           fixed_ip: 172.23.40.81
         - network: vlan985
           fixed_ip: 172.23.34.81
+        - network: vlan985
+          fixed_ip: 172.23.57.41
 
 
   volume_attachment:
@@ -118,6 +120,8 @@ resources:
           fixed_ip: 172.23.40.82
         - network: vlan985
           fixed_ip: 172.23.34.82
+        - network: vlan985
+          fixed_ip: 172.23.57.42
 
 
   volume_attachment:
@@ -142,6 +146,8 @@ resources:
           fixed_ip: 172.23.40.83
         - network: vlan985
           fixed_ip: 172.23.34.83
+        - network: vlan985
+          fixed_ip: 172.23.57.43
 
 
   volume_attachment:
@@ -166,6 +172,8 @@ resources:
           fixed_ip: 172.23.40.84
         - network: vlan985
           fixed_ip: 172.23.34.84
+        - network: vlan985
+          fixed_ip: 172.23.57.44
 
   volume_attachment:
     type: OS::Cinder::VolumeAttachment
@@ -189,6 +197,8 @@ resources:
           fixed_ip: 172.23.40.85
         - network: vlan985
           fixed_ip: 172.23.34.85
+        - network: vlan985
+          fixed_ip: 172.23.57.45
 
   volume_attachment:
     type: OS::Cinder::VolumeAttachment
@@ -212,6 +222,8 @@ resources:
           fixed_ip: 172.23.40.86
         - network: vlan985
           fixed_ip: 172.23.34.86
+        - network: vlan985
+          fixed_ip: 172.23.57.46
 
 
   volume_attachment:
@@ -236,6 +248,8 @@ resources:
           fixed_ip: 172.23.40.87
         - network: vlan985
           fixed_ip: 172.23.34.87
+        - network: vlan985
+          fixed_ip: 172.23.57.47
 
 
   volume_attachment:
@@ -260,6 +274,8 @@ resources:
           fixed_ip: 172.23.40.88
         - network: vlan985
           fixed_ip: 172.23.34.88
+        - network: vlan985
+          fixed_ip: 172.23.57.48
 
 
   volume_attachment:
@@ -284,6 +300,8 @@ resources:
           fixed_ip: 172.23.40.89
         - network: vlan985
           fixed_ip: 172.23.34.89
+        - network: vlan985
+          fixed_ip: 172.23.57.49
 
 
   volume_attachment:
@@ -308,6 +326,8 @@ resources:
           fixed_ip: 172.23.40.90
         - network: vlan985
           fixed_ip: 172.23.34.90
+        - network: vlan985
+          fixed_ip: 172.23.57.50
 
 
   volume_attachment:
@@ -332,6 +352,8 @@ resources:
           fixed_ip: 172.23.40.91
         - network: vlan985
           fixed_ip: 172.23.34.91
+        - network: vlan985
+          fixed_ip: 172.23.57.51
 
 
   volume_attachment:
