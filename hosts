@@ -54,8 +54,11 @@ imperator
 sugarsnax
 
 [compute-vms]
-gs-vcompute01 ansible_ssh_user=centos
-gs-vcompute[03:11] ansible_ssh_user=centos
+gs-vcompute[01:11] ansible_ssh_user=centos
 
 [cluster:children]
 compute-vms
+
+[metal]
+gs-openstack
+gs-compute[01:11]
