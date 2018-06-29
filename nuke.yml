@@ -1,0 +1,21 @@
+---
+# This playbook will reset the instalation to facilitate a new installation.
+# All data is lost!
+- hosts: metal
+  become: True
+  name: Dummy to gather facts
+  tasks:
+    - name: Stop docker service
+      shell: "systemctl stop docker"
+    - name: Verify docker is stopped.
+      systemd:
+        name: docker
+        state: stopped
+    - name: remove volumes
+      shell: "rm -rf /srv"
+
+- hosts: cinder-storage
+  become: True
+  tasks:
+    - name: wipe cinder storage.
+      shell: "dd if=/dev/zero of={{ storage_volume }} bs=1M count=1 && sync"
