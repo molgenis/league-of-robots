@@ -15,7 +15,17 @@
       shell: "rm -rf /srv"
 
 - hosts: cinder-storage
+  gather_facts: false
   become: True
   tasks:
     - name: wipe cinder storage.
       shell: "dd if=/dev/zero of={{ storage_volume }} bs=1M count=1 && sync"
+
+- hosts: nova-compute
+  gather_facts: false
+  become: True
+  tasks:
+    - name: kill all vm's
+      shell: "for machine in  $(virsh list --uuid ); do virsh destroy $machine ; done"
+    - name: wipe all vm's
+      shell: "for machine in  $(virsh list --uuid --all); do virsh undefine $machine ; done"
