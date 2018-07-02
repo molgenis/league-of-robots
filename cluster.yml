@@ -1,8 +1,10 @@
 ---
 - name: Install the common role from the hpc-cloud repo.
   hosts: all
+  become: true
   roles:
-  - cluster
+  - spacewalk_client
   - ldap
+  - cluster
 
 - import_playbook: users.yml
