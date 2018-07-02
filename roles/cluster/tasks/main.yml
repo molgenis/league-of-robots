@@ -95,3 +95,13 @@
     state: present
     update_cache: yes
   become: true
+
+- name: set lustre.conf
+  template:
+    src: templates/lustre.conf
+    dest: /etc/modprobe.d/lustre.conf
+    mode: 0644
+    owner: root
+    group: root
+    backup: no
+  become: true
