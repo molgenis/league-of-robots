@@ -3,5 +3,6 @@
   hosts: all
   roles:
   - cluster
+  - ldap
 
 - import_playbook: users.yml
