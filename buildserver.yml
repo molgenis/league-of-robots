@@ -11,25 +11,25 @@
         - kernel-devel
 
 
-- name: Set lustre client source url.
-  set_fact:
-    lustre_rpm_url: https://downloads.whamcloud.com/public/lustre/lustre-2.10.4/el7/client/SRPMS
-    lustre_src_rpm_name: lustre-2.10.4-1.src.rpm
-    lustre_client_rpm_name: lustre-client-2.10.4-1.el7.x86_64.rpm
+    - name: Set lustre client source url.
+      set_fact:
+        lustre_rpm_url: https://downloads.whamcloud.com/public/lustre/lustre-2.10.4/el7/client/SRPMS
+        lustre_src_rpm_name: lustre-2.10.4-1.src.rpm
+        lustre_client_rpm_name: lustre-client-2.10.4-1.el7.x86_64.rpm
 
-- name: check if the buildserver has already built the client.
-  stat:
-    path: /root/rpmbuild/RPMS/x86_64/{{ lustre_client_rpm_name }}
-  register: remote_file
-
-- name: build the lustre client.
-  block:
-    - name: Fetch the lustre client source
-      get_url:
-        url: "{{ lustre_rpm_url }}/{{ lustre_src_rpm_name }}"
-        dest: /tmp/{{ lustre_src_rpm_name }}
+    - name: check if the buildserver has already built the client.
+      stat:
+        path: /root/rpmbuild/RPMS/x86_64/{{ lustre_client_rpm_name }}
+      register: remote_file
 
     - name: build the lustre client.
-      command: rpmbuild --rebuild --without servers /tmp/{{ lustre_src_rpm_name }}
-      become: true
-  when: local_file.stat.exists == false and  remote_file.stat.exists == false
+      block:
+        - name: Fetch the lustre client source
+          get_url:
+            url: "{{ lustre_rpm_url }}/{{ lustre_src_rpm_name }}"
+            dest: /tmp/{{ lustre_src_rpm_name }}
+
+        - name: build the lustre client.
+          command: rpmbuild --rebuild --without servers /tmp/{{ lustre_src_rpm_name }}
+          become: true
+      when: remote_file.stat.exists == false
