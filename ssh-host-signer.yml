@@ -4,7 +4,6 @@
   tasks: []
 
 - hosts: all
-  become: True
   roles:
      - chrisgavin.ansible-ssh-host-signer
 

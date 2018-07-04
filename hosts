@@ -58,6 +58,7 @@ gs-vcompute[01:11]
 
 [cluster:children]
 compute-vms
+administration
 
 [metal]
 gs-openstack
