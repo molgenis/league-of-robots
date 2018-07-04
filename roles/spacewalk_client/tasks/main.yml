@@ -41,7 +41,8 @@
   ignore_errors: yes
 
 - name: Disable gpgcheck
-  command: sudo -i 's/gpgcheck = 1/gpgcheck = 0/g' /etc/yum/pluginconf.d/rhnplugin.conf
+  command: sed -i 's/gpgcheck = 1/gpgcheck = 0/g' /etc/yum/pluginconf.d/rhnplugin.conf
+
 
 - name: upgrade all packages
   yum:

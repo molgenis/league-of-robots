@@ -2,8 +2,6 @@
 - hosts: slurm
   become: True
   roles:
-     - spacewalk_client
-     - ldap
      - docker
      - hpc-cloud/roles/mariadb
      - slurm

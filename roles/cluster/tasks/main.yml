@@ -8,3 +8,8 @@
     group: root
     backup: yes
   become: true
+
+- name: set selinux in permissive mode
+  selinux:
+    policy: targeted
+    state: permissive
