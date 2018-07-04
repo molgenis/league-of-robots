@@ -1,6 +1,6 @@
 ---
-- name: Install the common role from the hpc-cloud repo.
-  hosts: all
+- name: Install roles needed for all virtual cluster components.
+  hosts: cluster
   become: true
   roles:
   - spacewalk_client

@@ -7,11 +7,6 @@
 - name: load secrets
   include_vars: secrets.yml
 
-- name: hack to patch spacewalk client
-  get_url:
-   url: https://raw.githubusercontent.com/spacewalkproject/spacewalk/361efdfda34b381157b11bde1e7fcd06c64347c9/client/rhel/rhn-client-tools/src/up2date_client/hardware_gudev.py
-   dest: /usr/share/rhn/up2date_client/hardware_gudev.py
-
 - name: install spacewalk client packages.
   yum:
    name: "{{item}}"
@@ -23,12 +18,27 @@
    - m2crypto
    - yum-rhn-plugin
 
+- name: hack to patch spacewalk client
+  get_url:
+   url: https://raw.githubusercontent.com/spacewalkproject/spacewalk/361efdfda34b381157b11bde1e7fcd06c64347c9/client/rhel/rhn-client-tools/src/up2date_client/hardware_gudev.py
+   dest: /usr/share/rhn/up2date_client/hardware_gudev.py
+
+- name: restart spacewalk daemon
+  systemd:
+   name: rhnsd.service
+   state: restarted
+
 - name: register at the spacewalk server
   rhn_register:
    state: present
    activationkey: "{{activation_key}}"
    server_url: "{{server_url}}"
    channels: "{{rhn_channels}}"
+  register: result
+  until: result is succeeded
+  retries: 3
+  delay: 3
+  ignore_errors: yes
 
 - name: upgrade all packages
   yum:
