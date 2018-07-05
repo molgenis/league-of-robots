@@ -11,18 +11,23 @@
 
 - name: Set hostname to inventory_hostname
   hostname:
-    name: '{{ inventory_hostname }}.hpc.local'
-- name: set hostname in /etc/hosts
-  lineinfile:
-    dest: /etc/hosts
-    regexp: '^127\.0\.0\.1[ \t]+localhost'
-    line: '127.0.0.1 localhost {{ inventory_hostname }}'
-    state: present
+    name: '{{ inventory_hostname }}'
 
 - name: set selinux in permissive mode
   selinux:
     policy: targeted
     state: permissive
+
+- name: add slum group
+  group:
+    name: slurm
+    gid: 501
+
+- name: Add slurm user
+  user:
+    name: slurm
+    uid: 497
+    group: slurm
 
 - name: install the slurm client
   yum:
@@ -30,8 +35,12 @@
     state: latest
     update_cache: yes
 
+- file:
+    name: /etc/slurm
+    state: directory
+
 - name: set the slurm config file
   copy:
     src: roles/slurm/files/slurm.conf
-    dest: /etc/slurm.conf
+    dest: /etc/slurm/slurm.conf
     mode: 0644
