@@ -3,18 +3,9 @@
   hosts: cluster
   become: true
   tasks:
-   - name: Set hostname to inventory_hostname
-     hostname:
-      name: '{{ inventory_hostname }}'
-   - name: set hostname in /etc/hosts
-     lineinfile:
-      dest: /etc/hosts
-      regexp: '^127\.0\.0\.1[ \t]+localhost'
-      line: '127.0.0.1 localhost {{ inventory_hostname }}'
-      state: present
   roles:
-   - spacewalk_client
+      # - spacewalk_client
    - ldap
-   - cluster
+     #- cluster
 
-- import_playbook: users.yml
+     #- import_playbook: users.yml
