@@ -77,9 +77,8 @@ Subsystem sftp /usr/libexec/openssh/sftp-server -f AUTHPRIV -l INFO
 
 PubkeyAuthentication yes
 
-Match Group !admin
-    AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper
-    AuthorizedKeysCommandUser root
+AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper
+AuthorizedKeysCommandUser root
 #
 # 129.125.249.0/24   # RUG BeheersWerkPlek
 # 172.23.40.1/24     # Management VLAN 983
