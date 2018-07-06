@@ -8,9 +8,11 @@ TimeoutStartSec=0
 Restart=always
 ExecStartPre=-/usr/bin/docker stop %n
 ExecStartPre=-/usr/bin/docker rm %n
-ExecStart=/usr/bin/docker run  --name munge --rm --name %n \
+ExecStart=/usr/bin/docker run --hostname {{ ansible_fqdn }}  --name munge --rm --name %n \
+          --network host \
           --volume /srv/slurm/volumes/etc/munge:/etc/munge \
           --volume /srv/slurm/volumes/etc/munge:/var/run/munge/ \
+          --volume /srv/slurm/volumes/etc/slurm:/etc/slurm \
           hpc/slurm /usr/sbin/munged -f -F
 
 [Install]
