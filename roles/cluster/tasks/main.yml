@@ -17,30 +17,3 @@
   selinux:
     policy: targeted
     state: permissive
-
-- name: add slum group
-  group:
-    name: slurm
-    gid: 501
-
-- name: Add slurm user
-  user:
-    name: slurm
-    uid: 497
-    group: slurm
-
-- name: install the slurm client
-  yum:
-    name: slurm
-    state: latest
-    update_cache: yes
-
-- file:
-    name: /etc/slurm
-    state: directory
-
-- name: set the slurm config file
-  copy:
-    src: roles/slurm/files/slurm.conf
-    dest: /etc/slurm/slurm.conf
-    mode: 0644

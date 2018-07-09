@@ -1,0 +1,59 @@
+---
+- name: add slum group
+  group:
+    name: slurm
+    gid: 501
+
+- name: Add slurm user
+  user:
+    name: slurm
+    uid: 497
+    group: slurm
+
+- name: install the slurm client
+  yum:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - slurm
+    - slurm-slurmd
+
+- file:
+    name: "{{ item }}"
+    state: directory
+  with_items:
+    - /etc/slurm
+    - /var/log/slurm
+    - /var/spool/slurmd
+
+- name: set the slurm config file
+  copy:
+    src: roles/slurm/files/slurm.conf
+    dest: /etc/slurm/slurm.conf
+    mode: 0644
+
+- name: Set cgroup.conf
+  copy:
+    src: roles/slurm/files/cgroup.conf
+    dest: /etc/slurm/cgroup.conf
+    mode: 0644
+
+- name: Install munge_keyfile
+  copy:
+    src: ../slurm/files/munge.key
+    owner: munge
+    dest: /etc/munge/munge.key
+
+- name: set permissions for munge key
+  file:
+    path: /etc/munge/munge.key
+    mode: 0600
+
+- name: start slurm and munge service
+  systemd:
+    name: "{{ item}}"
+    state: started
+  with_items:
+    - slurmd
+    - munge

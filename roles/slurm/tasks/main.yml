@@ -87,8 +87,13 @@
 - name: Install munge_keyfile
   copy:
     src: files/munge.key
-    owner: slurm
+    owner: munge
     dest: /srv/slurm/volumes/etc/munge/munge.key
+
+- name: set permissions for munge key
+  file:
+    path: /srv/slurm/volumes/etc/munge/munge.key
+    mode: 0600
 
 - name: install slurm config files
   template:
