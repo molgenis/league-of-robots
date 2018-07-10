@@ -1,5 +1,5 @@
 ---
 - src: geerlingguy.firewall
   version: 2.4.0
-
+- src: geerlingguy.postfix
 - src: chrisgavin.ansible-ssh-host-signer
