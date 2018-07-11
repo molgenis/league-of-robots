@@ -1,0 +1,25 @@
+---
+
+- name: Create an ext4 filesystem on /dev/vdb
+  filesystem:
+    fstype: ext4
+    dev: /dev/vdb
+
+- name: Make scratch mountpoint
+  file:
+    path: "/scratch"
+    mode: 0777
+    state: directory
+
+- name: Mount /dev/vdb on /scratch
+  mount:
+    path: /scratch
+    src: /dev/vdb
+    fstype: ext4
+    opts: rw,relatime
+    state: present
+
+- name: mount all mountpoints in fstab
+  command: mount -a
+  args:
+  warn: no

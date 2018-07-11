@@ -53,11 +53,14 @@ gearshift
 imperator
 sugarsnax
 
-[compute-vms]
+[user-interface]
+gearshift
+
+[compute-vm]
 gs-vcompute[01:11]
 
 [cluster:children]
-compute-vms
+compute-vm
 administration
 
 [metal]

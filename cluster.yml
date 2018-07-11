@@ -4,8 +4,21 @@
   become: true
   tasks:
   roles:
-      # - spacewalk_client
-   - ldap
-     #- cluster
+     - spacewalk_client
+     - ldap
+     - cluster
+     - import_playbook: users.yml
 
-     #- import_playbook: users.yml
+- name: Install virtual compute nodes
+  hosts: compute-vm
+  become: true
+  tasks:
+  roles:
+     - compute-vm
+
+- name: Install user interface
+  hosts: compute-vm
+  become: true
+  tasks:
+  roles:
+     - user-interface
