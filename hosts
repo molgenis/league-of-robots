@@ -69,3 +69,7 @@ administration
 [metal]
 gs-openstack
 gs-compute[01:11]
+
+[cluster:children]
+compute-vms
+administration

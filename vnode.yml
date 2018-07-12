@@ -1,0 +1,11 @@
+---
+- name: Install Roles that are needed for the virtual cluster.
+  hosts:
+    - cluster
+  become: True
+  roles:
+    - cluster
+     - spacewalk_client
+     - ldap
+
+# - import_playbook: users.yml
