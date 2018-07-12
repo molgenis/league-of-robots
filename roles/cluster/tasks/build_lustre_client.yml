@@ -1,0 +1,9 @@
+---
+
+- name: Fetch the lustre client source
+  get_url:
+    url: https://downloads.whamcloud.com/public/lustre/lustre-2.11.0/el7.4.1708/client/SRPMS/lustre-client-dkms-2.11.0-1.el7.src.rpm
+    dest: /tmp/lustre-client-dkms-2.11.0-1.el7.src.rpm
+
+- name: build the lustre client.
+  cmd: rpmbuild --rebuild --without servers /tmp/lustre-client-dkms-2.11.0-1.el7.src.rpm

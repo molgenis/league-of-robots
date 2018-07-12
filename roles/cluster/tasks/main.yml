@@ -48,3 +48,47 @@
   command: mount -a
   args:
     warn: false
+
+- name: check if the lustre client is present locally
+  stat:
+    path: /tmp/sugarsnax/root/rpmbuild/RPMS/noarch/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
+  register: local_file
+  delegate_to: localhost
+
+- name: check if the buildserver has already built the client.
+  stat:
+    path: /root/rpmbuild/RPMS/noarch/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
+  become: true
+  register: remote_file
+
+- name: build the lustre client.
+  block:
+    - name: Fetch the lustre client source
+      get_url:
+        url: https://downloads.whamcloud.com/public/lustre/lustre-2.11.0/el7.4.1708/client/SRPMS/lustre-client-dkms-2.11.0-1.el7.src.rpm
+        dest: /tmp/lustre-client-dkms-2.11.0-1.el7.src.rpm
+
+    - name: build the lustre client.
+      command: rpmbuild --rebuild --without servers /tmp/lustre-client-dkms-2.11.0-1.el7.src.rpm
+
+  delegate_to: sugarsnax
+  when: remote_file.stat.exists == false
+
+- name: fetch lustre client from build server
+  fetch:
+    src: /root/rpmbuild/RPMS/noarch/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
+    dest: /tmp
+  become: true
+  delegate_to: sugarsnax
+  when: local_file.stat.exists == false
+
+- name: copy the lustre client to the remote machine
+  copy:
+    src: /tmp/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
+    dest: /tmp/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
+
+- name: install lustre client
+  yum:
+    name: /tmp/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
+    state: present
+  become: true

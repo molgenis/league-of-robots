@@ -1,0 +1,8 @@
+---
+- hosts: buildserver
+  become: true
+  tasks:
+    - name: install the 'Development tools' package group
+      yum:
+        name: "@Development tools"
+        state: present

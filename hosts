@@ -47,6 +47,9 @@ gearshift
 [slurm]
 imperator
 
+[buildserver]
+sugarsnax
+
 [administration]
 airlock
 gearshift
