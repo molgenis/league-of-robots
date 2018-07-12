@@ -7,7 +7,6 @@
      - spacewalk_client
      - ldap
      - cluster
-     - import_playbook: users.yml
 
 - name: Install virtual compute nodes
   hosts: compute-vm
@@ -22,3 +21,5 @@
   tasks:
   roles:
      - user-interface
+
+- import_playbook: users.yml
