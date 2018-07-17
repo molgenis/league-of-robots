@@ -9,3 +9,18 @@
 
   vars:
      ssh_host_signer_ca_key: "ssh-host-ca/umcg-hpc-ca"
+
+  tasks:
+     - name: Remove wronlgly placed HostCertificate line
+       lineinfile:
+          path: /etc/ssh/sshd_config
+          line: HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert.pub
+          state: absent
+       become: true
+
+     - name: Place the line at the correct place
+       lineinfile:
+          path: /etc/ssh/sshd_config
+          line: HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert.pub
+          insertafter: HostCertificate /etc/ssh/ssh_host_rsa_key-cert.pub
+       become: true
