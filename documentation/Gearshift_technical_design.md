@@ -286,6 +286,46 @@ ToDo: List of local log files that will be forwarded to the remote log server:
  * /var/log/slurmctld.log
  * /var/log/yum.log
 
+### User authentication and authorization-attributes
+
+User authentication and authorization will be done via the Comanage for the Science Collaboration Zone (SCZ). The authentication itself will be 2-factor, and the authorization workflow will be designed and maintained by GCC. 
+
+The following attributes will be part of the federated authorization process. (All personalized attributes are examples in this scheme):
+
+User:
+
+dn: uid=r.rohde@rug.nl,ou=users,ou=bbmri,o=co 
+objectClass: ndsLoginProperties
+objectClass: inetOrgPerson
+objectClass: ldapPublicKey
+objectClass: Top
+objectClass: organizationalPerson
+objectClass: Person
+objectClass: posixAccount
+cn: Remco Rohde 
+gidNumber: 10000001
+homeDirectory: /home/10000001
+sn: Rohde
+uid: r.rohde@rug.nl 
+uidNumber: 10000001 
+description: Me, Myself and I 
+givenName: Remco
+loginDisabled: FALSE
+loginShell: /bin/bash
+mail: r.rohde@rug.nl
+mobile: +31 6123456
+o: Rijksuniversiteit Groningen
+
+Group:
+
+dn: cn=TestRSGroup01:Members,ou=groups,ou=bbmri,o=co
+objectClass: Top
+objectClass: groupOfNames
+cn: TestRSGroup01:Members
+description: TestRSGroup01:Members
+member: uid=r.rohde@rug.nl,ou=users,ou=bbmri,o=co
+
+
 ---
 
 # <a name="Security"/> Security
