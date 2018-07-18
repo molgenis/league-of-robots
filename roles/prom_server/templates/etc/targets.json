@@ -1,0 +1,36 @@
+[
+    {
+        "targets": [
+            "airlock:9100",
+            "imperator:9100",
+            "sugarsnax:9100",
+            "gearshift:9100",
+            "gs-vcompute01:9100",
+            "gs-vcompute02:9100",
+            "gs-vcompute03:9100",
+            "gs-vcompute04:9100",
+            "gs-vcompute05:9100",
+            "gs-vcompute06:9100",
+            "gs-vcompute07:9100",
+            "gs-vcompute08:9100",
+            "gs-vcompute09:9100",
+            "gs-vcompute10:9100",
+            "gs-vcompute11:9100",
+            "gs-compute01:9100",
+            "gs-compute02:9100",
+            "gs-compute03:9100",
+            "gs-compute04:9100",
+            "gs-compute05:9100",
+            "gs-compute06:9100",
+            "gs-compute07:9100",
+            "gs-compute08:9100",
+            "gs-compute09:9100",
+            "gs-compute10:9100",
+            "gs-compute11:9100"
+        ],
+        "labels": {
+            "env": "gearshift",
+            "job": "node"
+        }
+    }
+]

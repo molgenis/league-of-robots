@@ -1,0 +1,49 @@
+---
+- file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: 65534
+  with_items:
+    - /srv/prometheus/etc/prometheus
+    - /srv/prometheus/prometheus
+
+- name: Install settings files.
+  copy:
+    src: templates/etc/{{ item }}
+    dest: /srv/prometheus/etc/prometheus/{{ item }}
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - alerting.rules
+    - prometheus.yml
+    - targets.json
+
+  tags:
+    - service-files
+
+- name: Install service files.
+  template:
+    src: templates/prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+    mode: 644
+    owner: root
+    group: root
+  tags:
+    - service-files
+
+- name: install service files
+  command: systemctl daemon-reload
+
+- name: enable service at boot
+  systemd:
+    name: prometheus.service
+    enabled: yes
+
+- name: make sure servcies are started.
+  systemd:
+    name: prometheus.service
+    state: restarted
+  tags:
+    - start-service

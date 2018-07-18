@@ -1,0 +1,38 @@
+---
+- set_fact:
+    service_name: prometheus-slurm-exporter
+- file:
+    path: /usr/local/prometheus
+    state: directory
+    mode: 0755
+
+- name: Install binary
+  copy:
+    src: "{{ playbook_dir }}/promtools/results/{{ service_name }}"
+    dest: "/usr/local/prometheus/{{ service_name }}"
+    mode: 0755
+
+- name: Install service files.
+  template:
+    src: "templates/{{ service_name }}.service"
+    dest: "/etc/systemd/system/{{ service_name }}.service"
+    mode: 644
+    owner: root
+    group: root
+  tags:
+    - service-files
+
+- name: install service files
+  command: systemctl daemon-reload
+
+- name: enable service at boot
+  systemd:
+    name: "{{ service_name }}.service"
+    enabled: yes
+
+- name: make sure servcies are started.
+  systemd:
+    name: "{{ service_name }}"
+    state: restarted
+  tags:
+    - start-service

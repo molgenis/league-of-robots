@@ -1,0 +1,36 @@
+---
+- file:
+    path: /usr/local/prometheus
+    state: directory
+    mode: 0755
+
+- name: Install ipmi exporter
+  copy:
+    src: "{{ playbook_dir }}/promtools/results/ipmi_exporter"
+    dest: /usr/local/prometheus/ipmi_exporter
+    mode: 0755
+
+- name: Install service files.
+  template:
+    src: templates/ipmi-exporter.service
+    dest: /etc/systemd/system/ipmi-exporter.service
+    mode: 644
+    owner: root
+    group: root
+  tags:
+      - service-files
+
+- name: install service files
+  command: systemctl daemon-reload
+
+- name: enable service at boot
+  systemd:
+    name: ipmi-exporter
+    enabled: yes
+
+- name: make sure servcies are started.
+  systemd:
+    name: ipmi-exporter.service
+    state: restarted
+  tags:
+      - start-service

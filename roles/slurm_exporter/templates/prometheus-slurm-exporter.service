@@ -1,0 +1,10 @@
+[Unit]
+Description=prometheus slurm exporter
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStart=/usr/local/prometheus/prometheus-slurm-exporter  -listen-address ":9102"
+
+[Install]
+WantedBy=multi-user.target

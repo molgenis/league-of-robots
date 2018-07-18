@@ -1,0 +1,36 @@
+---
+- file:
+    path: /usr/local/prometheus
+    state: directory
+    mode: 0755
+
+- name: Install node exporter
+  copy:
+    src: "{{ playbook_dir }}/promtools/results/node_exporter"
+    dest: /usr/local/prometheus/node_exporter
+    mode: 0755
+
+- name: Install service files.
+  template:
+    src: templates/node-exporter.service
+    dest: /etc/systemd/system/node-exporter.service
+    mode: 644
+    owner: root
+    group: root
+  tags:
+      - service-files
+
+- name: install service files
+  command: systemctl daemon-reload
+
+- name: enable service at boot
+  systemd:
+    name: node-exporter
+    enabled: yes
+
+- name: make sure servcies are started.
+  systemd:
+    name: node-exporter.service
+    state: restarted
+  tags:
+      - start-service

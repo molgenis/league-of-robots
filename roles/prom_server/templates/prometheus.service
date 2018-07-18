@@ -1,0 +1,19 @@
+[Unit]
+Description=Prometheus monitoring
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run --name %n \
+    --network host \
+    -v /srv/prometheus/prometheus:/prometheus  \
+    -v /srv/prometheus/etc/prometheus:/etc/prometheus  \
+    prom/prometheus:v2.2.1 \
+    --storage.tsdb.retention 40d --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/prometheus --web.enable-lifecycle
+[Install]
+WantedBy=multi-user.target

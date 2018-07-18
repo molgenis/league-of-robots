@@ -1,0 +1,10 @@
+[Unit]
+Description=prometheus ipmi exporter
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStart=/usr/local/prometheus/ipmi_exporter
+
+[Install]
+WantedBy=multi-user.target

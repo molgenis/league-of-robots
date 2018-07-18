@@ -1,0 +1,60 @@
+groups:
+- name: basic
+  rules:
+  - alert: InstanceDown
+    expr: up{job="node"} == 0
+    for: 10m
+    labels:
+      severity: page
+    annotations:
+      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down
+        for more than 10 minutes.'
+      summary: Instance {{ $labels.instance }} down
+  - alert: InstanceClockDrift
+    expr: abs(node_time - time()) > 140
+    for: 5m
+    labels:
+      severity: info
+    annotations:
+      description: '{{ $labels.job }} has wrong clock setting'
+      summary: Instance {{ $labels.instance }} has clock drift
+  - alert: DiskWillFillIn8Hours
+    expr: predict_linear(node_filesystem_free{job="node",mountpoint!~"/tmp|/local|/target/gpfs3"}[2h], 8 * 3600) < 0
+    for: 2h
+    labels:
+      severity: page
+    annotations:
+      description: Instance {{ $labels.instance }} will fill up within 8 hours
+      summary: '{{ $labels.instance }} disk full'
+  - alert: DiskWillFillIn72Hours
+    expr: predict_linear(node_filesystem_free{job="node",mountpoint!~"/tmp|/local|/target/gpfs3"}[6h], 72 * 3600) < 0
+    for: 8h
+    labels:
+      severity: page
+    annotations:
+      description: Instance {{ $labels.instance }} will fill up within 72 hours
+      summary: '{{ $labels.instance }} disk almost full'
+  - alert: DiskFull
+    expr: node_filesystem_free{job="node",mountpoint!~"/tmp|/net|/cvmfs|/var/lib/nfs/rpc_pipefs|/cvmfs|/misc|/run/docker/netns/.+?|/cgroup.+?", fstype!~"fuse.+?"} < 5.24288e+06
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      description: Instance {{ $labels.instance }} has a full {{ $labels.mountpoint }}.
+      summary: '{{ $labels.instance }} Disk full'
+  - alert: tmpFull
+    expr: node_filesystem_free{job="node",mountpoint="/tmp"} < 5242880
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      description: Instance {{ $labels.instance }} Has a full /tmp
+      summary: '{{ $labels.instance }} /tmp full'
+  - alert: NodeRebooted
+    expr: delta(node_boot_time[1h]) > 10
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      description: Instance {{ $labels.instance }} has been rebooted.
+      summary: '{{ $labels.instance }} rebooted'

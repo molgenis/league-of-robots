@@ -1,0 +1,22 @@
+---
+- hosts: imperator
+  become: true
+  roles:
+     - prom_server
+     - cadvisor
+
+- name: Monitoring of the virtualized components
+  hosts: cluster
+  become: true
+  tasks:
+  roles:
+     - node_exporter
+
+- name: Monitoring of the hardware components
+  hosts: metal
+  become: true
+  tasks:
+  roles:
+     - cadvisor
+     - node_exporter
+     - ipmi_exporter

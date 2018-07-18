@@ -6,6 +6,7 @@
   roles:
      - spacewalk_client
      - ldap
+     - node_exporter
      - cluster
 
 - name: Airlock needs ldap But no spacewalk and filesystems
@@ -15,6 +16,12 @@
   roles:
      - ldap
      - cluster
+
+- hosts: imperator
+  become: true
+  roles:
+     - prom_server
+     - cadvisor
 
 - name: Install virtual compute nodes
   hosts: compute-vm
@@ -30,8 +37,10 @@
   become: true
   tasks:
   roles:
+     - slurm_exporter
      - user-interface
      - datahandling
      - isilon
 
 - import_playbook: users.yml
+- import_playbook: ssh-host-signer.yml
