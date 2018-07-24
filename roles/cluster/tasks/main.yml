@@ -38,7 +38,8 @@
 - name: Mount isilon apps
   mount:
     path: /apps
-    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/apps
+    #src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/apps
+    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/.envsync/tmp01
     fstype: nfs
     opts: defaults,_netdev,nolock,vers=4.0,noatime,nodiratime
     state: present
@@ -51,11 +52,14 @@
     opts: defaults,_netdev,nolock,vers=4.0,noatime,nodiratime
     state: present
 
-- name: check if the lustre client is present locally
-  stat:
-    path: /tmp/sugarsnax/root/rpmbuild/RPMS/noarch/lustre-client-dkms-2.11.0-1.el7.centos.noarch.rpm
-  register: local_file
-  delegate_to: localhost
+- name: make endpoints to mount datahandling storage on.
+  file:
+    path: "{{ item }}"
+    mode: 0777
+    state: directory
+  with_items:
+    - /mnt/dh1/groups
+    - /mnt/dh2/groups
 
 - name: Mount dh1
   mount:
