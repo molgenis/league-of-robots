@@ -61,6 +61,11 @@
     - /mnt/dh1/groups
     - /mnt/dh2/groups
 
+- name: load the lustre kernel module.
+  modprobe:
+    name: lustre
+    state: present
+
 - name: Mount dh1
   mount:
     path: /mnt/dh1/groups
