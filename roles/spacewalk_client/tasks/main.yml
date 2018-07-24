@@ -42,7 +42,13 @@
 
 - name: Disable gpgcheck
   command: sed -i 's/gpgcheck = 1/gpgcheck = 0/g' /etc/yum/pluginconf.d/rhnplugin.conf
+  args:
+    warn: false
 
+- name: remove all current repos
+  shell: "rm -rf /etc/yum.repos.d/* && yum clean all"
+  args:
+    warn: false
 
 - name: upgrade all packages
   yum:

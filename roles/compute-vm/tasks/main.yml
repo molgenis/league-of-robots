@@ -22,4 +22,4 @@
 - name: mount all mountpoints in fstab
   command: mount -a
   args:
-  warn: no
+    warn: false
