@@ -28,6 +28,13 @@
     - /.envsync/umcgst10/apps
     - /home
 
+- name: install lustre client
+  yum:
+    name: lustre-client-2.10.4-1.el7.x86_64
+    state: present
+    update_cache: yes
+  become: true
+
 - name: Mount isilon apps
   mount:
     path: /apps
