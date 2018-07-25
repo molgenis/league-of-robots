@@ -46,9 +46,15 @@
     warn: false
 
 - name: remove all current repos
-  shell: "rm -rf /etc/yum.repos.d/* && yum clean all"
+  shell: "rm -rf /etc/yum.repos.d/*"
   args:
     warn: false
+
+- name: remove all current repos
+  command: "yum clean all"
+  args:
+    warn: false
+  ignore_errors: yes
 
 - name: upgrade all packages
   yum:

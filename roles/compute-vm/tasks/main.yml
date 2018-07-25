@@ -1,15 +1,21 @@
 ---
-
-- name: Create an ext4 filesystem on /dev/vdb
-  filesystem:
-    fstype: ext4
-    dev: /dev/vdb
-
 - name: Make scratch mountpoint
   file:
     path: "/scratch"
     mode: 0777
     state: directory
+
+- name: "check mount point /scratch"
+  command: mountpoint /scratch
+  register: mount_scratch
+  failed_when: false
+
+- name: Create an ext4 filesystem on /dev/vdb
+  filesystem:
+    fstype: ext4
+    dev: /dev/vdb
+  when:
+    mount_scratch.rc == 1
 
 - name: Mount /dev/vdb on /scratch
   mount:
@@ -23,3 +29,5 @@
   command: mount -a
   args:
     warn: false
+  when:
+    mount_scratch.rc == 1

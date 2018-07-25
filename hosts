@@ -39,7 +39,7 @@ gs-compute[01:11] storage_volume=/dev/sdb
 gs-compute[01:11] physical_interface_mappings=provider:enp130s0f0
 
 [jumphost]
-airlock.hpc.rug.nl
+airlock
 
 [interface]
 gearshift
@@ -47,8 +47,10 @@ gearshift
 [slurm]
 imperator
 
+[buildserver]
+sugarsnax
+
 [administration]
-airlock
 gearshift
 imperator
 sugarsnax
@@ -66,3 +68,4 @@ administration
 [metal]
 gs-openstack
 gs-compute[01:11]
+gs-vcompute[01:10]

@@ -17,34 +17,3 @@
   selinux:
     policy: targeted
     state: permissive
-
-- name: make endpoints to mount isilon storage on.
-  file:
-    path: "{{ item }}"
-    mode: 0777
-    state: directory
-  with_items:
-    - /apps
-    - /.envsync/umcgst10/apps
-    - /home
-
-- name: Mount isilon apps
-  mount:
-    path: /apps
-    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/apps
-    fstype: nfs
-    opts: defaults,_netdev,nolock,vers=4.0,noatime,nodiratime
-    state: present
-
-- name: Mount isilon home
-  mount:
-    path: /home
-    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/home
-    fstype: nfs
-    opts: defaults,_netdev,nolock,vers=4.0,noatime,nodiratime
-    state: present
-
-- name: mount all mountpoints in fstab
-  command: mount -a
-  args:
-    warn: false

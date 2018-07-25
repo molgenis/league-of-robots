@@ -98,3 +98,14 @@
         user: ger
         key: 'ssh-dss AAAAB3NzaC1kc3MAAACBAMJfiOS0W95C1+r7IBgBR8CqEGpJZ8viv4bpzXWNtDTYLFbfb4rL/PgzlCQqhqJbKCkHluJPHPNAeaW8KalHvqUrtD5xciX8PovcMhkg9Dksp9P5WGKCVfJb5MKwfdtEM9tgq9OjNZFN0nF3R6oW42DvxDKu3mXWiH1PH1I4arQdAAAAFQDxHkrRaQ/t4wH2nO6WN9jWEUNiAwAAAIBR5zi9P3JudJu3dddweDaXlVXY51cGQjXvxFJtFv1d5/jI2gCxcah1dLqkJMwGgFowF4imqUXFit20kNQiG5bUnuGEJWfTg/BkaM7W3ujRxDK6wIQCvAnQ0+zJR/qMqqH7MFlutcEm+uVuACs5abvDOp0scHaOuvGfIyf+qegvLAAAAIB577xm9csmftKclreLmigUksY4zlWoIVYsjgB4ofDVemtHTGYWFBSxQsbhhUrUhB6+AcTRGJnvLyJSaEQdCghVJKEIrGl9YA9lgztd8YAHsG2iVve1mMiFI/8NYJHMWJLuFratq5eC5tpBaW+MTm21NqHKD5Ry88Ul04n+sv5lfw== ger@rc-514'
         state: present
+
+    - user:
+        name: robin
+        comment: "Robin Teeninga"
+        group: admin
+        state: present
+
+    - authorized_key:
+        user: robin
+        key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXeVMbqjC0EKu8cmuxN+88l0TnzJUuRaFLufka2Mx9Adj8PtAZ4l9IP7f+O97ylbNQvci9DcC38NNe62b0ECutin3jUX9trvROYgxVMR/P89y139CSwWqBrHm29WLHdz9A0vO094HNzhp4xFVnblBUAFt3CCDIxvl59coV2bWgTykmVEoni9SSjqKgcC1hT0mIGcaDb428x9DsteJSakSNYwFbnbEbukA7Y5KQnbzaMl/h97C2FOsxiU5JZoiHgKNXCR5jkFsHzc3OEphXW1Ba4EnqsqUecpnfUr6OueFYR6a/q+AtIKVYT10lzCimXui/uf5zkntq1Kga/h3VtgmV root@robin-HP-Compaq-Elite-8300-MT'
+        state: present

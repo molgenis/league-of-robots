@@ -30,7 +30,7 @@
         - >
             openstack subnet create --subnet-range 129.125.60.0/24 --gateway 129.125.60.251
             --network vlan13 --allocation-pool start=129.125.60.195,end=129.125.60.196
-            --dns-nameserver 129.125.4.6 vlan13_subnet
+            --no-dhcp --dns-nameserver 129.125.4.6 vlan13_subnet
 
         - openstack flavor create --ram 4096 --disk 40 --vcpus 2  "auxiliary"
         - openstack flavor create --ram 245760 --disk 40 --vcpus 48  "Compute"
