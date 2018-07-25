@@ -33,3 +33,11 @@
           command: rpmbuild --rebuild --without servers /tmp/{{ lustre_src_rpm_name }}
           become: true
       when: remote_file.stat.exists == false
+
+    - name: Mount isilon apps
+      mount:
+        path: /apps
+        src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/.envsync/tmp01
+        fstype: nfs
+        opts: defaults,_netdev,nolock,vers=4.0,noatime,nodiratime
+        state: present

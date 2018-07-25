@@ -8,18 +8,30 @@
      - ldap
      - cluster
 
+- name: Airlock needs ldap But no spacewalk and filesystems
+  hosts: airlock
+  become: true
+  tasks:
+  roles:
+     - ldap
+     - cluster
+
 - name: Install virtual compute nodes
   hosts: compute-vm
   become: true
   tasks:
   roles:
      - compute-vm
+     - isilon
+     - datahandling
 
 - name: Install user interface
-  hosts: compute-vm
+  hosts: interface
   become: true
   tasks:
   roles:
      - user-interface
+     - datahandling
+     - isilon
 
 - import_playbook: users.yml
