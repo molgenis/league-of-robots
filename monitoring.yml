@@ -20,3 +20,10 @@
      - cadvisor
      - node_exporter
      - ipmi_exporter
+
+- name: Airlock proxies prometheus for Grafana in the cloud
+  hosts: airlock
+  become: true
+  tasks:
+  roles:
+     - prom_proxy

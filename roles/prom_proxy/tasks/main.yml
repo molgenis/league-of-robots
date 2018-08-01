@@ -1,0 +1,24 @@
+---
+- name: Install nginx
+  yum: name=nginx state=latest update_cache=yes
+
+- name: nginx.conf
+  copy:
+    src: templates/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+    owner: root
+    group: root
+
+- name: .htpasswd
+  copy:
+    src: templates/.htpasswd
+    dest: /etc/nginx/.htpasswd
+    mode: 0600
+    owner: nginx
+    group: nginx
+
+- name: make sure nginx is restarted
+  systemd:
+    name: nginx.service
+    state: restarted
