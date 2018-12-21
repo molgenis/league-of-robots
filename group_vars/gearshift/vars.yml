@@ -1,5 +1,5 @@
 ---
-slurm_cluster_name: talos
+slurm_cluster_name: gearshift
 sockets: 1
 CoresPerSocket: 9
 ThreadsPerCore: 1

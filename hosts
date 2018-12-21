@@ -44,6 +44,10 @@ airlock
 [slurm]
 imperator
 
+; Sys Admin Interface
+[sai]
+imperator
+
 [buildserver]
 sugarsnax
 

@@ -1,12 +1,12 @@
 ---
 - name: Make local mountpoint
   file:
-    path: "/local"
+    path: "/apps"
     mode: 0777
     state: directory
 
-- name: "check mount point /local"
-  command: mountpoint /local
+- name: "check mount point /apps"
+  command: mountpoint /apps
   register: mount_local
   failed_when: false
 
@@ -17,9 +17,9 @@
   when:
     mount_local.rc == 1
 
-- name: Mount /dev/vdb on /local
+- name: Mount /dev/vdb on /apps
   mount:
-    path: /local
+    path: /apps
     src: /dev/vdb
     fstype: ext4
     opts: rw,relatime

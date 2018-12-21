@@ -6,22 +6,32 @@
     state: directory
   with_items:
     - /apps
-    - /.envsync/umcgst10/apps
     - /home
   # When it's already mounted this may result in errors.
   # To make this idempotent errors are ignored.
   ignore_errors:
     yes
 
-    # Mount point that seems to work is incosistent across nodes. Even between compute nodes.
-    #- name: Mount isilon apps
-    #  mount:
-    #    path: /apps
-    #    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/apps
-    #    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/.envsync/tmp01
-    #    fstype: nfs
-    #    opts: defaults,_netdev,nolock,vers=4.0,noatime,nodiratime
-    #    state: present
+- name: make endpoints to mount isilon storage on.
+  file:
+    path: /.envsync/umcgst10/apps
+    mode: 0751
+    state: directory
+  ignore_errors:
+    yes
+  when: "'dai' in group_names and 'gearshift-cluster' in group_names"
+
+# Mount point that seems to work is incosistent across nodes. Even between compute nodes.
+- name: Mount isilon apps
+  mount:
+    path: /apps
+    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/apps
+    when: "'compute-vm' or 'user-interface' in group_names and 'gearshift-cluster' in group_names"
+    src: gcc-storage001.stor.hpc.local:/ifs/rekencluster/umcgst10/.envsync/tmp01
+    when: "'dai' in group_names and 'gearshift-cluster' in group_names"
+    fstype: nfs
+    opts: defaults,_netdev,nolock,vers=4.0,noatime,nodiratime
+    state: present
 
 
 - name: Mount isilon home
