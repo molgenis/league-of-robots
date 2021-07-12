@@ -1,6 +1,25 @@
+#
+# Install roles and collections from the default Ansible Galaxy server.
+#
 ---
-- src: geerlingguy.firewall
-  version: 2.4.0
-- src: geerlingguy.repo-epel
-- src: geerlingguy.security
+roles:
+  - src: geerlingguy.firewall
+    version: 2.5.0
+  - src: geerlingguy.repo-epel
+    version: 3.0.0
+  - src: geerlingguy.security
+    version: 2.0.1
+  - src: geerlingguy.postgresql
+    version: 3.1.1
+collections:
+  - name: community.general
+    version: '>=3.0.2'
+  - name: openstack.cloud
+    version: '>=1.2.1'
+  - name: ansible.posix
+    version: '>=1.2.0'
+  - name: pulp.pulp_installer
+    version: '==3.12.2'
+  - name: pulp.squeezer
+    version: '>=0.0.8'
 ...

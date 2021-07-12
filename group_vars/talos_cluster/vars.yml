@@ -1,0 +1,237 @@
+---
+slurm_cluster_name: 'talos'
+slurm_cluster_domain: 'hpc.rug.nl'
+stack_prefix: 'tl'
+slurm_version: '18.08.8-1.el7.umcg'
+slurm_allow_jobs_to_span_nodes: true
+repo_manager: 'spacewalk'
+rhn_channels:
+  - umcg2020
+mailhub: '172.23.34.34'
+rewrite_domain: "{{ stack_prefix }}-sai{% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %}"
+figlet_font: 'ogre'
+motd: |
+      =========================================================
+      !!! WARNING: {{ slurm_cluster_name | capitalize }} is in beta testing
+      =========================================================
+          This cluster may be redeployed from scratch, which
+          may result in complete data loss of home dirs 
+          and tmp0* group folders: You have been warned!!!
+          This does not affect prm0* group folders,
+          which are on a different (production) storage system.
+      =========================================================
+additional_etc_hosts:
+  - group: all
+    hosts:
+      - docs
+  - group: boxy_cluster
+    hosts:
+      - boxy-management
+      - boxy-storage
+  - group: calculon_cluster
+    hosts:
+      - calculon-management
+      - calculon-storage
+vcompute_hostnames: "{{ stack_prefix }}-vcompute[01-03]"
+vcompute_sockets: 4
+vcompute_cores_per_socket: 1
+vcompute_real_memory: 7820
+vcompute_max_cpus_per_node: "{{ vcompute_sockets * vcompute_cores_per_socket - 2 }}"
+vcompute_max_mem_per_node: "{{ vcompute_real_memory - vcompute_sockets * vcompute_cores_per_socket * 512 }}"
+vcompute_local_disk: 270000
+vcompute_features: 'tmp08'
+vcompute_ethernet_interfaces:
+  - 'vlan983'
+  - 'vlan985.isilon'
+ui_hostnames: "{{ slurm_cluster_name }}"
+ui_sockets: 4
+ui_cores_per_socket: 1
+ui_real_memory: 7820
+ui_local_disk: 0
+ui_features: 'prm08,tmp08'
+ui_ethernet_interfaces:
+  - 'vlan983'
+  - 'vlan985.isilon'
+ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/umcg-hpc-development-ca"
+use_ldap: yes
+create_ldap: no
+ldap_uri: 'ldap://172.23.40.249'
+ldap_base: 'ou=umcg,o=asds'
+ldap_binddn: 'cn=clusteradminumcg,o=asds'
+ldap_group_object_class: 'groupofnames'
+ldap_group_quota_soft_limit_template: 'ruggroupumcgquotaLFSsoft'
+ldap_group_quota_hard_limit_template: 'ruggroupumcgquotaLFS'
+nameservers: [
+  '/gcc-storage001.stor.hpc.local/172.23.40.244',  # Local DNS lookups for shared storage.
+  '8.8.4.4',  # Google DNS.
+  '8.8.8.8',  # Google DNS.
+]
+local_admin_groups:
+  - 'admin'
+  - 'docker'
+local_admin_users:
+  - 'alex2'
+  - 'egon'
+  - 'ger'
+  - 'gerben'
+  - 'henkjan'
+  - 'kim'
+  - 'marieke'
+  - 'marlies'
+  - 'marloes'
+  - 'morris'
+  - 'pieter'
+  - 'robin'
+  - 'sandi'
+  - 'wim'
+envsync_user: 'umcg-envsync'
+envsync_group: 'umcg-depad'
+functional_admin_group: 'umcg-funad'
+hpc_env_prefix: '/apps'
+regular_groups:
+  - 'umcg-atd'
+  - 'umcg-depad'
+  - 'umcg-endocrinology'
+  - 'umcg-gcc'
+  - 'umcg-lifelines'
+  - 'umcg-sysops'
+regular_users:
+  - user: 'umcg-atd-ateambot'
+    groups: ['umcg-atd']
+    sudoers: '%umcg-atd'
+  - user: 'umcg-atd-dm'
+    groups: ['umcg-atd']
+    sudoers: '%umcg-atd'
+  - user: 'umcg-endocrinology-dm'
+    groups: ['umcg-endocrinology']
+    sudoers: '%umcg-endocrinology-dms'
+  - user: 'umcg-gcc-dm'
+    groups: ['umcg-gcc']
+    sudoers: '%umcg-gcc'
+  - user: 'umcg-lifelines-dm'
+    groups: ['umcg-lifelines']
+    sudoers: '%umcg-lifelines-dms'
+  - user: 'umcg-sysops-dm'
+    groups: ['umcg-sysops']
+    sudoers: '%umcg-sysops'
+#
+# Shared storage related variables
+#
+pfs_mounts: [
+  { pfs: 'umcgst11',
+    source: 'gcc-storage001.stor.hpc.local:/ifs/rekencluster',
+    type: 'nfs4',
+    rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime',
+    ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro' },
+]
+lustre_quota_type: 'group'
+lfs_mounts: [
+  { lfs: 'home',
+    pfs: 'umcgst11',
+    machines: "{{ groups['cluster'] }}" },
+  { lfs: 'tmp08',
+    pfs: 'umcgst11',
+    groups: ['umcg-atd', 'umcg-endocrinology', 'umcg-gcc', 'umcg-lifelines', 'umcg-sysops'] },
+  { lfs: 'rsc08',
+    pfs: 'umcgst11',
+    groups: ['umcg-atd', 'umcg-lifelines', 'umcg-sysops'] },
+  { lfs: 'prm08',
+    pfs: 'umcgst11',
+    groups: ['umcg-atd', 'umcg-gcc', 'umcg-lifelines', 'umcg-solve-rd', 'umcg-sysops'] },
+  { lfs: 'env08',
+    pfs: 'umcgst11',
+    machines: "{{ groups['compute_vm'] + groups['user_interface'] }}" },
+]
+ega_fuse_client_mounts:
+  solve_rd: '/groups/umcg-solve-rd/prm08/ega-fuse-client'
+ega_fuse_client_java_home: '/apps/software/AdoptOpenJDK/8u222b10-hotspot'
+iptables_allow_icmp_inbound:
+  - 'umcg_net1'
+  - 'umcg_net2'
+  - 'umcg_net3'
+  - 'rug_bwp_net'
+  - 'rug_operator'
+  - 'rug_gcc_cloud_net'
+  - 'foyer'
+  - 'boxy'
+  - 'bender'
+  - 'lobby'
+  - 'calculon'
+  - 'flexo'
+  - 'gate'
+  - 'zinc-finger'
+  - 'coenzyme'
+  - 'passage'
+  - 'leucine-zipper'
+  - 'chaperone'
+  - 'airlock'
+  - 'jenkins1'
+  - 'jenkins2'
+iptables_allow_ssh_inbound:
+  - 'umcg_net1'
+  - 'umcg_net2'
+  - 'umcg_net3'
+  - 'rug_bwp_net'
+  - 'rug_operator'
+  - 'foyer'
+  - 'boxy'
+  - 'bender'
+  - 'lobby'
+  - 'calculon'
+  - 'flexo'
+  - 'gate'
+  - 'zinc-finger'
+  - 'coenzyme'
+  - 'passage'
+  - 'leucine-zipper'
+  - 'chaperone'
+  - 'airlock'
+  - 'jenkins1'
+  - 'jenkins2'
+iptables_allow_ssh_outbound:
+  - 'foyer'
+  - 'boxy'
+  - 'bender'
+  - 'lobby'
+  - 'calculon'
+  - 'flexo'
+  - 'gate'
+  - 'peregrine'
+  - 'gattaca01'
+  - 'gattaca02'
+  - 'cher_ami'
+  - 'eriba_ds'
+  - 'molgenis_downloads'
+  - 'airlock'
+  - 'surfsara_grid_ui'
+  - 'lumc_shark_ui'
+  - 'cnag_sftp'
+  - 'erasmus_mc_net'
+  - 'rug_f5_net'
+  - 'sanger_sftp'
+iptables_allow_ebi_mysql_outbound:
+  - 'ebi_sanger_net1'
+  - 'ebi_sanger_net2'
+iptables_allow_ftp_outbound:
+  - 'ebi_sanger_net1'
+  - 'ebi_sanger_net2'
+  - 'broad_ftp'
+  - 'ncbi_net1'
+  - 'ncbi_net2'
+iptables_allow_aspera_outbound:
+  - 'ebi_sanger_net1'
+  - 'ebi_sanger_net2'
+  - 'broad_aspera_1'
+  - 'broad_aspera_2'
+  - 'broad_aspera_3'
+  - 'broad_aspera_4'
+  - 'broad_aspera_5'
+  - 'broad_aspera_6'
+  - 'broad_aspera_7'
+  - 'broad_aspera_8'
+  - 'broad_aspera_9'
+  - 'ncbi_net1'
+  - 'ncbi_net2'
+iptables_allow_globus_outbound:
+  - 'sanger_globus'
+...

@@ -1,9 +1,13 @@
 site_name: "{{ slurm_cluster_name | capitalize }} HPC cluster"
+site_url: "http://{{ networking_lookups[groups['docs'] | first | regex_replace('^' + ai_jumphost + '\\+','')].fqdn }}/{{ slurm_cluster_name }}/"
+use_directory_urls: true
 theme:
   name: readthedocs
   highlightjs: false
   hljs_languages:
     - yaml
+  collapse_navigation: false
+  titles_only: false
 site_dir: "/var/www/html/{{ slurm_cluster_name }}/"
 extra_css:
     - css/custom.css
@@ -13,15 +17,26 @@ nav:
     - 'Cluster': 'cluster.md'
     - 'License': 'license.md'
     - 'Contact': 'contact.md'
-  - User Guide:
-    - 'Requesting accounts for {{ slurm_cluster_name | capitalize }}': 'accounts.md'
-    - 'Login - How to start a session': 'logins.md'
+  - Requesting Accounts:
+    - 'Accounts, security and privacy': 'accounts.md'
+    - 'Generate SSH key pair for Windows': 'generate-key-pair-mobaxterm.md'
+    - 'Generate SSH key pair for macOS & Linux': 'generate-key-pair-openssh.md'
+  - Logins:
+    - 'Jumphosts, UIs and sessions': 'logins.md'
+    - 'SSH config & login for Windows clients': 'logins-windows.md'
+    - 'SSH config for macOS clients': 'logins-macos-config.md'
+    - 'SSH config for Linux clients': 'logins-linux-config.md'
+    - 'SSH login for macOS & Linux clients': 'logins-macos-linux.md'
+    - 'Customize your environment': 'custom-environment.md'
+  - Storage:
     - 'Keep - What is stored where on {{ slurm_cluster_name | capitalize }}': 'storage.md'
     - 'Data transfers - How to move data to / from {{ slurm_cluster_name | capitalize }}': 'datatransfers.md'
+  - Compute:
     - 'Crunch - How to manage jobs on {{ slurm_cluster_name | capitalize }}': 'analysis.md'
-    - 'Technical specifications - Details of the {{ slurm_cluster_name | capitalize }} HPC environment': 'specifications.md'
+  - Technical Specifications:
+    - 'Details on the {{ slurm_cluster_name | capitalize }} HPC environment': 'specifications.md'
 {% if 'hyperchicken' in slurm_cluster_name or 'fender' in slurm_cluster_name %}
-  - Group specific documentation:
+  - Group Specific Documentation:
     - 'Solve-RD - How to find and work with Solve-RD data': 'solve-rd.md'
 {% endif %}
 #    - 'Support - FAQs, mailinglists & courses': 'support.md'

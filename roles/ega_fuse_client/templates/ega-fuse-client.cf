@@ -1,0 +1,2 @@
+username:{{ ega_fuse_client_credentials[item.key].user }}
+password:{{ ega_fuse_client_credentials[item.key].pass }}

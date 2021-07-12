@@ -1,0 +1,13 @@
+---
+#
+# Important: maintain correct handler order.
+# Handlers are executed in the order in which they are defined
+# and not in the order in which they are listed in a "notify: handler_name" statement!
+#
+- name: Reboot if a kernel update was installed.
+  shell:
+    cmd: |
+         /bin/needs-restarting -r >/dev/null 2>&1 || /sbin/shutdown -r +60 "Restarting to apply updates..."
+  become: true
+  listen: reboot_for_kernel_update
+...

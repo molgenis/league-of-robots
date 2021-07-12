@@ -1,0 +1,302 @@
+# Deploy Slurm control host.
+---
+- name: 'Add Slurm group.'
+  group:
+    name: 'slurm'
+    gid: "{{ slurm_gid }}"
+  notify:
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+- name: 'Add Munge group.'
+  group:
+    name: 'munge'
+    gid: "{{ munge_gid }}"
+  notify:
+    - 'restart_munge'
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+- name: 'Add Slurm user.'
+  user:
+    name: 'slurm'
+    uid: "{{ slurm_uid }}"
+    group: 'slurm'
+  notify:
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+- name: 'Add Munge user.'
+  user:
+    name: 'munge'
+    uid: "{{ munge_uid }}"
+    group: 'munge'
+  notify:
+    - 'restart_munge'
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+- name: 'Install munge.'
+  yum:
+    state: 'latest'
+    update_cache: true
+    name:
+      - 'munge'
+  become: true
+
+- name: 'Install a logrotate file for slurm.'
+  copy:
+    src: "files/logrotate_slurm"
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    dest: '/etc/logrotate.d/slurm'
+  become: true
+
+- name: 'Install munge.key file.'
+  copy:
+    src: "files/{{ slurm_cluster_name }}_munge.key"
+    owner: 'munge'
+    group: 'munge'
+    mode: '0600'
+    dest: '/etc/munge/munge.key'
+  notify:
+    - 'restart_munge'
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+- name: 'Install Slurm management dependencies with yum.'
+  yum:
+    state: 'latest'
+    update_cache: true
+    name:
+      - 'MySQL-python'
+      - 'lua-posix'
+  notify:
+    - 'restart_munge'
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+- name: 'Install Slurm management deamons with yum.'
+  yum:
+    state: 'installed'
+    update_cache: true
+    allow_downgrade: true
+    name:
+      - "slurm*{{ slurm_version }}"
+      - "slurm-slurmctld*{{ slurm_version }}"
+      - "slurm-slurmdbd*{{ slurm_version }}"
+      - "slurm-perlapi*{{ slurm_version }}"
+  notify:
+    - 'restart_munge'
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+# See: https://bugs.schedmd.com/show_bug.cgi?id=8388
+- name: 'Patch slurm daemon systemd service files to disable PID files.'
+  lineinfile:
+    path: "/usr/lib/systemd/system/{{ item }}.service"
+    regexp: '^#?PIDFile='
+    line: "#PIDFile=/var/run/slurm/{{ item }}.pid"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - 'slurmctld'
+    - 'slurmdbd'
+  notify:
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+  become: true
+
+- name: 'Create a database for Slurm accounting.'
+  mysql_db:
+    login_host: 'localhost'
+    login_user: 'root'
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    login_unix_socket: "/var/lib/mysql/mysql.sock"
+    name: "{{ slurm_database_name }}"
+    state: 'present'
+  no_log: true
+  notify:
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+
+- name: 'Make sure the slurm database user is present and grant privileges on the Slurm accounting DB.'
+  mysql_user:
+    login_host: 'localhost'
+    login_user: 'root'
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    login_unix_socket: "/var/lib/mysql/mysql.sock"
+    name: "{{ slurm_storage_user }}"
+    password: "{{ slurm_storage_pass }}"
+    host: 'localhost'
+    priv: "{{ slurm_database_name }}.*:ALL"
+    connect_timeout: 120
+  no_log: true
+  notify:
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
+
+- name: 'Create folders for Slurm.'
+  file:
+    name: "{{ item.name }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    state: 'directory'
+  with_items:
+    - name: '/etc/slurm'
+      owner: 'root'
+      group: 'root'
+      mode: '0755'
+    - name: '/var/log/slurm'
+      owner: 'slurm'
+      group: 'root'
+      mode: '0750'
+    - name: '/var/spool/slurm'
+      owner: 'slurm'
+      group: 'root'
+      mode: '0750'
+    - name: '/var/run/slurm'
+      owner: 'slurm'
+      group: 'root'
+      mode: '0775'
+  become: true
+
+- name: 'Install Slurm config file.'
+  template:
+    src: 'templates/slurm.conf'
+    dest: '/etc/slurm/slurm.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify: 'restart_slurmctld'
+  tags: 'slurm.conf'
+  become: true
+
+- name: 'Install Slurm DBD config file.'
+  template:
+    src: 'templates/slurmdbd.conf'
+    dest: '/etc/slurm/slurmdbd.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify: 'reload_slurmdbd'
+  become: true
+
+- name: 'Install Slurm scripts.'
+  copy:
+    src: "files/{{ item }}"
+    dest: "/etc/slurm/{{ item }}"
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  with_items:
+    - 'job_submit.lua'
+  become: true
+
+- name: 'Make sure slurmdbd and munge services are enabled and started.'
+  systemd:
+    name: "{{ item }}"
+    state: 'started'
+    enabled: 'yes'
+    daemon_reload: 'yes'
+  with_items:
+    - 'munge.service'
+    - 'slurmdbd.service'
+  become: true
+
+- name: 'Copy Slurm DB initialization script to host running slurmdbd.'
+  template:
+    src: 'templates/configure_slurm_accounting_db.bash'
+    dest: '/etc/slurm/configure_slurm_accounting_db.bash'
+    owner: 'root'
+    group: 'root'
+    mode: '0700'
+  tags: 'create_database'
+  become: true
+
+#
+# Flush handlers to make sure Slurm DB is present and connection settings have been updated.
+#
+- name: 'Flush handlers.'
+  meta: flush_handlers
+
+- name: 'Execute Slurm DB initialization script on host running slurmdbd.'  # noqa no-changed-when
+  command:
+    cmd: '/etc/slurm/configure_slurm_accounting_db.bash'
+  register: command_result
+  retries: 3
+  delay: 5
+  until:
+    - command_result.stderr|length == 0
+    - command_result.stdout|length > 0
+  # NOTE: cannot use command_result.rc to check for the exit value of script in failed_when or changed_when
+  #       as the sacctmgr commands used in the script may return exit code 1 when trying to create/modify
+  #       something that already exists. This results in "Nothing new added." on STDOUT, but no message on STDERR.
+  #       In case something is really wrong there will be messags printed to STDERR.
+  failed_when: command_result.stderr|length > 0
+  tags: 'create_database'
+  become: true
+
+- name: 'Make sure slurmctld service is enabled and started now that the cluster DB is present.'
+  systemd:
+    name: 'slurmctld.service'
+    state: 'started'
+    enabled: 'yes'
+    daemon_reload: true
+  become: true
+
+- name: 'Make backup dir.'
+  file:
+    path: '/root/slurm/backup'
+    state: 'directory'
+    owner: 'root'
+    group: 'root'
+    mode: '0700'
+  tags: 'backup'
+  become: true
+
+- name: 'Create Slurm accounting DB backup now.'  # noqa no-changed-when
+  shell: |
+         mysqldump --all-databases \
+             -uroot -p{{ MYSQL_ROOT_PASSWORD }} \
+             -h localhost --protocol=socket \
+             > /root/slurm/backup/slurm.sql
+  tags: 'backup'
+  no_log: true
+  become: true
+
+- name: 'Deploy cron job to backup the Slurm accounting DB every night. Keep 7 backups.'
+  cron:
+    name: 'Slurm database backup'
+    minute: '11'
+    hour: '3'
+    job: >
+      /bin/cp --backup=numbered /root/slurm/backup/slurm.sql /root/slurm/backup/slurm_bak.sql
+      && mysqldump --all-databases -uroot -p{{ MYSQL_ROOT_PASSWORD }} -h localhost --protocol=socket
+      > /root/slurm/backup/slurm.sql
+      && /bin/find /root/slurm/backup/slurm_bak.sql.* -mtime 7 -delete
+  tags: 'backup'
+  no_log: true
+  become: true
+
+- name: 'Allow passwordless sudo to slurm user for users in the functional_admins_group.'
+  template:
+    src: 'templates/91-slurm'
+    dest: "/etc/sudoers.d/91-slurm"
+    owner: 'root'
+    group: 'root'
+    mode: '0440'
+  when: functional_admin_group is defined and functional_admin_group | length >= 1
+  become: true
+
+...

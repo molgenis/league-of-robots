@@ -1,0 +1,16 @@
+---
+- name: 'Create regular users & groups in cluster LDAP.'
+  include_tasks:
+    file: ldap_regular_users.yml
+  when:
+    - use_ldap | default(true, true) | bool
+    - create_ldap | default(false, true) | bool
+    - inventory_hostname in groups['ldap_server'] | default([])
+
+- name: 'Create local regular users & groups.'
+  include_tasks:
+    file: local_regular_users.yml
+  when:
+    - not use_ldap | default(true, true) | bool
+    - inventory_hostname in groups['cluster'] | default([]) or inventory_hostname in groups['jumphost'] | default([])
+...

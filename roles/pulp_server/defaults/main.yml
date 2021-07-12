@@ -1,0 +1,43 @@
+#
+# Three different users are required for a complete Pulp instalation.
+#
+# 1. repo_management_user:
+#    This is a Linux user/account. Users in the Linux admin group can sudo to this user to manage Pulp manually.
+#    E.g. create/update/delete artifacts, repositories, remotes, publications and distributions.
+#
+# 2. pulp_api_user:
+#    This is the account used by the repo_management_user to login to the Pulp API to work with Pulp.
+#    The pulp_api_password is for this account.
+#
+# 3. pulp_user:
+#    This is a Linux user/account, which is used to run the Pulp daemons/services.
+#    Not specified here, but configured in the pulp.pulp_installer.pulp_all_services role we depend on.
+#
+repo_management_user: repoadmin
+pulp_api_user: admin
+pulp_api_host: localhost
+pulp_api_port: 24817
+pulp_api_baseurl: "http://{{ pulp_api_host }}:{{ pulp_api_port }}"
+pulp_default_admin_password: "{{ pulp_api_password }}"
+pulpcore_version: "==3.12.2"
+pulp_install_plugins:
+  # galaxy-ng: {}
+  # pulp-2to3-migration: {}
+  # pulp-ansible: {}
+  # pulp-certguard: {}
+  # pulp-container: {}
+  # pulp-cookbook: {}
+  # pulp-deb: {}
+  pulp-file: {}
+  # pulp-gem: {}
+  # pulp-maven: {}
+  # pulp-npm: {}
+  # pulp-python: {}
+  pulp-rpm:
+    version: "==3.10.0"
+pulp_settings:
+  secret_key: "{{ pulp_secret }}"
+  content_origin: "{{ pulp_webserver_disable_https | default(false) | ternary('http', 'https') }}://{{ ansible_fqdn }}"
+pulp_root_cert_path_on_repo_server: "/etc/pulp/certs/root.crt"
+pulp_root_cert_path_on_control_host: "{{ playbook_dir }}/files/{{ slurm_cluster_name }}_cluster/\
+                                      {{ inventory_hostname | regex_replace('^' + ai_jumphost + '\\+','') }}_pulp_root.crt"

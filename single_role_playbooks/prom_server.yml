@@ -1,5 +1,5 @@
 ---
-- hosts: sys-admin-interface
+- hosts: sys_admin_interface
   roles:
      - prom_server
 ...

@@ -1,0 +1,10 @@
+---
+- name: "Add custom yum repos."
+  yum_repository:
+    name: "{{ item }}"
+    description: "{{ yum_repos[item].description }}"
+    baseurl: "{{ yum_repos[item].baseurl }}"
+    gpgcheck: false
+  with_items: "{{ yum_repos }}"
+  become: true
+...

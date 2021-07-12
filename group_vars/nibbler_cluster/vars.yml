@@ -1,0 +1,148 @@
+---
+slurm_cluster_name: 'nibbler'
+slurm_cluster_domain: ''  # Only add hpc.rug.nl domain when jumphost is registered in DNS.
+stack_prefix: 'nb'
+slurm_version: '18.08.8-1.el7.umcg'
+repo_manager: 'pulp'
+mailhub: '192.168.0.5'
+rewrite_domain: "{{ stack_prefix }}-sai{% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %}"
+figlet_font: 'ogre'
+motd: |
+      =========================================================
+      !!! WARNING: {{ slurm_cluster_name | capitalize }} is in beta testing
+      =========================================================
+          This cluster may be redeployed from scratch, which
+          may result in complete data loss of home dirs 
+          and tmp0* group folders: You have been warned!!!
+          This does not affect prm0* group folders,
+          which are on a different (production) storage system.
+      =========================================================
+additional_etc_hosts:
+  - group: all
+    hosts:
+      - docs
+  - group: boxy_cluster
+    hosts:
+      - boxy-management
+      - boxy-storage
+  - group: calculon_cluster
+    hosts:
+      - calculon-management
+      - calculon-storage
+vcompute_hostnames: "{{ stack_prefix }}-vcompute[01-03]"
+vcompute_sockets: 4
+vcompute_cores_per_socket: 1
+vcompute_real_memory: 3790
+vcompute_max_cpus_per_node: "{{ vcompute_sockets * vcompute_cores_per_socket - 2 }}"
+vcompute_max_mem_per_node: "{{ vcompute_real_memory - vcompute_sockets * vcompute_cores_per_socket * 512 }}"
+vcompute_local_disk: 270000
+vcompute_features: 'tmp02'
+vcompute_ethernet_interfaces:
+  - 'eth0'
+  - 'eth1'
+ui_hostnames: "{{ slurm_cluster_name }}"
+ui_sockets: 4
+ui_cores_per_socket: 1
+ui_real_memory: 3790
+ui_local_disk: 0
+ui_features: 'prm02,tmp02'
+ui_ethernet_interfaces:
+  - 'eth0'
+  - 'eth1'
+ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/umcg-hpc-development-ca"
+use_ldap: yes
+create_ldap: no
+ldap_uri: 'ldaps://svrs.id.rug.nl'
+ldap_base: 'ou=umcg,o=asds'
+ldap_binddn: 'cn=clusteradminumcg,o=asds'
+ldap_group_object_class: 'groupofnames'
+ldap_group_quota_soft_limit_template: 'ruggroupumcgquotaLFSsoft'
+ldap_group_quota_hard_limit_template: 'ruggroupumcgquotaLFS'
+cloud_image: CentOS 7
+cloud_user: centos
+flavor_jumphost: m1.small
+flavor_ui: m1.xlarge
+#flavor_vcompute: htc-node # Quota currently too small for 40 core compute nodes.
+flavor_vcompute: m1.xlarge
+flavor_management: m1.small
+network_public_external_id: vlan16
+network_private_management_id: internal_management
+network_private_management_cidr: '10.10.1.0/24'
+network_private_management_gw: '10.10.1.1'
+network_private_storage_id: internal_storage
+network_private_storage_cidr: '10.10.2.0/24'
+public_ip_addresses:
+  tunnel: '195.169.22.136'
+availability_zone: nova
+local_volume_size_repo: 20
+local_volume_size_vcompute: 1
+local_volume_size_management: 1
+nameservers: [
+  '8.8.4.4',  # Google DNS.
+  '8.8.8.8',  # Google DNS.
+]
+local_admin_groups:
+  - 'admin'
+  - 'docker'
+local_admin_users:
+  - 'egon'
+  - 'ger'
+  - 'gerben'
+  - 'henkjan'
+  - 'kim'
+  - 'marieke'
+  - 'marlies'
+  - 'marloes'
+  - 'morris'
+  - 'pieter'
+  - 'robin'
+  - 'sandi'
+  - 'wim'
+envsync_user: 'umcg-envsync'
+envsync_group: 'umcg-depad'
+functional_admin_group: 'umcg-funad'
+hpc_env_prefix: '/apps'
+regular_groups:
+  - 'umcg-atd'
+  - 'umcg-depad'
+  - 'umcg-gcc'
+  - 'umcg-lifelines'
+regular_users:
+  - user: 'umcg-atd-ateambot'
+    groups: ['umcg-atd']
+    sudoers: '%umcg-atd'
+  - user: 'umcg-atd-dm'
+    groups: ['umcg-atd']
+    sudoers: '%umcg-atd'
+  - user: 'umcg-gcc-dm'
+    groups: ['umcg-gcc']
+    sudoers: '%umcg-gcc'
+  - user: 'umcg-lifelines-dm'
+    groups: ['umcg-lifelines']
+    sudoers: '%umcg-lifelines-dms'
+#
+# Shared storage related variables
+#
+lustre_client_networks: 'tcp11(vlan???.lustre),tcp12(vlan???.lustre)'
+pfs_mounts: [
+  { pfs: 'umcgst01',
+    source: '172.23.57.201@tcp11:172.23.57.202@tcp11:/dh1',
+    type: 'lustre',
+    rw_options: 'defaults,_netdev,flock',
+    ro_options: 'defaults,_netdev,ro' },
+]
+lfs_mounts: [
+  { lfs: 'home',
+    pfs: 'xyz',
+    machines: "{{ groups['cluster'] }}" },
+  { lfs: 'tmp02',
+    pfs: 'xyz',
+    groups: ['umcg-atd', 'umcg-gcc', 'umcg-lifelines'] },
+  { lfs: 'prm02',
+    pfs: 'umcgst01',
+    groups: ['umcg-atd', 'umcg-gcc', 'umcg-lifelines'] },
+  { lfs: 'env02',
+    pfs: 'xyz',
+    machines: "{{ groups['compute_vm'] + groups['user_interface'] }}" },
+]
+...

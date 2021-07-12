@@ -6,4 +6,13 @@ firewall_allowed_tcp_ports:
   - '22'   # SSH
   - '80'   # HTTP
   - '443'  # HTTPS
+extra_jumphosts_for_docs_server:
+  - 'airlock'     # Gearshift
+  - 'reception'   # Talos
+  - 'portal'      # Hyperchicken/Nibbler
+  - 'corridor'    # Fender
+  - 'dockingport' # Marvin
+ssh_host_signer_hostnames: "{{ ansible_fqdn }},{{ ansible_hostname }}\
+    {% for jumphost_for_this_cluster in groups['jumphost'] %},{{ jumphost_for_this_cluster }}+{{ ansible_hostname }}{% endfor %}\
+    {% for extra_jumphost in extra_jumphosts_for_docs_server %},{{ extra_jumphost }}+{{ ansible_hostname }}{% endfor %}"
 ...

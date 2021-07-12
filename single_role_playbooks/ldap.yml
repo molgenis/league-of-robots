@@ -1,6 +1,8 @@
 ---
 - name: Install ldap role.
-  hosts: jumphost, cluster
+  hosts:
+    - jumphost
+    - cluster
   roles:
      - ldap
 ...

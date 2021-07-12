@@ -7,7 +7,7 @@
 - name: 'Find all ansible-managed files in /etc/sudoers.d/.'
   find:
     paths: '/etc/sudoers.d/'
-    use_regex: yes
+    use_regex: true
     patterns: '.*ansible-managed.*'
   register: ansible_managed_sudoers
   become: true

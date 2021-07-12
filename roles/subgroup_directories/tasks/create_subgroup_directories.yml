@@ -2,29 +2,26 @@
 - block:
     - name: "Get list of {{ group }} subgroups with version number from the LDAP."
       shell: |
-        ldapsearch -LLL -D '{{ ldap_binddn }}' -w '{{ bindpw }}' -b '{{ ldap_base }}' -H '{{ ldap_uri }}' \
+        ldapsearch -LLL -o ldif-wrap=no -D '{{ ldap_binddn }}' -w '{{ bindpw }}' -b '{{ ldap_base }}' -H '{{ ldap_uri }}' \
             "(ObjectClass=GroupofNames)" dn \
           | tr "=," "\n" \
-          | fgrep "{{ group }}" \
-          | grep -v "^{{ group }}$" \
-          | grep -- "-v[0-9][0-9]*$" \
+          | grep "^{{ group }}-.*-v[0-9][0-9]*$" \
           || true
       register: versioned_subgroups
-    - set_fact: # noqa 502
+    - set_fact:  # noqa unnamed-task
         versioned_subgroups_list: "{% if versioned_subgroups.stdout | length %}{{ versioned_subgroups.stdout.split('\n') | list }}{% endif %}"
 
 - block:
     - name: "Get list of {{ group }} subgroups without version number and excluding *-dms groups from the LDAP."
       shell: |
-        ldapsearch -LLL -D '{{ ldap_binddn }}' -w '{{ bindpw }}' -b '{{ ldap_base }}' -H '{{ ldap_uri }}' \
+        ldapsearch -LLL -o ldif-wrap=no -D '{{ ldap_binddn }}' -w '{{ bindpw }}' -b '{{ ldap_base }}' -H '{{ ldap_uri }}' \
             "(ObjectClass=GroupofNames)" dn \
-            | tr "=," "\n" \
-            | fgrep "{{ group }}" \
-            | grep -v "^{{ group }}$" \
-            | grep -v -- "-v[0-9][0-9]*$\|-dms$" \
-            || true
+          | tr "=," "\n" \
+          | grep "^{{ group }}-.*$" \
+          | grep -v -- "-v[0-9][0-9]*$\|-dms$\|-owners$" \
+          || true
       register: unversioned_subgroups
-    - set_fact: # noqa 502
+    - set_fact:  # noqa unnamed-task
         unversioned_subgroups_list: "{% if unversioned_subgroups.stdout | length %}{{ unversioned_subgroups.stdout.split('\n') | list }}{% endif %}"
 
 - name: "Create directory structure for releases with version number on {{ lfs }}."
@@ -54,7 +51,8 @@
         mode: "{{ mode_version }}"
         state: 'directory'
       with_items: "{{ versioned_subgroups_list }}"
-      ignore_errors: yes # Continue of this specific subgroup failed and try to create other subgroup folders.
+      # Continue if this specific subgroup failed and try to create other subgroup folders.
+      ignore_errors: true  # noqa ignore-errors
   when: versioned_subgroups_list | length > 0
   become: true
   become_user: "{{ group }}-dm"
@@ -76,7 +74,8 @@
         mode: "{{ mode_project }}"
         state: 'directory'
       with_items: "{{ unversioned_subgroups_list }}"
-      ignore_errors: yes # Continue of this specific subgroup failed and try to create other subgroup folders.
+      # Continue if this specific subgroup failed and try to create other subgroup folders.
+      ignore_errors: true  # noqa ignore-errors
   when: unversioned_subgroups_list | length > 0
   become: true
   become_user: "{{ group }}-dm"

@@ -1,0 +1,58 @@
+---
+- name: Check if host should use pulp client to access a pulp server for managed repos.
+  ansible.builtin.debug:
+    msg: "FATAL: expected repo_manager == pulp, but detected {{ repo_manager }}. \
+          Check Ansible repo_manager variable in the group_vars for this site."
+  when: repo_manager != 'pulp'
+  failed_when: repo_manager != 'pulp'
+
+- name: Add Pulp yum repos.
+  ansible.builtin.yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.client_baseurl }}"
+    gpgcheck: false
+  with_items: "{{ pulp_repos }}"
+  become: true
+
+- name: Copy pulp web server certificates to pulp clients.
+  ansible.builtin.copy:
+    src: "{{ slurm_cluster_name }}_cluster/\
+          {{ item | regex_replace('^' + ai_jumphost + '\\+','') }}_pulp_root.crt"
+    dest: /etc/pki/ca-trust/source/anchors/
+    owner: root
+    group: root
+    mode: '0600'
+  with_items: "{{ groups['repo'] }}"
+  become: true
+  notify: update-ca-trust
+
+- name: Flush handlers.
+  meta: flush_handlers
+
+- name: Find all *.repo files in /etc/yum.repos.d/.
+  find:
+    paths: '/etc/yum.repos.d/'
+    use_regex: false
+    patterns: '*.repo'
+  register: yum_repo_configs
+
+- name: Remove *.repo files from /etc/yum.repos.d/ that do not correspond to our Pulp repos.
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ yum_repo_configs.files | map (attribute='path') | list }}"
+  when: item | basename | regex_replace('.repo$','') not in pulp_repos | map(attribute='name') | list
+  become: true
+
+- name: Remove RHN/SpaceWalk if it was installed.
+  yum:
+    state: absent
+    name:
+      - rhn-client-tools
+      - rhn-check
+      - rhn-setup
+      - rhnsd
+      - yum-rhn-plugin
+  become: true
+...

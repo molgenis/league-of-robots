@@ -1,0 +1,64 @@
+---
+slurm_cluster_name: 'calculon'
+slurm_cluster_domain: 'hpc.rug.nl'
+stack_prefix: 'cc'
+repo_manager: 'spacewalk'
+rhn_channels:
+  - umcg2020
+figlet_font: 'ogre'
+motd: |
+      =========================================================
+      Welcome to: {{ slurm_cluster_name | capitalize }}
+      =========================================================
+additional_etc_hosts:
+  - group: all
+    hosts:
+      - docs
+      - gattaca01
+      - gattaca02
+      - calculon
+      - boxy
+      - bender
+      - flexo
+      - winterpeen
+ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/umcg-hpc-development-ca"
+use_ldap: yes
+create_ldap: no
+ldap_uri: 'ldaps://svrs.id.rug.nl'
+ldap_base: 'ou=umcg,o=asds'
+ldap_binddn: 'cn=clusteradminumcg,o=asds'
+ldap_group_object_class: 'groupofnames'
+cloud_image: CentOS 7
+cloud_user: centos
+flavor_jumphost: m1.small
+network_public_external_id: vlan16
+network_private_management_id: internal_management
+network_private_management_cidr: '10.10.1.0/24'
+network_private_management_gw: '10.10.1.1'
+network_private_storage_id: internal_storage
+network_private_storage_cidr: '10.10.2.0/24'
+public_ip_addresses:
+  lobby: '195.169.22.135'
+availability_zone: nova
+nameservers: [
+  '8.8.4.4',  # Google DNS.
+  '8.8.8.8',  # Google DNS.
+]
+local_admin_groups:
+  - 'admin'
+  - 'docker'
+local_admin_users:
+  - 'egon'
+  - 'gerben'
+  - 'henkjan'
+  - 'kim'
+  - 'marieke'
+  - 'marlies'
+  - 'marloes'
+  - 'morris'
+  - 'pieter'
+  - 'robin'
+  - 'sandi'
+  - 'wim'
+functional_admin_group: 'umcg-funad'
+...

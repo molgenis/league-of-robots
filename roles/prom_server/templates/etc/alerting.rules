@@ -9,7 +9,7 @@ groups:
     annotations:
       description: '{{ $labels.instance }} of job {{ $labels.job }} has been down
         for more than 10 minutes.'
-      summary: Instance {{ $labels.instance }} down
+      summary: 'Instance {{ $labels.instance }} down'
   - alert: Time not being synced
     expr: node_timex_sync_status{job="node"} == 0
     for: 5m
@@ -17,14 +17,14 @@ groups:
       severity: page
     annotations:
       description: '{{ $labels.instance }} is not configured to sync its time with an external ntp server'
-      summary: Instance {{ $labels.instance }} no ntp configured.
+      summary: 'Instance {{ $labels.instance }} no ntp configured.'
   - alert: clock wrong
-    expr: node_timex_offset_seconds{job="node"} > 1
+    expr: node_timex_offset_seconds{job="node"} > 3
     for: 10m
     labels:
       severity: page
     annotations:
-      description: '{{ $labels.instance }} has a clock offset > 1 second.'
+      description: '{{ $labels.instance }} has a clock offset > 3 seconds.'
       summary: '{{ $labels.instance }} has clock drift.'
   - alert: DiskWillFillIn8Hours
     expr: predict_linear(node_filesystem_free{job="node",mountpoint!~"/tmp|/local|/target/gpfs3"}[2h], 8 * 3600) < 0
@@ -32,7 +32,7 @@ groups:
     labels:
       severity: page
     annotations:
-      description: Instance {{ $labels.instance }} will fill up within 8 hours
+      description: 'Instance {{ $labels.instance }} will fill up within 8 hours'
       summary: '{{ $labels.instance }} disk full'
   - alert: DiskWillFillIn72Hours
     expr: predict_linear(node_filesystem_free{job="node",mountpoint!~"/tmp|/local|/target/gpfs3"}[6h], 72 * 3600) < 0
@@ -40,7 +40,7 @@ groups:
     labels:
       severity: page
     annotations:
-      description: Instance {{ $labels.instance }} will fill up within 72 hours
+      description: 'Instance {{ $labels.instance }} will fill up within 72 hours'
       summary: '{{ $labels.instance }} disk almost full'
   - alert: DiskFull
     expr: node_filesystem_free{job="node",mountpoint!~"/net|/cvmfs|/var/lib/nfs/rpc_pipefs|/cvmfs|/misc|/run/docker/netns/.+?|/cgroup.+?", fstype!~"fuse.+?"} < 5.24288e+06
@@ -48,7 +48,7 @@ groups:
     labels:
       severity: page
     annotations:
-      description: Instance {{ $labels.instance }} has a full {{ $labels.mountpoint }}.
+      description: 'Instance {{ $labels.instance }} has a full {{ $labels.mountpoint }}.'
       summary: '{{ $labels.instance }} Disk full'
   - alert: tmpFull
     expr: node_filesystem_free{job="node",mountpoint="/tmp"} < 5242880
@@ -56,7 +56,7 @@ groups:
     labels:
       severity: page
     annotations:
-      description: Instance {{ $labels.instance }} Has a full /tmp
+      description: 'Instance {{ $labels.instance }} Has a full /tmp'
       summary: '{{ $labels.instance }} /tmp full'
   - alert: NodeRebooted
     expr: delta(node_boot_time[1h]) > 10
@@ -64,8 +64,16 @@ groups:
     labels:
       severity: page
     annotations:
-      description: Instance {{ $labels.instance }} has been rebooted.
+      description: 'Instance {{ $labels.instance }} has been rebooted.'
       summary: '{{ $labels.instance }} rebooted'
+  - alert: Oom Killer
+    expr: min_over_time(node_vmstat_oom_kill{job="node"}[1h]) < node_vmstat_oom_kill{job="node"}
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      description: 'Oom killer active on {{ $labels.instance }}'
+      summary: 'Oom killer active on {{ $labels.instance }}'
   - alert: Node drained.
     expr: min_over_time(slurm_nodes_drain{instance="gearshift:9102",job="slurm_exorter"}[1h]) < slurm_nodes_drain{instance="gearshift:9102",job="slurm_exorter"}
     for: 5m

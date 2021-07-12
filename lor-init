@@ -4,7 +4,7 @@
 # for which the config is stored in the repo containing this script.
 #
 # This script assumes there is for each CLUSTERNAME a corresponding:
-#  1. ./group_vars/CLUSTERNAME-cluster/      Ansible group variables and secrets encrypted with Ansible vault.
+#  1. ./group_vars/CLUSTERNAME_cluster/      Ansible group variables and secrets encrypted with Ansible vault.
 #  2. ./CLUSTERNAME_hosts.ini                Ansible inventory file in the root of this repo.
 #  3. ./.vault/vault_pass.txt.CLUSTERNAME    Ansible vault password file in the root of this repo.
 #
@@ -37,7 +37,7 @@ function lor-config() {
 		return
 	fi
 	declare -a required_paths=(
-		"${LOR_DIR}/group_vars/${cluster}-cluster/"
+		"${LOR_DIR}/group_vars/${cluster}_cluster/"
 		"${LOR_DIR}/static_inventories/${cluster}_hosts.ini"
 		"${LOR_DIR}/.vault/vault_pass.txt.${cluster}"
 		"${LOR_DIR}/.vault/vault_pass.txt.all"
@@ -59,7 +59,6 @@ function lor-config() {
 	export AI_INVENTORY="static_inventories/${cluster}_hosts.ini"
 	export AI_PROXY="${jumphost}"
 	export ANSIBLE_VAULT_IDENTITY_LIST="all@.vault/vault_pass.txt.all, ${cluster}@.vault/vault_pass.txt.${cluster}"
-	export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=ignore
 	printf '%s\n' "Current working directory is $(pwd)"
 	printf '%s\n' "Using AI_PROXY:                    ${AI_PROXY}"
 	printf '%s\n' "Using AI_INVENTORY:                ${AI_INVENTORY}"

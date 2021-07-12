@@ -1,4 +1,9 @@
 ---
+- name: 'Set hostname to inventory_hostname.'
+  hostname:
+    name: "{{ inventory_hostname | regex_replace('^' + ai_jumphost + '\\+','') }}"
+  become: true
+
 - name: 'Find SSH host keys.'
   find:
     path: "{{ ssh_host_signer_key_directory }}"
@@ -37,10 +42,19 @@
     mode: '0600'
   delegate_to: localhost
 
+- name: 'Create temporary unvaulted copy of CA private key.'
+  copy:
+    src: "{{ ssh_host_signer_ca_private_key }}"
+    dest: "{{ temporary_directory.path }}/{{ ssh_host_signer_ca_private_key | basename }}"
+    mode: '0600'
+    decrypt: true
+  delegate_to: localhost
+  become: false
+
 - name: 'Sign SSH host keys.'
   command: >
     ssh-keygen -h
-      -s {{ ssh_host_signer_ca_private_key | quote }}
+      -s {{ temporary_directory.path | quote }}/{{ ssh_host_signer_ca_private_key | basename | quote }}
       -P {{ ssh_host_signer_ca_private_key_pass | quote }}
       -I {{ ssh_host_signer_id | quote }}
       -n {{ ssh_host_signer_hostnames | quote }}
@@ -77,6 +91,9 @@
   copy:
     src: "{{ item.item.path }}"
     dest: "{{ ssh_host_signer_key_directory }}"
+    owner: root
+    group: root
+    mode: '0644'
   when: item.rc != 0
   with_items: "{{ certificate_comparison.results }}"
   notify: reload_sshd
@@ -93,9 +110,12 @@
   lineinfile:
     dest: "{{ ssh_host_signer_ssh_config }}"
     line: "HostCertificate {{ item.path }}-cert.pub"
-    state: present
     insertafter: "HostKey {{ item.path }}"
-    backup: yes
+    state: present
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
   with_items: "{{ private_keys.files | selectattr('path', 'match', ssh_host_signer_key_types) | list }}"
   notify: reload_sshd
   become: true
@@ -105,6 +125,9 @@
     dest: "{{ ssh_host_signer_ssh_config }}"
     line: "HostCertificate {{ item.path }}-cert.pub"
     state: absent
+    owner: root
+    group: root
+    mode: '0644'
   with_items: "{{ private_keys.files | rejectattr('path', 'match', ssh_host_signer_key_types) | list }}"
   notify: reload_sshd
   become: true
@@ -114,6 +137,9 @@
     dest: "{{ ssh_host_signer_ssh_config }}"
     line: "HostKey {{ item.path }}"
     state: absent
+    owner: root
+    group: root
+    mode: '0644'
   with_items: "{{ private_keys.files | rejectattr('path', 'match', ssh_host_signer_key_types) | list }}"
   notify: reload_sshd
   become: true

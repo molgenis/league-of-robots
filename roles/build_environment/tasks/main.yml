@@ -1,0 +1,13 @@
+#
+# Deploy a basic/generic build environment on both
+#  * User Interface: to allow regular users to compile extra stuff in their home or in a tmp group dir.
+#  * Deploy Admin Interface: to allow deploy admins to compile and deploy apps using EasyBuild.
+# The DAI requires additional packages for compiling Slurm, Lmod, Lua, Ansible, etc.,
+# which users won't need.
+#
+---
+- import_tasks: generic_build_dependencies.yml
+  when: inventory_hostname in groups['user_interface'] or inventory_hostname in groups['deploy_admin_interface']
+- import_tasks: dai_build_dependencies.yml
+  when: inventory_hostname in groups['deploy_admin_interface']
+...

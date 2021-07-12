@@ -1,0 +1,22 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
+---
+ip_addresses:
+{% for server_info in relevant_servers_info %}
+  {{ server_info.name }}:
+    addr: {{ server_info.addresses[network_private_management_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'fixed') | map(attribute='addr') | first }}
+    mask: /32
+    vlan: {{ network_private_management_id }}
+    fqdn:
+    {% if server_info.name in groups['jumphost']%}
+    desc: Jumphost
+    {% elif server_info.name in groups['sys_admin_interface']%}
+    desc: Sys Admin Interface
+    {% elif server_info.name in groups['deploy_admin_interface']%}
+    desc: Deploy Admin Interface
+    {% elif server_info.name in groups['user_interface'] %}
+    desc: User Interface
+    {% elif server_info.name in groups['compute_vm']%}
+    desc: Compute Node
+    {% endif %}
+{% endfor %}
+...

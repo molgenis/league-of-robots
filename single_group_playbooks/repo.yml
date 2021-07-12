@@ -1,0 +1,18 @@
+---
+- import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Roles for repo management servers. <-==###'
+  hosts: repo
+  roles:
+    - admin_users
+    - ssh_host_signer
+    - ssh_known_hosts
+    - {role: geerlingguy.repo-epel, become: true}
+    - logrotate
+    - logins
+    - static_hostname_lookup
+    - sshd
+    - {role: geerlingguy.security, become: true}
+    - update
+    - pulp_server
+...

@@ -1,6 +1,0 @@
----
-- name: Install the common role from the hpc-cloud repo.
-  hosts: all
-  become: True
-  roles:
-  - hpc-cloud/roles/common

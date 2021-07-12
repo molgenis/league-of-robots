@@ -27,9 +27,9 @@
 - name: Make sure grafana service is started and enabled on (re)boot.
   systemd:
     name: grafana.service
-    enabled: yes
+    enabled: true
     state: started
-    daemon_reload: yes
+    daemon_reload: true
   tags:
     - start-service
   become: true

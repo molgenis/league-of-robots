@@ -1,7 +1,5 @@
 ---
-use_ldap: yes  # needed for the sshd template
-ldap_port: 389
-ldaps_port: 636
+use_ldap: true  # needed for the sshd template
 ldap_uri: ''
 ldap_base: ''
 ldap_binddn: ''

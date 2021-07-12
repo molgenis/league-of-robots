@@ -67,6 +67,14 @@
   failed_when: false
   register: root_pwd_check
 
+- name: 'Install dependencies to interface with MariaDB/MySQL databases/services.'
+  yum:
+    name:
+      - 'MySQL-python'
+    state: 'latest'
+    update_cache: yes
+  become: true
+
 - name: 'Set MariaDB/MySQL root user password.'
   mysql_user:
     name: 'root'

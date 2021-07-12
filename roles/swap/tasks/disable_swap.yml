@@ -1,0 +1,27 @@
+---
+- name: Check if swap is active.
+  command:
+    cmd: /usr/bin/grep "{{ swap_file_path }}" /proc/swaps
+  register: proc_swaps
+  changed_when: swap_file_path in proc_swaps.stdout
+  failed_when: proc_swaps.rc >= 2
+  notify: disable_swap_file
+
+- name: Flush handlers.
+  meta: flush_handlers
+
+- name: Remove swap file entry from fstab.
+  mount:
+    path: none
+    src: "{{ swap_file_path }}"
+    fstype: swap
+    opts: sw
+    state: absent
+  become: true
+
+- name: Remove swap file.
+  file:
+    path: "{{ swap_file_path }}"
+    state: absent
+  become: true
+...

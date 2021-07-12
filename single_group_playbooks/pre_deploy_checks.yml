@@ -1,0 +1,35 @@
+---
+- name: 'Sanity checks before we start.'
+  hosts: all
+  any_errors_fatal: true
+  gather_facts: false
+  become: false
+  vars:
+    #
+    # Disable Ansible's interpretor detection logic,
+    # which would fail to use the interpretor from an activated virtual environment.
+    #
+    - ansible_python_interpreter: python
+  pre_tasks:
+    - name: 'Verify Ansible version meets requirements.'
+      assert:
+        that: "ansible_version.full is version_compare(minimal_ansible_version, '>=')"
+        msg: "You must update Ansible to at least {{ minimal_ansible_version }}.x to use this playbook."
+      vars:
+        minimal_ansible_version: 2.10
+      run_once: true
+      delegate_to: localhost
+    - name: 'Verify that the group_vars were parsed.'
+      assert:
+        that: slurm_cluster_name is defined
+        msg: "FATAL: the slurm_cluster_name Ansible variable is undefined, which suggests that the group_vars were not parsed."
+      run_once: true
+      delegate_to: localhost
+    - name: 'Download dependencies from Ansible Galaxy on the Ansible control host.'
+      ansible.builtin.command:
+        cmd: ansible-galaxy install -r galaxy-requirements.yml
+      run_once: true
+      delegate_to: localhost
+      changed_when: "'installed successfully' in resolved_dependencies.stdout"
+      register: resolved_dependencies
+...

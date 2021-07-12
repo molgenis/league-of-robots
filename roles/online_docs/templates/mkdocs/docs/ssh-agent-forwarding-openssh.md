@@ -11,7 +11,7 @@
       ```$your_client> ssh-add /path/to/my/private.key```
 * Login to {{ slurm_cluster_name | capitalize }} with SSH _agent forwarding_ enabled 
   can now be accomplished with the ```-A``` argument on the commandline like this:  
-  ```$your_client> ssh -A {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}```
+  ```$your_client> ssh -A {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}```
 
 _**Note**_: You **cannot** accomplish this by configuring a ```ProxyCommand``` directive in a  ```${HOME}/.ssh/conf.d/*``` config file on your local client computer.
 

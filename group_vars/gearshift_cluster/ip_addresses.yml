@@ -1,0 +1,92 @@
+---
+ip_addresses:
+  sugarsnax:
+    addr: 172.23.40.35
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Deploy Admin Interface
+  imperator:
+    addr: 172.23.40.34
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Sys Admin Interface
+  gs-vcompute10:
+    addr: 172.23.40.90
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute09:
+    addr: 172.23.40.89
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute08:
+    addr: 172.23.40.88
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute07:
+    addr: 172.23.40.87
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute06:
+    addr: 172.23.40.86
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute05:
+    addr: 172.23.40.85
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute04:
+    addr: 172.23.40.84
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute03:
+    addr: 172.23.40.83
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute02:
+    addr: 172.23.40.82
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gs-vcompute01:
+    addr: 172.23.40.81
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  gearshift:
+    addr: 172.23.40.33
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: User Interface
+  gearshift-storage:
+    addr: 172.23.34.33
+    mask: /32
+    vlan: vlan985
+    desc: User Interface - Storage VLAN
+  airlock:
+    addr: 172.23.40.36
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Jumphost
+...

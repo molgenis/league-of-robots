@@ -1,0 +1,48 @@
+---
+#
+# fallocate doesn't work on centos7, see
+# https://unix.stackexchange.com/questions/294600/i-cant-enable-swap-space-on-centos-7
+#
+- name: "Create swap file {{ swap_file_path }}."
+  command:
+    cmd: |
+      dd if=/dev/zero bs=1MiB count={{ swap_file_size * 1024 }} of={{ swap_file_path | quote }}
+    creates: "{{ swap_file_path | quote }}"
+  notify:
+    - format_swap_file
+    - enable_swap_file
+  become: true
+
+- name: Set permissions on swap file.
+  file:
+    path: "{{ swap_file_path }}"
+    owner: root
+    group: root
+    mode: 0600
+  become: true
+
+- name: Add swap file entry to fstab.
+  mount:
+    path: none
+    src: "{{ swap_file_path }}"
+    fstype: swap
+    opts: sw
+    state: present
+  become: true
+
+- name: Check if swap is active.
+  command:
+    cmd: /usr/bin/grep "{{ swap_file_path }}" /proc/swaps
+  register: proc_swaps
+  changed_when: swap_file_path not in proc_swaps.stdout
+  failed_when: proc_swaps.rc >= 2
+  notify:
+    - format_swap_file
+    - enable_swap_file
+
+- name: Set swapiness.
+  sysctl:
+    name: vm.swappiness
+    value: "{{ swap_swappiness | int }}"
+  become: true
+...

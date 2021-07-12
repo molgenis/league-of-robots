@@ -1,0 +1,38 @@
+---
+- name: 'Check if required groups are present.'
+  group:
+    name: "{{ item }}"
+    gid: "{{ auth_groups[item].gid }}"
+    state: present
+  with_items: "{{ regular_groups }}"
+  become: true
+
+- name: "Check if required private groups for user's home dir are present."
+  group:
+    name: "{{ item.user }}"                 # Use same name as user's account name for user's private group.
+    gid: "{{ auth_users[item.user].uid }}"  # Use same GID as user's UID for user's private group.
+    state: present
+  with_items: "{{ regular_users }}"
+  become: true
+
+- name: 'Create local regular users and append them to relevant groups.'
+  user:
+    name: "{{ item.user }}"
+    uid: "{{ auth_users[item.user].uid }}"
+    comment: "{{ auth_users[item.user].comment }}"
+    group: "{{ item.user }}"
+    groups: "{{ item.groups }}"
+    home: "/home/{{ item.user }}"
+    append: false
+  with_items: "{{ regular_users }}"
+  become: true
+
+- name: 'Deploy authorized keys for local regular users.'
+  authorized_key:
+    user: "{{ item.user }}"
+    key: "{{ auth_users[item.user].pub_keys }}"
+    state: present
+    exclusive: true
+  with_items: "{{ regular_users }}"
+  become: true
+...

@@ -1,0 +1,25 @@
+---
+- name: "Find all ip_addresses.yml files in {{ playbook_dir }}/group_vars/*."
+  find:
+    paths: "{{ playbook_dir }}/group_vars/"
+    recurse: true
+    patterns: 'ip_addresses.yml'
+  register: ip_addresses_files
+  delegate_to: localhost
+- name: Include variables from all ip_addresses.yml files.
+  include_vars:
+    file: "{{ item }}"
+    name: "{{ item | dirname | basename }}"
+  with_items: "{{ ip_addresses_files.files | map (attribute='path') | list }}"
+  delegate_to: localhost
+- name: Deploy /etc/hosts file.
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    mode: 0644
+    owner: root
+    group: root
+    backup: true
+  become: true
+  tags: ['etc_hosts']
+...

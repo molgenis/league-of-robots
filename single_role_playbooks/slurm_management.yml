@@ -1,0 +1,10 @@
+---
+- hosts: sys_admin_interface
+  roles:
+     - mariadb
+     - slurm_management
+  vars:
+     # These variables are needed by the mariadb role.
+     hostname_node0: "{{ ansible_hostname }}"
+     ip_node0: "{{ ansible_default_ipv4['address'] }}"
+...

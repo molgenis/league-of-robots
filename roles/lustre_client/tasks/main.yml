@@ -1,0 +1,11 @@
+---
+#
+# Using an include here is silly, but required to prevent an error related to using:
+# "meta: flush_handlers" in combination with a "when" condition.
+# See: https://github.com/ansible/ansible/issues/41313
+#
+- name: 'Install Lustre client.'
+  include_tasks:
+    file: 'install.yml'
+  when: pfs_mounts | selectattr('type', 'equalto', 'lustre') | list | length >= 1
+...

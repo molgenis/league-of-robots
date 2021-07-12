@@ -6,8 +6,8 @@
 #       ANSIBLE_VAULT_PASSWORD_FILE=".vault_pass.txt.${cluster_name}"
 #  1. Use standard CentOS cloud image user 'centos' or 'root' user and without host key checking:
 #       export ANSIBLE_HOST_KEY_CHECKING=False
-#       ansible-playbook -i inventory.py -u centos -l 'jumphost,cluster'  single_role_playbooks/admin-users.yml
-#       ansible-playbook -i inventory.py -u root   -l 'docs'              single_role_playbooks/admin-users.yml
+#       ansible-playbook -i inventory.py -u centos -l 'jumphost,cluster'  single_role_playbooks/admin_users.yml
+#       ansible-playbook -i inventory.py -u root   -l 'docs'              single_role_playbooks/admin_users.yml
 #  2. Use local admin user's account and without host key checking:
 #       export ANSIBLE_HOST_KEY_CHECKING=False
 #       ansible-playbook -i inventory.py -u [admin_account] single_role_playbooks/ssh_host_signer.yml
@@ -15,20 +15,22 @@
 #       export ANSIBLE_HOST_KEY_CHECKING=True
 #       ansible-playbook -i inventory.py -u [admin_account] cluster.yml
 #     This will configure:
-#       A. Jumphost first as it is required to access the other machines.
-#       B. Basic roles for all cluster machines part 1:
+#       * Jumphost first as it is required to access the other machines.
+#       * Repo management server second as it is required for version control of the packages
+#         installed on all other machines except for the jumphost, which will always get the latest updates for security.
+#       * Basic roles for all cluster machines part 1:
 #           * Roles that do NOT require regular accounts or groups to be present.
-#       C. An LDAP with regular user accounts, which may be required for additional roles.
+#       * An LDAP with regular user accounts, which may be required for additional roles.
 #             (E.g. a chmod or chgrp for a file/folder requires the corresponding user or group to be present.)
-#       D. Basic roles for all cluster machines part 2:
+#       * Basic roles for all cluster machines part 2:
 #           * Roles that DO depend on regular accounts and groups.
-#       E. SAI as it is required to:
+#       * SAI as it is required to:
 #           * Configure layout on shared storage devices used by other machines.
 #           * Configure Slurm control and Slurm database.
-#       F. DAI
-#       G. UI
-#       H. Compute nodes
-#       I. Documentation server
+#       * DAI
+#       * UI
+#       * Compute nodes
+#       * Documentation server
 #
 
 #
@@ -39,136 +41,25 @@
 - name: 'Dummy play to ping jumphosts and establish a persistent SSH connection.'
   hosts: jumphost
 
-- name: 'Sanity checks before we start.'
-  hosts: all
-  pre_tasks:
-    - name: 'Verify Ansible version meets requirements.'
-      assert:
-        that: "ansible_version.full is version_compare('2.4', '>=')"
-        msg: 'You must update Ansible to at least 2.4.x to use this playbook.'
+- import_playbook: single_group_playbooks/pre_deploy_checks.yml
 
-- name: 'A. Roles for jumphosts.'
-  hosts: jumphost
-  roles:
-    - admin-users
-    - ssh_host_signer
-    - ssh_known_hosts
-    - yum-repos
-    - logins
-    - {role: geerlingguy.repo-epel, become: true}
-    - ldap
-    - static-hostname-lookup
-    - sshd
-    - node_exporter
-    - {role: geerlingguy.security, become: true}
-    - {role: grafana_proxy, when: ansible_hostname == 'airlock'}
-    - regular-users
-  tasks:
-    - name: 'Install cron job to reboot jumphost regularly to activate kernel updates.'
-      cron:
-        name: 'Reboot to load new kernel.'
-        weekday: '1'
-        minute: '45'
-        hour: '11'
-        user: root
-        job: /bin/needs-restarting -r >/dev/null 2>&1 || /sbin/shutdown -r +60 "Restarting to apply updates..."
-        cron_file: reboot
-      become: true
+- import_playbook: single_group_playbooks/jumphost.yml
 
-- name: 'B. Basic roles for all cluster machines part 1.'
-  hosts:
-    - cluster
-  roles:
-    - admin-users
-    - ssh_host_signer
-    - ssh_known_hosts
-    - spacewalk_client
-    - logins
-    - figlet_motd
-    - node_exporter
-    - static-hostname-lookup
-    - cluster
-    - resolver
-    - coredumps
+- import_playbook: single_group_playbooks/repo.yml
 
-- name: 'C. Create LDAP account server.'
-  hosts:
-    - ldap-server
-  roles:
-    - role: openldap
-      when:
-        - use_ldap | default(true, true) | bool
-        - create_ldap | default(false, true) | bool
+- import_playbook: single_group_playbooks/cluster_part1.yml
 
-- name: 'D. Basic roles for all cluster machines part 2.'
-  hosts:
-    - cluster
-  roles:
-    - ldap # client
-    - sshd
-    - regular-users
-    - shared_storage
+- import_playbook: single_group_playbooks/ldap_server.yml
 
-- name: 'E. Roles for SAIs.'
-  hosts:
-    - sys-admin-interface
-  roles:
-    - mount-volume
-    - slurm-management
-    - prom_server
-    - grafana
-    - cadvisor
-  vars:
-    # These variables are needed by the mariadb role.
-    # Which is a depencency of the slurm-management role.
-    # See roles/slurm/meta/main.yml
-    hostname_node0: "{{ ansible_hostname }}"
-    ip_node0: "{{ ansible_default_ipv4['address'] }}"
+- import_playbook: single_group_playbooks/cluster_part2.yml
 
-- name: 'F. Roles for DAIs.'
-  hosts: deploy-admin-interface
-  roles:
-    - mount-volume
-    - build-environment
-    - envsync
+- import_playbook: single_group_playbooks/sys_admin_interface.yml
 
-- name: 'G. Roles for UIs.'
-  hosts: user-interface
-  roles:
-    - build-environment
-    - slurm_exporter
-    - slurm-client
-    - sudoers
-    - subgroup_directories
-    - role: fuse-layer
-      when: fuse_mountpoint is defined and fuse_mountpoint | length >= 1
+- import_playbook: single_group_playbooks/deploy_admin_interface.yml
 
-- name: 'H. Roles for compute nodes.'
-  hosts: compute-vm
-  roles:
-    - mount-volume
-    - slurm-client
+- import_playbook: single_group_playbooks/user_interface.yml
 
-- name: 'I. Roles for documentation servers.'
-  hosts:
-    - docs
-  roles:
-    - admin-users
-    - ssh_host_signer
-    - yum-repos
-    - {role: geerlingguy.repo-epel, become: true}
-    - sshd
-    - {role: geerlingguy.security, become: true}
-    - online_docs
-  tasks:
-    - name: 'Install cron job to reboot server regularly to activate kernel updates.'
-      cron:
-        name: 'Reboot to load new kernel.'
-        weekday: '1'
-        minute: '45'
-        hour: '11'
-        user: root
-        job: /bin/needs-restarting -r >/dev/null 2>&1 || /sbin/shutdown -r +60 "Restarting to apply updates..."
-        cron_file: reboot
-      become: true
+- import_playbook: single_group_playbooks/compute_vm.yml
+
+- import_playbook: single_group_playbooks/docs.yml
 ...

@@ -3,8 +3,10 @@
 
 ## User Interface (UI) and Jumphost servers
 
+![logins always via jumphost](img/logins.svg)
+
 To submit jobs, check their status, test scripts, etc. you need to login on a _**User Interface (UI)**_ server using SSH.
-Each cluster has its own _**UI**_ and the one for the {{ slurm_cluster_name | capitalize }} HPC cluster is named _**{{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}**_.
+Each cluster has its own _**UI**_ and the one for the {{ slurm_cluster_name | capitalize }} HPC cluster is named _**{{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}**_.
 The UI and various other servers that make up the cluster receive updates during scheduled maintenance, 
 but as this disrupts the processing of jobs, scheduled maintenance is planned only ~twice a year.
 
@@ -24,26 +26,7 @@ First make sure you have an account. If you are new, please [follow these instru
 
 Configure your SSH client with the instructions for your operating system:
 
- * Instructions for [Windows clients](../logins-windows/).
- * Instructions for [macOS clients](../logins-macos/).
- * Instructions for [Linux/Unix clients](../logins-linux/).
-
-## Customize your environment
-
-Once logged in you can customize your environment by editing your ```${HOME}/.bashrc``` file on the cluster.
-The first few lines that are already present should not be changed unless you want to break your environment,
-so please append your custom stuff at the bottom of this file. In case you did corrupt your ```${HOME}/.bashrc```, 
-you can get a fresh copy from the template located in ```/etc/skel/.bashrc```.
-
-#### Time Zone
-
-The cluster runs in the Coordinated Universal Time (or UTC) time zone, which is not adjusted for daylight saving time. 
-The latter could confuse software when switching from winter to summer time or back resulting in newer files having older time stamps.
-If you prefer to see time stamps in your local time zone, you can set your preferred time zone by configuring the TZ environment variable. 
-E.g. for the Netherlands:
-```
-export TZ=Europe/Amsterdam
-```
-If you add this command to your ```${HOME}/.bashrc``` file you can make it the default when you login.
-See the [list of time zones on WikiPedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for other countries.
-
+ * Configuration and login instructions for [Windows clients](../logins-windows/).
+ * Configuration instructions for [macOS clients](../logins-macos-config/).
+ * Configuration instructions for [Linux/Unix clients](../logins-linux-config/).
+ * Login instructions for [macOS/Linux/Unix clients](../logins-macos-linux/).

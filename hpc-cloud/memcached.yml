@@ -1,5 +1,0 @@
----
-- hosts: memcached
-  become: True
-  roles:
-     - hpc-cloud/roles/memcached

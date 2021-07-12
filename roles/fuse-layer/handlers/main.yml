@@ -1,9 +1,0 @@
----
-- name: Restart fuse-layer service.
-  systemd:
-    name: 'ega-fuse-client.service'
-    state: 'restarted'
-    daemon_reload: 'yes'
-  become: true
-  listen: restart_fuser-layer
-...

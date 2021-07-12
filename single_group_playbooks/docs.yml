@@ -1,0 +1,16 @@
+---
+- import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Roles for documentation servers. <-==###'
+  hosts:
+    - docs
+  roles:
+    - admin_users
+    - ssh_host_signer
+    - logrotate
+    - update
+    - {role: geerlingguy.repo-epel, become: true}
+    - sshd
+    - {role: geerlingguy.security, become: true}
+    - online_docs
+...

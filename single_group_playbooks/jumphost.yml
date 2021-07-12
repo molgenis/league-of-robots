@@ -1,0 +1,23 @@
+---
+- import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Roles for jumphosts. <-==###'
+  hosts:
+    - jumphost
+  roles:
+    - admin_users
+    - ssh_host_signer
+    - ssh_known_hosts
+    - logrotate
+    - update
+    - {role: geerlingguy.repo-epel, become: true}
+    - {role: geerlingguy.firewall, become: true}
+    - logins
+    - ldap
+    - static_hostname_lookup
+    - sshd
+    - node_exporter
+    - {role: geerlingguy.security, become: true}
+    - {role: grafana_proxy, when: ansible_hostname == 'airlock'}
+    - regular_users
+...

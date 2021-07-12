@@ -1,0 +1,49 @@
+---
+- name: 'Check the local mount point.'
+  command: "mountpoint {{ volume_mount_point }}"
+  register: mount_local
+  failed_when: false
+  changed_when: false
+
+- name: 'Create an ext4 filesystem on /dev/vdb.'
+  filesystem:
+    fstype: 'ext4'
+    dev: '/dev/vdb'
+  when: mount_local.rc == 1
+  become: true
+
+- name: 'Mount the volume.'
+  mount:
+    path: "{{ volume_mount_point }}"
+    src: '/dev/vdb'
+    fstype: 'ext4'
+    opts: 'rw,relatime'
+    state: mounted
+  become: true
+
+- name: 'Recheck the local mount point.'
+  command: "mountpoint {{ volume_mount_point }}"
+  register: mount_local
+  failed_when: false
+  changed_when: false
+
+- name: 'Configure permissions for root.'
+  file:
+    path: "{{ volume_mount_point }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: mount_local.rc == 0 and inventory_hostname in groups['compute_vm']
+  become: true
+
+- name: 'Configure permissions for deploy admins.'
+  file:
+    path: "{{ volume_mount_point }}"
+    state: directory
+    owner: root
+    group: "{{ envsync_group }}"
+    mode: '2775'
+  when: mount_local.rc == 0 and inventory_hostname in groups['deploy_admin_interface']
+  become: true
+...

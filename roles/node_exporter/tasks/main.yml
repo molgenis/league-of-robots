@@ -23,7 +23,7 @@
     owner: root
     group: root
   tags:
-      - service-files
+    - service-files
   notify: restart_node_exporter
   become: true
 
@@ -31,8 +31,8 @@
   systemd:
     name: 'node-exporter.service'
     state: started
-    enabled: yes
+    enabled: true
   tags:
-      - start-service
+    - start-service
   become: true
 ...

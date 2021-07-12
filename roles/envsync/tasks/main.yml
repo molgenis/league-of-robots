@@ -16,24 +16,26 @@
     group: "{{ envsync_user }}"
     groups: "{{ envsync_group }}"
     home: "/home/{{ envsync_user }}"
-    create_home: no
-    append: no
+    create_home: false
+    append: false
   become: false
 
 #
 # Configure environment synchronization account.
 #
 - name: 'Initialize envsync account creating home dir if it did not exist yet.'
-  command: "su - {{ envsync_user }}"
-  register: envsync_login
-  failed_when: envsync_login.rc != 0
-  changed_when: "'Creating home directory' in envsync_login.stdout"
+  command:
+    cmd: "mkhomedir_helper {{ envsync_user }} 0077"
+    creates: "/home/{{ envsync_user }}"
   become: true
 
 - name: 'Allow passwordless sudo to the environment synchronization account for deploy admin users.'
   lineinfile:
     dest: '/etc/sudoers'
     line: "%{{ envsync_group }}    ALL=({{ envsync_user }})    NOPASSWD:ALL"
+    owner: root
+    group: root
+    mode: '0440'
   become: true
 
 - name: 'Insert/update block into ~/.bashrc to ensure we use the correct environment for syncing.'
@@ -47,7 +49,7 @@
       module list
     marker: "# {mark} ANSIBLE MANAGED BLOCK - Setup environment for environment synchronization account."
     insertafter: EOF
-    create: no
+    create: false
   become: true
 
 - name: 'Deploy script to verify and if necessary fix prmissions of the environment managed by the envsync account.'

@@ -3,16 +3,11 @@
 - name: Install yum dependencies
   yum:
     state: latest
-    update_cache: yes
+    update_cache: true
     name:
       - openldap-clients
       - nss-pam-ldapd
       - openssh-ldap
-      - python36
-      - python36-devel
-      - python36-PyYAML
-      - openssl-devel
-      - python36-sshpubkeys
   notify:
     - restart_nslcd
     - restart_sshd
@@ -52,27 +47,18 @@
   become: true
 
 - name: Deploy custom ssh-ldap-wrapper.
-  copy:
-    src: ssh_ldap_wrapper.py
-    dest: /usr/libexec/openssh/ssh_ldap_wrapper.py
+  template:
+    src: ssh-ldap-wrapper.bash
+    dest: /usr/libexec/openssh/ssh-ldap-wrapper.bash
     owner: root
     group: root
     mode: '0755'
   become: true
 
-- name: Deploy config file for custom ssh-ldap-wrapper.
-  template:
-    src: templates/ssh_ldap_wrapper.yml
-    dest: /usr/libexec/openssh/ssh_ldap_wrapper.yml
-    owner: root
-    group: root
-    mode: '0644'
-  become: true
-
 - name: Enable services.
   systemd:
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: started
   with_items:
     - nslcd
@@ -85,8 +71,12 @@
     src: "{{ playbook_dir }}/roles/sshd/templates/sshd_config"
     dest: /etc/ssh/sshd_config
     validate: '/usr/sbin/sshd -T -f %s'
+    owner: root
+    group: root
+    mode: '0644'
   notify: restart_sshd
   become: true
 
-- meta: flush_handlers
+- name: Flush handlers.
+  meta: flush_handlers
 ...

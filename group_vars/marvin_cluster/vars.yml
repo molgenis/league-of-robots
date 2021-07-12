@@ -1,0 +1,160 @@
+---
+slurm_cluster_name: 'marvin'
+slurm_cluster_domain: ''
+stack_prefix: 'mv'
+slurm_version: '18.08.8-1.el7.umcg'
+repo_manager: 'spacewalk'
+mailhub: '192.168.0.5'
+rewrite_domain: "{{ stack_prefix }}-sai{% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %}"
+figlet_font: 'speed'
+motd: "It is rare, but not unheard of."
+additional_etc_hosts:
+  - group: all
+    hosts:
+      - docs
+vcompute_hostnames: "{{ stack_prefix }}-vcompute01"
+vcompute_sockets: 16
+vcompute_cores_per_socket: 1
+vcompute_real_memory: 64264
+vcompute_max_cpus_per_node: "{{ vcompute_sockets * vcompute_cores_per_socket - 2 }}"
+vcompute_max_mem_per_node: "{{ vcompute_real_memory - vcompute_sockets * vcompute_cores_per_socket * 512 }}"
+vcompute_local_disk: 0
+vcompute_features: 'tmp11'
+vcompute_ethernet_interfaces:
+  - 'eth0'
+  - 'eth1'
+ui_hostnames: "{{ slurm_cluster_name }}"
+ui_sockets: 4
+ui_cores_per_socket: 1
+ui_real_memory: 7821
+ui_local_disk: 0
+ui_features: 'prm11,tmp11'
+ui_ethernet_interfaces:
+  - 'eth0'
+  - 'eth1'
+ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/ca-key-production-ebi"
+use_ldap: yes
+create_ldap: yes
+ldap_uri: ldap://mv-dai
+ldap_base: dc=ejp,dc=rd,dc=nl
+ldap_binddn: cn=admin,dc=ejp,dc=rd,dc=nl
+ldap_domain: ejp.rd.nl
+key_name: Gerben
+cloud_image: centos7
+cloud_user: centos
+flavor_ui: s1.large
+flavor_vcompute: s1.gargantuan
+flavor_management: s1.small
+public_net_id: ext-net-37
+public_ip_addresses:
+  dockingport: '193.62.55.244'
+private_net_id: EJP-RD-network
+private_subnet_id: EJP-RD-subnet
+private_storage_net_id: 
+private_storage_subnet_id: 
+security_group_id: SSH-and-ping-2
+availability_zone: AZ_1
+storage_availability_zone: nova
+local_volume_size: 1
+nameservers: [
+#  '/em-isi-3126.ebi.ac.uk/10.35.126.201',  # Local DNS lookups for shared storage.
+  '8.8.4.4',  # Google DNS.
+  '8.8.8.8',  # Google DNS.
+]
+local_admin_groups:
+  - 'admin'
+  - 'docker'
+  - 'umcg-atd'
+  - 'depad'
+local_admin_users:
+  - 'egon'
+  - 'gerben'
+  - 'henkjan'
+  - 'marieke'
+  - 'marloes'
+  - 'morris'
+  - 'pieter'
+  - 'wim'
+  - 'umcg-atd-dm'
+  - 'envsync'
+envsync_user: 'envsync'
+envsync_group: 'depad'
+hpc_env_prefix: '/apps'
+regular_groups:
+  - 'users'
+  - 'depad'
+  - 'erknet'
+  - 'euro-nmd'
+  - 'ern-liver'
+  - 'umcg-atd'
+regular_users:
+  - user: 'envsync'
+    groups: ['depad']
+
+  - user: 'erknet-dm'
+    groups: ['erknet']
+    sudoers: '%erknet'
+
+  - user: 'euro-nmd-dm'
+    groups: ['euro-nmd']
+    sudoers: '%euro-nmd'
+
+  - user: 'ern-liver-dm'
+    groups: ['ern-liver']
+    sudoers: '%ern-liver'
+
+  - user: 'umcg-atd-dm'
+    groups: ['umcg-atd']
+    sudoers: '%umcg-atd'
+  - user: 'gvdvries'
+    groups: ['users', 'depad', 'umcg-atd', 'erknet', 'euro-nmd','ern-liver']
+  - user: 'mbijlsma'
+    groups: ['users', 'depad', 'umcg-atd', 'erknet', 'euro-nmd','ern-liver']
+  - user: 'mswertz'
+    groups: ['users', 'depad', 'umcg-atd', 'erknet', 'euro-nmd','ern-liver']
+  - user: 'pneerincx'
+    groups: ['users', 'depad', 'umcg-atd', 'erknet', 'euro-nmd','ern-liver']
+  - user: 'rkanninga'
+    groups: ['users', 'depad', 'umcg-atd', 'erknet', 'euro-nmd','ern-liver']
+  - user: 'umcg-atd-dm'
+    groups: ['users', 'umcg-atd']
+    sudoers: 'pieter,gerben'
+  - user: 'erknet-dm'
+    groups: ['users', 'erknet']
+    sudoers: '%erknet'
+  - user: 'euro-nmd-dm'
+    groups: ['users', 'euro-nmd']
+    sudoers: '%euro-nmd'
+  - user: 'ern-liver-dm'
+    groups: ['users', 'ern-liver']
+    sudoers: '%ern-liver'
+#
+# Shared storage related variables
+#
+pfs_mounts: [
+  { pfs: 'ecst01',
+    source: '',
+    type: 'nfs',
+    rw_options: 'defaults,_netdev,noatime,nodiratime',
+    ro_options: 'defaults,_netdev,noatime,nodiratime,ro' },
+]
+lfs_mounts: [
+  { lfs: 'home',
+    pfs: 'ecst01',
+    machines: "{{ groups['cluster'] }}" },
+  { lfs: 'tmp11',
+    pfs: 'ecst01',
+    groups: ['umcg-atd', 'erknet', 'euro-nmd', 'ern-liver'] },
+  { lfs: 'prm11',
+    pfs: 'ecst01',
+    groups: ['umcg-atd', 'erknet', 'euro-nmd', 'ern-liver'] },
+  { lfs: 'env11',
+    pfs: 'ecst01',
+    machines: "{{ groups['compute_vm'] + groups['user_interface'] }}" },
+]
+interfaces:
+  - device: 'eth0'
+    bootproto: 'dhcp'
+  - device: 'eth1' 
+    bootproto: 'dhcp'
+...

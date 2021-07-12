@@ -1,9 +1,0 @@
----
-- hosts: jumphost
-  roles:
-    - static-hostname-lookup
-
-- hosts: cluster
-  roles:
-    - static-hostname-lookup
-...

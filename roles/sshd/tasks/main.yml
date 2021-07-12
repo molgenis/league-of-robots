@@ -3,6 +3,9 @@
   template:
     src: templates/sshd_config
     dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
     validate: '/usr/sbin/sshd -T -f %s'
   notify: restart_sshd
   become: true
@@ -11,7 +14,7 @@
   shell: awk '$5 < {{ sshd_moduli_minimum }}' /etc/ssh/moduli
   register: sshd_register_moduli
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: Remove weak (small) values from /etc/ssh/moduli.
   shell: awk '$5 >= {{ sshd_moduli_minimum }}' /etc/ssh/moduli > /etc/ssh/moduli.new ;

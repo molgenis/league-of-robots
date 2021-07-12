@@ -6,5 +6,5 @@ coredumps_pattern: '|/bin/false'
 #
 # For enabling coredumps:
 #
-#coredumps_pattern: 'core'
+# coredumps_pattern: 'core'
 ...

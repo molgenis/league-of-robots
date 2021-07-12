@@ -1,0 +1,33 @@
+---
+ip_addresses:
+  mv-dai:
+    addr: 192.168.0.11
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Deploy Admin Interface
+  mv-sai:
+    addr: 192.168.0.12
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Sys Admin Interface
+  mv-vcompute01:
+    addr: 192.168.0.7
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  marvin:
+    addr: 192.168.0.4
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: User Interface
+  dockingport:
+    addr: 192.168.0.9
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Jumphost
+...

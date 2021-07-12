@@ -1,5 +1,8 @@
 ---
-- hosts: all
+- hosts:
+    - jumphost
+    - cluster
+    - docs
   roles:
     - roles/rsyslogclient
   vars:

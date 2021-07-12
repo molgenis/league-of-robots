@@ -1,3 +1,4 @@
+
 {{ figlet['content'] | b64decode }}
 
 {{ motd }}

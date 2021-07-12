@@ -5,6 +5,9 @@
 # * Hence there is no systemd managed rsyncd running constantly
 #   and therfore no handler to (re)start a daemon.
 #
+# This role should not be confused with the rsync role, 
+# which configures rsync on a managed host for use with the Ansible "ansible.posix.synchronize" task.
+#
 ---
 - name: 'Install rsync.'
   yum:

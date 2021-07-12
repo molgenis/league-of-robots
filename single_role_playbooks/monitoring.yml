@@ -1,6 +1,6 @@
 ---
 - name: 'Install monitoring tools.'
-  hosts: sys-admin-interface
+  hosts: sys_admin_interface
   roles:
     - prom_server
     - grafana
@@ -21,7 +21,7 @@
     - node_exporter
 
 - name: 'Monitoring of the SLURM resource manager.'
-  hosts: user-interface
+  hosts: user_interface
   roles:
     - slurm_exporter
 

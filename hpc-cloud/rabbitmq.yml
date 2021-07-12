@@ -1,7 +1,0 @@
----
-- hosts: rabbitmq
-  become: True
-  roles:
-      - hpc-cloud/roles/rabbitmq
-  vars:
-      hostname_node0: "{{ hostvars[groups['rabbitmq'][0]]['ansible_hostname'] }}"

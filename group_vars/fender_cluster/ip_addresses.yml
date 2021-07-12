@@ -1,0 +1,99 @@
+---
+ip_addresses:
+  fd-dai:
+    addr: 192.168.0.21
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Deploy Admin Interface
+  fd-sai:
+    addr: 192.168.0.22
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Sys Admin Interface
+  fd-vcompute12:
+    addr: 192.168.0.19
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute11:
+    addr: 192.168.0.15
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute10:
+    addr: 192.168.0.26
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute09:
+    addr: 192.168.0.25
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute08:
+    addr: 192.168.0.31
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute07:
+    addr: 192.168.0.28
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute06:
+    addr: 192.168.0.14
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute05:
+    addr: 192.168.0.9
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute04:
+    addr: 192.168.0.24
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute03:
+    addr: 192.168.0.5
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute02:
+    addr: 192.168.0.11
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fd-vcompute01:
+    addr: 192.168.0.13
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  fender:
+    addr: 192.168.0.16
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: User Interface
+  corridor:
+    addr: 192.168.0.8 
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Jumphost
+...

@@ -2,7 +2,7 @@
 - name: 'Install dnsmasq.'
   yum:
     state: 'latest'
-    update_cache: yes
+    update_cache: true
     name:
       - 'dnsmasq'
   become: true
@@ -31,9 +31,10 @@
 - name: 'Enable dnsmasq service.'
   systemd:
     name: 'dnsmasq.service'
-    enabled: yes
+    enabled: true
   become: true
   notify: 'restart_dnsmasq'
 
-- meta: 'flush_handlers'
+- name: 'Flush handlers.'
+  meta: flush_handlers
 ...

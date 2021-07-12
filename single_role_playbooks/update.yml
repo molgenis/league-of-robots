@@ -1,0 +1,13 @@
+---
+- hosts:
+    - jumphost
+  roles:
+    - update
+
+- hosts:
+    - repo
+    - cluster
+    - docs
+  roles:
+    - update
+...

@@ -1,0 +1,50 @@
+---
+ip_addresses:
+  nb-repo:
+    addr: 10.10.1.56
+    mask: /32
+    vlan: internal_management
+    fqdn:
+  nb-sai:
+    addr: 10.10.1.106
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Sys Admin Interface
+  nb-dai:
+    addr: 10.10.1.75
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Deploy Admin Interface
+  nb-vcompute03:
+    addr: 10.10.1.108
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  nb-vcompute02:
+    addr: 10.10.1.140
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  nb-vcompute01:
+    addr: 10.10.1.199
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  nibbler:
+    addr: 10.10.1.112
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: User Interface
+  tunnel:
+    addr: 10.10.1.188
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Jumphost
+...

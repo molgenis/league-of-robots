@@ -1,0 +1,161 @@
+---
+ip_addresses:
+  calculon-management:
+    addr: 172.23.40.247
+    mask: /32
+    vlan: vlan983
+  calculon-storage:
+    addr: 172.23.34.247
+    mask: /32
+    vlan: vlan985
+  winterpeen:
+    addr: 172.23.40.230
+    mask: /32
+    vlan: 
+    fqdn:
+    desc: Sys Admin Interface
+  umcg-node001:
+    addr: 172.23.40.1
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node002:
+    addr: 172.23.40.2
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node003:
+    addr: 172.23.40.3
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node004:
+    addr: 172.23.40.4
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node005:
+    addr: 172.23.40.5
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node006:
+    addr: 172.23.40.6
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node007:
+    addr: 172.23.40.7
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node008:
+    addr: 172.23.40.8
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node009:
+    addr: 172.23.40.9
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node010:
+    addr: 172.23.40.10
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node011:
+    addr: 172.23.40.11
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node012:
+    addr: 172.23.40.12
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node013:
+    addr: 172.23.40.13
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node014:
+    addr: 172.23.40.14
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node015:
+    addr: 172.23.40.15
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node016:
+    addr: 172.23.40.16
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node017:
+    addr: 172.23.40.17
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node018:
+    addr: 172.23.40.18
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node019:
+    addr: 172.23.40.19
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  umcg-node020:
+    addr: 172.23.40.20
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Compute Node
+  calculon:
+    addr: 172.23.40.247
+    mask: /32
+    vlan:
+    fqdn:
+    desc: User Interface
+  bender:
+    addr: 172.23.40.246
+    mask: /32
+    vlan: 
+    fqdn:
+    desc: User Interface
+  flexo:
+    addr: 172.23.40.248
+    mask: /32
+    vlan: 
+    fqdn:
+    desc: User Interface
+  lobby:
+    addr: 10.10.1.144
+    mask: /32
+    vlan: internal_management
+    fqdn:
+    desc: Jumphost
+...

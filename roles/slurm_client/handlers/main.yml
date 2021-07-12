@@ -1,0 +1,41 @@
+---
+#
+# Important: maintain correct handler order.
+# Handlers are executed in the order in which they are defined
+# and not in the order in which they are listed in a "notify: handler_name" statement!
+#
+# Restart before reload: an reload after a restart may be redundant but should not fail,
+# but the other way around may fail when the impact of changes was too large for a reload.
+#
+- name: Restart munge service.
+  systemd:
+    name: 'munge.service'
+    state: 'restarted'
+    daemon_reload: true
+  become: true
+  listen: restart_munge
+
+- name: Restart slurmd service.
+  systemd:
+    name: 'slurmd.service'
+    state: 'restarted'
+    daemon_reload: true
+  become: true
+  listen: restart_slurmd
+#
+# Service reloads after restarts.
+#
+- name: Reload munge service.
+  systemd:
+    name: 'munge.service'
+    state: 'reloaded'
+  become: true
+  listen: reload_munge
+
+- name: Reload slurmd service.
+  systemd:
+    name: 'slurmd.service'
+    state: 'reloaded'
+  become: true
+  listen: reload_slurmd
+...

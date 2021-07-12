@@ -12,6 +12,6 @@
   sysctl:
     name: kernel.core_pattern
     value: "{{ coredumps_pattern }}"
-    sysctl_set: yes
+    sysctl_set: true
   become: true
 ...

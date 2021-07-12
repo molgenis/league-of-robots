@@ -13,19 +13,20 @@
 - name: Install some standard software
   yum:
     state: latest
-    update_cache: yes
+    update_cache: true
     name:
       - bash-completion
       - bc
       - bzip2
+      - cargo
       - curl
       - dos2unix
       - figlet
-      - fuse
-      - fuse-libs
       - git
       - git-core
       - gnutls
+      - irods-icommands
+      - libsodium
       - lsof
       - nano
       - ncdu
@@ -43,58 +44,21 @@
       - tmux
       - tree
       - unzip
+      - urw-base35-fonts
       - vim
       - wget
   tags:
     - software
   become: true
 
-- name: Check if rsync >= 3.1.2 is installed on the managed hosts.
-  shell:
-    cmd: |
-      set -o pipefail
-      rsync --version  2>&1 | head -n 1 | sed 's|^rsync *version *\([0-9\.]*\).*$|\1|' | tr -d '\n'
-  args:
-    warn: no
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  register: rsync_version_managed_host
-
-- name: Abort when modern rsync >= 3.1.2 is missing on the managed hosts.
-  debug:
-    msg: "FATAL: Need rsync >= 3.1.2 on {{ inventory_hostname }}, but detected {{ rsync_version.stdout }}."
-  when:        'rsync_version_managed_host is failed or (rsync_version_managed_host.stdout is version_compare("3.1.2", operator="<"))'
-  failed_when: 'rsync_version_managed_host is failed or (rsync_version_managed_host.stdout is version_compare("3.1.2", operator="<"))'
-
-- name: Check if rsync >= 3.1.2 is installed on the control host.
-  shell:
-    cmd: |
-      set -o pipefail
-      rsync --version  2>&1 | head -n 1 | sed 's|^rsync *version *\([0-9\.]*\).*$|\1|' | tr -d '\n'
-  args:
-    warn: no
-  changed_when: false
-  failed_when: false
-  ignore_errors: true
-  check_mode: no
-  register: rsync_version_control_host
-  delegate_to: localhost
-
-- name: Abort when modern rsync >= 3.1.2 is missing on control host.
-  debug:
-    msg: "FATAL: Need rsync >= 3.1.2 on {{ inventory_hostname }}, but detected {{ rsync_version.stdout }}."
-  when:        'rsync_version_control_host is failed or (rsync_version_control_host.stdout is version_compare("3.1.2", operator="<"))'
-  failed_when: 'rsync_version_control_host is failed or (rsync_version_control_host.stdout is version_compare("3.1.2", operator="<"))'
-  delegate_to: localhost
-
 - name: Add custom config files to /etc/skel/.
-  synchronize:
+  ansible.posix.synchronize:
     src: "{{ playbook_dir }}/roles/cluster/files/skel/./{{ item.src }}"
     dest: '/etc/skel/'
     owner: 'no'
     group: 'no'
-    use_ssh_args: 'yes'
+    use_ssh_args: true
+    ssh_connection_multiplexing: true
     rsync_opts:
       # --omit-dir-times  Is required to prevent "sync error: some files/attrs were not transferred"
       #                   for file systems like NFS mounts that cannot handle setting dir times properly.

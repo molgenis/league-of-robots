@@ -1,0 +1,69 @@
+#
+# Install rsync on managed hosts and verify if rsync on both managed and control hosts meet minimum requirements.
+# This role must be applied before using the Ansible "ansible.posix.synchronize" task in other roles.
+#
+# This role should not be confused with the rsyncd role,
+# which configures an rsync deamon on a managed host.
+#
+---
+- name: Install rsync.
+  yum:
+    state: 'latest'
+    update_cache: true
+    name: 'rsync'
+  become: true
+#
+# Check managed hosts.
+#
+- name: Check if rsync >= 3.1.2 is installed on the managed hosts.
+  shell:
+    cmd: |
+      set -o pipefail
+      (trap '' PIPE; rsync --version 2>/dev/null || echo 'missing') \
+          | head -n 1 | tr -d '\n' \
+          | sed 's|^rsync *version *\([0-9\.]*\).*$|\1|'
+  args:
+    executable: /bin/bash
+    warn: no
+  changed_when: false
+  check_mode: no
+  register: rsync_version_managed_host
+
+- name: Abort when modern rsync >= 3.1.2 is missing on the managed hosts.
+  debug:
+    msg: "FATAL: Need rsync >= 3.1.2 on {{ inventory_hostname }}, but detected {{ rsync_version_managed_host.stdout }}."
+  when:        rsync_version_managed_host is failed
+               or rsync_version_managed_host.stdout == 'missing'
+               or (rsync_version_managed_host.stdout is version_compare("3.1.2", operator="<"))
+  failed_when: rsync_version_managed_host is failed
+               or rsync_version_managed_host.stdout == 'missing'
+               or (rsync_version_managed_host.stdout is version_compare("3.1.2", operator="<"))
+#
+# Check control host.
+#
+- name: Check if rsync >= 3.1.2 is installed on the control host.
+  shell:
+    cmd: |
+      set -o pipefail
+      (trap '' PIPE; rsync --version 2>/dev/null || echo 'missing') \
+          | head -n 1 | tr -d '\n' \
+          | sed 's|^rsync *version *\([0-9\.]*\).*$|\1|'
+  args:
+    executable: /bin/bash
+    warn: no
+  changed_when: false
+  check_mode: no
+  register: rsync_version_control_host
+  delegate_to: localhost
+
+- name: Abort when modern rsync >= 3.1.2 is missing on control host.
+  debug:
+    msg: "FATAL: Need rsync >= 3.1.2 on control host, but detected {{ rsync_version_control_host.stdout }}."
+  when:        rsync_version_control_host is failed
+               or rsync_version_control_host.stdout == 'missing'
+               or (rsync_version_control_host.stdout is version_compare("3.1.2", operator="<"))
+  failed_when: rsync_version_control_host is failed
+               or rsync_version_control_host.stdout == 'missing'
+               or (rsync_version_control_host.stdout is version_compare("3.1.2", operator="<"))
+  delegate_to: localhost
+...

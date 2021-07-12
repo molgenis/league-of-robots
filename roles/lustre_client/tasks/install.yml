@@ -1,0 +1,100 @@
+---
+- name: Install packages for build environment to support Dynamic Kernel Module Support (DKMS).
+  yum:
+    state: latest
+    update_cache: true
+    name:
+      - asciidoc
+      - audit-libs-devel
+      - automake
+      - bc
+      - binutils-devel
+      - bison
+      - device-mapper-devel
+      - elfutils-devel
+      - elfutils-libelf-devel
+      - expect
+      - flex
+      - gcc
+      - gcc-c++
+      - git
+      - glib2
+      - glib2-devel
+      - hmaccalc
+      - keyutils-libs-devel
+      - krb5-devel
+      - ksh
+      - libattr-devel
+      - libblkid-devel
+      - libselinux-devel
+      - libtool
+      - libuuid-devel
+      - libyaml-devel
+      - lsscsi
+      - make
+      - ncurses-devel
+      - net-snmp-devel
+      - net-tools
+      - newt-devel
+      - numactl-devel
+      - parted
+      - patchutils
+      - pciutils-devel
+      - perl-ExtUtils-Embed
+      - pesign
+      - python-devel
+      - redhat-rpm-config
+      - rpm-build
+      - systemd-devel
+      - tcl
+      - tcl-devel
+      - tk
+      - tk-devel
+      - wget
+      - xmlto
+      - yum-utils
+      - zlib-devel
+  become: true
+
+- name: Install kernel tools/extras required for compiling kernel modules.
+  yum:
+    state: latest
+    update_cache: true
+    name:
+      - kernel
+      - kernel-devel
+      - kernel-headers
+      - kernel-abi-whitelists
+      - kernel-tools
+      - kernel-tools-libs
+      - kernel-tools-libs-devel
+  become: true
+  notify: reboot
+
+- meta: flush_handlers
+
+- name: Install the Lustre client.
+  yum:
+    state: latest
+    update_cache: true
+    name:
+      - lustre-client-dkms
+      - lustre-client
+  become: true
+
+- name: Load the Lustre kernel module.
+  modprobe:
+    name: lustre
+    state: present
+  become: true
+
+- name: Deploy lustre.conf
+  template:
+    src: templates/lustre.conf
+    dest: /etc/modprobe.d/lustre.conf
+    mode: 0644
+    owner: root
+    group: root
+    backup: false
+  become: true
+...

@@ -1,0 +1,16 @@
+#
+# This play depends on:
+#   * cluster_part1.yml
+#
+---
+- import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Extra roles for LDAP account server. <-==###'
+  hosts:
+    - ldap_server
+  roles:
+    - role: openldap
+      when:
+        - use_ldap | default(true, true) | bool
+        - create_ldap | default(false, true) | bool
+...

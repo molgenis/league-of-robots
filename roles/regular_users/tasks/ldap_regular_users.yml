@@ -1,0 +1,89 @@
+---
+- name: 'Make sure we have a parent entry for users.'
+  community.general.ldap_entry:
+    dn: "ou=users,{{ ldap_base }}"
+    objectClass: 'organizationalUnit'
+    bind_dn: "{{ ldap_binddn }}"
+    bind_pw: "{{ bindpw }}"
+    server_uri: "{{ ldap_uri }}"
+
+- name: 'Make sure we have a parent entry for groups.'
+  community.general.ldap_entry:
+    dn: "ou=groups,{{ ldap_base }}"
+    objectClass: 'organizationalUnit'
+    bind_dn: "{{ ldap_binddn }}"
+    bind_pw: "{{ bindpw }}"
+    server_uri: "{{ ldap_uri }}"
+
+- name: 'Add regular groups to parent entry for groups.'
+  community.general.ldap_entry:
+    dn: "cn={{ item }},ou=groups,{{ ldap_base }}"
+    objectClass: 'posixGroup'
+    state: present
+    server_uri: "{{ ldap_uri }}"
+    bind_dn: "{{ ldap_binddn }}"
+    bind_pw: "{{ bindpw }}"
+    attributes:
+      gidNumber: "{{ auth_groups[item].gid }}"
+  with_items: "{{ regular_groups }}"
+
+- name: 'Add private groups for home dirs of users to parent entry for groups.'
+  community.general.ldap_entry:
+    dn: "cn={{ item.user }},ou=groups,{{ ldap_base }}"  # Use same name as user's account name for user's private group.
+    objectClass: 'posixGroup'
+    state: present
+    server_uri: "{{ ldap_uri }}"
+    bind_dn: "{{ ldap_binddn }}"
+    bind_pw: "{{ bindpw }}"
+    attributes:
+      gidNumber: "{{ auth_users[item.user].uid }}"  # Use same GID as user's UID for user's private group.
+  with_items: "{{ regular_users }}"
+
+- name: 'Add users to parent entry for users.'
+  community.general.ldap_entry:
+    dn: "cn={{ item.user }},ou=users,{{ ldap_base }}"
+    state: present
+    server_uri: "{{ ldap_uri }}"
+    objectClass:
+      - 'inetOrgPerson'
+      - 'posixAccount'
+      - 'top'
+      - 'ldapPublicKey'
+    bind_dn: "{{ ldap_binddn }}"
+    bind_pw: "{{ bindpw }}"
+    attributes:
+      sn: "{{ item.user }}"
+      givenName: "{{ auth_users[item.user].comment }}"
+      cn: "{{ item.user }}"
+      uid: "{{ item.user }}"
+      uidNumber: "{{ auth_users[item.user].uid }}"
+      gidNumber: "{{ auth_users[item.user].uid }}"  # primary group == private group for user.
+      homeDirectory: "/home/{{ item.user }}"
+      loginShell: '/bin/bash'
+      sshPublicKey: "{{ auth_users[item.user].pub_keys }}"
+  with_items: "{{ regular_users }}"
+
+- name: 'Update public keys.'
+  community.general.ldap_attrs:
+    dn: "cn={{ item.user }},ou=users,{{ ldap_base }}"
+    state: exact
+    server_uri: "{{ ldap_uri }}"
+    bind_dn: "{{ ldap_binddn }}"
+    bind_pw: "{{ bindpw }}"
+    attributes:
+      sshPublicKey: "{{ auth_users[item.user].pub_keys }}"
+  with_items: "{{ regular_users }}"
+
+- name: 'Add users to groups.'
+  community.general.ldap_attrs:
+    dn: "cn={{ item.1 }},ou=groups,{{ ldap_base }}"
+    state: present
+    server_uri: "{{ ldap_uri }}"
+    bind_dn: "{{ ldap_binddn }}"
+    bind_pw: "{{ bindpw }}"
+    attributes:
+      memberUid: "{{ item.0.user }}"
+  with_subelements:
+    - "{{ regular_users }}"
+    - 'groups'
+...

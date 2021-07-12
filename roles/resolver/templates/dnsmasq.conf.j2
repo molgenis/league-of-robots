@@ -1,3 +1,7 @@
 {% for nameserver in nameservers %}
 server={{ nameserver }}
 {% endfor %}
+
+{% for override in nameserver_domain_overrides %}
+server=/{{ override.domain }}/{{ override.nameserver }}
+{% endfor %}

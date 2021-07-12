@@ -1,0 +1,12 @@
+---
+- name: Fetch the lustre client source code.
+  get_url:
+    url: "{{ lustre_repo_url }}/{{ lustre_src_rpm_name }}.src.rpm"
+    dest: "/tmp/{{ lustre_src_rpm_name }}.src.rpm"
+
+- name: Rebuild the lustre client.
+  command:
+    cmd: rpmbuild --rebuild --without servers "/tmp/{{ lustre_src_rpm_name }}.src.rpm"
+    creates: "/root/rpmbuild/RPMS/{{ lustre_client_architecture }}/{{ lustre_client_rpm_name }}.rpm"
+  become: true
+...

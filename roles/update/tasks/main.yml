@@ -1,0 +1,27 @@
+---
+- name: 'Install yum-utils, which provides the "needs-restarting" utility.'
+  yum:
+    name: yum-utils
+    state: latest
+    update_cache: true
+  become: true
+- name: 'Update all installed packages (except Slurm).'
+  yum:
+    name: '*'
+    state: latest
+    update_cache: true
+    exclude: 'slurm*'  # Specific Slurm versions configured in slurm-* roles, because we use a custom patched version.
+  notify: reboot_for_kernel_update
+  become: true
+- name: 'Install cron job to reboot server regularly to activate kernel updates.'
+  cron:
+    name: 'Reboot to load new kernel.'
+    weekday: '1'
+    minute: '45'
+    hour: '11'
+    user: root
+    job: /bin/needs-restarting -r >/dev/null 2>&1 || /sbin/shutdown -r +60 "Restarting to apply updates..."
+    cron_file: reboot
+  when: inventory_hostname not in groups['cluster']|default([])
+  become: true
+...

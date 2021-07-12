@@ -1,0 +1,19 @@
+---
+slurm_uid: 497
+slurm_gid: 497
+munge_uid: 498
+munge_gid: 498
+#
+# slurm_allow_jobs_to_span_nodes
+#
+# We always use fast network interconnects nodes <-> large shared storage devices,
+# but do not always have fast, low latency network interconnects between nodes.
+#   false (default) Should be used when fast, low latency network interconnects between nodes are not available.
+#                   This will set MaxNodes = 1 for all nodes of all partitions in slurm.conf,
+#                   which limits (MPI) jobs to max the amount of cores on a single node.
+#   true            Should be used when fast, low latency network interconnects between nodes are present.
+#                   Allows (MPI) jobs to use multiple nodes.
+#                   Will set MaxNodes in slurm.conf to the total amount of compute nodes in the Slurm cluster.
+#
+slurm_allow_jobs_to_span_nodes: false
+...

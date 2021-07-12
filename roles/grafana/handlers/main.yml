@@ -11,7 +11,7 @@
   systemd:
     name: 'grafana.service'
     state: restarted
-    daemon_reload: yes
+    daemon_reload: true
   become: true
   listen: restart_grafana
 ...

@@ -1,4 +1,11 @@
 ---
+#
+# ToDo: this may fail when deploying a cluster from scratch
+# when DNS resolving is not yet properly configured resulting in:
+# 'Failure downloading https://copr-be.cloud.fedoraproject.org/results/@spacewalkproject/spacewalk-2.8-client/\
+#  epel-7-x86_64/00742644-spacewalk-repo/spacewalk-client-repo-2.8-11.el7.centos.noarch.rpm,
+#  Request failed: <urlopen error [Errno -2] Name or service not known>'
+#
 - name: 'Install spacewalk client repo.'
   yum:
     name: "https://copr-be.cloud.fedoraproject.org/results/@spacewalkproject/\
@@ -8,13 +15,13 @@
 
 - name: 'Install spacewalk client packages.'
   yum:
-   name:
-     - 'rhn-client-tools'
-     - 'rhn-check'
-     - 'rhn-setup'
-     - 'rhnsd'
-     - 'm2crypto'
-     - 'yum-rhn-plugin'
+    name:
+      - 'rhn-client-tools'
+      - 'rhn-check'
+      - 'rhn-setup'
+      - 'rhnsd'
+      - 'm2crypto'
+      - 'yum-rhn-plugin'
   notify:
     - 'restart_rhnsd'
   become: true
@@ -22,25 +29,26 @@
 - name: 'Enable spacewalk service.'
   systemd:
     name: 'rhnsd.service'
-    enabled: yes
+    enabled: true
     state: started
   notify:
     - 'restart_rhnsd'
   become: true
 
-- meta: 'flush_handlers'
+- name: 'Flush handlers.'
+  meta: flush_handlers
 
 - name: 'Register client at the spacewalk server.'
   rhn_register:
-   state: present
-   activationkey: "{{ activation_key }}"
-   server_url: "{{ spacewalk_server_url }}"
-   channels: "{{ rhn_channels }}"
+    state: present
+    activationkey: "{{ activation_key }}"
+    server_url: "{{ spacewalk_server_url }}"
+    channels: "{{ rhn_channels }}"
   register: result
   until: result is succeeded
   retries: 3
   delay: 3
-  ignore_errors: yes
+  ignore_errors: true
   no_log: true
   become: true
 
@@ -49,6 +57,9 @@
     path: '/etc/yum/pluginconf.d/rhnplugin.conf'
     regexp: '^gpgcheck = [0-9].*'
     line: 'gpgcheck = 0'
+    owner: root
+    group: root
+    mode: '0644'
   become: true
 
 - name: 'Remove all (non-spacewalk) repo config files from /etc/yum.repos.d/.'
@@ -58,13 +69,5 @@
   register: deleted_items
   changed_when: deleted_items.stdout | length >= 1
   failed_when: deleted_items.stderr | length >= 1
-  become: true
-
-- name: 'Upgrade all packages to version specified in spacewalk channel.'
-  yum:
-   name: '*'
-   state: latest
-   update_cache: yes
-   exclude: 'slurm*' # Specific Slurm versions configured in slurm-* roles, because we use a custom patched version.
   become: true
 ...

@@ -1,0 +1,6 @@
+---
+- name: Install regular_users role.
+  hosts: jumphost, cluster
+  roles:
+     - regular_users
+...

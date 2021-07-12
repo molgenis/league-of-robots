@@ -1,0 +1,50 @@
+---
+ip_addresses:
+  tl-dai:
+    addr: 172.23.40.94
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Deploy Admin Interface
+  tl-sai:
+    addr: 172.23.40.93
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Sys Admin Interface
+  tl-vcompute03:
+    addr: 172.23.40.97
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  tl-vcompute02:
+    addr: 172.23.40.96
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  tl-vcompute01:
+    addr: 172.23.40.95
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Compute Node
+  talos:
+    addr: 172.23.40.92
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: User Interface
+  talos-storage:
+    addr: 172.23.34.92
+    mask: /32
+    vlan: vlan985
+    desc: User Interface - Storage VLAN
+  reception:
+    addr: 172.23.40.100
+    mask: /32
+    vlan: vlan983
+    fqdn:
+    desc: Jumphost
+...

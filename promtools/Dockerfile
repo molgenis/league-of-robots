@@ -1,8 +1,10 @@
-FROM golang:1.11-stretch
+FROM golang:1.15-buster
 
 MAINTAINER Egon Rijpkema <e.m.a.rijpkema@rug.nl>
 
 RUN mkdir /results
+
+RUN go get github.com/godbus/dbus
 
 RUN go get github.com/prometheus/node_exporter && \
     cd ${GOPATH-$HOME/go}/src/github.com/prometheus/node_exporter && \

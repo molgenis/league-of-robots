@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ -z "${SLURM_JOB_ID}" ]; then
+    logger -s "FATAL: SLURM_JOB_ID is empty or unset in SLURM task prolog."
+    exit 1
+elif [[ -z "${SLURM_JOB_QOS}" ]]; then
+    logger -s "FATAL: SLURM_JOB_QOS is empty or unset in SLURM task prolog."
+    exit 1
+fi
+
+set -e
+set -u
+
+#
+# Make sure we have a tmp dir in /local on compute nodes.
+# When this failed the job should not continue as SLURM will default to /tmp,
+# which is not suitable for heavy random IO nor large data sets.
+# Hammering /tmp may effectively result in the node going down.
+# When the prolog fails the node will be set to state=DRAIN instead.
+#
+# For the data staging QoS "ds", which executes jobs only on the UI,
+# a dedicated tmp dir per job may be absent as not all UIs have a /local mount.
+#
+TMPDIR="/local/${SLURM_JOB_ID}/"
+if [[ ! -d "${TMPDIR}" ]] && [[ ! "${SLURM_JOB_QOS}" =~ ^ds.* ]]; then
+    logger -s "FATAL: TMPDIR ${TMPDIR} is not available in SLURM task prolog."
+    exit 1
+else
+    #
+    # STDOUT from this task prolog is used to initialize the job task's env,
+    # so we need to print the export statements to STDOUT.
+    #
+    echo "export TMPDIR=${TMPDIR}"
+fi
+
+#
+# Set TMOUT to configure automagic logout from interactive sessions
+# after 30 minutes of inactivity.
+#
+if [[ "${SLURM_JOB_QOS}" =~ ^interactive.* ]]; then
+    echo "TMOUT=1800"
+    echo "readonly TMOUT"
+    echo "export TMOUT"
+fi

@@ -1,7 +1,7 @@
 ---
 #
 # Important: maintain correct handler order.
-# Handlers are executed in the order in which they are defined 
+# Handlers are executed in the order in which they are defined
 # and not in the order in which they are listed in a "notify: handler_name" statement!
 #
 # Restart before reload: an reload after a restart may be redundant but should not fail,
@@ -11,7 +11,7 @@
   systemd:
     name: 'prometheus-slurm-exporter.service'
     state: restarted
-    daemon_reload: yes
+    daemon_reload: true
   become: true
   listen: restart_prometheus-slurm-exporter
 #

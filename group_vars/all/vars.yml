@@ -1,4 +1,5 @@
 ---
+openstack_api_timeout: 180
 admin_ranges: "129.125.249.0/24,172.23.40.1/24"
 ssh_host_signer_ca_keypair_dir: "ssh-host-ca"
 ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/hpc-ca"
@@ -14,10 +15,17 @@ firewall_allowed_tcp_ports:
   - '22'   # SSH
   - '9100'   # Node Exporter
 #
+# Public keys of all local admins.
+#
+public_keys_of_local_admins: "{{ local_admin_users | map('extract', auth_users) \
+    | rejectattr('pub_keys', 'none') | rejectattr('pub_keys', 'undefined') \
+    | map(attribute='pub_keys') \
+    | map('regex_findall', '^([^\\n]+)', 'multiline=True') | flatten }}"
+#
 # Local group specs.
 # Note:
 #  *  all local groups are listed here.
-#  * In ../[name]-cluster/vars.yml we list which groups are created locally on which cluster.
+#  * In ../[name]_cluster/vars.yml we list which groups are created locally on which cluster.
 #  * Never ever change nor recycle a GID value here unless you are in for a surprise...
 #
 auth_groups:
@@ -40,4 +48,36 @@ yum_repos:
   umcg-centos7:
     description: 'UMCG YUM repo for CentOS 7.'
     baseurl: http://spacewalk02.hpc.rug.nl/umcg-centos7
+#
+# Pulp repos.
+#
+pulp_repos:
+  - name: centos7-base
+    description: 'CentOS-7 - Base.'
+    remote_url: http://mirror.centos.org/centos/7/os/x86_64/
+    client_baseurl: "https://{{ stack_prefix }}-repo/pulp/content/{{ slurm_cluster_name }}/centos7-base/"
+  - name: centos7-updates
+    description: 'CentOS-7 - Updates.'
+    remote_url: http://mirror.centos.org/centos/7/updates/x86_64/
+    client_baseurl: "https://{{ stack_prefix }}-repo/pulp/content/{{ slurm_cluster_name }}/centos7-updates/"
+  - name: centos7-extras
+    description: 'CentOS-7 - Extras.'
+    remote_url: http://mirror.centos.org/centos/7/extras/x86_64/
+    client_baseurl: "https://{{ stack_prefix }}-repo/pulp/content/{{ slurm_cluster_name }}/centos7-extras/"
+  - name: epel7
+    description: 'Extra Packages for Enterprise Linux 7 (EPEL).'
+    remote_url: https://download.fedoraproject.org/pub/epel/7/x86_64/
+    client_baseurl: "https://{{ stack_prefix }}-repo/pulp/content/{{ slurm_cluster_name }}/epel7/"
+  - name: cpel7
+    description: 'UMCG Custom Packages for Enterprise Linux 7 (CPEL).'
+    #remote_url: no remote for our homebrew packages.
+    client_baseurl: "https://{{ stack_prefix }}-repo/pulp/content/{{ slurm_cluster_name }}/cpel7/"
+  - name: irods7
+    description: 'RENCI iRODS Repository for Enterprise Linux 7.'
+    remote_url: https://packages.irods.org/yum/pool/centos7/x86_64/
+    client_baseurl: "https://{{ stack_prefix }}-repo/pulp/content/{{ slurm_cluster_name }}/irods7/"
+  - name: lustre7
+    description: 'Lustre client Long Term Support (LTS) releases for Enterprise Linux 7.'
+    remote_url: https://downloads.whamcloud.com/public/lustre/latest-release/el7/client/
+    client_baseurl: "https://{{ stack_prefix }}-repo/pulp/content/{{ slurm_cluster_name }}/lustre7/"
 ...

@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="774 152 1140 1174" width="1140" height="1174">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledBall_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 5 6" markerWidth="5" markerHeight="6" color="#626362">
+      <g>
+        <circle cx="1.3999994" cy="0" r="1.39999876271888" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledBall_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-4 -3 5 6" markerWidth="5" markerHeight="6" color="#626362">
+      <g>
+        <circle cx="-1.3999994" cy="0" r="1.39999876271888" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <font-face font-family="Trebuchet MS" font-size="24" panose-1="2 11 7 3 2 2 2 2 2 4" units-per-em="1000" underline-position="-127.4414" underline-thickness="97.65625" slope="0" x-height="527.832" cap-height="721.6797" ascent="938.9648" descent="-222.16797" font-weight="700">
+      <font-face-src>
+        <font-face-name name="TrebuchetMS-Bold"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#626362">
+      <g>
+        <path d="M 3.7333333 0 L 0 -1.4 L 0 1.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <clipPath id="inner_stroke_clip_path">
+      <path d="M 909 1080 L 1011 1080 C 1015.9706 1080 1020 1084.0294 1020 1089 L 1020 1191 C 1020 1195.9706 1015.9706 1200 1011 1200 L 909 1200 C 904.0294 1200 900 1195.9706 900 1191 L 900 1089 C 900 1084.0294 904.0294 1080 909 1080 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_2">
+      <path d="M 909 960 L 1191 960 C 1195.9706 960 1200 964.0294 1200 969 L 1200 1011 C 1200 1015.9706 1195.9706 1020 1191 1020 L 909 1020 C 904.0294 1020 900 1015.9706 900 1011 L 900 969 C 900 964.0294 904.0294 960 909 960 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_3">
+      <path d="M 1029 1020 L 1191 1020 C 1195.9706 1020 1200 1024.0294 1200 1029 L 1200 1191 C 1200 1195.9706 1195.9706 1200 1191 1200 L 1029 1200 C 1024.0294 1200 1020 1195.9706 1020 1191 L 1020 1029 C 1020 1024.0294 1024.0294 1020 1029 1020 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_4">
+      <path d="M 969 1020 L 1011 1020 C 1015.9706 1020 1020 1024.0294 1020 1029 L 1020 1071 C 1020 1075.9706 1015.9706 1080 1011 1080 L 969 1080 C 964.0294 1080 960 1075.9706 960 1071 L 960 1029 C 960 1024.0294 964.0294 1020 969 1020 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_5">
+      <path d="M 909 1020 L 951 1020 C 955.9706 1020 960 1024.0294 960 1029 L 960 1071 C 960 1075.9706 955.9706 1080 951 1080 L 909 1080 C 904.0294 1080 900 1075.9706 900 1071 L 900 1029 C 900 1024.0294 904.0294 1020 909 1020 Z"/>
+    </clipPath>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-5 -3 6 6" markerWidth="6" markerHeight="6" color="#626362">
+      <g>
+        <path d="M -3.7333333 0 L 0 1.4 L 0 -1.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <clipPath id="inner_stroke_clip_path_6">
+      <path d="M 1293 576 L 1395 576 C 1399.9706 576 1404 580.02944 1404 585 L 1404 687 C 1404 691.9706 1399.9706 696 1395 696 L 1293 696 C 1288.0294 696 1284 691.9706 1284 687 L 1284 585 C 1284 580.02944 1288.0294 576 1293 576 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_7">
+      <path d="M 1203 312 L 1485 312 C 1489.9706 312 1494 316.02944 1494 321 L 1494 363 C 1494 367.97056 1489.9706 372 1485 372 L 1203 372 C 1198.0294 372 1194 367.97056 1194 363 L 1194 321 C 1194 316.02944 1198.0294 312 1203 312 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_8">
+      <path d="M 1263 384 L 1425 384 C 1429.9706 384 1434 388.02944 1434 393 L 1434 555 C 1434 559.97056 1429.9706 564 1425 564 L 1263 564 C 1258.0294 564 1254 559.97056 1254 555 L 1254 393 C 1254 388.02944 1258.0294 384 1263 384 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_9">
+      <path d="M 1323 168 L 1365 168 C 1369.9706 168 1374 172.02944 1374 177 L 1374 219 C 1374 223.97056 1369.9706 228 1365 228 L 1323 228 C 1318.0294 228 1314 223.97056 1314 219 L 1314 177 C 1314 172.02944 1318.0294 168 1323 168 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_10">
+      <path d="M 1323 240 L 1365 240 C 1369.9706 240 1374 244.02944 1374 249 L 1374 291 C 1374 295.97056 1369.9706 300 1365 300 L 1323 300 C 1318.0294 300 1314 295.97056 1314 291 L 1314 249 C 1314 244.02944 1318.0294 240 1323 240 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_11">
+      <path d="M 1499 1080 L 1601 1080 C 1605.9706 1080 1610 1084.0294 1610 1089 L 1610 1191 C 1610 1195.9706 1605.9706 1200 1601 1200 L 1499 1200 C 1494.0294 1200 1490 1195.9706 1490 1191 L 1490 1089 C 1490 1084.0294 1494.0294 1080 1499 1080 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_12">
+      <path d="M 1497 960 L 1779 960 C 1783.9706 960 1788 964.0294 1788 969 L 1788 1011 C 1788 1015.9706 1783.9706 1020 1779 1020 L 1497 1020 C 1492.0294 1020 1488 1015.9706 1488 1011 L 1488 969 C 1488 964.0294 1492.0294 960 1497 960 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_13">
+      <path d="M 1619 1020 L 1781 1020 C 1785.9706 1020 1790 1024.0294 1790 1029 L 1790 1191 C 1790 1195.9706 1785.9706 1200 1781 1200 L 1619 1200 C 1614.0294 1200 1610 1195.9706 1610 1191 L 1610 1029 C 1610 1024.0294 1614.0294 1020 1619 1020 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_14">
+      <path d="M 1497 900 L 1539 900 C 1543.9706 900 1548 904.0294 1548 909 L 1548 951 C 1548 955.9706 1543.9706 960 1539 960 L 1497 960 C 1492.0294 960 1488 955.9706 1488 951 L 1488 909 C 1488 904.0294 1492.0294 900 1497 900 Z"/>
+    </clipPath>
+    <clipPath id="inner_stroke_clip_path_15">
+      <path d="M 1557 900 L 1599 900 C 1603.9706 900 1608 904.0294 1608 909 L 1608 951 C 1608 955.9706 1603.9706 960 1599 960 L 1557 960 C 1552.0294 960 1548 955.9706 1548 951 L 1548 909 C 1548 904.0294 1552.0294 900 1557 900 Z"/>
+    </clipPath>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.18.5\n2021-05-14 13:18:54 +0000</metadata>
+  <g id="Backfill" fill-opacity="1" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none">
+    <title>Backfill</title>
+    <rect fill="white" x="774" y="152" width="1140" height="1174"/>
+    <g id="Backfill_Layer_1">
+      <title>Layer 1</title>
+      <g id="Group_386">
+        <g id="Line_251">
+          <line x1="909.9" y1="1224" x2="1190.1" y2="1224" marker-end="url(#FilledBall_Marker)" marker-start="url(#FilledBall_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_252">
+          <text transform="translate(905 1277)" fill="#5e5e5e">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#5e5e5e" x="67.06445" y="23">5 core cluster</tspan>
+          </text>
+        </g>
+        <g id="Line_253">
+          <line x1="876" y1="1190.1" x2="876" y2="975.9" marker-end="url(#FilledArrow_Marker)" marker-start="url(#FilledBall_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_254">
+          <text transform="translate(795 1219) rotate(-90)" fill="#5e5e5e">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#5e5e5e" x="71.1543" y="23">(Wall)Time (hours)</tspan>
+          </text>
+        </g>
+        <g id="Line_256">
+          <line x1="888" y1="1020" x2="864" y2="1020" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_257">
+          <line x1="888" y1="1080" x2="864" y2="1080" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_258">
+          <line x1="888" y1="1140" x2="864" y2="1140" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_260">
+          <line x1="960" y1="1212" x2="960" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_261">
+          <line x1="1020" y1="1212" x2="1020" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_262">
+          <line x1="1080" y1="1212" x2="1080" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_263">
+          <line x1="1140" y1="1212" x2="1140" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_265">
+          <text transform="translate(845 1121)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">1</tspan>
+          </text>
+        </g>
+        <g id="Graphic_266">
+          <text transform="translate(845 1061)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">2</tspan>
+          </text>
+        </g>
+        <g id="Graphic_267">
+          <text transform="translate(845 1001)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">3</tspan>
+          </text>
+        </g>
+        <g id="Graphic_268">
+          <text transform="translate(845 941)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">4</tspan>
+          </text>
+        </g>
+        <g id="Graphic_270">
+          <text transform="translate(917 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">1</tspan>
+          </text>
+        </g>
+        <g id="Graphic_271">
+          <text transform="translate(977 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">2</tspan>
+          </text>
+        </g>
+        <g id="Graphic_272">
+          <text transform="translate(1037 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">3</tspan>
+          </text>
+        </g>
+        <g id="Graphic_273">
+          <text transform="translate(1097 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">4</tspan>
+          </text>
+        </g>
+        <g id="Graphic_274">
+          <text transform="translate(1157 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">5</tspan>
+          </text>
+        </g>
+        <g id="Graphic_275">
+          <text transform="translate(845 1181)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="0" y="23">0</tspan>
+          </text>
+        </g>
+        <g id="Group_286">
+          <g id="Graphic_249">
+            <path d="M 909 1080 L 1011 1080 C 1015.9706 1080 1020 1084.0294 1020 1089 L 1020 1191 C 1020 1195.9706 1015.9706 1200 1011 1200 L 909 1200 C 904.0294 1200 900 1195.9706 900 1191 L 900 1089 C 900 1084.0294 904.0294 1080 909 1080 Z" stroke="#2370ba" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path)"/>
+          </g>
+          <g id="Graphic_276">
+            <text transform="translate(905 1109)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="14.230469" y="23">2 cores</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="13.064453" y="51">2 hours</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_288">
+          <g id="Graphic_277">
+            <text transform="translate(917 977)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="43.55078" y="23">5 cores / 1 hour</tspan>
+            </text>
+          </g>
+          <g id="Graphic_280">
+            <path d="M 909 960 L 1191 960 C 1195.9706 960 1200 964.0294 1200 969 L 1200 1011 C 1200 1015.9706 1195.9706 1020 1191 1020 L 909 1020 C 904.0294 1020 900 1015.9706 900 1011 L 900 969 C 900 964.0294 904.0294 960 909 960 Z" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_2)"/>
+          </g>
+        </g>
+        <g id="Group_287">
+          <g id="Graphic_283">
+            <path d="M 1029 1020 L 1191 1020 C 1195.9706 1020 1200 1024.0294 1200 1029 L 1200 1191 C 1200 1195.9706 1195.9706 1200 1191 1200 L 1029 1200 C 1024.0294 1200 1020 1195.9706 1020 1191 L 1020 1029 C 1020 1024.0294 1024.0294 1020 1029 1020 Z" stroke="#b34400" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_3)"/>
+          </g>
+          <g id="Graphic_284">
+            <text transform="translate(1025 1085)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="44.23047" y="23">3 cores</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="43.064453" y="51">3 hours</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_292">
+          <g id="Graphic_291">
+            <text transform="translate(965 1022)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="8.212891" y="23">1 c</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="7.240234" y="51">1 h</tspan>
+            </text>
+          </g>
+          <g id="Graphic_290">
+            <path d="M 969 1020 L 1011 1020 C 1015.9706 1020 1020 1024.0294 1020 1029 L 1020 1071 C 1020 1075.9706 1015.9706 1080 1011 1080 L 969 1080 C 964.0294 1080 960 1075.9706 960 1071 L 960 1029 C 960 1024.0294 964.0294 1020 969 1020 Z" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_4)"/>
+          </g>
+        </g>
+        <g id="Graphic_294">
+          <text transform="translate(905 1022)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="8.212891" y="23">1 c</tspan>
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="7.240234" y="51">1 h</tspan>
+          </text>
+        </g>
+        <g id="Graphic_293">
+          <path d="M 909 1020 L 951 1020 C 955.9706 1020 960 1024.0294 960 1029 L 960 1071 C 960 1075.9706 955.9706 1080 951 1080 L 909 1080 C 904.0294 1080 900 1075.9706 900 1071 L 900 1029 C 900 1024.0294 904.0294 1020 909 1020 Z" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_5)"/>
+        </g>
+      </g>
+      <g id="Line_354">
+        <line x1="1344" y1="1160.1" x2="1344" y2="963.9" marker-end="url(#FilledArrow_Marker)" marker-start="url(#FilledArrow_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_355">
+        <text transform="translate(1283 1181)" fill="#626362">
+          <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="6.419922" y="23">First Jobs</tspan>
+        </text>
+      </g>
+      <g id="Graphic_356">
+        <text transform="translate(1283 915)" fill="#626362">
+          <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="9.103516" y="23">Last Jobs</tspan>
+        </text>
+      </g>
+      <g id="Group_385">
+        <g id="Group_347">
+          <g id="Graphic_349">
+            <path d="M 1293 576 L 1395 576 C 1399.9706 576 1404 580.02944 1404 585 L 1404 687 C 1404 691.9706 1399.9706 696 1395 696 L 1293 696 C 1288.0294 696 1284 691.9706 1284 687 L 1284 585 C 1284 580.02944 1288.0294 576 1293 576 Z" stroke="#2370ba" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_6)"/>
+          </g>
+          <g id="Graphic_348">
+            <text transform="translate(1289 605)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="14.230469" y="23">2 cores</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="13.064453" y="51">2 hours</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_341">
+          <g id="Graphic_343">
+            <text transform="translate(1211 329)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="43.55078" y="23">5 cores / 1 hour</tspan>
+            </text>
+          </g>
+          <g id="Graphic_342">
+            <path d="M 1203 312 L 1485 312 C 1489.9706 312 1494 316.02944 1494 321 L 1494 363 C 1494 367.97056 1489.9706 372 1485 372 L 1203 372 C 1198.0294 372 1194 367.97056 1194 363 L 1194 321 C 1194 316.02944 1198.0294 312 1203 312 Z" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_7)"/>
+          </g>
+        </g>
+        <g id="Group_338">
+          <g id="Graphic_340">
+            <path d="M 1263 384 L 1425 384 C 1429.9706 384 1434 388.02944 1434 393 L 1434 555 C 1434 559.97056 1429.9706 564 1425 564 L 1263 564 C 1258.0294 564 1254 559.97056 1254 555 L 1254 393 C 1254 388.02944 1258.0294 384 1263 384 Z" stroke="#b34400" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_8)"/>
+          </g>
+          <g id="Graphic_339">
+            <text transform="translate(1259 449)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="44.23047" y="23">3 cores</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="43.064453" y="51">3 hours</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_335">
+          <g id="Graphic_337">
+            <text transform="translate(1319 170)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="8.212891" y="23">1 c</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="7.240234" y="51">1 h</tspan>
+            </text>
+          </g>
+          <g id="Graphic_336">
+            <path d="M 1323 168 L 1365 168 C 1369.9706 168 1374 172.02944 1374 177 L 1374 219 C 1374 223.97056 1369.9706 228 1365 228 L 1323 228 C 1318.0294 228 1314 223.97056 1314 219 L 1314 177 C 1314 172.02944 1318.0294 168 1323 168 Z" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_9)"/>
+          </g>
+        </g>
+        <g id="Group_350">
+          <g id="Graphic_352">
+            <text transform="translate(1319 242)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="8.212891" y="23">1 c</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="7.240234" y="51">1 h</tspan>
+            </text>
+          </g>
+          <g id="Graphic_351">
+            <path d="M 1323 240 L 1365 240 C 1369.9706 240 1374 244.02944 1374 249 L 1374 291 C 1374 295.97056 1369.9706 300 1365 300 L 1323 300 C 1318.0294 300 1314 295.97056 1314 291 L 1314 249 C 1314 244.02944 1318.0294 240 1323 240 Z" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_10)"/>
+          </g>
+        </g>
+        <g id="Line_357">
+          <line x1="1524" y1="608.1" x2="1524" y2="249.9" marker-end="url(#FilledBall_Marker)" marker-start="url(#FilledArrow_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_358">
+          <text transform="translate(1433 629)" fill="#626362">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="3.2851562" y="23">Highest priority</tspan>
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="41.740234" y="51">in queue</tspan>
+          </text>
+        </g>
+        <g id="Graphic_359">
+          <text transform="translate(1433 173)" fill="#626362">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="5.376953" y="23">Lowest priority</tspan>
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="41.740234" y="51">in queue</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_387">
+        <g id="Line_332">
+          <line x1="1499.9" y1="1224" x2="1780.1" y2="1224" marker-end="url(#FilledBall_Marker)" marker-start="url(#FilledBall_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_331">
+          <text transform="translate(1495 1277)" fill="#5e5e5e">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#5e5e5e" x="67.06445" y="23">5 core cluster</tspan>
+          </text>
+        </g>
+        <g id="Graphic_329">
+          <text transform="translate(1865 1219) rotate(-90)" fill="#5e5e5e">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#5e5e5e" x="71.1543" y="23">(Wall)Time (hours)</tspan>
+          </text>
+        </g>
+        <g id="Line_325">
+          <line x1="1550" y1="1212" x2="1550" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_324">
+          <line x1="1610" y1="1212" x2="1610" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_323">
+          <line x1="1670" y1="1212" x2="1670" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_322">
+          <line x1="1730" y1="1212" x2="1730" y2="1236" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_317">
+          <text transform="translate(1507 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">1</tspan>
+          </text>
+        </g>
+        <g id="Graphic_316">
+          <text transform="translate(1567 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">2</tspan>
+          </text>
+        </g>
+        <g id="Graphic_315">
+          <text transform="translate(1627 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">3</tspan>
+          </text>
+        </g>
+        <g id="Graphic_314">
+          <text transform="translate(1687 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">4</tspan>
+          </text>
+        </g>
+        <g id="Graphic_313">
+          <text transform="translate(1747 1241)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="5.96875" y="23">5</tspan>
+          </text>
+        </g>
+        <g id="Line_330">
+          <line x1="1812" y1="1190.1" x2="1812" y2="915.9" marker-end="url(#FilledArrow_Marker)" marker-start="url(#FilledBall_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_328">
+          <line x1="1824" y1="1020" x2="1800" y2="1020" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_327">
+          <line x1="1824" y1="1080" x2="1800" y2="1080" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_326">
+          <line x1="1824" y1="1140" x2="1800" y2="1140" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_321">
+          <text transform="translate(1829 1121)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">1</tspan>
+          </text>
+        </g>
+        <g id="Graphic_320">
+          <text transform="translate(1829 1061)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">2</tspan>
+          </text>
+        </g>
+        <g id="Graphic_319">
+          <text transform="translate(1829 1001)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">3</tspan>
+          </text>
+        </g>
+        <g id="Graphic_318">
+          <text transform="translate(1829 941)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">4</tspan>
+          </text>
+        </g>
+        <g id="Graphic_312">
+          <text transform="translate(1829 1181)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="0" y="23">0</tspan>
+          </text>
+        </g>
+        <g id="Group_309">
+          <g id="Graphic_311">
+            <path d="M 1499 1080 L 1601 1080 C 1605.9706 1080 1610 1084.0294 1610 1089 L 1610 1191 C 1610 1195.9706 1605.9706 1200 1601 1200 L 1499 1200 C 1494.0294 1200 1490 1195.9706 1490 1191 L 1490 1089 C 1490 1084.0294 1494.0294 1080 1499 1080 Z" stroke="#2370ba" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_11)"/>
+          </g>
+          <g id="Graphic_310">
+            <text transform="translate(1495 1109)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="14.230469" y="23">2 cores</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="13.064453" y="51">2 hours</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_303">
+          <g id="Graphic_305">
+            <text transform="translate(1505 977)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="43.55078" y="23">5 cores / 1 hour</tspan>
+            </text>
+          </g>
+          <g id="Graphic_304">
+            <path d="M 1497 960 L 1779 960 C 1783.9706 960 1788 964.0294 1788 969 L 1788 1011 C 1788 1015.9706 1783.9706 1020 1779 1020 L 1497 1020 C 1492.0294 1020 1488 1015.9706 1488 1011 L 1488 969 C 1488 964.0294 1492.0294 960 1497 960 Z" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_12)"/>
+          </g>
+        </g>
+        <g id="Group_300">
+          <g id="Graphic_302">
+            <path d="M 1619 1020 L 1781 1020 C 1785.9706 1020 1790 1024.0294 1790 1029 L 1790 1191 C 1790 1195.9706 1785.9706 1200 1781 1200 L 1619 1200 C 1614.0294 1200 1610 1195.9706 1610 1191 L 1610 1029 C 1610 1024.0294 1614.0294 1020 1619 1020 Z" stroke="#b34400" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_13)"/>
+          </g>
+          <g id="Graphic_301">
+            <text transform="translate(1615 1085)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="44.23047" y="23">3 cores</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="43.064453" y="51">3 hours</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_297">
+          <g id="Graphic_299">
+            <text transform="translate(1493 902)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="8.212891" y="23">1 c</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="7.240234" y="51">1 h</tspan>
+            </text>
+          </g>
+          <g id="Graphic_298">
+            <path d="M 1497 900 L 1539 900 C 1543.9706 900 1548 904.0294 1548 909 L 1548 951 C 1548 955.9706 1543.9706 960 1539 960 L 1497 960 C 1492.0294 960 1488 955.9706 1488 951 L 1488 909 C 1488 904.0294 1492.0294 900 1497 900 Z" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_14)"/>
+          </g>
+        </g>
+        <g id="Group_353">
+          <g id="Graphic_296">
+            <text transform="translate(1553 902)" fill="black">
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="8.212891" y="23">1 c</tspan>
+              <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="black" x="7.240234" y="51">1 h</tspan>
+            </text>
+          </g>
+          <g id="Graphic_295">
+            <path d="M 1557 900 L 1599 900 C 1603.9706 900 1608 904.0294 1608 909 L 1608 951 C 1608 955.9706 1603.9706 960 1599 960 L 1557 960 C 1552.0294 960 1548 955.9706 1548 951 L 1548 909 C 1548 904.0294 1552.0294 900 1557 900 Z" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" clip-path="url(#inner_stroke_clip_path_15)"/>
+          </g>
+        </g>
+        <g id="Graphic_381">
+          <text transform="translate(1829 881)" fill="#1a1918">
+            <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#1a1918" x="0" y="23">5</tspan>
+          </text>
+        </g>
+        <g id="Line_383">
+          <line x1="1824" y1="960" x2="1800" y2="960" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+      </g>
+      <g id="Line_393">
+        <path d="M 1042.8471 920.1371 C 1043.48 900.7523 1051.232 867.1787 1092 840 C 1153.1939 799.2041 1195.4065 829.3963 1260 792 C 1306.3635 765.158 1317.082 733.5722 1319.439 717.8816" marker-end="url(#FilledBall_Marker)" marker-start="url(#FilledArrow_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_392">
+        <text transform="translate(1481 752)" fill="#626362">
+          <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="16.304688" y="23">Without </tspan>
+          <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="19.65625" y="51">Backfill</tspan>
+        </text>
+      </g>
+      <g id="Graphic_391">
+        <text transform="translate(1109 752)" fill="#626362">
+          <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="34.94336" y="23">With </tspan>
+          <tspan font-family="Trebuchet MS" font-size="24" font-weight="700" fill="#626362" x="19.65625" y="51">Backfill</tspan>
+        </text>
+      </g>
+      <g id="Line_395">
+        <path d="M 1645.2241 920.1371 C 1644.5912 900.7523 1636.8393 867.1787 1596.0712 840 C 1534.8773 799.2041 1492.6648 829.3963 1428.0712 792 C 1381.7077 765.158 1370.9893 733.5722 1368.6321 717.8816" marker-end="url(#FilledBall_Marker)" marker-start="url(#FilledArrow_Marker_2)" stroke="#626362" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+    </g>
+  </g>
+</svg>

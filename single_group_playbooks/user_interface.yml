@@ -1,0 +1,20 @@
+#
+# This play depends on:
+#   * cluster_part1.yml
+#   * cluster_part2.yml
+#
+---
+- import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Extra roles for UIs. <-==###'
+  hosts:
+    - user_interface
+  roles:
+    - build_environment
+    - slurm_exporter
+    - slurm_client
+    - sudoers
+    - subgroup_directories
+    - role: ega_fuse_client
+      when: ega_fuse_client_mounts is defined and ega_fuse_client_mounts | length >= 1
+...

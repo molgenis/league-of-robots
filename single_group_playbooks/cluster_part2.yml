@@ -1,0 +1,12 @@
+---
+- import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Basic roles for all cluster machines part 2. <-==###'
+  hosts:
+    - cluster
+  roles:
+    - ldap  # client
+    - sshd
+    - regular_users
+    - shared_storage
+...

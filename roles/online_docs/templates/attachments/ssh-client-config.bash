@@ -306,7 +306,7 @@ function manageConfig() {
 # Special comment lines parsed by our mount-cluster-drives script to create sshfs mounts.
 # (Will be ignored by OpenSSH.)
 # {% set sshfs_jumphost = groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') %}
-# {% set sshfs_ui = groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') %}
+# {% set sshfs_ui = groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') %}
 #SSHFS {{ sshfs_ui }}_groups={{ sshfs_jumphost }}+{{ sshfs_ui }}:/groups/
 #SSHFS {{ sshfs_ui }}_home={{ sshfs_jumphost }}+{{ sshfs_ui }}:/home/${_user}/
 #
@@ -370,21 +370,19 @@ Host {% for jumphost in groups['jumphost'] %}{{ jumphost | regex_replace('^' + a
 # Universal jumphost settings for triple-hop SSH.
 #
 Host *+*+*
-    ProxyCommand ssh -x -q -i "${_private_key_file}" $(echo %h | sed 's/+[^+]*$//') -W $(echo %h | sed 's/^[^+]*+[^+]*+//'):%p
+    ProxyCommand ssh -x -q \$(echo %h | sed 's/+[^+]*$//') -W \$(echo %h | sed 's/^[^+]*+[^+]*+//'):%p
 #
 # Double-hop SSH settings to connect via specific jumphosts.
 #
 Host {% for jumphost in groups['jumphost'] %}{{ jumphost | regex_replace('^' + ai_jumphost + '\\+','')}}+* {% endfor %}{% raw %}{% endraw %}
-    User ${_user}
-    ProxyCommand ssh -x -q -i "${_private_key_file}" %r@\$(echo %h | sed 's/+[^+]*$//'){% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %} -W \$(echo %h | sed 's/^[^+]*+//'):%p
+    ProxyCommand ssh -x -q \$(echo "\${JUMPHOST_USER:-%r}")@\$(echo %h | sed 's/+[^+]*$//'){% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %} -W \$(echo %h | sed 's/^[^+]*+//'):%p
 #
 # Sometimes port 22 for the SSH protocol is blocked by firewalls; in that case you can try to use SSH on port 443 as fall-back.
 # Do not use port 443 by default for SSH as it is officially assigned to HTTPS traffic
 # and some firewalls will cause problems with SSH traffic over port 443.
 #
 Host {% for jumphost in groups['jumphost'] %}{{ jumphost | regex_replace('^' + ai_jumphost + '\\+','')}}443+* {% endfor %}{% raw %}{% endraw %}
-    User ${_user}
-    ProxyCommand ssh -x -q -i "${_private_key_file}" %r@\$(echo %h | sed 's/443+[^+]*$//'){% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %} -W \$(echo %h | sed 's/^[^+]*+//'):%p -p 443
+    ProxyCommand ssh -x -q \$(echo "\${JUMPHOST_USER:-%r}")@\$(echo %h | sed 's/443+[^+]*$//'){% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %} -W \$(echo %h | sed 's/^[^+]*+//'):%p -p 443
 
 EOF
 }
@@ -494,17 +492,17 @@ manageConfig "${user}" "${private_key_file}"
 # Notify user.
 #
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' 'Finished configuring your SSH client for logins to {{ slurm_cluster_name | capitalize }}.'
-log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' 'You can log in to User Interface {{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}'
+log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' 'You can log in to User Interface {{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}'
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' '    via jumphost {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}{% if slurm_cluster_domain | length %}.{{ slurm_cluster_domain }}{% endif %}'
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' '    in a terminal with the following SSH command:'
-log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' '        ssh {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}'
+log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' '        ssh {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}'
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' 'We will now test your connection by executing the above SSH command to login and logout.'
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' 'If this is the first time your private key will be used for an SSH session,'
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' '    you will receive a prompt to supply the password for your private key,'
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' '    which can be stored in your login KeyChain,'
 log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "    so you won't have to retype the password again for a subsequent SSH session."
 read -e -p "Press [ENTER] to test your connection."
-if ssh {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }} exit; then
+if ssh {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }} exit; then
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' 'Login was succesful.'
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' 'Consult the online documentation for additional examples '
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' '    and how to transfer data with rsync over SSH.'

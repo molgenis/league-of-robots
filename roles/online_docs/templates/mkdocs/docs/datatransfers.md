@@ -27,26 +27,26 @@ Your options to move data to/from the {{ slurm_cluster_name | capitalize }} HPC 
   * via [GUI on macOS](../datatransfers-macos/)
   * via the commandline: see below for _rsync_ over SSH
 
-#### Using rsync over SSH
+### Using rsync over SSH
 
 * You can transfer data with ```rsync``` over _SSH_ to copy files to for example your home dir on the cluster with something like the command below.
 
-        $your_client> rsync -av some_directory {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}:
+        $your_client> rsync -av some_directory {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}:
 
     _**Note the colon**_ at the end of the ```rsync``` command:
 
-      1. Without the colon you would copy to a local file named ```{{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}``` instead.
+      1. Without the colon you would copy to a local file named ```{{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}``` instead.
       1. If you do not specify a path after the colon you'll transfer data to the default location, which is your home dir.
 
 * If you want the data to go elsewhere you'll have to specify where. E.g.:
 
-        $your_client> rsync -av some_directory {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}:/path/to/somewhere/else/
+        $your_client> rsync -av some_directory {{ groups['jumphost'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}+{{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}:/path/to/somewhere/else/
 
 * Swap source and destination to pull data from the cluster as opposed to pushing data to the cluster.
 
 ## 2. Push to or pull from another (SSH) server
 
-#### Using rsync over SSH
+### Using rsync over SSH
 
 When you login from your local computer (via a jumphost) to a server of the {{ slurm_cluster_name | capitalize }} HPC cluster 
 and next need to transfer data from {{ slurm_cluster_name | capitalize }} to another SSH server or vice versa, 
@@ -70,7 +70,7 @@ First, configure _SSH agent forwarding_ using one of:
 Next, login to {{ slurm_cluster_name | capitalize }} and verify that _agent forwarding_ worked 
 by executing the following command to list the identities (private keys) available to your _SSH agent_:
 ```
-${{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}> ssh-add -l
+${{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}> ssh-add -l
 ```
 
 * You should get a response with at least one key fingerprint, which means you can now transfer data with ```rsync``` to/from the other server 
@@ -85,18 +85,18 @@ ${{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','
 Once you have a private key on {{ slurm_cluster_name | capitalize }} and can login to the other server using ssh, 
 you can use rsync (over ssh) to pull data from the other server like this:
 ```
-${{ groups['user-interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}> rsync -av your-account@other-server.some.domain:/path/to/source_folder   /path/to/destination_folder/
+${{ groups['user_interface'] | first | regex_replace('^' + ai_jumphost + '\\+','') }}> rsync -av your-account@other-server.some.domain:/path/to/source_folder   /path/to/destination_folder/
 ```
 Swap source and destination to push data to the other server as opposed to pulling data from the other sever.
 
-#### Using http(s)
+### Using http(s)
 
 For downloads on / uploads from {{ slurm_cluster_name | capitalize }} over _http(s)_ you can use the commandline tools ```curl``` or ```wget```. 
 In case you want to pull from / push to a git repository you can use https URLs with the ```git``` command.
 
 {# jinja2 comment: firewall requires improvements for sftp/aspera.
 
-#### Using aspera
+### Using aspera
 
 For downloads on {{ slurm_cluster_name | capitalize }} or uploads from over _**sftp**_ (ftp tunnelled over ssh) or **aspera**:
 
@@ -105,7 +105,7 @@ For downloads on {{ slurm_cluster_name | capitalize }} or uploads from over _**s
   If you hit a firewall when trying to use _sftp_, _rsync_ or _aspera_ [contact the helpdesk via email](../contact/) to request an update of the firewall config
   and mention the protocol used, the name / address of the server and any non-standard ports used by that server if relevant.
 
-#### Using ftp
+### Using ftp
 
 For downloads on {{ slurm_cluster_name | capitalize }} over _ftp_ you are mostly out of luck as we don't support ftp, not even only for outgoing connections (except to/from a very limited list of bioinformatics institutes). 
 The _ftp_ protocol is very messy requiring various open ports on firewalls; it was simply never designed for anything else than public data and is a serious security risk.
@@ -115,7 +115,7 @@ The _ftp_ protocol is very messy requiring various open ports on firewalls; it w
 
 ## Debugging and Frequent Asked Question (FAQs)
 
-#### Q: How do I share large data sets stored on a cluster with an external collaborator?
+### Q: How do I share large data sets stored on a cluster with an external collaborator?
 
 A: We don't expose our large shared file systems to the outside world directly via cluster User Interface (UI) servers.
    Instead we use a ''stand-alone'' SFTP server with ''local'' storage as intermediate. 

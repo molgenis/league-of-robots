@@ -1,0 +1,89 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
+#
+##
+### /etc/hosts
+### 
+### Generated automatically by Ansible
+### with league-of-robots/roles/static_hostname_lookup role.
+### Do NOT edit manually: changes will be lost!
+##
+#
+# localhost
+#
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+{% if groups['jumphost'] is defined and groups['jumphost'] | length >= 1 %}
+#
+# Jumphosts
+#
+  {% for server_hostname in groups['jumphost'] %}
+{{ "%-15s" | format(ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+  {% endfor %}
+{% endif %}
+{% if groups['repo'] is defined and groups['repo'] | length >= 1 %}
+#
+# Repo servers
+#
+  {% for server in groups['repo'] %}
+     {% set server_hostname = server | regex_replace('^' + ai_jumphost + '\\+','') %}
+{{ "%-15s" | format(ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+  {% endfor %}
+{% endif %}
+{% if groups['sys_admin_interface'] is defined and groups['sys_admin_interface'] | length >= 1 %}
+#
+# Sys Admin Interfaces (SAIs)
+#
+  {% for server in groups['sys_admin_interface'] %}
+     {% set server_hostname = server | regex_replace('^' + ai_jumphost + '\\+','') %}
+{{ "%-15s" | format(ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+  {% endfor %}
+{% endif %}
+{% if groups['deploy_admin_interface'] is defined and groups['deploy_admin_interface'] | length >= 1 %}
+#
+# Deploy Admin Interfaces (DAIs)
+#
+  {% for server in groups['deploy_admin_interface'] %}
+    {% set server_hostname = server | regex_replace('^' + ai_jumphost + '\\+','') %}
+{{ "%-15s" | format(ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+  {% endfor %}
+{% endif %}
+{% if groups['user_interface'] is defined and groups['user_interface'] | length >= 1 %}
+#
+# User Interfaces (UIs)
+#
+  {% for server in groups['user_interface'] %}
+    {% set server_hostname = server | regex_replace('^' + ai_jumphost + '\\+','') %}
+{{ "%-15s" | format(ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+  {% endfor %}
+{% endif %}
+{% if groups['compute_vm'] is defined and groups['compute_vm'] | length >= 1 %}
+#
+# Compute nodes
+#
+  {% for server in groups['compute_vm'] %}
+    {% set server_hostname = server | regex_replace('^' + ai_jumphost + '\\+','') %}
+{{ "%-15s" | format(ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+  {% endfor %}
+{% endif %}
+{% if groups['docs'] is defined and groups['docs'] | length >= 1 %}
+#
+# Documentation webservers
+#
+  {% for server in groups['docs'] %}
+    {% set server_hostname = server | regex_replace('^' + ai_jumphost + '\\+','') %}
+    {% if ip_addresses[server_hostname] is defined %}
+{{ "%-15s" | format(ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% if additional_etc_hosts is defined and additional_etc_hosts | length >= 1 %}
+#
+# Additional hosts.
+#
+  {% for item in additional_etc_hosts %}
+    {% set additional_ip_addresses = lookup('vars', item.group).ip_addresses %}
+    {% for server_hostname in item.hosts %}
+{{ "%-15s" | format(additional_ip_addresses[server_hostname].addr) }}    {{ server_hostname }}
+    {% endfor %}
+  {% endfor %}
+{% endif %}

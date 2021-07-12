@@ -1,5 +1,7 @@
 ---
 - hosts: cluster
   roles:
-    - spacewalk_client
+    - role: spacewalk_client
+      when:
+        - repo_manager == 'spacewalk'
 ...

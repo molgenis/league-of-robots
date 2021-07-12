@@ -1,0 +1,12 @@
+---
+- hosts:
+    - jumphost
+  roles:
+    - logrotate
+- hosts:
+    - repo
+    - cluster
+    - docs
+  roles:
+    - logrotate
+...

@@ -1,0 +1,7 @@
+---
+- name: Running update-ca-trust when certificates have changed.
+  command:
+    cmd: update-ca-trust extract
+  become: true
+  listen: update-ca-trust
+...

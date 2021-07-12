@@ -6,7 +6,7 @@
     # Need DBus 1.11.10 for a fix, but CentOS 7.6 is stuck on dbus 1.10.24.
     #
     name: 'Restart systemd-logind'
-    minute: '/10'
+    minute: '*/10'
     user: root
     job: '/bin/systemctl restart systemd-logind'
     cron_file: restart_logind
@@ -15,7 +15,7 @@
 - name: 'Install yum dependencies.'
   yum:
     state: 'latest'
-    update_cache: yes
+    update_cache: true
     name:
       - pam_script
       - oddjob-mkhomedir
@@ -37,11 +37,9 @@
   become: true
 
 - name: 'Enable pam_script.'
-  file:
+  file:  # noqa risky-file-permissions
     src: 'pam_script'
     dest: "/etc/{{ item }}"
-    owner: root
-    group: root
     state: link
   with_items:
     - pam_script_acct
@@ -69,27 +67,27 @@
 # which will now automatically create account, users and associations of slurm users to slurm accounts
 # upon job submission when they do not already exist.
 #
-#- name: Install login_checks.sh script.
-#  copy:
-#    src: 'login_checks.sh'
-#    dest: '/etc/pam-script.d/login_checks.sh'
-#    owner: root
-#    group: root
-#    mode: '0755'
-#  when: inventory_hostname in groups['cluster']
-#  become: true
+# - name: Install login_checks.sh script.
+#   copy:
+#     src: 'login_checks.sh'
+#     dest: '/etc/pam-script.d/login_checks.sh'
+#     owner: root
+#     group: root
+#     mode: '0755'
+#   when: inventory_hostname in groups['cluster']
+#   become: true
 #
-#- name: Enable login_checks.sh script for ses_open.
-#  file:
-#    src: "{{ item }}"
-#    dest: "/etc/pam-script.d/{{ item }}_ses_open"
-#    owner: root
-#    group: root
-#    state: link
-#  with_items:
-#    - login_checks.sh
-#  when: inventory_hostname in groups['cluster']
-#  become: true
+# - name: Enable login_checks.sh script for ses_open.
+#   file:  # noqa risky-file-permissions
+#     src: "{{ item }}"
+#     dest: "/etc/pam-script.d/{{ item }}_ses_open"
+#     owner: root
+#     group: root
+#     state: link
+#   with_items:
+#     - login_checks.sh
+#   when: inventory_hostname in groups['cluster']
+#   become: true
 #
 - name: 'Disable login_checks.sh script as we use the Slurm job_submit.lua plugin now.'
   file:
@@ -102,16 +100,16 @@
 
 - name: 'Set tiny quota for regular users on jumphosts.'
   include_tasks:
-    file: "{{ playbook_dir }}/roles/logins/tasks/jumphost-quota.yml"
+    file: jumphost-quota.yml
   when:
     - inventory_hostname in groups['jumphost'] | default([])
 
 - name: 'Enable services.'
   systemd:
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: started
-    daemon_reload: yes
+    daemon_reload: true
   with_items:
     - dbus.service
     - oddjobd.service

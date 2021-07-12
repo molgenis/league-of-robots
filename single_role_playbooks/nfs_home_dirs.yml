@@ -3,12 +3,12 @@
 #
 ---
 - name: Export /home on NFS server.
-  hosts: user-interface
+  hosts: user_interface
   roles:
      - nfs_home_server
 
 - name: Mount /home on NFS clients.
-  hosts: compute-vm
+  hosts: compute_vm
   roles:
      - nfs_home_client
 ...

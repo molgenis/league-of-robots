@@ -1,5 +1,5 @@
 ---
-- hosts: data-staging
+- hosts: data_staging
   roles:
     - rsyncd # Note: depends on ldap role, which will be included when deploying this one.
 ...

@@ -1,47 +1,9 @@
 ---
-# https://gist.github.com/manuelmeurer/a2c0a8c24a0bb5092250
+- include_tasks:
+    file: enable_swap.yml
+  when: swap_file_state == 'enabled'
 
-- name: set swap_file variable
-  set_fact:
-    swap_file: /swapfile.swap
-
-- name: check if swap file exists
-  stat:
-    path: "{{ swap_file }}"
-  register: swap_file_check
-
-
-# fallocate doesn't work on centos7, see
-# https://unix.stackexchange.com/questions/294600/i-cant-enable-swap-space-on-centos-7
-- name: create swap file
-  become: yes
-  command: dd if=/dev/zero bs=1MiB count={{ swap_space  * 1024 }} of={{ swap_file }}
-  when: not swap_file_check.stat.exists
-
-- name: set permissions on swap file
-  become: yes
-  file:
-    path: "{{ swap_file }}"
-    mode: 0600
-
-- name: format swap file
-  become: yes
-  command: mkswap {{ swap_file }}
-  when: not swap_file_check.stat.exists
-
-- name: add to fstab
-  become: yes
-  lineinfile:
-    dest: /etc/fstab
-    regexp: "{{ swap_file }}"
-    line: "{{ swap_file }} none swap sw 0 0"
-
-- name: turn on swap
-  become: yes
-  command: swapon -a
-
-- name: set swapiness
-  become: yes
-  sysctl:
-    name: vm.swappiness
-    value: "1"
+- include_tasks:
+    file: disable_swap.yml
+  when: swap_file_state != 'enabled'
+...

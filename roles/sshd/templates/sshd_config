@@ -97,7 +97,7 @@ ClientAliveInterval 300
 Subsystem sftp /usr/libexec/openssh/sftp-server -f AUTHPRIV -l INFO
 
 {% if use_ldap %}
-AuthorizedKeysCommand /usr/libexec/openssh/ssh_ldap_wrapper.py
+AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper.bash
 AuthorizedKeysCommandUser root
 AuthorizedKeysFile /dev/null
 

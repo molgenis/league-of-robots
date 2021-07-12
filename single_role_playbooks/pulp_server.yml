@@ -1,0 +1,7 @@
+---
+- hosts: repo
+  roles:
+    - role: pulp_server
+      when:
+        - repo_manager == 'pulp'
+...

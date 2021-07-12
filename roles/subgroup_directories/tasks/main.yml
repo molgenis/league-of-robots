@@ -1,7 +1,7 @@
 ---
 - name: 'Loop over "prm" file systems.'
   include_tasks:
-    file: "{{ playbook_dir }}/roles/subgroup_directories/tasks/create_subgroup_directories.yml"
+    file: create_subgroup_directories.yml
   vars:
     lfs: "{{ lfs_item.0.lfs }}"
     group: "{{ lfs_item.1 }}"
@@ -13,11 +13,11 @@
     - 'groups'
   loop_control:
     loop_var: lfs_item
-  when: inventory_hostname in groups['user-interface']
+  when: inventory_hostname in groups['user_interface']
 
 - name: 'Loop over "tmp" file systems.'
   include_tasks:
-    file: "{{ playbook_dir }}/roles/subgroup_directories/tasks/create_subgroup_directories.yml"
+    file: create_subgroup_directories.yml
   vars:
     lfs: "{{ lfs_item.0.lfs }}"
     group: "{{ lfs_item.1 }}"
@@ -29,5 +29,5 @@
     - 'groups'
   loop_control:
     loop_var: lfs_item
-  when: inventory_hostname in groups['user-interface']
+  when: inventory_hostname in groups['user_interface']
 ...

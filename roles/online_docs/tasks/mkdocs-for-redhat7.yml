@@ -2,7 +2,7 @@
 - name: 'Install Python 3 for CentOS 7.'
   yum:
     state: 'latest'
-    update_cache: yes
+    update_cache: true
     name:
       - 'python36'
       - 'python36-setuptools'

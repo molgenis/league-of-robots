@@ -1,9 +1,0 @@
----
-- hosts: all
-  name: Dummy to gather facts
-  tasks: []
-
-- hosts: nova-compute
-  become: True
-  roles:
-     - hpc-cloud/roles/nova-compute

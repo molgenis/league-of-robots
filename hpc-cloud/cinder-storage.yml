@@ -1,9 +1,0 @@
----
-- hosts: all
-  name: Dummy to gather facts
-  tasks: []
-
-- hosts: cinder-storage
-  become: True
-  roles:
-     - hpc-cloud/roles/cinder-storage

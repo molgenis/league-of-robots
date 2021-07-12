@@ -6,6 +6,7 @@ networks:
 
 firewall_allowed_tcp_ports:
   - "22"
+  - "6818"
 
 firewall_log_dropped_packets: true
 

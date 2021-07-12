@@ -1,0 +1,11 @@
+---
+ip_addresses:
+  boxy-management:
+    addr: 172.23.40.237
+    mask: /32
+    vlan: vlan983
+  boxy-storage:
+    addr: 172.23.34.237
+    mask: /32
+    vlan: vlan985
+...

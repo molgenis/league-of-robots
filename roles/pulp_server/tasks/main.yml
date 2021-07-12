@@ -1,0 +1,229 @@
+#
+# This pulp_server role depends on
+#     pulp.pulp_installer.pulp_all_services
+# which installs pulp itself.
+#
+# In this role we
+#  * Create a {{ repo_management_user }} user.
+#  * Install/check additional tooling like:
+#      * pulp-cli, which is the commandline interface to interact with a Pulp instance.
+#      * httpie, a commandline interface to interface with the Pulp API using GET/POST/PUT HTTP calls.
+#  * Configure some repositories and their remotes.
+#  * Sync repositories for the first time to create an initial repository version,
+#    create a publications for the initial repository version and distribute that publication.
+# Creating additional repository version, new publications and updating distribution is manual work for
+# the {{ repo_management_user }} and outside the scope for this pulp_server role.
+---
+- name: Get checksum of Pulp root certificate on repo server.
+  stat:
+    path: "{{ pulp_root_cert_path_on_repo_server }}"
+    checksum_algorithm: sha1
+  register: repo_server_pulp_root_certificate
+  become: true
+
+- name: Checking if Pulp root certificate must be updated.
+  debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+         ***********************************************************************************************************
+                    The Pulp root certificate on the Pulp repo server in:
+                        {{ pulp_root_cert_path_on_repo_server }}
+                    Differs from the Pulp root certificate on the Ansible control host in:
+                        {{ pulp_root_cert_path_on_control_host }}
+                    Check which one is correct and update the other one.
+         ***********************************************************************************************************
+  when: repo_server_pulp_root_certificate.stat.checksum | default('Missing Pulp root certificate checksum on repo server', true)
+        != lookup('unvault', pulp_root_cert_path_on_control_host) | hash('sha1')
+  failed_when: repo_server_pulp_root_certificate.stat.checksum | default('Missing Pulp root certificate checksum on repo server', true)
+               != lookup('unvault', pulp_root_cert_path_on_control_host) | hash('sha1')
+
+- name: Add pulp web server root certificate to list of trusted root certificates.
+  ansible.builtin.copy:
+    src: "{{ slurm_cluster_name }}_cluster/\
+          {{ item | regex_replace('^' + ai_jumphost + '\\+','') }}_pulp_root.crt"
+    dest: /etc/pki/ca-trust/source/anchors/
+    owner: root
+    group: root
+    mode: '0600'
+  with_items: "{{ groups['repo'] }}"
+  become: true
+  notify: update-ca-trust
+
+- name: Flush handlers.
+  meta: flush_handlers
+
+#
+## IMPORTANT:
+## The (root) certificates above are used by the nginx web server serving content to Pulp clients,
+## which use an encrypted connection over HTTPS to access content.
+##
+## Below this comment we use HTTP on localhost and disable any SSL certificate validation for the Pulp API,
+## because the Pulp API server as well as the client components to interact with the API are all written in Python
+## and adding a CA root certificate to these various Python components is a big inconsistent mess.
+##  * Pulp API is served by a gunicorn web server written in Python.
+##  * pulp-cli installed on the repo server is written in Python.
+##  * The calls in the tasks below use the pulp.sequeezer Ansible collection, which is also written Python.
+##
+#
+
+- name: Install packages with yum.
+  yum:
+    state: 'latest'
+    update_cache: true
+    name:
+      - nano
+      - httpie
+      - jq
+      - curl
+  become: true
+
+- name: "Create local private group for {{ repo_management_user }} user's home dir."
+  group:
+    name: "{{ repo_management_user }}"                 # Use same name as user's account name for user's private group.
+    gid: "{{ auth_users[repo_management_user].uid }}"  # Use same GID as user's UID for user's private group.
+    state: present
+  become: true
+
+- name: Create /admin root dir for the home dirs of local admin users.
+  file:
+    path: '/admin'
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  become: true
+
+- name: "Create local {{ repo_management_user }} user."
+  user:
+    name: "{{ repo_management_user }}"
+    uid: "{{ auth_users[repo_management_user].uid }}"
+    comment: "{{ auth_users[repo_management_user].comment }}"
+    group: "{{ repo_management_user }}"
+    home: "/admin/{{ repo_management_user }}"
+    append: false
+  become: true
+
+- name: "Initialize {{ repo_management_user }} account creating home dir if it did not exist yet."
+  command:
+    cmd: "mkhomedir_helper {{ repo_management_user }} 0077"
+    creates: "/admin/{{ repo_management_user }}"
+  become: true
+
+- name: "Allow passwordless sudo to the {{ repo_management_user }} account for Pulp admin users."
+  lineinfile:
+    dest: '/etc/sudoers'
+    line: "%admin    ALL=({{ repo_management_user }})    NOPASSWD:ALL"
+    owner: root
+    group: root
+    mode: '0440'
+  become: true
+
+- name: "Install pulp-cli from PyPi using pip and into a dedicated virtualenv in the {{ repo_management_user }} user's home."
+  pip:
+    name: pulp-cli[pygments]>=0.8.0
+    virtualenv_command: 'python3 -m venv'
+    virtualenv: "/admin/{{ repo_management_user }}/pulp-cli.venv"
+  become: true
+  become_user: "{{ repo_management_user }}"
+
+- name: Create folders for config files.
+  file:
+    name: "{{ item }}"
+    owner: "{{ repo_management_user }}"
+    group: "{{ repo_management_user }}"
+    mode: '0750'
+    state: 'directory'
+  with_items:
+    - "/admin/{{ repo_management_user }}/.config/"
+    - "/admin/{{ repo_management_user }}/.config/pulp/"
+  become: true
+  become_user: "{{ repo_management_user }}"
+
+- name: "Deploy ~.netrc file for {{ repo_management_user }} user."
+  template:
+    src: templates/repo_management_user.netrc.j2
+    dest: "/admin/{{ repo_management_user }}/.netrc"
+    mode: 0600
+    owner: "{{ repo_management_user }}"
+    group: "{{ repo_management_user }}"
+  become: true
+  become_user: "{{ repo_management_user }}"
+
+- name: "Deploy ~.config/pulp/settings.toml file for {{ repo_management_user }} user."
+  template:
+    src: templates/repo_management_user.settings.toml.j2
+    dest: "/admin/{{ repo_management_user }}/.config/pulp/settings.toml"
+    mode: 0600
+    owner: "{{ repo_management_user }}"
+    group: "{{ repo_management_user }}"
+  become: true
+  become_user: "{{ repo_management_user }}"
+
+- name: Read status from pulp API server and refresh API cache.
+  pulp.squeezer.status:
+    pulp_url: "{{ pulp_api_baseurl }}"
+    username: "{{ pulp_api_user }}"
+    password: "{{ pulp_api_password }}"
+    validate_certs: false
+    refresh_api_cache: true
+  register: pulp_status
+  become: true
+  become_user: "{{ repo_management_user }}"
+  no_log: true
+
+- name: Report pulp status.
+  debug:
+    var: pulp_status
+
+- name: Create remotes.
+  pulp.squeezer.rpm_remote:
+    name: "{{ item.name }}-remote"
+    url: "{{ item.remote_url }}"
+    policy: on_demand
+    state: present
+    pulp_url: "{{ pulp_api_baseurl }}"
+    username: "{{ pulp_api_user }}"
+    password: "{{ pulp_api_password }}"
+    validate_certs: false
+  with_items: "{{ pulp_repos | selectattr('remote_url', 'defined') | list }}"
+  become: true
+  become_user: "{{ repo_management_user }}"
+  no_log: true
+
+- name: Create repositories.
+  pulp.squeezer.rpm_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    state: present
+    pulp_url: "{{ pulp_api_baseurl }}"
+    username: "{{ pulp_api_user }}"
+    password: "{{ pulp_api_password }}"
+    validate_certs: false
+  with_items: "{{ pulp_repos }}"
+  become: true
+  become_user: "{{ repo_management_user }}"
+  no_log: true
+
+- name: Incomplete pulp squeezer support notification.
+  debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+         ***********************************************************************************************************
+         This is as far as we can get with the current limited support for RPM repositories in pulp-sequeezer.
+         You will need to login to {{ inventory_hostname }} and use the pulp-cli as user {{ repo_management_user }}
+         and
+          * For repos with upstream remotes: add the remote to the repo (once) and sync the repo with the remote.
+          * For repos that without upstream remote: upload RPM files to Pulp creating artifacts,
+                                                    create RPMs in Pulp from the artifacts
+                                                    and finally add the Pulp RPMs to the the Pulp RPM repository.
+            (Syncing with remotes or adding RPMs automatically creates new repository versions.)
+          * Create a new publication from the last repository version.
+          * Create a distribution based on the new publication if it did not exist yet
+            or update the existing distribution to serve the new publication.
+         For instructions and examples see:
+            .../league-of-robots/documentation/Configuring_Pulp.md
+         ***********************************************************************************************************
+  failed_when: true  # Always fail to get attention and inform user the work is not complete/done.
+...

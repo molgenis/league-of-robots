@@ -1,0 +1,22 @@
+---
+- name: Install generic build depedencies.
+  yum:
+    state: latest
+    update_cache: true
+    name:
+      - '@development'
+      - 'glibc-common'
+      - 'glibc-devel'
+      - 'glibc-headers'
+      - 'gnutls-devel'
+      - 'intltool'
+      - 'kernel-devel'
+      - 'libselinux-devel'
+      - 'libsodium-devel'
+      - 'openssl-devel'
+      - 'patch'
+      - 'qt5-qtbase-devel'
+      - 'qt5-qtxmlpatterns-devel'
+      - 'rpm-build'
+  become: true
+...

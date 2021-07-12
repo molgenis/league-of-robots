@@ -1,0 +1,24 @@
+---
+- import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Basic roles for all cluster machines part 1. <-==###'
+  hosts:
+    - cluster
+  roles:
+    - admin_users
+    - ssh_host_signer
+    - ssh_known_hosts
+    - swap
+    - {role: spacewalk_client, when: repo_manager == 'spacewalk'}
+    - {role: pulp_client, when: repo_manager == 'pulp'}
+    - logrotate
+    - update
+    - logins
+    - figlet_motd
+    - node_exporter
+    - static_hostname_lookup
+    - cluster
+    - resolver
+    - coredumps
+    - logrotate
+...

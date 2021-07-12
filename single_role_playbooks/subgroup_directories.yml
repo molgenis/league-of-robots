@@ -1,5 +1,5 @@
 ---
-- hosts: user-interface
+- hosts: user_interface
   roles:
     - subgroup_directories
 ...

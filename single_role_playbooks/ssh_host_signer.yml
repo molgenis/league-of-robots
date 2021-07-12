@@ -1,5 +1,9 @@
 ---
-- hosts: all
+- hosts:
+    - jumphost
+    - repo
+    - cluster
+    - docs
   roles:
     - ssh_host_signer
     - ssh_known_hosts

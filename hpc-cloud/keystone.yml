@@ -1,9 +1,0 @@
----
-- hosts: databases
-  name: Dummy to gather facts
-  tasks: []
-
-- hosts: keystone
-  become: True
-  roles:
-     - hpc-cloud/roles/keystone

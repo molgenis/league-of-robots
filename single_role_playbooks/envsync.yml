@@ -1,5 +1,5 @@
 ---
-- hosts: deploy-admin-interface
+- hosts: deploy_admin_interface
   roles:
     - envsync
 ...

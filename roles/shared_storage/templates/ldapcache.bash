@@ -700,13 +700,13 @@ done
 #
 log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Retrieving data from LDAP..."
 log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "ldap_group_quota_fields to retrieve = ${ldap_group_quota_fields}."
-mixed_stdouterr=$(ldapsearch -LLL -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
+mixed_stdouterr=$(ldapsearch -LLL -o ldif-wrap=no -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
 					"(ObjectClass=GroupofNames)" ${ldap_group_quota_fields} 2>&1 >"${groups_ldif}") \
 					|| log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" $? "ldapsearch failed."
 
 ldap_user_quota_fields='cn rugpersonUMCGQuotaHome rugpersonUMCGQuotaHomeSoft loginExpirationTime loginDisabled'
 log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "ldap_user_quota_fields to retrieve = ${ldap_user_quota_fields}."
-mixed_stdouterr=$(ldapsearch -LLL -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
+mixed_stdouterr=$(ldapsearch -LLL -o ldif-wrap=no -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
 					"(ObjectClass=person)" ${ldap_user_quota_fields} 2>&1 > "${users_ldif}") \
 					|| log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" $? "ldapsearch failed."
 log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "ldapsearch results were saved to ${groups_ldif} and ${users_ldif}."
@@ -764,11 +764,11 @@ if [ ! -z "${backup_dir:-}" ]; then
 	#
 	BACKUP_TS=`date "+%Y-%m-%d-T%H%M"`
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Retrieving data from LDAP for backup..."
-	mixed_stdouterr=$(ldapsearch -LLL -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
+	mixed_stdouterr=$(ldapsearch -o ldif-wrap=no -LLL -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
 					"(ObjectClass=GroupofNames)" 2>&1 >"${backup_dir}/groups-${BACKUP_TS}.ldif") \
 						|| log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" $? "ldapsearch failed."
 	
-	mixed_stdouterr=$(ldapsearch -LLL -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
+	mixed_stdouterr=$(ldapsearch -o ldif-wrap=no -LLL -D "${LDAP_USER}" -w "${LDAP_PASS}" -b "${LDAP_SEARCH_BASE}" \
 					"(ObjectClass=person)" 2>&1 > "${backup_dir}/users-${BACKUP_TS}.ldif") \
 						|| log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" $? "ldapsearch failed."
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "ldapsearch results for backup were saved to ${groups_ldif} and ${users_ldif}."

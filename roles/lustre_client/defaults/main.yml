@@ -1,0 +1,7 @@
+---
+#
+# We cannot define a default for lustre_client_networks here;
+# Always configure lustre_client_networks in group_vars/[group]/vars.yml
+#
+#lustre_client_networks: 'tcp11(vlanMISSING.lustre),tcp12(vlanMISSING.lustre)'
+...

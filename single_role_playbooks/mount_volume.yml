@@ -1,0 +1,8 @@
+- name: Mount the ceph volume
+  hosts:
+     - compute_vm
+     - sys_admin_interface
+     - deploy_admin_interface
+  roles:
+     - mount_volume
+...

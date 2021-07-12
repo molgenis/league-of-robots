@@ -1,8 +1,11 @@
 ---
-- hosts: jumphost
+- hosts:
+    - jumphost
   roles:
     - logins
-- hosts: cluster
+- hosts:
+    - repo
+    - cluster
   roles:
     - logins
 ...

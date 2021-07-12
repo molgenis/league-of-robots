@@ -38,8 +38,8 @@
   systemd:
     name: "{{ service_name }}.service"
     state: started
-    enabled: yes
+    enabled: true
   tags:
-      - start-service
+    - start-service
   become: true
 ...

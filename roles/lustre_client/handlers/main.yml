@@ -1,0 +1,6 @@
+---
+- name: Reboot machine with new kernel.
+  reboot:
+  become: true
+  listen: reboot
+...

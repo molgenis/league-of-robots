@@ -2,26 +2,6 @@
 # Install webserver and deploy cluster specific documentation on that web server.
 #
 ---
-- name: 'Check if rsync >= 3.1.2 is installed on the control host.'
-  shell:
-    cmd: |
-      set -o pipefail
-      rsync --version  2>&1 | head -n 1 | sed 's|^rsync *version *\([0-9\.]*\).*$|\1|' | tr -d '\n'
-  args:
-    warn: no
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  register: 'rsync_version'
-  delegate_to: 'localhost'
-
-- name: 'Abort when modern rsync >= 3.1.2 is missing on control host.'
-  debug:
-    msg: "FATAL: Need rsync >= 3.1.2 on the control host, but detected {{ rsync_version.stdout }}."
-  when:         'rsync_version is failed or (rsync_version.stdout is version_compare("3.1.2", operator="<"))'
-  failed_when: 'rsync_version is failed or (rsync_version.stdout is version_compare("3.1.2", operator="<"))'
-  delegate_to: 'localhost'
-
 - name: 'Check OS version of target host.'
   fail:
     msg: 'This role requires RedHat/CentOS version >= 7.x'
@@ -29,7 +9,7 @@
 
 #
 # This is currently problematic when
-# * the default user used to login to the cluster is different from 
+# * the default user used to login to the cluster is different from
 # * the default user used to login on the webserver where the docs are hosted
 # as you can specify only one account name with -u on the commandline when running ansible-playbook.
 #
@@ -39,7 +19,7 @@
   delegate_facts: true
   with_items:
     - "{{ groups['jumphost'] }}"
-    - "{{ groups['user-interface'] }}"
+    - "{{ groups['user_interface'] }}"
 
 - name: 'Get Slurm version from scontrol on UI.'
   shell:
@@ -48,13 +28,13 @@
       scontrol version | head -n 1 | sed 's|^slurm *\([0-9\.]*\).*$|\1|' | tr -d '\n'
   args:
     executable: '/bin/bash'
-    warn: no
+    warn: false
   environment:
     SOURCE_HPC_ENV: "True"   # Required to source our modules.bashrc in non-interactive shells.
-  delegate_to: "{{ groups['user-interface'] | first }}"
+  delegate_to: "{{ groups['user_interface'] | first }}"
   changed_when: false
   failed_when: false
-  check_mode: no
+  check_mode: false
   register: 'slurm_version'
 
 - name: 'Get Lmod version from UI.'
@@ -71,14 +51,35 @@
       lmod -v | sed '/^$/d' | sed 's|^.*Version \([0-9\.]*\).*$|\1|' | head -1
   args:
     executable: '/bin/bash'
-    warn: no
+    warn: false
   environment:
     SOURCE_HPC_ENV: "True"   # Required to source our modules.bashrc in non-interactive shells.
-  delegate_to: "{{ groups['user-interface'] | first }}"
+  delegate_to: "{{ groups['user_interface'] | first }}"
   changed_when: false
   failed_when: false
-  check_mode: no
+  check_mode: false
   register: 'lmod_version'
+
+- name: "Find all ip_addresses.yml files in {{ playbook_dir }}/group_vars/*."
+  find:
+    paths: "{{ playbook_dir }}/group_vars/"
+    recurse: true
+    patterns: 'ip_addresses.yml'
+  register: ip_addresses_files
+  delegate_to: localhost
+
+- name: 'Include variables from all ip_addresses.yml files.'
+  include_vars:
+    file: "{{ item }}"
+    name: "networking_lookup"
+  with_items: "{{ ip_addresses_files.files | map (attribute='path') | list }}"
+  register: networking_lookups
+  delegate_to: localhost
+
+- name: 'Combine network info from ip_addresses.yml files into one dict.'
+  set_fact:
+    networking_lookups: "{{ networking_lookups.results | json_query('[].ansible_facts.networking_lookup.ip_addresses') | combine() }}"
+  delegate_to: localhost
 
 - name: 'Set selinux in permissive mode.'
   selinux:
@@ -89,7 +90,7 @@
 - name: 'Install EPEL repo and rsync.'
   yum:
     state: 'latest'
-    update_cache: yes
+    update_cache: true
     name:
       - 'epel-release'
       - 'rsync'
@@ -98,7 +99,7 @@
 - name: 'Install webserver and php.'
   yum:
     state: 'latest'
-    update_cache: yes
+    update_cache: true
     name:
       - 'php'
       - 'httpd'
@@ -109,7 +110,7 @@
 - name: 'Enable webserver.'
   service:
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: 'started'
   with_items:
     - 'httpd'
@@ -117,7 +118,7 @@
 
 - name: 'Install MkDocs on RedHat 7.x.'
   include_tasks:
-    file: "{{ playbook_dir }}/roles/online_docs/tasks/mkdocs-for-redhat7.yml"
+    file: mkdocs-for-redhat7.yml
   when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] >= "7"
 
 - name: 'Create base directories for MarkDown and HTML files.'
@@ -143,12 +144,13 @@
   become: true
 
 - name: 'Create static files for index in document root.'
-  synchronize:
+  ansible.posix.synchronize:
     src: "{{ playbook_dir }}/roles/online_docs/files/index//./{{ item.src }}"
     dest: "/var/www/html/"
     owner: 'no'
     group: 'no'
-    use_ssh_args: 'yes'
+    use_ssh_args: true
+    ssh_connection_multiplexing: true
     rsync_opts:
       # --omit-dir-times  Is required to prevent "sync error: some files/attrs were not transferred"
       #                   for file systems like NFS mounts that cannot handle setting dir times properly.
@@ -187,12 +189,13 @@
   become: true
 
 - name: 'Create static files for MarkDown.'
-  synchronize:
+  ansible.posix.synchronize:
     src: "{{ playbook_dir }}/roles/online_docs/files/mkdocs/docs/./{{ item.src }}"
     dest: "/srv/mkdocs/{{ slurm_cluster_name }}/docs/"
     owner: 'no'
     group: 'no'
-    use_ssh_args: 'yes'
+    use_ssh_args: true
+    ssh_connection_multiplexing: true
     rsync_opts:
       # --omit-dir-times  Is required to prevent "sync error: some files/attrs were not transferred"
       #                   for file systems like NFS mounts that cannot handle setting dir times properly.
@@ -224,12 +227,13 @@
   become: true
 
 - name: 'Create skeleton for AppleScript apps.'
-  synchronize:
+  ansible.posix.synchronize:
     src: "{{ playbook_dir }}/roles/online_docs/files/attachments/{{ item.src }}/./"
     dest: "/srv/mkdocs/{{ slurm_cluster_name }}/tmp/{{ item.dest }}"
     owner: 'no'
     group: 'no'
-    use_ssh_args: 'yes'
+    use_ssh_args: true
+    ssh_connection_multiplexing: true
     recursive: 'yes'
     rsync_opts:
       - '--relative'
@@ -239,12 +243,13 @@
       - '--perms'
       - '--force'
   with_items:
-    - src:  'ssh-client-config.app'
+    - src: 'ssh-client-config.app'
       dest: "ssh-client-config-for-{{ slurm_cluster_name }}.app"
-    - src:  'mount-cluster-drives.app'
+    - src: 'mount-cluster-drives.app'
       dest: 'mount-cluster-drives.app'
   notify:
     - 'zip_attachments'
+    - 'build_mkdocs'
   become: true
 
 - name: 'Make sure main script of AppleScript apps are executable.'
@@ -259,6 +264,7 @@
     - 'mount-cluster-drives.app'
   notify:
     - 'zip_attachments'
+    - 'build_mkdocs'
   become: true
 
 - name: 'Create files for attachments based on templates.'
@@ -270,8 +276,7 @@
     mode: "{{ item.mode }}"
   with_items:
     #
-    # For macOS users we inject the configuration script for this cluster into the AppleScript app skeleton:
-    # 
+    # For macOS users we inject the configuration script for this cluster into the AppleScript app skeleton.
     #
     - src: 'ssh-client-config.bash'
       dest: "ssh-client-config-for-{{ slurm_cluster_name }}.app/Contents/MacOS/ssh-client-config.command"
@@ -284,6 +289,7 @@
       mode: '0750'
   notify:
     - 'zip_attachments'
+    - 'build_mkdocs'
   become: true
 
 - name: 'Create MarkDown files based on templates.'

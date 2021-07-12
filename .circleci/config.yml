@@ -18,16 +18,34 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install ansible-lint
+            pip install "ansible-lint[community,yamllint]"
+            ansible-galaxy install -r galaxy-requirements.yml
       - run:
           name: run tests
+          shell: /bin/bash
           command: |
+            set -e
+            set -u
+            set -o pipefail
             . venv/bin/activate
-            ansible-lint cluster.yml > lint_results 2>&1 || true
-            cat lint_results
-            errors=$(grep -c '^[0-9]* [A-Z].*' lint_results)
+            if [[ -n "${ANSIBLE_ROLES_PATH:-}" ]]; then
+                export ANSIBLE_ROLES_PATH="${HOME}/.ansible/roles/:${ANSIBLE_ROLES_PATH}"
+            else
+                export ANSIBLE_ROLES_PATH="${HOME}/.ansible/roles/"
+            fi
+            if ansible-lint -p --nocolor cluster.yml deploy-os_servers.yml > lint_results 2>&1; then
+              lint_errors=0
+            else
+              cat lint_results
+              #
+              # Parse number of errors from:
+              # Finished with [0-9][0-9]* failure(s), [0-9][0-9]* warning(s) on [0-9][0-9]* files
+              #
+              lint_status=$(grep '^Finished with' lint_results)
+              lint_errors=$(echo "${lint_status}" | sed 's|^Finished with \([0-9][0-9]*\) failure.*|\1|')
+            fi
             echo '###############################################'
-            printf 'Counted %d ansible-lint errors.\n' ${errors:-0}
+            printf 'Counted %d ansible-lint error(s).\n' ${lint_errors}
             echo '###############################################'
-            if (( errors > 1 )); then /bin/false; fi
+            if (( ${lint_errors} > 0 )); then /bin/false; fi
 ...

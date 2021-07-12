@@ -1,9 +1,12 @@
 ---
-- hosts: jumphost
+- hosts:
+    - jumphost
   roles:
     - sshd
 
-- hosts: cluster
+- hosts:
+    - repo
+    - cluster
   roles:
     - sshd
 ...

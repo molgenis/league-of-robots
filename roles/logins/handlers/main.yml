@@ -1,7 +1,7 @@
 ---
 #
 # Important: maintain correct handler order.
-# Handlers are executed in the order in which they are defined 
+# Handlers are executed in the order in which they are defined
 # and not in the order in which they are listed in a "notify: handler_name" statement!
 #
 - name: 'Run authconfig update.'
@@ -12,10 +12,11 @@
 #
 # Notes:
 # * OddJob has a dependency on DBus.
-# * Due to a bug systemd-logind may enter a broken state when DBus is restarted
+# * Due to a bug in DBus systemd-logind may enter a broken state when DBus is restarted
 #   making logins via SSH and or sudo commands very slow.
 #   https://bugzilla.redhat.com/show_bug.cgi?id=1532105
 #   Workaround for now is to always restart systemd-logind after DBus is restarted.
+#   Is fixed in DBus 1.11.x, but that is not available yet for CentOS 7.x.
 #
 - name: 'Restart oddjobd service and its dependencies.'
   service:

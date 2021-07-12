@@ -14,12 +14,13 @@ If you are completely new here, please:
 
 Solve-RD samples are read-only available on {{ slurm_cluster_name | capitalize }} via the
 [EGA FUSE client](https://github.com/EGA-archive/ega-fuse-client).
-This client uses the **F**ile system in **USE*rspace (FUSE) framework 
+This client uses the **F**ile system in **USE**rspace (FUSE) framework 
 to make the Solve-RD data available as if it was located on just another disk.
 Hence the client will handle both transfer and on the fly decryption of the data.
-The mount point (path) on ```prm``` storage where the data is located is:
+The data is located at the following mount point (path):
 ```
-{{ fuse_mountpoint }}
+{% for mountpoint in ega_fuse_client_mounts | dict2items | map(attribute='value') | select('search', 'solve-rd') | list %}{{ mountpoint }}{% if not loop.last %}
+{% endif %}{% endfor %}
 ```
 From there samples can be staged to ```/groups/${group}/tmp*/...``` for analysis.
 
