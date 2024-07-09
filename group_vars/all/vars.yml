@@ -105,13 +105,13 @@ pulp_repos:
   centos7:
     - name: centos7-base
       description: 'CentOS-7 - Base.'
-      remote_url: http://mirror.centos.org/centos/7/os/x86_64/
+      remote_url: http://vault.centos.org/centos/7/os/x86_64/
     - name: centos7-updates
       description: 'CentOS-7 - Updates.'
-      remote_url: http://mirror.centos.org/centos/7/updates/x86_64/
+      remote_url: http://vault.centos.org/centos/7/updates/x86_64/
     - name: centos7-extras
       description: 'CentOS-7 - Extras.'
-      remote_url: http://mirror.centos.org/centos/7/extras/x86_64/
+      remote_url: http://vault.centos.org/centos/7/extras/x86_64/
     - name: epel7
       description: 'Extra Packages for Enterprise Linux 7 (EPEL).'
       remote_url: https://download.fedoraproject.org/pub/epel/7/x86_64/
@@ -184,21 +184,21 @@ yum_repos:
     - file: centos7-base.repo
       id: centos7-base
       name: 'CentOS-7 - Base.'
-      baseurl: http://mirror.centos.org/centos/7/os/x86_64/
+      baseurl: http://vault.centos.org/centos/7/os/x86_64/
       enabled: 1
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
     - file: centos7-updates.repo
       id: centos7-updates
       name: 'CentOS-7 - Updates.'
-      baseurl: http://mirror.centos.org/centos/7/updates/x86_64/
+      baseurl: http://vault.centos.org/centos/7/updates/x86_64/
       enabled: 1
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
     - file: centos7-extras.repo
       id: centos7-extras
       name: 'CentOS-7 - Extras.'
-      baseurl: http://mirror.centos.org/centos/7/extras/x86_64/
+      baseurl: http://vault.centos.org/centos/7/extras/x86_64/
       enabled: 1
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
