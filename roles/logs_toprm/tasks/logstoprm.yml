@@ -22,7 +22,6 @@
     mode: '0750'
   become: true
 
-
 - name: "Create SSH key pair."
   community.crypto.openssh_keypair:
     path: "{{ home_path.stdout }}/.ssh/id_ed25519"
@@ -68,12 +67,17 @@
 
 - name: 'Create crontab for collecting the logs.'
   ansible.builtin.cron:
-    name: "logstoprm_cron.sh # Unique ID required to update existing cronjob: do not modify."
-    minute: "41"
-    hour: "*/8"
-    day: "*"
-    user: "{{ logs_toprm_chaperone_user }}"
-    job: /bin/bash -c "{{ home_path.stdout }}/logstoprm_cron.sh"
   become: true
   become_user: "{{ logs_toprm_chaperone_user }}"
+
+- name: 'Create cron job to make daily backup with the script'
+  ansible.builtin.cron:
+    name: 'logstoprm_cron.sh # Unique ID required to update existing cronjob: do not modify.'
+    minute: '{{ 59 | random(seed=inventory_hostname) }}'
+    hour: '*/8'
+    day: '*'
+    user: '{{ logs_toprm_chaperone_user }}'
+    job: /bin/bash -c '{{ home_path.stdout }}/logstoprm_cron.sh'
+    cron_file: 'logstoprm'
+  become: true
 ...
