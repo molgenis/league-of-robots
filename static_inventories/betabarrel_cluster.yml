@@ -163,6 +163,22 @@ all:
               slurm_ethernet_interfaces:
                 - em1
                 - em3
+        dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            bb-dragen:
+              slurm_local_scratch_dir: /staging/slurm
+              volumes:  # Empty list: do not mount extra volumes on Dragen machines.
+              slurm_sockets: 2
+              slurm_cores_per_socket: 32
+              slurm_real_memory: 515432
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
+              slurm_local_disk: 102400
+              slurm_features: 'dragen'
+              slurm_ethernet_interfaces:
+                - enp26s0f0  # VLAN990
+                - enp5s0  # BMC
+                - enp135s0f0  # VLAN16
     chaperone:
       hosts:
         bb-chaperone:

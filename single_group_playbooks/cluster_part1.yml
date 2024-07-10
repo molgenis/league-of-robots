@@ -12,14 +12,14 @@
     - role: yum_local
       when: local_yum_repository is defined
     #
-    # ToDo: Management of network interfaces changed in Rocky 9,
+    # ToDo: Management of network interfaces changed in EL >= 8,
     # which uses NetworkManager and a different way of device naming.
     # This role needs an update...
     #
     - role: interfaces
       when:
         - ansible_facts['os_family'] == "RedHat"
-        - ansible_facts['distribution_major_version'] <= "8"
+        - ansible_facts['distribution_major_version'] <= "7"
     - iptables
     - ssh  # client
     - grub

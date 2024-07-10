@@ -1,0 +1,33 @@
+---
+cluster_common_packages:
+  RedHat7:
+    - bash-completion
+    - bc
+    - bzip2
+    - curl
+    - lsof
+    - nano
+    - rsync
+    - screen
+    - strace
+    - unzip
+    - urw-base35-fonts
+    - vim
+    - wget
+    - yum-utils
+  RedHat8:
+    - bash-completion
+    - bc
+    - bzip2
+    - curl
+    - lsof
+    - nano
+    - rsync
+    - screen
+    - strace
+    - unzip
+    - urw-base35-fonts
+    - vim
+    - wget
+    - yum-utils
+...

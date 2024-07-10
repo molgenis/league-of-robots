@@ -426,6 +426,12 @@ pfs_mounts:
     rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime'
     ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
+  - pfs: umcgst13
+    source: 'gcc-storage001.stor.hpc.local:/ifs/rekencluster'
+    type: nfs4
+    rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime'
+    ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro'
+    machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst01
     source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
     type: lustre
@@ -433,12 +439,6 @@ pfs_mounts:
     ro_options: 'defaults,_netdev,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst02
-    source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
-    type: lustre
-    rw_options: 'defaults,_netdev,flock'
-    ro_options: 'defaults,_netdev,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
-  - pfs: umcgst03
     source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
     type: lustre
     rw_options: 'defaults,_netdev,flock'
@@ -578,7 +578,7 @@ lfs_mounts:
       - name: umcg-vdakker
       - name: umcg-weersma
       - name: umcg-wijmenga
-    rw_machines: "{{ groups['user_interface'] }}"
+    #rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
     quota_type: 'project'
@@ -634,11 +634,9 @@ lfs_mounts:
       - name: umcg-vdakker
       - name: umcg-weersma
       - name: umcg-wijmenga
-    rw_machines: "{{ groups['user_interface'] }}"
+   #rw_machines: "{{ groups['user_interface'] }}"
   - lfs: rsc01
-    pfs: umcgst03
-    quota_type: 'project'
-    quota_pid_increment: 100000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
+    pfs: umcgst13
     groups:
       - name: umcg-aad
       - name: umcg-as
