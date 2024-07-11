@@ -11,6 +11,8 @@
 - name: Collect content from all the .pub files
   ansible.builtin.command: cat {{ item.path }}
   loop: "{{ ssh_ca_pub_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
   register: ssh_ca_content
   changed_when: false
   delegate_to: localhost
@@ -25,7 +27,7 @@
     mode: '0644'
   loop: "{{ ssh_ca_content.results }}"
   loop_control:
-    label: "{{ item.item }}"
+    label: "{{ item.item.path | basename }}"
   become: true
 
 - name: Make sure /etc/ssh/ssh_config.d/*.conf config files are included.

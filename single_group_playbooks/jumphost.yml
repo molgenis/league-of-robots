@@ -19,14 +19,8 @@
     - remove
     - update
     - logins
-    - role: ldap
-      when:
-        - use_ldap | default(true) | bool
-        - not use_sssd | default(false) | bool
     - role: sssd
-      when:
-        - use_ldap | default(true) | bool
-        - use_sssd | default(false) | bool
+      when: use_sssd | default(false) | bool
     - sshd
     - basic_security
     - role: logs_client

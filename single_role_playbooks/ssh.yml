@@ -14,6 +14,7 @@
     - irods
     - jenkins
     - repo
+    - chaperone
   roles:
     - ssh
 ...

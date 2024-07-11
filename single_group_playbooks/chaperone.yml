@@ -6,6 +6,7 @@
   hosts:
     - chaperone
   roles:
+    - ssh
     - locale
     - cluster
     - regular_users

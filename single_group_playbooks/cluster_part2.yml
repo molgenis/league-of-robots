@@ -6,14 +6,8 @@
   hosts:
     - cluster
   roles:
-    - role: ldap
-      when:
-        - use_ldap | default(true) | bool
-        - not use_sssd | default(false) | bool
     - role: sssd
-      when:
-        - use_ldap | default(true) | bool
-        - use_sssd | default(false) | bool
+      when: use_sssd | default(false) | bool
     - sshd
     - regular_users
     - lustre_client
