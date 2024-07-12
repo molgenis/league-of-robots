@@ -1,12 +1,19 @@
 #jinja2: trim_blocks:True, lstrip_blocks: True
-#
-##
+{% if inventory_hostname in groups['chaperone'] | default([]) %}
+### /etc/hosts-LoR
+#    - This file is generated next to /etc/hosts to provide a list of additional
+#      hosts and their IP addresses.
+#    - File is created on the machines that are not fully managed by
+#      league-of-robots playbooks
+#    - Used for establishing secure connection to trusted remote servers
+{% else %}
 ### /etc/hosts
-### 
+{% endif %}
+
 ### Generated automatically by Ansible
 ### with league-of-robots/roles/static_hostname_lookup role.
 ### Do NOT edit manually: changes will be lost!
-##
+
 #
 # localhost
 #

@@ -9,6 +9,7 @@
     - cluster
     - irods
     - ldap_server
+    - chaperone
   roles:
     - static_hostname_lookup
 ...

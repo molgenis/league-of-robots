@@ -176,7 +176,7 @@ function start_flow(){
                      # Executing the main command
                      test -d "{% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/" || mkdir "{% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/"
                      # the main command we would like to run inside cron
-                     _command="{ rsync -a --rsh=\"ssh -l {% endraw %}{{ logs_toprm_earl_user }}{% raw%}\" ${_earl_name}::logstoprm {% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/ ; } 1>${_rsync_log}"
+                     _command="{ HOSTALIASES=/etc/hosts-LoR rsync -a --rsh=\"ssh -l {% endraw %}{{ logs_toprm_earl_user }}{% raw%}\" ${_earl_name}::logstoprm {% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/ ; } 1>${_rsync_log}"
                      logger -t "${_log_tag}" "($$ ${FUNCNAME} ${_earl_name})    RUNNING MAIN COMMAND"
                      timeout "${_max_runtime}" bash -c "${_command}" & _child="${!}"
                      echo "${_child}" >> "${_pidfile}" # storing process ID inside the pid file

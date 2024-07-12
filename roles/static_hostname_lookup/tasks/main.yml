@@ -1,5 +1,5 @@
 ---
-- name: Deploy /etc/hosts file.
+- name: Deploy /etc/hosts file for managed machines.
   ansible.builtin.template:
     src: templates/hosts.j2
     dest: /etc/hosts
@@ -9,4 +9,17 @@
     backup: true
   become: true
   tags: ['etc_hosts']
+  when: inventory_hostname not in groups['chaperone'] | default([])
+
+- name: Deploy additional /etc/hosts-LoR file for machines that are not managed by us.
+  ansible.builtin.template:
+    src: templates/hosts.j2
+    dest: /etc/hosts-LoR
+    mode: '0644'
+    owner: root
+    group: root
+    backup: true
+  become: true
+  tags: ['etc_hosts_lor']
+  when: inventory_hostname in groups['chaperone'] | default([])
 ...

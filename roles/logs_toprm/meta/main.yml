@@ -1,4 +1,6 @@
 ---
 dependencies:
   - role: include_vars_from_other_groups
+  # static_hostname role is needed for adding extra hosts in the /etc/hosts-LoR
+  - role: static_hostname_lookup
 ...
