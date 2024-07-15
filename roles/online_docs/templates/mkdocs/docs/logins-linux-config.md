@@ -18,7 +18,9 @@ mkdir -p -m 700 "${HOME}/.ssh/conf.d/"
 touch "${HOME}/.ssh/config"
 touch "${HOME}/.ssh/known_hosts"
 touch "${HOME}/.ssh/conf.d/{{ slurm_cluster_name }}"
+touch "${HOME}/.ssh/conf.d/generic"
 chmod -R go-rwx "${HOME}/.ssh"
+
 ```
 
 ## 2. Configure Certificate Authority's (CA) public key to verify the identity of cluster servers
@@ -57,7 +59,27 @@ to the beginning of your ```${HOME}/.ssh/config``` file.
 Important: this _Include_ directive must precede any lines containing _Host_ or _Match_ directives,
 otherwise the _Include_ will only apply to a specific set of hosts.
 
-## 4. Create SSH config file for {{ slurm_cluster_name | capitalize }}
+## 4. Create SSH config file with generic settings
+
+Now we need to configure some generic settings for transparent multi-hop SSH.
+Open your ```${HOME}/.ssh/conf.d/generic``` file in a text editor and add the lines below.
+
+```
+#
+# Generic stuff for key management.
+#
+IgnoreUnknown UseKeychain
+    UseKeychain yes
+IgnoreUnknown AddKeysToAgent
+    AddKeysToAgent yes
+#
+# Universal jumphost settings for triple-hop SSH.
+#
+Host *+*+*
+    ProxyCommand ssh -x -q $(echo "${JUMPHOST_USER:-%r}")@$(echo %h | sed 's/+[^+]*$//') -W $(echo %h | sed 's/^[^+]*+[^+]*+//'):%p
+```
+
+## 5. Create SSH config file for {{ slurm_cluster_name | capitalize }}
 
 Now we need to configure transparent multi-hop SSH for {{ slurm_cluster_name | capitalize }}.
 Open your ```${HOME}/.ssh/conf.d/{{ slurm_cluster_name }}``` file in a text editor and add the lines below.
@@ -66,13 +88,6 @@ Open your ```${HOME}/.ssh/conf.d/{{ slurm_cluster_name }}``` file in a text edit
 * Edit the line ```IdentityFile "~/.ssh/id_ed25519"``` to point to the private key file you generated if you did not save it in the default location, which is "~/.ssh/id_ed25519".
 
 ```
-#
-# Generic stuff: only for macOS clients.
-#
-IgnoreUnknown UseKeychain
-    UseKeychain yes
-IgnoreUnknown AddKeysToAgent
-    AddKeysToAgent yes
 #
 # Host settings.
 #
@@ -132,11 +147,6 @@ Host {{ jumphost }}
     HostKeyAlias {{ jumphost }}
 {% endfor -%}
 #
-# Universal jumphost settings for triple-hop SSH.
-#
-Host *+*+*
-    ProxyCommand ssh -x -q $(echo %h | sed 's/+[^+]*$//') -W $(echo %h | sed 's/^[^+]*+[^+]*+//'):%p
-#
 # Double-hop SSH settings to connect via specific jumphosts.
 #
 Host {% for jumphost in groups['jumphost'] %}{{ jumphost }}+* {% endfor %}{% raw %}{% endraw %}
@@ -150,7 +160,7 @@ Host {% for jumphost in groups['jumphost'] %}{{ jumphost }}443+* {% endfor %}{% 
     ProxyCommand ssh -x -q $(echo "${JUMPHOST_USER:-%r}")@$(echo %h | sed 's/443+[^+]*$//') -W $(echo %h | sed 's/^[^+]*+//'):%p -p 443
 ```
 
-## 5. Login
+## 6. Login
 
 Done! You can now use the config and [login with your ssh client](../logins-macos-linux/)
 

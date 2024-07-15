@@ -28,9 +28,12 @@ trap 'logger -t "${_log_tag}" "${$} Command (${BASH_COMMAND}) failed on line num
 #
 _script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 _rsync_log="${_script_path_dir}/logstoprm_cron_rsync.log"
+
 if test -e "${_rsync_log}"; then
-   tail -n 10000 "${_rsync_log}" > ${_rsync_log}.old # Keep only 10k of old rsync logs
+   cat "${_rsync_log}.old" "${_rsync_log}" 2>/dev/null | tail -n 10000 > "${_rsync_log}.tmp" # Keep only 10k of old rsync logs
+   mv "${_rsync_log}.tmp" "${_rsync_log}.old"
 fi
+echo "" > "${_rsync_log}"
 
 _main_lock_dir="{% endraw %}{{ logs_toprm_destination }}{% raw%}/lock_dirs"      # full path
 if ! test -d "${_main_lock_dir}"; then
@@ -175,8 +178,10 @@ function start_flow(){
                      logger -t "${_log_tag}" "($$ ${FUNCNAME} ${_earl_name})    we already delayed the start so we can now proceed"
                      # Executing the main command
                      test -d "{% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/" || mkdir "{% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/"
+                     # Make rsync log a bit nicer to read
+                     echo -e "#######\n####### ${_earl_name}\n#######\n" >> "${_rsync_log}"
                      # the main command we would like to run inside cron
-                     _command="{ HOSTALIASES=/etc/hosts-LoR rsync -a --rsh=\"ssh -l {% endraw %}{{ logs_toprm_earl_user }}{% raw%}\" ${_earl_name}::logstoprm {% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/ ; } 1>${_rsync_log}"
+                     _command="{ HOSTALIASES=/etc/hosts-LoR rsync -au --rsh=\"ssh -l {% endraw %}{{ logs_toprm_earl_user }}{% raw%}\" --log-file="${_rsync_log}" ${_earl_name}::logstoprm {% endraw %}{{ logs_toprm_destination }}{% raw%}/${_earl_name}/ ; }"
                      _command_logger="logger -t \"${_log_tag}\" \"($$ ${FUNCNAME} ${_earl_name})    main command SUCCESSFULLY finished!\""
                      logger -t "${_log_tag}" "($$ ${FUNCNAME} ${_earl_name})    RUNNING MAIN COMMAND"
                      timeout "${_max_runtime}" bash -c "${_command} && ${_command_logger}" & _child="${!}"
@@ -277,8 +282,8 @@ done
 
 # Cleanning up
 remove_locks
-cat ${_rsync_log}.old ${_rsync_log} | head -n 10000 > ${_rsync_log}.joined
-mv -f ${_rsync_log}.joined ${_rsync_log} && echo -n "" > ${_rsync_log}.old
+cat "${_rsync_log}.old" "${_rsync_log}" | tail -n 10000 > "${_rsync_log}.tmp"
+mv "${_rsync_log}.tmp" "${_rsync_log}.old"
 
 logger -t "${_log_tag}" "($$ main) _______ Finished _______"
 {% endraw %}

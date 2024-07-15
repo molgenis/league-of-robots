@@ -166,6 +166,7 @@ all:
         dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             bb-dragen:
+              ansible_host: bb-porch+betabarrel+bb-dragen
               slurm_local_scratch_dir: /staging/slurm
               volumes:  # Empty list: do not mount extra volumes on Dragen machines.
               slurm_sockets: 2
