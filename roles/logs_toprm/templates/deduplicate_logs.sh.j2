@@ -1,0 +1,80 @@
+#!/bin/bash
+set -eEuo pipefail
+_log_tag="logstoprm"
+# We store all the extra information into the system logs, like civilized people
+trap 'logger -t "${_log_tag}" "${0##*/}  Command (${BASH_COMMAND}) failed on line number (${LINENO})"' ERR TERM
+trap 'logger -t "${_log_tag}" "${0##*/}  Script was interrupted by external process / user."' INT QUIT
+
+# This script checkes all the files for the duplicates
+#  - first it collects the list of all the files
+#  - then iterates through each file and looks for the duplicate
+#  - duplicates are log files of similar path and same
+#      ./ [earl*] / [machine] / compressed_files / [log type]-[date]
+#  - checks if the files are the same
+#    - if so, then update the timestamp
+#    - if not, then merge both files into one, keep only unique lines
+#  - finally make one file a hardlink to another (to reduce storage),
+#    but keep each file, or rsync would recreate them at the next run
+
+# Local log prepare
+_script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+_log_file="${_script_path_dir}/${0##*/}.log"
+if test -e "${_log_file}"; then
+   if test -e "${_log_file}.old"; then
+      cat "${_log_file}.old" "${_log_file}" 2>/dev/null | tail -n 10000 > "${_log_file}.tmp" # Keep only 10k of old rsync logs
+      mv "${_log_file}.tmp" "${_log_file}.old"
+   else
+      cp ${_log_file} ${_log_file}.old
+   fi
+fi
+echo "" > "${_log_file}"
+
+{% raw %}
+_base_dir="{% endraw %}{{ logs_toprm_destination }}{% raw %}"
+cd "${_base_dir}"
+# find all files that are not already hardlinked (=skip ones that are already done)
+# note: '-links 1' returns one or more links, therefore '>1' and '<2' is needed
+_all_files="$(find "${_base_dir}" -path "*earl*" -type f -links 1 -and -links -2 -printf "%P %n\n")"
+_all_paths=$(awk '{ print $1 }' <<< "${_all_files}")
+
+_count_deduplicated=0
+logger -t "${_log_tag}" "${0##*/}  Starting to deduplicate files in the ${_base_dir}"
+while IFS= read -r _line; do
+   _path=$(awk -F' ' '{print $1}' <<< "${_line}")
+   _hardlinks=$(awk -F' ' '{print $2}' <<< "${_line}")
+   _earl="$(awk -F'/' '{print $1}' <<< "${_path}")"
+   _machine="$(awk -F'/' '{print $2}' <<< "${_path}")"
+   _month="$(awk -F'/' '{print $3}' <<< "${_path}")"
+   _file="$(awk -F'/' '{print $5}' <<< "${_path}")"
+   echo "- ${_path}" >> "${_log_file}"
+   _replica_path=$(awk -F '/' -v aearl="${_earl}" -v amachine="${_machine}" -v amonth="${_month}" -v afile="${_file}" '$1 != aearl && $2 == amachine && $5 == afile' <<< "${_all_paths}")
+   if [[ "${_hardlinks}" -eq "1" ]]; then
+      if [[ -n "${_replica_path}" ]]; then
+         echo "  ${_replica_path}" >> "${_log_file}"
+         if ! diff ${_path} ${_replica_path} > /dev/null ; then
+            echo "    are different" >> "${_log_file}"
+            # merge both files into one, keep only unique lines from each
+            zcat ${_path} ${_replica_path} 2>/dev/null | sort -u | gzip > "${_path}.tmp" && sync
+            mv -f "${_path}.tmp" "${_path}"
+         else
+            echo "    are same - touching date" >> "${_log_file}"
+            # files are the same, then only change the timestamp to right now
+            # so that rsync will never overwrite it anymore
+            touch ${_path}
+         fi
+         # now hard link them together - it does not take extra storage and it works with
+         # rsync -au which does not update if newer exist
+         echo "    linking ${_path} and ${_replica_path}" >> "${_log_file}"
+         ln -f ${_path} ${_replica_path}
+         _count_deduplicated=$(( _count_deduplicated + 1))
+      else
+         echo "    no duplicated file for ${_path}" >> "${_log_file}"
+      fi
+   else
+      echo "    ${_hardlinks} hardlinks for file ${_path}" >> "${_log_file}"
+   fi
+done <<< "${_all_files}"
+logger -t "${_log_tag}" "${0##*/}  Successfully finished deduplicating. Deduplicated ${_count_deduplicated} files."
+
+{% endraw %}
+

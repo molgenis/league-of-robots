@@ -15,11 +15,14 @@
 
 - name: 'Install logstoprm cron .sh script.'
   ansible.builtin.template:
-    src: logstoprm_cron.sh.j2
-    dest: "{{ home_path.stdout }}/logstoprm_cron.sh"
+    src: "{{ item }}"
+    dest: "{{ home_path.stdout }}/{{ item | regex_replace('\\.j2$', '') }}"
     owner: "{{ logs_toprm_chaperone_user }}"
     group: "{{ logs_toprm_chaperone_user }}"
     mode: '0750'
+  loop:
+    - logstoprm_cron.sh.j2
+    - deduplicate_logs.sh.j2
   become: true
 
 - name: "Create SSH key pair."

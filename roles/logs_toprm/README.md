@@ -19,6 +19,14 @@ Order
 
 ![Overview](overview.png)
 
+## Logs
+
+There are logs in the home folder of `~umcg-logstoprm` in two files
+ - `~/logstoprm_cron_rsync.log` contains last cron's rsync log
+ - `~logstoprm_cron_rsync.log` contains past 10k lines of previous logs
+
+Scripts logs go into system logs with tag `logstoprm` > see debugging below.
+
 ## Debugging
 
 Checking logs on the chaperone machine

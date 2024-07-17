@@ -27,11 +27,15 @@ trap 'logger -t "${_log_tag}" "${$} Command (${BASH_COMMAND}) failed on line num
 ## Variables
 #
 _script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-_rsync_log="${_script_path_dir}/logstoprm_cron_rsync.log"
+_rsync_log="${_script_path_dir}/${0##*/}.cron.log"
 
 if test -e "${_rsync_log}"; then
-   cat "${_rsync_log}.old" "${_rsync_log}" 2>/dev/null | tail -n 10000 > "${_rsync_log}.tmp" # Keep only 10k of old rsync logs
-   mv "${_rsync_log}.tmp" "${_rsync_log}.old"
+   if test -e "${_rsync_log}.old"; then
+      cat "${_rsync_log}.old" "${_rsync_log}" 2>/dev/null | tail -n 10000 > "${_rsync_log}.tmp" # Keep only 10k of old rsync logs
+      mv "${_rsync_log}.tmp" "${_rsync_log}.old"
+   else
+      cp ${_rsync_log} ${_rsync_log}.old
+   fi
 fi
 echo "" > "${_rsync_log}"
 
@@ -86,7 +90,7 @@ function check_time(){
    #     now >                                     14       should kill process
    #      _time_delay_start + ( _max_runtime * _max_loops ) + _max_remote_time
    #     file `time` is missing or wrong perms              log
-   
+
    # Collect time from server
    _timedir=".testtimedir.${_hostname}"
    test -d "${_timedir}" && rmdir "${_timedir}" # clean old directory
@@ -280,10 +284,10 @@ for _each_server in "${earl_servers[@]}"; do
    fi
 done
 
+~/deduplicate_logs.sh
+
 # Cleanning up
 remove_locks
-cat "${_rsync_log}.old" "${_rsync_log}" | tail -n 10000 > "${_rsync_log}.tmp"
-mv "${_rsync_log}.tmp" "${_rsync_log}.old"
 
 logger -t "${_log_tag}" "($$ main) _______ Finished _______"
 {% endraw %}
