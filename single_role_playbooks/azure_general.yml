@@ -1,0 +1,8 @@
+---
+- name: Configure general settings using Azure API.
+  hosts: all
+  connection: local
+  gather_facts: false
+  roles:
+    - azure_general
+...

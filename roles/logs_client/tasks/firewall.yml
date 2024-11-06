@@ -12,6 +12,8 @@
   become: true
   ignore_errors: true
   ignore_unreachable: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Count log servers online and offline
   ansible.builtin.set_fact:
@@ -51,6 +53,8 @@
   notify: restart_server_firewall
   ignore_errors: true
   ignore_unreachable: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Force all services to restart, before we continue to configure logs clients
   ansible.builtin.meta: flush_handlers

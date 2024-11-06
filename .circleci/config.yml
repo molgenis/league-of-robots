@@ -17,9 +17,8 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            openstacksdk_major_version='1'
-            python -m venv openstacksdk-${openstacksdk_major_version:-1}.venv
-            source openstacksdk-${openstacksdk_major_version:-1}.venv/bin/activate
+            python -m venv python.venv
+            source python.venv/bin/activate
             export ANSIBLE_ROLES_PATH="${VIRTUAL_ENV}/ansible/ansible_roles/:"
             export ANSIBLE_COLLECTIONS_PATH="${VIRTUAL_ENV}/ansible/:"
             pip install jmespath
@@ -28,7 +27,7 @@ jobs:
             attempt=1
             until [[ "${attempt}" -gt 3 ]]; do
               [[ "${attempt}" -gt 1 ]] && sleep 30
-              ansible-galaxy install -r requirements-${openstacksdk_major_version:-1}.yml --timeout 120 && status="${?}" && break
+              ansible-galaxy install -r requirements.yml --timeout 120 && status="${?}" && break
               attempt=$((attempt+1))
             done
             if [[ "${status}" -ne 0 ]]; then
@@ -43,7 +42,7 @@ jobs:
             set -e
             set -u
             set -o pipefail
-            source openstacksdk-${openstacksdk_major_version:-1}.venv/bin/activate
+            source python.venv/bin/activate
             export ANSIBLE_ROLES_PATH="${VIRTUAL_ENV}/ansible/ansible_roles/:"
             export ANSIBLE_COLLECTIONS_PATH="${VIRTUAL_ENV}/ansible/:"
             if ansible-lint -p --nocolor --offline *.yml > lint_results 2>&1; then

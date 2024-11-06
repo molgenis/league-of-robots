@@ -1,19 +1,4 @@
 ---
-- name: Compile list of local file systems to mount for NFS servers.
-  ansible.builtin.set_fact:
-    local_mounts: "{{ local_mounts | default([]) + [local_mount] }}"
-  vars:
-    local_mount:
-      mount_point: "/mnt/{{ item['pfs'] }}"
-      device: "{{ item['device'] }}"
-      mounted_owner: root
-      mounted_group: root
-      mounted_mode: '0755'
-      mount_options: 'rw,relatime'
-      type: ext4
-  when: inventory_hostname in groups['nfs_server'] | default([])
-  with_items: "{{ pfs_mounts | selectattr('type', 'search', 'nfs') | selectattr('device', 'defined') | list }}"
-
 - name: Check if file system source is a device.
   ansible.builtin.stat:
     path: "{{ item.device }}"

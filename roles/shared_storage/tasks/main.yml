@@ -11,7 +11,7 @@
     mode: '0600'
     owner: root
     group: root
-  with_items: "{{ pfs_mounts | selectattr('device', 'undefined') | selectattr('type', 'equalto', 'cifs') | list }}"
+  with_items: "{{ pfs_mounts | selectattr('type', 'equalto', 'cifs') | list }}"
   when: inventory_hostname in item.machines | default([])
   become: true
 
@@ -27,7 +27,7 @@
       {%- if item.type == 'cifs' -%}
       ,credentials=/etc/sysconfig/{{ item.pfs | regex_replace('\$$', '') | regex_replace('/', '_') }}.cifs,uid=root,gid=root,dir_mode=02750,file_mode=0640
       {%- endif -%}
-  with_items: "{{ pfs_mounts | selectattr('device', 'undefined') | list }}"
+  with_items: "{{ pfs_mounts | list }}"
   when: inventory_hostname in item.machines | default([])
   become: true
 
@@ -443,6 +443,48 @@
     - inventory_hostname in item.ro_machines | default ([])
     - inventory_hostname in groups['compute_node'] | default([]) or
       inventory_hostname in groups['user_interface'] | default([])
+  become: true
+
+#
+##
+### Restart remote-fs.target to update systemd automount units.
+##
+#
+- name: 'Restart systemd remote-fs.target.'
+  ansible.builtin.systemd:
+    name: 'remote-fs.target'
+    state: 'restarted'
+    daemon_reload: true
+  vars:
+    pfs_using_rw_automounts: "{{ pfs_mounts
+        | rejectattr('rw_options', 'undefined')
+        | selectattr('rw_options', 'search', 'automount')
+        | map(attribute='pfs')
+        | unique }}"
+    pfs_using_ro_automounts: "{{ pfs_mounts
+        | rejectattr('ro_options', 'undefined')
+        | selectattr('ro_options', 'search', 'automount')
+        | map(attribute='pfs')
+        | unique }}"
+  when:
+    - inventory_hostname in lfs_mounts
+          | rejectattr('pfs', 'undefined')
+          | rejectattr('rw_machines', 'undefined')
+          | selectattr('pfs', 'in', pfs_using_rw_automounts)
+          | map(attribute='rw_machines')
+          | flatten | unique or
+      inventory_hostname in lfs_mounts
+          | rejectattr('pfs', 'undefined')
+          | rejectattr('ro_machines', 'undefined')
+          | selectattr('pfs', 'in', pfs_using_ro_automounts)
+          | map(attribute='ro_machines')
+          | flatten | unique or
+      inventory_hostname in pfs_mounts
+          | rejectattr('pfs', 'undefined')
+          | rejectattr('machines', 'undefined')
+          | selectattr('pfs', 'in', pfs_using_rw_automounts)
+          | map(attribute='machines')
+          | flatten | unique
   become: true
 
 #

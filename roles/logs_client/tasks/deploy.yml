@@ -79,15 +79,6 @@
     - rsyslog_enable
   become: true
 
-- name: Remove old restart services
-  ansible.builtin.systemd_service:
-    name: "{{ item }}"
-    enabled: false
-  with_items:
-    - rsyslog-restart.timer
-    - rsyslog-restart.service
-  become: true
-
 - name: Remove problematic /etc/rsyslog.d/listen.conf file
   ansible.builtin.file:
     path: /etc/rsyslog.d/listen.conf

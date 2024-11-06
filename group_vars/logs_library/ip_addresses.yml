@@ -10,25 +10,23 @@ ip_addresses:
       netmask: /32
       fqdn: 'NXDOMAIN'
   earl2:
-    logs_internal_management:
-      address: 10.0.0.6
+    logs_external:
+      address: 10.10.1.4
       netmask: /32
-      fqdn: 'NXDOMAIN'
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    logs_external_network:
-      address: 20.61.46.9
+    logs_external_public:
+      address: 13.80.53.69
       netmask: /32
-      fqdn: 'NXDOMAIN'
+      fqdn: 'logs-earl2-ad5f.westeurope.cloudapp.azure.com'
   earl3:
-    logs_internal_management:
-      address: 10.0.0.5
+    logs_external:
+      address: 10.10.1.5
       netmask: /32
-      fqdn: 'NXDOMAIN'
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    logs_external_network:
-      address: 20.13.120.7
+    logs_external_public:
+      address: 13.80.53.89
       netmask: /32
-      fqdn: 'NXDOMAIN'
+      fqdn: 'logs-earl3-ad5f.westeurope.cloudapp.azure.com'
   earl4:
     logs_internal_management:
       address: 10.10.1.62
@@ -47,22 +45,21 @@ ip_addresses:
       address: 195.169.22.177
       netmask: /32
       fqdn: 'NXDOMAIN'
+  earl6:
+    logs_external:
+      address: 10.10.1.6
+      netmask: /32
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
+    logs_external_public:
+      address: 40.68.146.2
+      netmask: /32
+      fqdn: 'logs-earl6-ad5f.westeurope.cloudapp.azure.com'
   logs_internal_management-vlan16-router:
     logs_internal_management:
       address: 10.10.1.1
       netmask: /32
     vlan16:
       address: 195.169.22.175
-      netmask: /32
-      fqdn: 'NXDOMAIN'
-  earl6:
-    logs_internal_management:
-      address: 10.0.0.4
-      netmask: /32
-      fqdn: 'NXDOMAIN'
-      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    logs_external_network:
-      address: 20.13.126.173
       netmask: /32
       fqdn: 'NXDOMAIN'
 ...

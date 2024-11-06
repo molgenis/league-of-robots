@@ -1,0 +1,16 @@
+#
+# See README.md for instructins how to use this playbook.
+#
+---
+- name: Run pre deploy checks.
+  ansible.builtin.import_playbook: single_group_playbooks/pre_deploy_checks.yml
+
+- name: Run playbook to configure Azure environment general settings.
+  ansible.builtin.import_playbook: single_role_playbooks/azure_general.yml
+
+- name: Run playbook to create Azure network components.
+  ansible.builtin.import_playbook: single_role_playbooks/azure_networking.yml
+
+- name: Run playbook to create Azure servers.
+  ansible.builtin.import_playbook: single_role_playbooks/azure_computing.yml
+...

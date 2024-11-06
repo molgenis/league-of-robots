@@ -44,6 +44,8 @@
   delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
   loop: "{{ logs_class_servers }}"
   become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   tags:
     - test
 ...

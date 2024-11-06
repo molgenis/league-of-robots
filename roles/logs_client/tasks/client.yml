@@ -47,125 +47,127 @@
     path: "{{ rsyslog_remote_path_key_dir }}/{{ inventory_hostname }}.key"
   register: remote_client_key_status
 
-- name: Generate private {{ rsyslog_remote_path_key_dir }}/{{ inventory_hostname }}.key on rsyslog client
-  ansible.builtin.command: >
-    certtool --generate-privkey --bits 4096
-      --outfile {{ rsyslog_remote_path_key_dir }}/{{ inventory_hostname }}.key
-  when: not remote_client_key_status.stat.exists or remote_client_key_status.stat.size == 0
-  changed_when: not remote_client_key_status.stat.exists or remote_client_key_status.stat.size == 0
-  register: remote_client_key_generate
-  failed_when: remote_client_key_generate.rc != 0
-  become: true
+- name: Configure certificates
+  when: not repo_rsyslog_ca_cert.stat.exists or not remote_client_cert_status.stat.exists or
+        ( verify_certificate_result.rc is defined and verify_certificate_result.rc != 0 ) or
+        remote_client_key_status.stat.size == 0
+  block:
+    - name: Generate private {{ rsyslog_remote_path_key_dir }}/{{ inventory_hostname }}.key on rsyslog client
+      ansible.builtin.command: >
+        certtool --generate-privkey --bits 4096
+          --outfile {{ rsyslog_remote_path_key_dir }}/{{ inventory_hostname }}.key
+      register: remote_client_key_generate
+      changed_when: remote_client_key_generate.rc == 0
+      failed_when: remote_client_key_generate.rc != 0
+      become: true
 
-- name: Copy certificate signing request template to rsyslog client
-  ansible.builtin.template:
-    src: templates/client_template.csr
-    dest: /tmp/client_template.csr
-    mode: '0600'
-    force: true
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  changed_when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
+    - name: Copy certificate signing request template to rsyslog client
+      ansible.builtin.template:
+        src: templates/client_template.csr
+        dest: /tmp/client_template.csr
+        mode: '0600'
+        force: true
 
-- name: Create certificate signing request on rsyslog client
-  ansible.builtin.command: >
-    certtool --generate-request
-    --load-privkey {{ rsyslog_remote_path_key_dir }}/{{ inventory_hostname }}.key
-    --template /tmp/client_template.csr
-    --outfile /tmp/{{ inventory_hostname }}.csr
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  changed_when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  register: client_request_generate_result
-  failed_when: client_request_generate_result.rc != 0
-  notify: client_restart_rsyslog
-  become: true
+    - name: Create certificate signing request on rsyslog client
+      ansible.builtin.command: >
+        certtool --generate-request
+        --load-privkey {{ rsyslog_remote_path_key_dir }}/{{ inventory_hostname }}.key
+        --template /tmp/client_template.csr
+        --outfile /tmp/{{ inventory_hostname }}.csr
+      register: client_request_generate_result
+      changed_when: client_request_generate_result.rc == 0
+      failed_when: client_request_generate_result.rc != 0
+      notify: client_restart_rsyslog
+      become: true
 
-- name: Create local temporary directory for certificate signing requests and certificates
-  ansible.builtin.tempfile:
-    state: directory
-    suffix: tmp_certs_dir
-  register: temp_certs_dir
-  delegate_to: localhost
-  connection: local
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
+    - name: Create local temporary directory for certificate signing requests and certificates
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: tmp_certs_dir
+      register: temp_certs_dir
+      delegate_to: localhost
+      connection: local
 
-- name: Fetch rsyslog client certificate signing request
-  ansible.builtin.fetch:
-    src: /tmp/{{ inventory_hostname }}.csr
-    dest: "{{ temp_certs_dir.path }}/"
-    flat: true
-    fail_on_missing: true
-    validate_checksum: true
-  become: true
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
+    - name: Fetch rsyslog client certificate signing request
+      ansible.builtin.fetch:
+        src: /tmp/{{ inventory_hostname }}.csr
+        dest: "{{ temp_certs_dir.path }}/"
+        flat: true
+        fail_on_missing: true
+        validate_checksum: true
+      become: true
 
-- name: Copy rsyslog client certificate signing request to rsyslog server
-  ansible.builtin.copy:
-    src: "{{ temp_certs_dir.path }}/{{ inventory_hostname }}.csr"
-    dest: "/tmp/{{ inventory_hostname }}.csr"
-    owner: root
-    group: root
-    mode: '0600'
-    force: true
-  become: true
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-  loop: "{{ logs_class_servers }}"
+    - name: Copy rsyslog client certificate signing request to rsyslog server
+      ansible.builtin.copy:
+        src: "{{ temp_certs_dir.path }}/{{ inventory_hostname }}.csr"
+        dest: "/tmp/{{ inventory_hostname }}.csr"
+        owner: root
+        group: root
+        mode: '0600'
+        force: true
+      become: true
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      loop: "{{ logs_class_servers }}"
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
 
-- name: Copy client temporary template to rsyslog server
-  ansible.builtin.template:
-    src: templates/client_template.csr
-    dest: /tmp/{{ inventory_hostname }}_client_template.csr
-    mode: '0600'
-    force: true
-  become: true
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-  loop: "{{ logs_class_servers }}"
+    - name: Copy client temporary template to rsyslog server
+      ansible.builtin.template:
+        src: templates/client_template.csr
+        dest: /tmp/{{ inventory_hostname }}_client_template.csr
+        mode: '0600'
+        force: true
+      become: true
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      loop: "{{ logs_class_servers }}"
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
 
-- name: Sign rsyslog client certificate on rsyslog server with rsyslog CA certificate
-  ansible.builtin.command: >
-    certtool --generate-certificate
-      --load-request /tmp/{{ inventory_hostname }}.csr
-      --load-ca-certificate {{ rsyslog_remote_path_cert_dir }}/{{ rsyslog_ca_cert_file }}
-      --load-ca-privkey {{ rsyslog_remote_path_key_dir }}/{{ rsyslog_ca_key_file }}
-      --template /tmp/{{ inventory_hostname }}_client_template.csr
-      --outfile {{ rsyslog_remote_path_cert_dir }}/{{ inventory_hostname }}.pem
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  changed_when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  register: client_certificates_generate_results
-  failed_when: client_certificates_generate_results.rc != 0
-  become: true
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-  loop: "{{ logs_class_servers }}"
-  notify: restart_server_rsyslog
+    - name: Sign rsyslog client certificate on rsyslog server with rsyslog CA certificate
+      ansible.builtin.command: >
+        certtool --generate-certificate
+          --load-request /tmp/{{ inventory_hostname }}.csr
+          --load-ca-certificate {{ rsyslog_remote_path_cert_dir }}/{{ rsyslog_ca_cert_file }}
+          --load-ca-privkey {{ rsyslog_remote_path_key_dir }}/{{ rsyslog_ca_key_file }}
+          --template /tmp/{{ inventory_hostname }}_client_template.csr
+          --outfile {{ rsyslog_remote_path_cert_dir }}/{{ inventory_hostname }}.pem
+      register: client_certificates_generate_results
+      changed_when: client_certificates_generate_results.rc == 0
+      failed_when: client_certificates_generate_results.rc != 0
+      become: true
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      loop: "{{ logs_class_servers }}"
+      notify: restart_server_rsyslog
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
 
-- name: Fetch rsyslog client certificates from rsyslog server
-  ansible.builtin.fetch:
-    src: "{{ rsyslog_remote_path_cert_dir }}/{{ inventory_hostname }}.pem"
-    dest: "{{ temp_certs_dir.path }}/"
-    flat: true
-    fail_on_missing: true
-    validate_checksum: true
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  become: true
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-  loop: "{{ logs_class_servers }}"
-  notify: restart_server_rsyslog
+    - name: Fetch rsyslog client certificates from rsyslog server
+      ansible.builtin.fetch:
+        src: "{{ rsyslog_remote_path_cert_dir }}/{{ inventory_hostname }}.pem"
+        dest: "{{ temp_certs_dir.path }}/"
+        flat: true
+        fail_on_missing: true
+        validate_checksum: true
+      become: true
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      loop: "{{ logs_class_servers }}"
+      notify: restart_server_rsyslog
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
 
-- name: Deploy rsyslog client certificate
-  ansible.builtin.copy:
-    src: "{{ temp_certs_dir.path }}/{{ item }}"
-    dest: "/{{ rsyslog_remote_path_cert_dir }}/"
-    owner: root
-    group: root
-    mode: '0644'
-    backup: true
-    force: true
-  when: not remote_client_key_status.stat.exists or verify_certificate_result.rc == 1
-  with_items:
-    - "{{ inventory_hostname }}.pem"
-  become: true
-  notify: client_restart_rsyslog
+    - name: Deploy rsyslog client certificate
+      ansible.builtin.copy:
+        src: "{{ temp_certs_dir.path }}/{{ item }}"
+        dest: "/{{ rsyslog_remote_path_cert_dir }}/"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+        force: true
+      with_items:
+        - "{{ inventory_hostname }}.pem"
+      become: true
+      notify: client_restart_rsyslog
 
 - name: Remove local temporary directory {{ temp_certs_dir.path }}
   ansible.builtin.file:

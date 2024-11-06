@@ -133,4 +133,6 @@ function lor-config() {
 		printf 'INFO: Using OpenStack cloud:             %s.\n' 'none'
 	fi
 	set "${_previous_opt_nounset_state}"
+   # Configure Azure environment
+   export AZURE_CONFIG_DIR=${PWD}/.azure
 }

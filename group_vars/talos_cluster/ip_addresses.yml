@@ -2,10 +2,10 @@
 ip_addresses:
   reception:
     vlan983:
-      address: 172.23.40.100
+      address: 172.23.40.23
       netmask: /32
     vlan16:
-      address: 129.125.60.18
+      address: 195.169.22.195
       netmask: /32
       fqdn: 'reception.hpc.rug.nl'
   talos:

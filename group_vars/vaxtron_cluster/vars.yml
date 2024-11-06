@@ -488,7 +488,7 @@ lustre_client_networks_baremetal:
     interface: eno12399np0
 pfs_mounts:
   - pfs: umcgst01
-    source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
+    source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
     type: lustre
     rw_options: 'defaults,_netdev,flock'
     ro_options: 'defaults,_netdev,ro'
@@ -534,6 +534,8 @@ lfs_mounts:
       - name: umcg-fg
         mode: '2750'
       - name: umcg-franke-scrna
+        mode: '2750'
+      - name: umcg-gcc
         mode: '2750'
       - name: umcg-gdio
         mode: '2750'

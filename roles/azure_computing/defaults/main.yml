@@ -1,0 +1,11 @@
+---
+azure_resource_group: "{{ stack_name }}"
+azure_location: "westeurope"
+
+openstack_api_timeout: 180
+stack_hosts_created_in_azure: "{{ hostvars
+    | json_query('* | [?azure_flavor] | [].inventory_hostname')
+    | flatten
+    | unique }}"
+cloud_user: centos # Azure rocky9 images have by default set default user to centos
+...

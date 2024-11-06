@@ -156,20 +156,27 @@ stack_networks:
     cidr: '10.10.2.0/24'
     type: storage
     external: false
-  - name: vlan985
+  - name: vlan985  # DH4 Lustre
     cidr: '172.23.56.0/22'
     allow_ingress:
       - 172.23.57.213/32  # Lustre server
       - 172.23.57.214/32  # Lustre server
     type: storage
     external: true
-  - name: vlan1068
+  - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
     allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
+    type: storage
+    external: true
+  - name: vlan1073  # DH5 Lustre
+    cidr: '172.23.12.0/22'
+    allow_ingress:
+      - 172.23.15.186/32  # Lustre server
+      - 172.23.15.187/32  # Lustre server
     type: storage
     external: true
 nameservers: [
@@ -521,8 +528,10 @@ lustre_client_networks:
     interface: ens6
 pfs_mounts:
   - pfs: umcgst01
-    source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
+    source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
     type: lustre
+    #rw_options: 'defaults,_netdev,flock,nofail,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    #ro_options: 'defaults,_netdev,ro,nofail,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
     rw_options: 'defaults,_netdev,flock'
     ro_options: 'defaults,_netdev,ro'
     machines: "{{ groups['sys_admin_interface'] }}"

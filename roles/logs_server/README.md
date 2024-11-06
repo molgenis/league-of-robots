@@ -129,6 +129,9 @@ service. As according to the [rsyslog documentation](https://www.rsyslog.com/doc
 
 ## VIII. Debugging
 
+Logs do not appear in logs_server / `single_role_playbooks/logs_client.yml -t test` fails?
+Restart rsyslog service on both the logs server and all the problematic clients.
+
 Get the connections to the server from the clients
 
 ```

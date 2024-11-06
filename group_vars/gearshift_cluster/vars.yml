@@ -433,12 +433,6 @@ pfs_mounts:
     rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime'
     ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
-  - pfs: umcgst01
-    source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
-    type: lustre
-    rw_options: 'defaults,_netdev,flock'
-    ro_options: 'defaults,_netdev,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst02
     source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
     type: lustre
@@ -523,63 +517,6 @@ lfs_mounts:
     pfs: umcgst10
     groups:
       - name: umcg-atd
-    rw_machines: "{{ groups['user_interface'] }}"
-  - lfs: prm02
-    pfs: umcgst01
-    quota_type: 'project'
-    quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
-    groups:
-      - name: umcg-aad
-      - name: umcg-as
-      - name: umcg-atd
-      - name: umcg-biogen
-      - name: umcg-bionic-mdd-gwama
-      - name: umcg-bios
-      - name: umcg-dag3
-      - name: umcg-datateam
-      - name: umcg-ejp-rd
-      - name: umcg-endocrinology
-      - name: umcg-fg
-      - name: umcg-franke-scrna
-      - name: umcg-fu
-      - name: umcg-gaf
-      - name: umcg-gap
-      - name: umcg-gastrocol
-      - name: umcg-gcc
-      - name: umcg-gdi
-      - name: umcg-gdio
-      - name: umcg-gonl
-      - name: umcg-griac
-      - name: umcg-grip
-      - name: umcg-gsad
-      - name: umcg-hematology
-      - name: umcg-hlhs
-      - name: umcg-immunogenetics
-      - name: umcg-impact
-      - name: umcg-lifelines
-      - name: umcg-lld
-      - name: umcg-llnext
-      - name: umcg-mic
-      - name: umcg-micompany
-      - name: umcg-msb
-      - name: umcg-muhas
-      - name: umcg-nawijn
-      - name: umcg-neonatology
-      - name: umcg-pgx
-      - name: umcg-pmb
-      - name: umcg-radicon
-      - name: umcg-rehabilitation
-      - name: umcg-reki
-      - name: umcg-solve-rd
-      - name: umcg-sommer
-      - name: umcg-sysops
-      - name: umcg-tifn
-      - name: umcg-ukb
-      - name: umcg-ugli
-      - name: umcg-verbeek
-      - name: umcg-vdakker
-      - name: umcg-weersma
-      - name: umcg-wijmenga
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02

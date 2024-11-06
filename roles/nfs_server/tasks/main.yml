@@ -63,14 +63,8 @@
 - name: 'Add NFS share to /etc/exports.'
   ansible.builtin.lineinfile:
     path: /etc/exports
-    line: "/mnt/{{ item.pfs }} {{ stack_networks
-                                  | selectattr('name', 'equalto', stack_prefix + '_internal_storage')
-                                  | map(attribute='cidr')
-                                  | first }}(rw,sync,no_root_squash,no_subtree_check)"
-  with_items: "{{ pfs_mounts
-                  | selectattr('type', 'search', 'nfs')
-                  | selectattr('device', 'defined')
-                  | list }}"
+    line: "{{ item['path'] }} {{ item['clients'] }}"
+  loop: "{{ nfs_server_shares }}"
   notify:
     - export_nfs_shares
   become: true

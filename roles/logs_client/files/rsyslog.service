@@ -7,6 +7,7 @@ Documentation=man:rsyslogd(8)
 Documentation=https://www.rsyslog.com/doc/
 
 [Service]
+Type=notify
 ; sometimes it takes a long time for the service to cleanly exit
 ; but default value of 90 seconds seems a bit too low for how the
 ; service actually behaved
@@ -17,13 +18,10 @@ StartLimitBurst=10
 ; and at the same time also increase the number of failed attempts
 ; interval window from 10 seconds to 30 second
 StartLimitInterval=30
-; make sure the service is always restarted
-Restart=always
-; the rest of the service settings are good, as-is
-Type=notify
 EnvironmentFile=-/etc/sysconfig/rsyslog
 ExecStart=/usr/sbin/rsyslogd -n $SYSLOGD_OPTIONS
-Restart=on-failure
+; make sure the service is always restarted
+Restart=always
 UMask=0066
 StandardOutput=null
 ; Increase the default a bit in order to allow many simultaneous

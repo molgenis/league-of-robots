@@ -200,6 +200,20 @@ all:
     nfs_server:
       hosts:
         wh-sai:
+          local_mounts:
+            - mount_point: '/mnt/umcgst12'
+              device: /dev/vdb
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: 'rw,relatime,nofail,x-systemd.device-timeout=10'
+              type: ext4
+          nfs_server_shares:
+            - path: '/mnt/umcgst12'
+              clients: "{{ stack_networks
+                           | selectattr('name', 'equalto', stack_prefix + '_internal_storage')
+                           | map(attribute='cidr')
+                           | first }}(rw,sync,no_root_squash,no_subtree_check)"
     smb_server:
       hosts:
         wh-sai:

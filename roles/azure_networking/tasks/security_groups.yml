@@ -1,0 +1,168 @@
+---
+# Additional notes about these security groups are in the ../README.md
+
+- name: inventory_groups_with_hosts_created_in_azure
+  ansible.builtin.debug:
+    msg: "{{ inventory_groups_with_hosts_created_in_azure }}"
+- name: network_names_of_all_hosts_created_in_azure
+  ansible.builtin.debug:
+    msg: "{{ network_names_of_all_hosts_created_in_azure }}"
+#
+# Open: the security group that allows all traffic - needed for subnets
+#       (see readme on why this is  needed)
+#
+- name: "Create security group {{ stack_prefix }}_open."
+  azure.azcollection.azure_rm_securitygroup:
+    name: "{{ stack_prefix }}_open"
+    rules:
+      - name: Any
+        protocol: "*"
+        destination_port_range: "*"
+        source_address_prefix: '*'
+        access: Allow
+        priority: 100
+    purge_rules: true
+    resource_group: "{{ azure_resource_group }}"
+#
+# Jumphost: receive 22 and 443 from anywhere, block ICMP
+#
+- name: "Create security group {{ stack_prefix }}_jumphosts."
+  azure.azcollection.azure_rm_securitygroup:
+    name: "{{ stack_prefix }}_jumphosts"
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        source_address_prefix: '*'
+        access: Allow
+        priority: 101
+      - name: SSH_fallback
+        protocol: Tcp
+        destination_port_range: 443
+        source_address_prefix: '*'
+        access: Allow
+        priority: 102
+      - name: ICMP
+        protocol: Icmp
+        source_address_prefix: '*'
+        access: Deny
+        priority: 103
+    purge_rules: true
+    resource_group: "{{ azure_resource_group }}"
+#
+# Cluster: limit connection only from the nodes from the same network.
+#
+#
+# TODO: check management type
+#
+- name: "Create security group {{ stack_prefix }}_cluster"
+  azure.azcollection.azure_rm_securitygroup:
+    name: "{{ stack_prefix }}_cluster"  # in this case we hard limit it to _cluster
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        source_address_prefix: "{{ network_cidr }}"
+        access: Allow
+        priority: 201
+      - name: SSH_fallback
+        protocol: Tcp
+        destination_port_range: 443
+        source_address_prefix: "{{ network_cidr }}"
+        access: Allow
+        priority: 202
+      - name: ICMP
+        protocol: Icmp
+        source_address_prefix: "{{ network_cidr }}"
+        access: Allow
+        priority: 203
+    purge_rules: true
+    resource_group: "{{ azure_resource_group }}"
+  vars:
+    network_name: "{{ item }}"
+    network_cidr: "{{ azure_networks | selectattr('name', 'equalto', item) | map(attribute='cidr') | first }}"
+  with_items: "{{ azure_networks
+                | selectattr('type', 'equalto', 'management')
+                | map(attribute='name')
+                | intersect(network_names_of_all_hosts_created_in_azure)
+                | default([]) }}"
+  when: azure_networks
+                | selectattr('type', 'equalto', 'management')
+                | map(attribute='name')
+                | intersect(network_names_of_all_hosts_created_in_azure)
+                | default([])
+                | length > 0
+#
+# Logs: allow external connections
+#
+- name: Print logs network names
+  ansible.builtin.debug:
+    msg: "network_name: {{ network_name }}"
+  vars:
+    network_name: "{{ item }}"
+  with_items: "{{ azure_networks
+                | selectattr('type', 'equalto', 'logservers')
+                | map(attribute='name')
+                | intersect(network_names_of_all_hosts_created_in_azure)
+                | default([]) }}"
+  when: "'logs' in inventory_groups_with_hosts_created_in_azure"
+
+- name: "Create security group {{ stack_prefix }}_logservers"
+  azure.azcollection.azure_rm_securitygroup:
+    name: "{{ stack_prefix }}_logservers"
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        source_address_prefix: "*"
+        direction: Inbound
+        access: Allow
+        priority: 101
+      - name: SSH_fallback
+        protocol: Tcp
+        destination_port_range: 443
+        source_address_prefix: "*"
+        direction: Inbound
+        access: Allow
+        priority: 102
+      - name: Rsyslog
+        protocol: Tcp
+        destination_port_range: 41514
+        source_address_prefix: "*"
+        direction: Inbound
+        access: Allow
+        priority: 103
+      - name: ICMP
+        protocol: Icmp
+        source_address_prefix: "*"
+        direction: Inbound
+        access: Allow
+        priority: 104
+    purge_rules: true
+    resource_group: "{{ azure_resource_group }}"
+  when: "'logs' in inventory_groups_with_hosts_created_in_azure"
+
+# TO-DO
+## Data staging security groups.
+#        - name: ssh
+#          protocol: Tcp
+#          destination_port_range: 22
+#          source_address_prefix: '*'
+#          priority: 101
+#        - name: ssh_fallback
+#          protocol: Tcp
+#          destination_port_range: 443
+#          source_address_prefix: '*'
+#          priority: 102
+#        - name: ICMP
+#          protocol: Icmp
+#          source_address_prefix: '*'
+#          priority: 103
+## (Pulp) repo server security group.
+#        - protocol: tcp
+#          port: 22  # SSH
+#        - protocol: tcp
+#          port: 443  # HTTPS
+#        - protocol: icmp
+#          port: -1  # ICMP protocol does not have any ports.
+...

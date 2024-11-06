@@ -1,0 +1,10 @@
+---
+- name: Create network components using Azure API.
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: python
+  roles:
+    - azure_networking
+...

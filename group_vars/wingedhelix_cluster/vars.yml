@@ -447,12 +447,11 @@ lustre_client_networks:
     interface: enp5s0
 pfs_mounts:
   - pfs: umcgst12
-    device: /dev/vdb
-    source: "{{ ip_addresses[groups['nfs_server'][0]][stack_prefix + '_internal_storage']['address'] }}:/mnt"
+    source: "{{ ip_addresses['wh-sai'][stack_prefix + '_internal_storage']['address'] }}:/mnt"
     type: nfs4    # checked with cat /proc/filesystem
     rw_options: 'defaults,_netdev,noatime,nodiratime,local_lock=flock'
     ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
+    machines: []  # Complete PFS not mounted over NFS anywhere.
   - pfs: umcgst04/slice1
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre

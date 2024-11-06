@@ -445,13 +445,15 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
+    #
+    # perun
+    #
     - file: perun.repo
       id: perun
       name: 'Perun IdM Slave Scripts'
       baseurl: 'https://repo.cerit-sc.cz/el-perun/noarch/'
       enabled: 1
-      gpgcheck: 1
-      gpgkeysource: 'https://repo.cerit-sc.cz/repo.cerit-sc.cz.gpg.pub'
+      gpgcheck: 0
   oracle8:
     - file: oracle-linux-ol8.repo
       id: ol8_baseos_latest
@@ -646,15 +648,19 @@ logs_server_public_networks:
     - name: earl1
       network: vlan16
     - name: earl2
-      network: logs_external_network
+      network: logs_external_public
   diagnostics:
     - name: earl3
-      network: logs_external_network
+      network: logs_external_public
     - name: earl4
       network: vlan16
   research:
     - name: earl5
       network: vlan16
     - name: earl6
-      network: logs_external_network
+      network: logs_external_public
+#
+## Azure
+#
+azure_location: westeurope
 ...

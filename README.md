@@ -110,9 +110,9 @@ Deploying a fully functional stack of virtual machines from scratch involves the
 
 ---
 
-## Details for phase 3. Create, start and configure virtual machines on an OpenStack cluster.
+## Details for phase 3. Create, start and configure virtual environment(s).
 
-#### 0. Clone this repo and configure Python virtual environment.
+#### 0. Clone this repo and configure a generic Python virtual environment.
 
 ```bash
 mkdir -p ${HOME}/git/
@@ -120,30 +120,19 @@ cd ${HOME}/git/
 git clone https://github.com/rug-cit-hpc/league-of-robots.git
 cd league-of-robots
 #
-# For older openstacksdk < 0.99 we need the ansible openstack collection 1.x.
-# For newer openstacksdk > 1.00 we need the ansible openstack collection 2.x.
-#
-openstacksdk_major_version='3'  # Change for older OpenStack SDK.
-#
 # Create Python virtual environment (once)
 #
-python3 -m venv openstacksdk-${openstacksdk_major_version:-3}.venv
+python3 -m venv python.venv
 #
 # Activate virtual environment.
 #
-source openstacksdk-${openstacksdk_major_version:-3}.venv/bin/activate
+source python.venv/bin/activate
 #
 # Install OpenStack SDK (once) and other python packages.
 #
 pip3 install --upgrade pip
 pip3 install wheel
 pip3 install setuptools  # No longer part of default Python >= 3.12.x, but we need it.
-if [[ "${openstacksdk_major_version:-3}" -eq 0 ]]; then
-  pip3 install "openstacksdk<0.99"
-else
-  pip3 install "openstacksdk==${openstacksdk_major_version:-3}.*"
-fi
-pip3 install openstackclient
 pip3 install ruamel.yaml
 pip3 install netaddr
 #
@@ -173,20 +162,39 @@ pip3 install ansible-lint
 pip3 install mitogen
 ```
 
-#### 1. Import the required roles and collections for the playbooks.
+#### 1. Python virtual environment: install packages to manage OpenStack environment
 
 ```bash
-source openstacksdk-${openstacksdk_major_version:-3}.venv/bin/activate
+pip3 install openstacksdk
+pip3 install openstackclient
+```
+
+#### 2. Import the required roles and collections for the playbooks.
+
+```bash
+source python.venv/bin/activate
 export ANSIBLE_ROLES_PATH="${VIRTUAL_ENV}/ansible/ansible_roles/:"
 export ANSIBLE_COLLECTIONS_PATH="${VIRTUAL_ENV}/ansible/:"
-ansible-galaxy install -r requirements-${openstacksdk_major_version:-3}.yml
+ansible-galaxy install -r requirements.yml
 ```
 
 Note: the default location where these dependencies will get installed with the ```ansible-galaxy install``` command is ```${HOME}/.ansible/```,
 which may conflict with versions of roles and collections required for other repos.
 Therefore we set ```ANSIBLE_ROLES_PATH``` and ```ANSIBLE_COLLECTIONS_PATH``` to use a custom path for the dependencies inside the virtual environment we'll use for this repo.
 
-#### 2. Create a `vault_pass.txt`.
+#### 3. Python virtual environment: install packages to manage Azure environment
+
+Make sure you already executed `ansible-galaxy install ... ` (see previous step).
+
+```bash
+  pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
+  _azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt")"
+  pip install -r "${_azure_pip_requirements}"
+```
+
+See also Galaxy Ansible [Azure Azcollection > Documentation](https://galaxy.ansible.com/ui/repo/published/azure/azcollection/docs/)
+
+#### 4. Create a `vault_pass.txt`.
 
 The vault password is used to encrypt/decrypt the ```secrets.yml``` file per *stack_name*, 
 which will be created in the next step if you do not already have one.
@@ -205,7 +213,7 @@ they will not accidentally get committed to the repo.
   chmod -R go-rwx .vault/
   ```
 
-#### 3. Configure Ansible settings including the vault.
+#### 5. Configure Ansible settings including the vault.
 
 To create a new *stack* you will need ```group_vars``` and a static inventory for that *stack*:
 
@@ -218,7 +226,7 @@ To create a new *stack* you will need ```group_vars``` and a static inventory fo
   #
   # Activate Python virtual env created in step 0.
   #
-  source openstacksdk-${openstacksdk_major_version:-3}.venv/bin/activate
+  source python.venv/bin/activate
   #
   # Configure this repo for a specific cluster.
   # This will set required ENVIRONMENT variables including
@@ -240,7 +248,7 @@ To use use an existing encrypted ```group_vars/[stack_name]/secrets.yml```:
 
 * Add a ```.vault/vault_pass.txt.[stack_name]``` file to this repo and use a text editor to add the vault password to this file.
 
-#### 4. Configure the Certificate Authority (CA).
+#### 6. Configure the Certificate Authority (CA).
 
 We use an SSH public-private key pair to sign the host keys of all the machines in a cluster.
 This way users only need the public key of the CA in their ```~.ssh/known_hosts``` file
@@ -269,7 +277,7 @@ Are you sure you want to continue connecting (yes/no)?
   ansible-vault encrypt --encrypt-vault-id [stack_name] ssh-host-ca/[stack_name]-ca
   ```
 
-#### 5. Build Prometheus Node Exporter
+#### 7. Build Prometheus Node Exporter
 
 * Make sure you are a member of the `docker` group.
   Otherwise you will get this error:
@@ -285,7 +293,7 @@ Are you sure you want to continue connecting (yes/no)?
   ./build.sh
   ```
 
-#### 6. Generate munge key and encrypt it using Ansible Vault.
+#### 8. Generate munge key and encrypt it using Ansible Vault.
 
 Execute:
 ```bash
@@ -295,7 +303,7 @@ ansible-vault encrypt --encrypt-vault-id [stack_name] files/[stack_name]/munge.k
 ```
 The encrypted ```files/[stack_name]/munge.key``` can now be committed safely.
 
-#### 7. Generate TLS certificate, passwords & hashes for the LDAP server and encrypt it using Ansible Vault.
+#### 9. Generate TLS certificate, passwords & hashes for the LDAP server and encrypt it using Ansible Vault.
 
 If you do not configure any LDAP domains using the ```ldap_domains``` variable (see *ldap_server* role for details) in ```group_vars/[stack_name]/vars.yml```,
 then the machines for the [stack_name] _stack_ will use local accounts created on each machine and this step can be skipped.
@@ -322,7 +330,7 @@ Then this _stack_ will create and run its own LDAP server. You will need to crea
     * A ```readonly``` account with a correct _dn_, _password_ and corresponding _hash_.
     * An ```admin``` account with a correct _dn_, _password_ and corresponding _hash_.
 
-##### 7a TLS certificate for LDAP server.
+##### 9a TLS certificate for LDAP server.
 
 Create key and CA certificate with one command
    ```
@@ -355,7 +363,7 @@ Note that the `Common Name` must be the address of the ldap server. Based on the
    ```
 The encrypted files in ```files/[stack_name]/``` can now be committed safely.
 
-##### 7b passwords and hashes for LDAP accounts.
+##### 9b passwords and hashes for LDAP accounts.
 
 When an OpenLDAP server is created, you will need passwords and corresponding hashes for the LDAP _root_ account
 as well as for functional accounts for at least one LDAP domain. Therefore the minimal setup in ```group_vars/[stack_name]/secrets.yml``` is something like this:
@@ -404,7 +412,7 @@ For the record:
 
 Use the **_entire_** strings as the ```hash``` values in ```group_vars/[stack_name]/secrets.yml```.
 
-#### 8. Running playbooks.
+#### 10. Running playbooks.
 
 There are two _wrapper playbooks_:
 
@@ -433,7 +441,7 @@ These shorter subset _playbooks_ can save a lot of time during development, test
   #
   # Activate Python virtual env created in step 0.
   #
-  source openstacksdk-${openstacksdk_major_version:-3}.venv/bin/activate
+  source python.venv/bin/activate
   #
   # Initialize the OpenstackSDK
   #
@@ -543,6 +551,6 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
   ansible-playbook -u "${lor_admin_user}" single_role_playbooks/rsyslog_client.yml
   ```
 
-#### 9. Verify operation.
+#### 11. Verify operation.
 
 See the end user documentation, that was generated with the ```online_docs``` role for instructions how to submit a job to test the cluster.

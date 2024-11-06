@@ -48,4 +48,10 @@
     state: absent
     path: /etc/singularity/
   become: true
+
+- name: 'Clean azure image of microsoft bloatware.'
+  ansible.builtin.include_tasks:
+    file: clean_azure_image.yml
+  when:
+    - hostvars[inventory_hostname]['azure_flavor'] is defined
 ...

@@ -2,6 +2,7 @@
 stack_prefix: 'logs'
 stack_domain: ''
 stack_name: "{{ stack_prefix }}_library"  # stack_name must match the name of the folder that contains this vars.yml file.
+repo_manager: 'none'
 os_distribution: 'rocky9'
 cloud_image: RockyLinux-9.3_xfs
 cloud_user: centos
@@ -14,6 +15,19 @@ stack_networks:
     type: management
     external: false
     mtu_size: '1450'
+# Azure
+azure_networks:
+  # types: management, logservers
+  - name: "{{ stack_prefix }}_external"
+    type: logservers
+    cidr: '10.10.1.0/24'
+azure_image:
+  rocky9:
+    offer: 'rockylinux-x86_64'
+    publisher: 'resf'
+    sku: '9-base'
+    version: 'latest'
+azure_resource_group: "{{ stack_name }}"
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
