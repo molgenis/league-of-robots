@@ -18,7 +18,7 @@ all:
           create_ldap: true
           ldap_domains:
             stack:
-              uri: "ldaps://ladap.westeurope.cloudapp.azure.com"
+              uri: "ldaps://ladap"
               base: "dc={{ stack_name }},dc=local"
               schema: rfc2307bis
               min_id: 1000
@@ -34,7 +34,8 @@ all:
             - 'lsaai'
           regular_users:
             - user: "lsaai"
-              groups: "lsaai"
+              groups:
+                - "lsaai"
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['lsaai']['perun'] }}"
             - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"

@@ -80,7 +80,6 @@ local_admin_groups:
   - 'admin'
   - 'docker'
 local_admin_users:
-  - 'egon'
   - 'ger'
   - 'gerben'
   - 'henkjan'

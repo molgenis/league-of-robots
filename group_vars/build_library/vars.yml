@@ -19,7 +19,6 @@ os_distribution: 'centos7'
 local_admin_groups:
   - 'admin'
 local_admin_users:
-  - 'egon'
   - 'gerben'
   - 'henkjan'
   - 'marieke'

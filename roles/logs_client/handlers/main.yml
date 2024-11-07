@@ -4,7 +4,7 @@
     /etc/sysconfig/iptables-init.bash
   register: fw_reg
   changed_when: fw_reg.rc == 0
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
   loop: "{{ logs_class_servers }}"
   become: true
   notify: client_restart_rsyslog
@@ -16,7 +16,7 @@
   ansible.builtin.service:
     name: rsyslog.service
     state: restarted
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
   loop: "{{ logs_class_servers }}"
   become: true
   listen: restart_server_rsyslog

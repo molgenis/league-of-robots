@@ -103,7 +103,6 @@ local_admin_groups:
   - 'docker'
 local_admin_users:
   - 'bob'
-  - 'egon'
   - 'fokke'
   - 'ger'
   - 'gerben'

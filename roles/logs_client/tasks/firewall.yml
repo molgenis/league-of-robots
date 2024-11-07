@@ -6,7 +6,7 @@
     group: "root"
     mode: '0770'
     state: 'directory'
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
   register: create_iptables_extras_d
   loop: "{{ logs_class_servers }}"
   become: true
@@ -46,7 +46,7 @@
     create: true
     regexp: "{{ client_public_ip.content | trim }} 41514"
     line: "{{ client_public_ip.content | trim }} 41514"
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
   register: add_ip_to_firewall_extra_allow
   loop: "{{ logs_class_servers }}"
   become: true

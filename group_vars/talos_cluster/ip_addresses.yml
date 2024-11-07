@@ -2,7 +2,7 @@
 ip_addresses:
   reception:
     vlan983:
-      address: 172.23.40.23
+      address: 172.23.40.38
       netmask: /32
     vlan16:
       address: 195.169.22.195
