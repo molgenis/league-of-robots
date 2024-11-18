@@ -5,12 +5,12 @@
     state: present
   become: true
 
-- name: "Create a {{ ssh_key_type }} SSH key for root user"
+- name: "Create a {{ archive_ssh_key_type }} SSH key for root user"
   ansible.builtin.user:
     name: "root"
     generate_ssh_key: true
-    ssh_key_file: "{{ ssh_key_location }}"
-    ssh_key_type: "{{ ssh_key_type }}"
+    ssh_key_file: "{{ archive_ssh_key_location }}"
+    ssh_key_type: "{{ archive_ssh_key_type }}"
   become: true
 
 - name: Create archive directory for each group
@@ -70,15 +70,15 @@
     create: true
   become: true
 
-- name: "Check the connection - note that {{ ssh_key_location }}.pub must be first copied into {{ archive_system }}:.ssh/authorized_keys"
+- name: "Check the connection - note that {{ archive_ssh_key_location }}.pub must be first copied into {{ archive_system }}:.ssh/authorized_keys"
   ansible.builtin.command: |
-    ssh -i {{ ssh_key_location }} {{ archive_user }}@{{ archive_system }} "ls"
+    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "ls"
   changed_when: false
   become: true
 
 - name: Check if remote folder exists
   ansible.builtin.command: |
-    ssh -i {{ ssh_key_location }} {{ archive_user }}@{{ archive_system }} "test -d {{ archive_path }}/{{ item }}"
+    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "test -d {{ archive_path }}/{{ item }}"
   register: archive_dir_test
   failed_when: archive_dir_test.rc > 1   # is 0 if folder exists, 1 if it is missing, and higher if command failed
   changed_when: false
@@ -87,7 +87,7 @@
 
 - name: Create remote group folder if missing
   ansible.builtin.command: |
-    ssh -i {{ ssh_key_location }} {{ archive_user }}@{{ archive_system }} "mkdir {{ archive_path }}/{{ item.item }}"
+    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "mkdir {{ archive_path }}/{{ item.item }}"
   when: item.rc == 1
   loop: "{{ archive_dir_test.results }}"
   become: true
@@ -96,7 +96,7 @@
   ansible.posix.mount:
     src: "{{ archive_user }}@{{ archive_system }}:{{ archive_path }}/{{ item }}"
     path: "/groups/{{ item }}/archive"
-    opts: "{{ 'noauto,x-systemd.automount,_netdev,users,idmap=user,IdentityFile=' + ssh_key_location +
+    opts: "{{ 'noauto,x-systemd.automount,_netdev,users,idmap=user,IdentityFile=' + archive_ssh_key_location +
       ',reconnect,x-systemd.idle-timeout=60,default_permissions,allow_other,uid=' + item + '-dm,gid=' + item | trim() }}"
     state: present
     fstype: fuse.sshfs

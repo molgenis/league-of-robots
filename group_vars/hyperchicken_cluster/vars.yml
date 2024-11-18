@@ -95,9 +95,17 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 
+# Archive settings
 archive_groups:
   - 'umcg-atd'
   - 'solve-rd'
+archive_ssh_key_location: '/root/.ssh/id_ed25519_archive'
+archive_ssh_key_type: 'ed25519'
+archive_system: 'archive.surfsara.nl'
+archive_user: 'umcg-atd-dm'
+archive_main_dir: 'archives01'
+archive_path: '/home/{{ archive_user }}/{{ archive_main_dir }}'
+
 regular_groups:
   - "{{ envsync_group }}"
   - "{{ functional_admin_group }}"
