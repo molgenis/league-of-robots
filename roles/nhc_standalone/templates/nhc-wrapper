@@ -10,31 +10,31 @@ trap 'echo "Terminated by signal SIGHUP." ; exit 129' 1
 trap 'echo "Terminated by signal SIGINT." ; exit 130' 2
 trap 'echo "Terminated by signal SIGTERM." ; exit 143' 15
 
-slack_webhook='{{ slurm_notification_slack_webhook }}'
+slack_webhook='{{ slurm_notification_slack_webhook[stack_dtap_state] }}'
 cluster_name='{{ slurm_cluster_name | capitalize }}'
 
 {% raw %}
 
 function nhc_parse_timespec() {
-	local VARNAME="$1"
+	local VARNAME="${1}"
 	local i TIMESPEC CHR SECS=0 NUMSTR=''
 
-	if [[ -n "$2" ]]
+	if [[ -n "${2}" ]]
 	then
-		TIMESPEC="$2"
+		TIMESPEC="${2}"
 	else
-		eval 'TIMESPEC="${'"$VARNAME"'}"'
+		eval 'TIMESPEC="${'"${VARNAME}"'}"'
 	fi
 
 	for ((i=0; i<"${#TIMESPEC}"; i++))
 	do
-		CHR="${TIMESPEC:$i:1}"
+		CHR="${TIMESPEC:${i}:1}"
 		if [[ -z "${CHR#[0-9]}" ]]
 		then
 			NUMSTR="${NUMSTR}${CHR}"
 		elif [[ -z "${NUMSTR}" ]]
 		then
-			echo "ERROR:  Missing number before character ${CHR} in timespec ${TIMESPEC} at position $i."
+			echo "ERROR:  Missing number before character ${CHR} in timespec ${TIMESPEC} at position ${i}."
 			echo "ERROR:  Parsing terminated. Using ${SECS} seconds for expiration of old results."
 			break
 		else
@@ -46,7 +46,7 @@ function nhc_parse_timespec() {
 			[Ss])  ((SECS += NUMSTR))          ;;
 			[Ff])  FUDGETIME="${NUMSTR}"       ;;
 			*)
-			echo "ERROR:  Invalid character ${CHR} encountered in timespec ${TIMESPEC} at position $i."
+			echo "ERROR:  Invalid character ${CHR} encountered in timespec ${TIMESPEC} at position ${i}."
 			echo "ERROR:  Parsing terminated. Using ${SECS} seconds for expiration of old results."
 			NUMSTR=""
 			break
@@ -57,13 +57,13 @@ function nhc_parse_timespec() {
 	done
 
 	[[ -n "${NUMSTR}" ]] && ((SECS += NUMSTR))
-	eval ${VARNAME}='"${SECS}"'
+	eval "${VARNAME}"='"${SECS}"'
 }
 
 function nhcwrap_init_env() {
 	umask 0077
 	PATH="/sbin:/usr/sbin:/bin:/usr/bin"
-	if [ -f "/etc/debian_version" ]
+	if [[ -f "/etc/debian_version" ]]
 	then
 		SYSCONFIGDIR="/etc/default"
 		LIBEXECDIR="/usr/lib"
@@ -73,7 +73,7 @@ function nhcwrap_init_env() {
 	fi
 	if [[ -r "/proc/sys/kernel/hostname" ]]
 	then
-		read HOSTNAME < "/proc/sys/kernel/hostname"
+		read -r HOSTNAME < "/proc/sys/kernel/hostname"
 	else
 		HOSTNAME=$(/bin/hostname)
 	fi
@@ -93,7 +93,7 @@ function nhcwrap_help() {
 	local TITLE UNDERLINE
 
 	PROGNAME="${PROGNAME/#*\/}"
-	TITLE="$PROGNAME Usage"
+	TITLE="${PROGNAME} Usage"
 	UNDERLINE="${TITLE//?/-}"
 
 	cat <<EOF
@@ -106,13 +106,13 @@ Syntax:  ${PROGNAME} [<options>] [<var>=<value> [...]]
  OPTION            DESCRIPTION
 -------------------------------------------------------------------------------
  -h                Show command line help (this info)
- -A <args>         Pass <args> to $SUBPROG
+ -A <args>         Pass <args> to ${SUBPROG}
  -D <directory>    Use <directory> for cache/bookkeeping
- -N                Send notification with output of $SUBPROG to Slack
- -X <timespec>     Expire cached output after <timespec> (e.g., "6h" or "1d")
- --                Stop parsing command line; pass remaining args to $SUBPROG
+ -N                Send notification with output of ${SUBPROG} to Slack
+ -X <timespec>     Expire cached output when the date changed and additionally after <timespec> (e.g., "6h" or "1d")
+ --                Stop parsing command line; pass remaining args to ${SUBPROG}
 
- All other command line parameters, if any, are passed directly to $SUBPROG.
+ All other command line parameters, if any, are passed directly to ${SUBPROG}.
 
  Timespecs may specify weeks (w), days (d), hours (h), minutes (m), and/or
  seconds (s).  If no suffix is given, seconds are assumed.  Result expiration
@@ -120,7 +120,7 @@ Syntax:  ${PROGNAME} [<options>] [<var>=<value> [...]]
 
 EXAMPLES:
 ---------
- To run $SUBPROG, send notification to slack, and pass parameters "-d -t 60":
+ To run ${SUBPROG}, send notification to slack, and pass parameters "-d -t 60":
     # ${PROGNAME} -N -- -d -t 60
   OR
     # ${PROGNAME} -N -A "-d -t 60"
@@ -159,8 +159,8 @@ function nhcwrap_finalize_env() {
 
 	NW_DATEFMT="${NW_DATEFMT:-(%F %T)}"
 	STATEDIR="${STATEDIR:-/tmp/${SUBPROG}-${EUID}}"
-	OUTFILE="$STATEDIR/$SUBPROG.out"
-	SAVEFILE="$STATEDIR/$SUBPROG.save"
+	OUTFILE="${STATEDIR}/${SUBPROG}.out"
+	SAVEFILE="${STATEDIR}/${SUBPROG}.save"
 	FUDGETIME="${FUDGETIME:-5}"
 
 	# We have to be very careful about how we create and manage the
@@ -174,17 +174,17 @@ function nhcwrap_finalize_env() {
 		mv "${TMPDIR}" "${STATEDIR}"
 	fi
 	chmod 0000 "${STATEDIR}" 2>/dev/null
-	chown $EUID "${STATEDIR}" 2>/dev/null
+	chown "${EUID}" "${STATEDIR}" 2>/dev/null
 	chmod 0700 "${STATEDIR}" 2>/dev/null
 	if [[ -h "${STATEDIR}" || ! -d "${STATEDIR}" || ! -O "${STATEDIR}" || ! -w "${STATEDIR}" ]]
 	then
 		echo "ERROR:  State directory ${STATEDIR} create/chown/chmod failed for uid ${EUID}.  Aborting."
-		exit -1
+		exit 1
 	fi
 
 	if [[ "${SUBPROG#*/}" != "${SUBPROG}" ]]
 	then
-		PATH="${SUBPROG%/*}:$PATH"
+		PATH="${SUBPROG%/*}:${PATH}"
 		SUBPROG="${SUBPROG##*/}"
 	fi
 
@@ -196,13 +196,13 @@ function nhcwrap_finalize_env() {
 }
 
 function nhcwrap_spawn_command() {
-	local RC SAVEFILE_TIME CTIME MTIME NOW
+	local RC SAVEFILE_TIME CTIME MTIME NOW_TIME SAVEFILE_DATE NOW_DATE
 
-	echo "Executing $SUBPROG ${ARGLIST[*]}" `date "+$NW_DATEFMT"`
+	echo "Executing ${SUBPROG} ${ARGLIST[*]}" "$(date "+${NW_DATEFMT}")"
 	# Remove output file so that it will be recreated by bash with ctime of now.
 	rm -f "${OUTFILE}"
-	"$SUBPROG" "${ARGLIST[@]}" >& "${OUTFILE}"
-	RC=$?
+	"${SUBPROG}" "${ARGLIST[@]}" >& "${OUTFILE}"
+	RC="${?}"
 
 	# Expire old results file if too old.
 	# NOTE: We do the comparison *after* subprogram execution in an
@@ -218,22 +218,27 @@ function nhcwrap_spawn_command() {
 		MTIME="${SAVEFILE_TIME// *}"
 		CTIME="${SAVEFILE_TIME//* }"
 		((SAVEFILE_TIME=MTIME<CTIME?MTIME:CTIME))
-		NOW=$(date '+%s')
-		if ((NOW + FUDGETIME - SAVEFILE_TIME >= EXPIRE))
+		NOW_TIME=$(date '+%s')
+		SAVEFILE_DATE="$(date -d "@${SAVEFILE_TIME}" '+%Y%M%d')"
+		NOW_DATE="$(date -d "@${NOW_TIME}" '+%Y%M%d')"
+		if [[ "${NOW_DATE}" -gt "${SAVEFILE_DATE}" ]]
 		then
-			echo "Results file expired after $((NOW-SAVEFILE_TIME)) seconds (+/- ${FUDGETIME}s)."
-			rm -f "${SAVEFILE}"
-			rm -f "${SAVEFILE}.short"
-		else
-			echo "Results file found with age $((NOW-SAVEFILE_TIME)) seconds (+/- ${FUDGETIME}s)."
+			if ((NOW_TIME + FUDGETIME - SAVEFILE_TIME >= EXPIRE))
+			then
+				echo "Results file expired after $((NOW_TIME-SAVEFILE_TIME)) seconds (+/- ${FUDGETIME}s)."
+				rm -f "${SAVEFILE}"
+				rm -f "${SAVEFILE}.short"
+			else
+				echo "Results file found with age $((NOW_TIME-SAVEFILE_TIME)) seconds (+/- ${FUDGETIME}s)."
+			fi
 		fi
 	fi
 
-	return $RC
+	return "${RC}"
 }
 
 function nhcwrap_check_output() {
-	local PROG_RC=$1 RC
+	local RC
 
 	if [[ -f "${SAVEFILE}" ]]
 	then
@@ -273,12 +278,12 @@ function nhcwrap_check_output() {
 		mv -f "${OUTFILE}" "${SAVEFILE}"
 		RC=1
 	fi
-	return $RC
+	return "${RC}"
 }
 
 function nhcwrap_report_results() {
 	# If we get here, we have results to report.
-	if [[ ! -z "${PREV_RESULTS}" ]]
+	if [[ -n "${PREV_RESULTS}" ]]
 	then
 		# We have empty results this time but non-empty previous
 		# results.  This means a prior error is now cleared.
@@ -287,7 +292,7 @@ function nhcwrap_report_results() {
 			read -r -d '' message << EOM
 {
 	"type": "mrkdwn",
-	"text": "*The _$(hostname)_ of the _${cluster_name}_ cluster is healthy again*:
+	"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster is healthy again*:
 \`\`\`
 The following error(s) on ${cluster_name} have now been CLEARED:
 ${PREV_RESULTS}
@@ -308,9 +313,9 @@ EOM
 			read -r -d '' message << EOM
 {
 	"type": "mrkdwn",
-	"text": "*The _$(hostname)_ of the _${cluster_name}_ cluster needs help*:
+	"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster needs help*:
 \`\`\`
-$(cat "${SAVEFILE}" | tr \" \')
+$(tr \" \' < "${SAVEFILE}")
 \`\`\`"
 }
 EOM
@@ -320,7 +325,7 @@ EOM
 				-d "${message}"
 			echo
 		else
-			echo "$(< ${SAVEFILE})"
+			echo "$(< "${SAVEFILE}")"
 		fi
 	fi
 	return 0
@@ -331,6 +336,6 @@ nhcwrap_parse_cmdline "$@" || exit 99
 nhcwrap_finalize_env
 
 nhcwrap_spawn_command
-nhcwrap_check_output $? || nhcwrap_report_results
+nhcwrap_check_output "${?}" || nhcwrap_report_results
 
 {% endraw %}

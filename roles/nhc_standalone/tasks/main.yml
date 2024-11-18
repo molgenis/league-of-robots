@@ -76,6 +76,6 @@
     name: 'NHC wrapper'
     minute: '*/5'
     user: 'root'
-    job: '/usr/sbin/nhc-wrapper -N -P nhc_standalone -D /var/run/nhc/ -X 12h -A "-a"'
+    job: '/usr/sbin/nhc-wrapper -N -P nhc_standalone -D /var/run/nhc/ -X 15h -A "-a"'
   become: true
 ...

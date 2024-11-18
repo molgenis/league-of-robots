@@ -1,73 +1,107 @@
-# If folder is empty for 2 weeks -> delete folder
-# If folder is not empty, but only a  .finished file is present (2 weeks) -> delete folder
-# If folder is not empty and no .finished file is present (1 week) -> notification, 2 weeks -> delete folder
-
 #!/bin/bash
 
-dirToCheck="/groups/umcg-genomescan/"*
-dateInSecNow=$(date +%s)
+set -e
+set -u
+set -o pipefail
 
-# Check only dirs, ignore files and reverse sort to check subfolders first
-for dir in $(find ${dirToCheck} -maxdepth 1 -type d | sort -r)
+slurm_notification_slack_webhook='{{ slurm_notification_slack_webhook[stack_dtap_state] }}'
+{% raw %}
+dirToCheck="/groups/umcg-genomescan/"
+currentTimeInSeconds="$(date +%s)"
+
+#
+# Find all GenomeScan batch dirs ignoring files.
+#
+# If folder is older than 2 weeks -> delete folder.
+# If folder is younger
+#    If it only contains leftovers from already processed data -> do nothing.
+#    If it contains unprocessed data and is older than 1 week -> send warning.
+#
+# Leftovers from processed data sets:
+#   Old style with only raw data:
+#     [0-9]{6}-[0-9]{3}/
+#     [0-9]{6}-[0-9]{3}/[0-9]{6}-[0-9]{3}.finished
+#   E.g.:
+#     104832-210/
+#     104832-210/104832-210.finished
+#   New style Dragen data:
+#     [0-9]{6}-[0-9]{3}/
+#     [0-9]{6}-[0-9]{3}/[0-9]{6}-[0-9]{3}.finished
+#     [0-9]{6}-[0-9]{3}/Analysis/
+#     [0-9]{6}-[0-9]{3}/Raw_data/
+#     [0-9]{6}-[0-9]{3}/UMCG_CSV_[0-9]{6}-[0-9]{3}.csv
+#   E.g.
+#     104832-210/
+#     104832-210/104832-210.finished
+#     104832-210/Analysis/
+#     104832-210/Raw_data/
+#     104832-210/UMCG_CSV_104832-210.csv
+#
+if [[ -e "${dirToCheck}" && -r "${dirToCheck}" ]]
+then
+	: #no-op
+else
+	echo "FATAL: ${dirToCheck} does not exist or is not readable."
+	exit 1
+fi
+readarray -t batchDirs < <(find "${dirToCheck}" -mindepth 1 -maxdepth 1 -type d | sort)
+if [[ "${#batchDirs[@]}" -eq '0' ]]
+then
+	echo "No batch dirs found at ${dirToCheck}."
+	exit 0
+fi
+for batchDir in "${batchDirs[@]}"
 do
-	#Check ctime instead of mtime and remove /groups from dir to be able to look it up is fs
-	creationTime=$(/sbin/debugfs -R 'stat '${dir#*/*/} /dev/vdb | awk '/crtime/{print $2}' FS='--')
-	creationTimeSeconds=$(date -d"${creationTime}" +%s)
-
-	if [[ ! $(ls -A "${dir}") ]]
+	echo "Processing ${batchDir} ..."
+	#
+	# Check creation time instead of modification time.
+	#
+	creationTimeInSeconds="$(stat -c '%W' "${batchDir}")"
+	echo "  Checking age ..."
+	if [[ $(((${currentTimeInSeconds} - ${creationTimeInSeconds}) / 86400)) -gt 14 ]]
 	then
-		echo "${dir} is empty, check if it's older than 2 week -> delete"
-		if [[ $(((${dateInSecNow} - ${creationTimeSeconds}) / 86400)) -gt 14 ]]
-		then
-			echo "${dir} is older than 14 days and will be deleted"
-			rm -rf "${dir}"
-		else
-			echo "${dir} is not yet older than 14 days, will be removed soon."
-		fi
+		echo "  Deleting folder, because it is older than 14 days ..."
+		rm -rf "${batchDir}"
 	else
-		echo "${dir} is not empty, check if .finished file is present and if there's other data"
-		numberOfFiles=$(find "${dir}" -maxdepth 1 -type f | wc -l)
-		if [[ ${numberOfFiles} == 1 && $(find "${dir}" -maxdepth 1 -type f) == *".finished" ]]
+		echo "  Keeping folder, because it is not yet older than 14 days."
+		foundUnprocessedData="$(find "${batchDir}" -mindepth 1 -maxdepth 2 \
+				! -name Raw_data -a \
+				! -name Analysis -a \
+				! -name '*.finished' -a \
+				! -name 'UMCG_CSV_*.csv'
+			)"
+		if [[ -z "${foundUnprocessedData:-}" ]]
 		then
-			if [[ $(((${dateInSecNow} - ${creationTimeSeconds}) / 86400)) -gt 14 ]]
+			echo "    Folder empty or contains only leftovers from processed data."
+		else 
+			echo "    Folder contains unprocessed data: checking age ..."
+			if [[ $(((${currentTimeInSeconds} - ${creationTimeInSeconds}) / 86400)) -gt 7 ]]
 			then
-				echo "${dir} is older than 14 days and will be deleted"
-				rm -rf "${dir}"
-			else
-				echo "${dir} is not yet older than 14 days, will be removed soon."
-			fi
-		else
-			if [[ $(((${dateInSecNow} - ${creationTimeSeconds}) / 86400)) -gt 14 ]]
-			then    
-				echo "${dir} is older than 14 days and will be deleted"
-				rm -rf "${dir}"
-			elif [[ $(((${dateInSecNow} - ${creationTimeSeconds}) / 86400)) -gt 7 ]]
-			then
-				echo "${dir} is older than 7 days, notification will be send"
-				dirdate=$(date -d "${creationTime}")
-				delete_date=$(date -d "${dirdate} +15 days")
-
+				echo "      Unprocessed folder is older than 7 days: sending warning ..."
+				creationDate="$(date -d "@${creationTimeInSeconds}")"
+				deletionDate=$(date -d "${creationDate} +15 days")
 				#
 				# Compile JSON message payload.
 				#
-				read -r -d '' message << EOM
-{
-	"type": "mrkdwn",
-	"text": "*Cleanup alert on _{{ slurm_cluster_name | capitalize }}_*:
-\`\`\`
-The following data on $(hostname) of the {{ slurm_cluster_name | capitalize }} cluster is older than a week: ${dir}. This
-data will be deleted on ${delete_date}!
-\`\`\`"
-}
-EOM
-
-#
-# Post message to Slack channel.
-#
-curl -X POST '{{ slurm_notification_slack_webhook }}' \
-	-H 'Content-Type: application/json' \
-	-d "${message}" 
+				read -r -d '\0' message <<- EOM
+					{
+						"type": "mrkdwn",
+						"text": "*Cleanup alert for _$(hostname):${batchDir}_*:
+						\`\`\`
+						This unprocessed data is older than a week and will be *deleted on ${deletionDate}*!
+						\`\`\`"
+					}\0
+				EOM
+				#
+				# Post message to Slack channel.
+				#
+				curl -X POST "${slurm_notification_slack_webhook}" \
+					 -H 'Content-Type: application/json' \
+					 -d "${message}"
+			else
+				echo "      Unprocessed folder is younger than 7 days: there is no need to send a warning."
 			fi
 		fi
 	fi
 done
+{% endraw %}

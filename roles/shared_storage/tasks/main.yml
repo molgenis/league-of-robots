@@ -1,7 +1,7 @@
 ---
 #
 ##
-### Mount PFS-ses on DAI and create all required LFS-ses and subfolders on them with the correct permissions.
+### Mount complete PFS-ses and create all required LFS-ses and subfolders on them with the correct permissions.
 ##
 #
 - name: 'Create credential files for mounting cifs shares.'
@@ -253,134 +253,42 @@
         inventory_hostname in groups['chaperone'] | default([])
   become: true
 
-- name: 'Mount "tmp" Logical File Systems (LFSs) per group from shared storage read-write.'
+- name: 'Mount Logical File Systems (LFSs) per group from shared storage read-write.'
   ansible.posix.mount:
     path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
           {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='rw_options') | first }}"
-    state: 'mounted'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | list }}"
-    - 'groups'
-  when: inventory_hostname in item.0.rw_machines | default ([])
-  become: true
-
-- name: 'Mount "tmp" Logical File Systems (LFSs) per group from shared storage read-only.'
-  ansible.posix.mount:
-    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
-          {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='ro_options') | first }}"
-    state: 'mounted'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | list }}"
-    - 'groups'
-  when: inventory_hostname in item.0.ro_machines | default ([])
-  become: true
-
-- name: 'Mount "rsc" Logical File Systems (LFSs) per group from shared storage read-write.'
-  ansible.posix.mount:
-    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
-          {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='rw_options') | first }}"
-    state: 'mounted'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'rsc[0-9]+$') | list }}"
-    - 'groups'
-  when: inventory_hostname in item.0.rw_machines | default ([])
-  become: true
-
-- name: 'Mount "rsc" Logical File Systems (LFSs) per group from shared storage read-only.'
-  ansible.posix.mount:
-    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
-          {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='ro_options') | first }}"
-    state: 'mounted'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'rsc[0-9]+$') | list }}"
-    - 'groups'
-  when: inventory_hostname in item.0.ro_machines | default ([])
-  become: true
-
-- name: 'Mount "prm" Logical File Systems (LFSs) per group from shared storage read-write.'
-  ansible.posix.mount:
-    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
-          {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='rw_options') | first }}{{ extra_opts }}"
-    state: 'mounted'
+    opts: "{{ basic_opts }}{{ extra_opts }}"
+    state: "{% if basic_opts is search('automount') %}present{% else %}mounted{% endif %}"
   vars:
+    basic_opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='rw_options') | first }}"
     extra_opts: >-
       {%- if pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first == 'cifs' -%}
       ,credentials=/etc/sysconfig/{{ item.0.pfs | regex_replace('\$$', '') }}.cifs,uid={{ item.1.name }}-dm,gid={{ item.1.name }},dir_mode=02750,file_mode=0640
       {%- endif -%}
   with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'prm[0-9]+$') | list }}"
+    - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
     - 'groups'
   when: inventory_hostname in item.0.rw_machines | default ([])
   become: true
 
-- name: 'Mount "prm" Logical File Systems (LFSs) per group from shared storage read-only.'
+- name: 'Mount Logical File Systems (LFSs) per group from shared storage read-only.'
   ansible.posix.mount:
     path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
           {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='ro_options') | first }}{{ extra_opts }}"
-    state: 'mounted'
+    opts: "{{ basic_opts }}{{ extra_opts }}"
+    state: "{% if basic_opts is search('automount') %}present{% else %}mounted{% endif %}"
   vars:
+    basic_opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='ro_options') | first }}"
     extra_opts: >-
       {%- if pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first == 'cifs' -%}
       ,credentials=/etc/sysconfig/{{ item.0.pfs | regex_replace('\$$', '') }}.cifs,uid={{ item.1.name }}-dm,gid={{ item.1.name }},dir_mode=02750,file_mode=0640
       {%- endif -%}
   with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'prm[0-9]+$') | list }}"
-    - 'groups'
-  when: inventory_hostname in item.0.ro_machines | default ([])
-  become: true
-
-- name: 'Mount "dat" Logical File Systems (LFSs) per group from shared storage read-write.'
-  ansible.posix.mount:
-    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
-          {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='rw_options') | first }}{{ extra_opts }}"
-    state: 'mounted'
-  vars:
-    extra_opts: >-
-      {%- if pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first == 'cifs' -%}
-      ,credentials=/etc/sysconfig/{{ item.0.pfs | regex_replace('\$$', '') }}.cifs,uid={{ item.1.name }}-dm,gid={{ item.1.name }},dir_mode=02770,file_mode=0660
-      {%- endif -%}
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'dat[0-9]+$') | list }}"
-    - 'groups'
-  when: inventory_hostname in item.0.rw_machines | default ([])
-  become: true
-
-- name: 'Mount "dat" Logical File Systems (LFSs) per group from shared storage read-only.'
-  ansible.posix.mount:
-    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='source') | first }}/\
-          {{ item.0.pfs }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    fstype: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first }}"
-    opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='ro_options') | first }}{{ extra_opts }}"
-    state: 'mounted'
-  vars:
-    extra_opts: >-
-      {%- if pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first == 'cifs' -%}
-      ,credentials=/etc/sysconfig/{{ item.0.pfs | regex_replace('\$$', '') }}.cifs,uid={{ item.1.name }}-dm,gid={{ item.1.name }},dir_mode=02770,file_mode=0660
-      {%- endif -%}
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'dat[0-9]+$') | list }}"
+    - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
     - 'groups'
   when: inventory_hostname in item.0.ro_machines | default ([])
   become: true

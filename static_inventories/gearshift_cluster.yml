@@ -12,19 +12,6 @@ all:
           os_distribution: 'rocky9'
           host_networks:
             - name: vlan983
-          iptables_allow_icmp_inbound:
-            - "{{ all.ip_addresses['umcg']['net1'] }}"
-            - "{{ all.ip_addresses['umcg']['net2'] }}"
-            - "{{ all.ip_addresses['umcg']['net3'] }}"
-            - "{{ all.ip_addresses['umcg']['net4'] }}"
-            - "{{ all.ip_addresses['rug']['bwp_net'] }}"
-            - "{{ all.ip_addresses['rug']['operator'] }}"
-            - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
-            - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
-            - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
-            - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
-            - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
-            - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
     repo:
       hosts:
         gs-repo:

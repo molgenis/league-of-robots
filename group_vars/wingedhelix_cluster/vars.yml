@@ -3,6 +3,7 @@ slurm_cluster_name: 'wingedhelix'
 stack_domain: ''
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'wh'
+stack_dtap_state: production
 slurm_version: '23.02.7-2.el9.umcg'
 slurm_partitions:
   - name: regular_big_vm  # Must be in sync with group listed in Ansible inventory.

@@ -244,36 +244,43 @@ yum_repos:
   rocky9:
     - file: rocky.repo
       id: baseos
+      name: Rocky Linux 9 - BaseOS
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-9
       enabled: 1
       gpgcheck: 1
     - file: rocky.repo
       id: baseos-debug
+      name: Rocky Linux 9 - BaseOS Debug
       enabled: 0
     - file: rocky.repo
       id: baseos-source
       enabled: 0
     - file: rocky.repo
       id: appstream
+      name: Rocky Linux 9 - AppStream
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-9
       enabled: 1
       gpgcheck: 1
     - file: rocky.repo
       id: appstream-debug
+      name: Rocky Linux 9 - AppStream Debug
       enabled: 0
     - file: rocky.repo
       id: appstream-source
       enabled: 0
     - file: rocky.repo
       id: crb
+      name: Rocky Linux 9 - CRB
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-9
       enabled: 1
       gpgcheck: 1
     - file: rocky.repo
       id: crb-debug
+      name: Rocky Linux 9 - CRB Debug
       enabled: 0
     - file: rocky.repo
       id: crb-source
+      name: Rocky Linux 9 - CRB Source
       enabled: 0
     #
     # Rocky Security
@@ -290,92 +297,119 @@ yum_repos:
     #
     - file: rocky-addons.repo
       id: highavailability
+      name: Rocky Linux 9 - Addons High Availability
       enabled: 0
     - file: rocky-addons.repo
       id: highavailability-debug
+      name: Rocky Linux 9 - Addons High Availability Debug
       enabled: 0
     - file: rocky-addons.repo
       id: highavailability-source
+      name: Rocky Linux 9 - Addons High Availability Source
       enabled: 0
     - file: rocky-addons.repo
       id: resilientstorage
+      name: Rocky Linux 9 - Addons Resilient Storage
       enabled: 0
     - file: rocky-addons.repo
       id: resilientstorage-debug
+      name: Rocky Linux 9 - Addons Resilient Storage Debug
       enabled: 0
     - file: rocky-addons.repo
       id: resilientstorage-source
+      name: Rocky Linux 9 - Addons Resilient Storage Source
       enabled: 0
     - file: rocky-addons.repo
       id: nfv
+      name: Rocky Linux 9 - Addons NFV
       enabled: 0
     - file: rocky-addons.repo
       id: nfv-debug
+      name: Rocky Linux 9 - Addons NFV Debug
       enabled: 0
     - file: rocky-addons.repo
       id: nfv-source
+      name: Rocky Linux 9 - Addons NFV Source
       enabled: 0
     - file: rocky-addons.repo
       id: rt
+      name: Rocky Linux 9 - Addons RT
       enabled: 0
     - file: rocky-addons.repo
       id: rt-debug
+      name: Rocky Linux 9 - Addons RT Debug
       enabled: 0
     - file: rocky-addons.repo
       id: rt-source
+      name: Rocky Linux 9 - Addons RT Source
       enabled: 0
     - file: rocky-addons.repo
       id: sap
+      name: Rocky Linux 9 - Addons SAP
       enabled: 0
     - file: rocky-addons.repo
       id: sap-debug
+      name: Rocky Linux 9 - Addons SAP Debug
       enabled: 0
     - file: rocky-addons.repo
       id: sap-source
+      name: Rocky Linux 9 - Addons SAP source
       enabled: 0
     - file: rocky-addons.repo
       id: saphana
+      name: Rocky Linux 9 - Addons Saphana
       enabled: 0
     - file: rocky-addons.repo
       id: saphana-debug
+      name: Rocky Linux 9 - Addons Saphana Debug
       enabled: 0
     - file: rocky-addons.repo
       id: saphana-source
+      name: Rocky Linux 9 - Addons Saphana Source
       enabled: 0
     #
     # Rocky Devel
     #
     - file: rocky-devel.repo
       id: devel
+      name: Rocky Linux 9 - Development
       enabled: 0
     - file: rocky-devel.repo
       id: devel-debug
+      name: Rocky Linux 9 - Development Debug
       enabled: 0
     - file: rocky-devel.repo
       id: devel-source
+      name: Rocky Linux 9 - Development Source
       enabled: 0
     #
     # Rocky Extras
     #
     - file: rocky-extras.repo
       id: extras
+      name: Rocky Linux 9 - Extras
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-9
       enabled: 1
       gpgcheck: 1
     - file: rocky-extras.repo
       id: extras-debug
+      name: Rocky Linux 9 - Extras Debug
       enabled: 0
     - file: rocky-extras.repo
       id: extras-source
+      name: Rocky Linux 9 - Extras Source
       enabled: 0
     - file: rocky-extras.repo
       id: plus
+      name: Rocky Linux 9 - Extras Plus
       enabled: 0
     - file: rocky-extras.repo
       id: plus-debug
+      name: Rocky Linux 9 - Extras Plus Debug
       enabled: 0
     - file: rocky-extras.repo
       id: plus-source
+      name: Rocky Linux 9 - Extras Plus Source
       enabled: 0
     #
     # EPEL
@@ -452,8 +486,9 @@ yum_repos:
       id: perun
       name: 'Perun IdM Slave Scripts'
       baseurl: 'https://repo.cerit-sc.cz/el-perun/noarch/'
+      gpgkey: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
+      gpgcheck: 1
       enabled: 1
-      gpgcheck: 0
   oracle8:
     - file: oracle-linux-ol8.repo
       id: ol8_baseos_latest

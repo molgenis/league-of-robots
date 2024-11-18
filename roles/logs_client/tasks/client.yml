@@ -106,7 +106,7 @@
         mode: '0600'
         force: true
       become: true
-      delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
       loop: "{{ logs_class_servers }}"
       vars:
         ansible_python_interpreter: /usr/bin/python3
@@ -118,7 +118,7 @@
         mode: '0600'
         force: true
       become: true
-      delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
       loop: "{{ logs_class_servers }}"
       vars:
         ansible_python_interpreter: /usr/bin/python3
@@ -135,7 +135,7 @@
       changed_when: client_certificates_generate_results.rc == 0
       failed_when: client_certificates_generate_results.rc != 0
       become: true
-      delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
       loop: "{{ logs_class_servers }}"
       notify: restart_server_rsyslog
       vars:
@@ -149,7 +149,7 @@
         fail_on_missing: true
         validate_checksum: true
       become: true
-      delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
+      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
       loop: "{{ logs_class_servers }}"
       notify: restart_server_rsyslog
       vars:

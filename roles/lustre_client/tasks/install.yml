@@ -200,7 +200,11 @@
     backup: true
     insertafter: '\[Service\]'
     regexp: '^#?SuccessExitStatus='
-    line: 'SuccessExitStatus=239'  # lustre NID already loaded.
+    #
+    # 142 = Operation already in progress; In this case it usually means network already configured, peer already added, etc.
+    # 239 = Lustre NID already loaded.
+    #
+    line: 'SuccessExitStatus=142 239'
     owner: root
     group: root
     mode: '0644'

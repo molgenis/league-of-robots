@@ -34,20 +34,33 @@
 - name: Configure slurm triggers.
   ansible.builtin.command:
     cmd: |
-         strigger --set --flags=perm {{ item }}
+         strigger --set --flags=perm --{{ item['state'] }} -p '/etc/slurm/notification_scripts/{{ item['program'] }} -e {{ item['state'] }}'
   register: slurm_strigger_result
   failed_when:
     - slurm_strigger_result.rc != 0
     - "'Duplicate' not in slurm_strigger_result.stderr"
   changed_when: slurm_strigger_result.rc == 0
   loop:
-    - "-d -p '/etc/slurm/notification_scripts/nodes.bash'"
-    - "-D -p '/etc/slurm/notification_scripts/nodes.bash'"
-    - "-F -p '/etc/slurm/notification_scripts/nodes.bash'"
-    - "-e -p '/etc/slurm/notification_scripts/management.bash'"
-    - "-a -p '/etc/slurm/notification_scripts/management.bash'"
-    - "-h -p '/etc/slurm/notification_scripts/management.bash'"
-    - "-g -p '/etc/slurm/notification_scripts/management.bash'"
+    - state: 'down'
+      program: nodes.bash
+    - state: 'fail'
+      program: nodes.bash
+    - state: 'draining'  # Not supported on older Slurm versions < 23.02.
+      program: nodes.bash
+    - state: 'drained'
+      program: nodes.bash
+    - state: 'resume'  # Not supported on older Slurm < 23.02.
+      program: nodes.bash
+    - state: 'up'
+      program: nodes.bash
+    - state: 'primary_slurmctld_acct_buffer_full'
+      program: management.bash
+    - state: 'primary_slurmctld_failure'
+      program: management.bash
+    - state: 'primary_database_failure'
+      program: management.bash
+    - state: 'primary_slurmdbd_failure'
+      program: management.bash
   become: true
   become_user: slurm
 ...

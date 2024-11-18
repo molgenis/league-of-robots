@@ -3,6 +3,7 @@ slurm_cluster_name: 'nibbler'
 stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'nb'
+stack_dtap_state: production
 slurm_version: '23.02.7-2.el9.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
@@ -530,8 +531,8 @@ pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
     type: lustre
-    #rw_options: 'defaults,_netdev,flock,nofail,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    #ro_options: 'defaults,_netdev,ro,nofail,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    #rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    #ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
     rw_options: 'defaults,_netdev,flock'
     ro_options: 'defaults,_netdev,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
@@ -546,6 +547,12 @@ pfs_mounts:
     type: lustre
     rw_options: 'defaults,_netdev,flock'
     ro_options: 'defaults,_netdev,ro'
+    machines: "{{ groups['sys_admin_interface'] }}"
+  - pfs: umcgst04/slice3
+    source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
+    type: lustre
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -757,6 +764,61 @@ lfs_mounts:
       - name: umcg-vdakker
       - name: umcg-weersma
       - name: umcg-wijmenga
+    rw_machines: "{{ groups['user_interface'] }}"
+  - lfs: rsc02
+    pfs: umcgst04/slice3
+    quota_type: 'project'
+    quota_pid_increment: 500000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
+    groups:
+      - name: umcg-atd
+      - name: umcg-biogen
+      - name: umcg-bionic-mdd-gwama
+      - name: umcg-bios
+      - name: umcg-dag3
+      - name: umcg-datateam
+      - name: umcg-ejp-rd
+      - name: umcg-endocrinology
+      - name: umcg-fg
+      - name: umcg-franke-scrna
+      - name: umcg-fu
+      - name: umcg-gap
+      - name: umcg-gastrocol
+      - name: umcg-gcc
+      - name: umcg-gdi
+      - name: umcg-gdio
+      - name: umcg-gonl
+      - name: umcg-griac
+      - name: umcg-grip
+      - name: umcg-gsad
+      - name: umcg-hematology
+      - name: umcg-hlhs
+      - name: umcg-immunogenetics
+      - name: umcg-impact
+      - name: umcg-lifelines
+      - name: umcg-lld
+      - name: umcg-llnext
+      - name: umcg-mic
+      - name: umcg-micompany
+      - name: umcg-msb
+      - name: umcg-nawijn
+      - name: umcg-neonatology
+      - name: umcg-nephrology
+      - name: umcg-pmb
+      - name: umcg-radicon
+      - name: umcg-rehabilitation
+      - name: umcg-reki
+      - name: umcg-solve-rd
+      - name: umcg-sommer
+      - name: umcg-sysops
+      - name: umcg-tifn
+      - name: umcg-ukb
+      - name: umcg-ugli
+      - name: umcg-verbeek
+      - name: umcg-vdakker
+      - name: umcg-visclasataxia
+      - name: umcg-weersma
+      - name: umcg-wijmenga
+    ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env02
     pfs: umcgst04/slice2

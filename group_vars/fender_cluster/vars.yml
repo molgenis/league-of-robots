@@ -3,6 +3,7 @@ slurm_cluster_name: 'fender'
 stack_domain: ''
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'fd'
+stack_dtap_state: production
 slurm_version: '22.05.2-1.el7.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
@@ -349,6 +350,7 @@ pfs_mounts:
     rw_options: 'defaults,_netdev,noatime,nodiratime,rw'
     ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
+    check_fs_free: '8%'
 lfs_mounts:
   - lfs: home
     pfs: ecst02

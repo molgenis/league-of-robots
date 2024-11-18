@@ -3,6 +3,7 @@ slurm_cluster_name: 'forkhead'
 stack_domain: ''  # Only add hpc.rug.nl domain when jumphost is registered in DNS.
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'fh'
+stack_dtap_state: development
 slurm_version: '22.05.2-1.el7.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.

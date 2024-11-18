@@ -41,7 +41,7 @@
   until: remote_test_result.rc == 0
   retries: 12
   delay: 5
-  delegate_to: "{% if groups['jumphost'] | first != inventory_hostname %}{{ groups['jumphost'] | first }}+{% endif %}{{ item }}"
+  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
   loop: "{{ logs_class_servers }}"
   become: true
   vars:

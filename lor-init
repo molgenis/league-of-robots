@@ -110,7 +110,7 @@ function lor-config() {
 	printf 'INFO: Using AI_PROXY:                    %s\n' "${AI_PROXY:-None: no jumphost specified in ANSIBLE_INVENTORY}"
 	printf 'INFO: Using ANSIBLE_VAULT_IDENTITY_LIST: %s\n' "${ANSIBLE_VAULT_IDENTITY_LIST}"
 	printf 'INFO: Using ANSIBLE_ROLES_PATH:          %s\n' "${ANSIBLE_ROLES_PATH}"
-	printf 'INFO: Using ANSIBLE_COLLECTIONS_PATH:   %s\n' "${ANSIBLE_COLLECTIONS_PATH}"
+	printf 'INFO: Using ANSIBLE_COLLECTIONS_PATH:    %s\n' "${ANSIBLE_COLLECTIONS_PATH}"
 	#
 	# Enable ansible_mitogen strategy plugin for improved speed of plays when available.
 	#
