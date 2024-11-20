@@ -1,23 +1,29 @@
 # Surf archiving
 
-## Expects
+## About
 
-Runs as root user to create connection and services, then normal users can use
-moiunt point over this ssh connection. The /group/umcg-XXX/archive can be then
-used at any point and is auto-mounted on demand when accessed.
+When mount point is accessed
+ - system establishes an ssh connection to each the remote archive system
+ - it mounts the remote folder via sshfs onto the subfolder of the associated group
+ - permissions of the `-dm` user is applied on the system
+ - on remote system all the data is stored under the user of the established ssh connection
+ - after the user(s) stop using the mountpoint folder (no files are open, and user is not
+   accessing the folder anymore) the mountpoint is disconnected from remote server
+ - all groups that use the same archive system are sharin the same ssh connection which implies
+   - connections to the remote archive system are well managed
+   - bandwidth to the remote archive is shared between the groups
+   - (TODO) bandwidth could be throttled
+ - permissions
+   - even though that the files are owned in the backed by the remote archive user
+   - local user can access only the files from the group that he is a member of
 
-Role expects that there is already a ssh key-pair created and stored at
+## Prerequisites
 
-    /root/.ssh/id_ed25519_archive{.pub} 0600
+ - role uses a pre-created ssh key-pair for each cluster stack. Key must be stored
+   at `/root/.ssh/id_ed25519_archive{.pub}` with permission `0600`. Role will crash
+   otherwise. Administrator must copy content of `/root/.ssh/id_ed25519_archive.pub`
+   into remote archive server's `.ssh/authorized_keys` file and then rerun the role.
+ - this role will be deployed on the user interface machines only
+ - the groups that have access to the archive, are defined in the `archive_groups`
+   of the `group_vars/[stack]_cluster/vars.yml`
 
-- or it will create it and role will crash when testing the connection, since
-  administrator must copy content of `/root/.ssh/id_ed25519_archive.pub` into
-  archive server's `.ssh/authorized_keys` file. And rerun the role.
-
-This service will run only on user interface machine.
-
-The groups that have access to the archive, are specified in the 
-
-    `group_vars/[stack]_cluster/vars.yml`
-
-and the corresponding variable named `archive_groups`.
