@@ -19,11 +19,15 @@ When mount point is accessed
 
 ## Prerequisites
 
- - role uses a pre-created ssh key-pair for each cluster stack. Key must be stored
-   at `/root/.ssh/id_ed25519_archive{.pub}` with permission `0600`. Role will crash
-   otherwise. Administrator must copy content of `/root/.ssh/id_ed25519_archive.pub`
-   into remote archive server's `.ssh/authorized_keys` file and then rerun the role.
  - this role will be deployed on the user interface machines only
  - the groups that have access to the archive, are defined in the `archive_groups`
    of the `group_vars/[stack]_cluster/vars.yml`
+ - (if missing on stack user interface machine) role creates ssh key-pair for user root
+ - (if ^ public key is missing on remote archive server's `.ssh/authorized_keys`, then
+   this role will fail > administrator must login to remote archive machine and copy
+   content of `/root/.ssh/id_ed25519_archive.pub` into `.ssh/authorized_keys` file on
+   the remote archive server. To establish connection
+    - (either) via ssh from another stack that has already connected archive, or
+    - via ssh from any machine, using password (see `group_vars/all/secrets.yml`)
+ - rerun the role
 

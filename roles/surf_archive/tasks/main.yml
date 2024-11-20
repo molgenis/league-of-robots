@@ -161,7 +161,7 @@ become: true
 - name: Deploy ssh configuration settings for accessing archive
   ansible.builtin.template:
     src: templates/ssh_configuration
-    dest: /root/.ssh/conf.d/archive
+    dest: /root/.ssh/conf.d/surf_archive
     owner: root
     group: root
     mode: "0600"
