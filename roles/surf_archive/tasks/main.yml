@@ -129,20 +129,18 @@
     - 'archive_systemd_reload'
   become: true
 
-- name: Create archive folder for each group
+- name: Create archive directory for each group
+  ansible.builtin.file:
+    path: "/groups/{{ item.1 }}/{{ item.0.name }}"
+    owner: "{{ item.1 }}-dm"
+    group: "{{ item.1 }}"
+    mode: "2750"
+    state: "directory"
   when: archive_groups | default([]) | length >= 1
-  block:
-    - name: Create archive directory for each group
-      ansible.builtin.file:
-        path: "/groups/{{ item.1 }}/{{ item.0.name }}"
-        owner: "{{ item.1 }}-dm"
-        group: "{{ item.1 }}"
-        mode: "2750"
-        state: "directory"
-      with_subelements:
-        - "{{ archive_groups | list }}"
-        - 'groups'
-      become: true
+with_subelements:
+  - "{{ archive_groups | list }}"
+  - 'groups'
+become: true
 
 - name: Create ssh subdirectories
   ansible.builtin.file:
