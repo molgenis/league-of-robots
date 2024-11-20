@@ -1,5 +1,5 @@
-Host {{ archive_system }}
-    User {{ archive_user }}
+{% for archive_host in archive_unique_hosts %}
+Host {{ archive_host }}
     ServerAliveInterval 60
     ServerAliveCountMax 5
     IdentityFile "{{ archive_ssh_key_location }}"
@@ -7,3 +7,4 @@ Host {{ archive_system }}
     ControlMaster auto
     ControlPath ~/.ssh/tmp/%C
     ControlPersist 120m
+{% endfor %}

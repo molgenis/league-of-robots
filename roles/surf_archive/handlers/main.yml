@@ -1,9 +1,16 @@
 ---
-- name: Restart service remote-fs service to support newly configured groups
-  ansible.builtin.systemd:
-    name: remote-fs.target
-    state: restarted
+- name: Reload systemd
+  ansible.builtin.systemd_service:
     daemon_reload: true
-  listen: 'restart_remotefs'
+  listen: 'archive_systemd_reload'
+  become: true
+
+- name: Enable and start automounts
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  listen: 'archive_mount_enable'
+  with_items: "{{ desired_automounts }}"
   become: true
 ...

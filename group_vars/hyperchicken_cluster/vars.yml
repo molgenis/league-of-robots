@@ -96,16 +96,28 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 
-# Archive settings
+# (SURF SARA) Archive settings
 archive_groups:
-  - 'umcg-atd'
-  - 'solve-rd'
+  - name: archives01
+    groups:
+      - 'umcg-atd'
+      - 'solve-rd'
+    archive_system: 'archive.surfsara.nl'
+    archive_user: 'umcg-atd-dm'
+    archive_system_fingerprints: |
+      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
+      ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
+  - name: archives02
+    groups:
+      - 'umcg-atd'
+      - 'umcg-gsad'
+    archive_system: 'archive.surfsara.nl'
+    archive_user: 'umcg-atd-dm'
+    archive_system_fingerprints: |
+      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
+      ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
 archive_ssh_key_location: '/root/.ssh/id_ed25519_archive'
 archive_ssh_key_type: 'ed25519'
-archive_system: 'archive.surfsara.nl'
-archive_user: 'umcg-atd-dm'
-archive_main_dir: 'archives01'
-archive_path: '/home/{{ archive_user }}/{{ archive_main_dir }}'
 
 regular_groups:
   - "{{ envsync_group }}"

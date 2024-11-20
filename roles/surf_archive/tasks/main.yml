@@ -13,15 +13,136 @@
     ssh_key_type: "{{ archive_ssh_key_type }}"
   become: true
 
-- name: Create archive directory for each group
-  ansible.builtin.file:
-    path: "/groups/{{ item }}/archive"
-    owner: "{{ item }}-dm"
-    group: "{{ item }}"
-    mode: "2750"
-    state: "directory"
-  with_items: "{{ archive_groups }}"
+- name: Find all .automount files in /etc/systemd/system
+  ansible.builtin.find:
+    paths: /etc/systemd/system
+    patterns: "*.automount"
+    recurse: true
+  register: automounts_all_existing
+
+- name: Find all .mount files in /etc/systemd/system
+  ansible.builtin.find:
+    paths: /etc/systemd/system
+    patterns: "*.mount"
+    recurse: true
+  register: mounts_all_existing
+
+- name: Search for files containing 'ansible_systemd_archive'
+  ansible.builtin.command: grep -l 'ansible_systemd_archive' "{{ item.path }}"
+  with_items: "{{ automounts_all_existing.files }}"
+  register: automounts_grep
+  changed_when: false
+  failed_when: false  # Avoid failure if no matches are found
+  ignore_errors: true # Ignore errors from grep when no matches are found
   become: true
+
+- name: Search for files containing 'ansible_systemd_archive'
+  ansible.builtin.command: grep -l 'ansible_systemd_archive' "{{ item.path }}"
+  with_items: "{{ mounts_all_existing.files }}"
+  register: mounts_grep
+  changed_when: false
+  failed_when: false  # Avoid failure if no matches are found
+  ignore_errors: true # Ignore errors from grep when no matches are found
+  become: true
+
+- name: Make a list of file paths with ansible_systemd_archive label
+  ansible.builtin.set_fact:
+    automounts_tagged_files: "{{ automounts_grep.results | selectattr('rc', 'equalto', 0) | map(attribute='item.path') | default([]) | list }}"
+    mounts_tagged_files: "{{ mounts_grep.results | selectattr('rc', 'equalto', 0) | map(attribute='item.path') | default([]) | list }}"
+
+- name: Extract basenames from automounts
+  ansible.builtin.set_fact:
+    automounts_basename: "{{ automounts_basename | default([]) + [item | basename] }}"
+  with_items: "{{ automounts_tagged_files }}"
+
+- name: Extract basenames from automounts
+  ansible.builtin.set_fact:
+    mounts_basename: "{{ mounts_basename | default([]) + [item | basename] }}"
+  with_items: "{{ mounts_tagged_files }}"
+
+- name: Make a list of desired mount and automount files
+  ansible.builtin.set_fact:
+    desired_automounts: "{{ desired_automounts | default([])  + ['groups-' + item.1 | regex_replace('-', '\\\\x2d') +
+                         '-' + item.0.name | regex_replace('-', '\\\\x2d') + '.automount'] }}"
+    desired_mounts: "{{ desired_mounts | default([])  + ['groups-' + item.1 | regex_replace('-', '\\\\x2d') +
+                     '-' + item.0.name | regex_replace('-', '\\\\x2d') + '.mount'] }}"
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'groups'
+
+- name: Set disable_automounts and disable_mounts
+  ansible.builtin.set_fact:
+    disable_automounts: "{{ automounts_basename | default([]) | difference(desired_automounts | default([])) }}"
+    disable_mounts: "{{ mounts_basename | default([]) | difference(desired_mounts | default([])) }}"
+
+- name: Join disabled mounts and automounts
+  ansible.builtin.set_fact:
+    disable_joined: "{{ disable_joined | default([]) + [item] }}"
+  with_items:
+    - "{{ disable_automounts }}"
+    - "{{ disable_mounts }}"
+
+- name: Set disable_automounts and disable_mounts
+  ansible.builtin.set_fact:
+    remove_mountpoints: "{{ remove_mountpoints | default([]) + ['/' + item | regex_replace('-', '\/') |
+                         regex_replace('\\\\x2d', '-') | regex_replace('\\.(mount|automount)$', '')] }}"
+  with_items: "{{ disable_joined }}"
+  when: disable_joined is defined and disable_joined | length > 0
+
+- name: Systemd disable automounts
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  with_items:
+    - "{{ disable_automounts }}"
+  become: true
+
+- name: Unmount mountpoints
+  ansible.posix.mount:
+    path: "{{ item }}"
+    state: unmounted
+  with_items:
+    - "{{ remove_mountpoints }}"
+  when: remove_mountpoints is defined and remove_mountpoints | length > 0
+  become: true
+
+- name: Check if mountpoint directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ remove_mountpoints }}"
+  when: remove_mountpoints is defined and remove_mountpoints | length > 0
+  become: true
+
+- name: Flushing handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Remove auto/mount files not in the desired list
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}"
+    state: absent
+  with_items:
+    - "{{ disable_automounts }}"
+    - "{{ disable_mounts }}"
+  notify:
+    - 'archive_systemd_reload'
+  become: true
+
+- name: Create archive folder for each group
+  when: archive_groups | default([]) | length >= 1
+  block:
+    - name: Create archive directory for each group
+      ansible.builtin.file:
+        path: "/groups/{{ item.1 }}/{{ item.0.name }}"
+        owner: "{{ item.1 }}-dm"
+        group: "{{ item.1 }}"
+        mode: "2750"
+        state: "directory"
+      with_subelements:
+        - "{{ archive_groups | list }}"
+        - 'groups'
+      become: true
 
 - name: Create ssh subdirectories
   ansible.builtin.file:
@@ -35,6 +156,10 @@
     - "tmp"
   become: true
 
+- name: Unique hosts
+  ansible.builtin.set_fact:
+    archive_unique_hosts: "{{ archive_groups | map(attribute='archive_system', default='') | unique }}"
+
 - name: Deploy ssh configuration settings for accessing archive
   ansible.builtin.template:
     src: templates/ssh_configuration
@@ -44,13 +169,6 @@
     mode: "0600"
   become: true
 
-- name: Collect public keys from the server
-  ansible.builtin.command: |
-    ssh-keyscan {{ archive_system }}
-  register: servers_public_keys
-  changed_when: false
-  become: true
-
 - name: Write public keys into known_hosts
   ansible.builtin.blockinfile:
     path: /root/.ssh/known_hosts
@@ -58,9 +176,12 @@
     owner: root
     group: root
     mode: "0600"
+    marker: "# DO NOT EDIT: Managed by LOR surf_archive role | {{ item.name }}@{{ item.archive_system }}"
     block: |
-      {{ servers_public_keys.stdout }}
-  when: servers_public_keys.rc == 0
+      {{ item.archive_system }} {{ item.archive_system_fingerprints }}
+  when: item.archive_system_fingerprints is defined
+  with_items:
+    - "{{ archive_groups }}"
   become: true
 
 - name: Configure ssh to check for extra configration files in conf.d
@@ -68,39 +189,48 @@
     path: /root/.ssh/config
     line: "Include conf.d/*"
     create: true
+    owner: root
+    group: root
+    mode: "0600"
   become: true
 
-- name: "Check the connection - note that {{ archive_ssh_key_location }}.pub must be first copied into {{ archive_system }}:.ssh/authorized_keys"
+- name: Check connection and ensure that group folder on remote archive system exists
   ansible.builtin.command: |
-    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "ls"
-  changed_when: false
-  become: true
-
-- name: Check if remote folder exists
-  ansible.builtin.command: |
-    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "test -d {{ archive_path }}/{{ item }}"
+    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "mkdir -p /home/{{ archive_user }}/{{ item.0.name }}/{{ item.1 }}"
   register: archive_dir_test
-  failed_when: archive_dir_test.rc > 1   # is 0 if folder exists, 1 if it is missing, and higher if command failed
   changed_when: false
-  with_items: "{{ archive_groups }}"
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'groups'
   become: true
 
-- name: Create remote group folder if missing
-  ansible.builtin.command: |
-    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "mkdir {{ archive_path }}/{{ item.item }}"
-  when: item.rc == 1
-  loop: "{{ archive_dir_test.results }}"
+- name: Create mount files from templates
+  ansible.builtin.template:
+    src: archive_mount.j2
+    dest: "/etc/systemd/system/groups-{{ item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.mount"
+    owner: root
+    group: root
+    mode: "0644"
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'groups'
+  notify:
+    - 'archive_systemd_reload'
+    - 'archive_mount_enable'
   become: true
 
-- name: Mount archive volumes for each group
-  ansible.posix.mount:
-    src: "{{ archive_user }}@{{ archive_system }}:{{ archive_path }}/{{ item }}"
-    path: "/groups/{{ item }}/archive"
-    opts: "{{ 'noauto,x-systemd.automount,_netdev,users,idmap=user,IdentityFile=' + archive_ssh_key_location +
-      ',reconnect,x-systemd.idle-timeout=60,default_permissions,allow_other,uid=' + item + '-dm,gid=' + item | trim() }}"
-    state: present
-    fstype: fuse.sshfs
-  with_items: "{{ archive_groups }}"
-  notify: restart_remotefs
+- name: Create automount files from templates
+  ansible.builtin.template:
+    src: archive_automount.j2
+    dest: "/etc/systemd/system/groups-{{ item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.automount"
+    owner: root
+    group: root
+    mode: "0644"
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'groups'
+  notify:
+    - 'archive_systemd_reload'
+    - 'archive_mount_enable'
   become: true
 ...
