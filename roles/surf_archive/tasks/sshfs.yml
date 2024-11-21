@@ -1,0 +1,75 @@
+---
+- name: Install fuse-sshfs
+  ansible.builtin.package:
+    name: fuse-sshfs
+    state: present
+  become: true
+
+- name: "Create a {{ archive_ssh_key_type }} SSH key for root user"
+  ansible.builtin.user:
+    name: "root"
+    generate_ssh_key: true
+    ssh_key_file: "{{ archive_ssh_key_location }}"
+    ssh_key_type: "{{ archive_ssh_key_type }}"
+  become: true
+
+- name: Create .ssh folder structure
+  ansible.builtin.file:
+    path: "/root/.ssh/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0700"
+    state: directory
+  with_items:
+    - "conf.d"
+    - "tmp"
+  become: true
+
+- name: Set list of unique ssh hosts
+  ansible.builtin.set_fact:
+    archive_unique_hosts: "{{ archive_groups | map(attribute='archive_system', default='') | unique }}"
+
+- name: Deploy ssh configuration settings for accessing archive
+  ansible.builtin.template:
+    src: templates/ssh_configuration
+    dest: /root/.ssh/conf.d/surf_archive
+    owner: root
+    group: root
+    mode: "0600"
+  become: true
+
+- name: Write public keys into known_hosts
+  ansible.builtin.blockinfile:
+    path: /root/.ssh/known_hosts
+    create: true
+    owner: root
+    group: root
+    mode: "0600"
+    marker: "# DO NOT EDIT: Managed by LOR surf_archive role | {{ item.name }}@{{ item.archive_system }}"
+    block: |
+      {{ item.archive_system }} {{ item.archive_system_fingerprints }}
+  when: item.archive_system_fingerprints is defined
+  with_items:
+    - "{{ archive_groups }}"
+  become: true
+
+- name: Configure ssh to check for extra configration files in conf.d
+  ansible.builtin.lineinfile:
+    path: /root/.ssh/config
+    line: "Include conf.d/*"
+    create: true
+    owner: root
+    group: root
+    mode: "0600"
+  become: true
+
+- name: Check connection and ensure that group folder on remote archive system exists
+  ansible.builtin.command: |
+    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "mkdir -p /home/{{ archive_user }}/{{ item.0.name }}/{{ item.1 }}"
+  register: archive_dir_test
+  changed_when: false
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'groups'
+  become: true
+...
