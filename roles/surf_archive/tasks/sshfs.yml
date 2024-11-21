@@ -38,19 +38,25 @@
     mode: "0600"
   become: true
 
+- name: Collect all ssh fingerprints
+  ansible.builtin.set_fact:
+    archive_all_fingerprints: "{{ archive_all_fingerprints | default([]) + [item.0.archive_system + ' ' + item.1] }}"
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'archive_system_fingerprints'
+
 - name: Write public keys into known_hosts
-  ansible.builtin.blockinfile:
+  ansible.builtin.lineinfile:
     path: /root/.ssh/known_hosts
+    state: present
+    search_string: "{{ item }}"
+    line: "{{ item }}"
     create: true
     owner: root
     group: root
     mode: "0600"
-    marker: "# DO NOT EDIT: Managed by LOR surf_archive role | {{ item.name }}@{{ item.archive_system }}"
-    block: |
-      {{ item.archive_system }} {{ item.archive_system_fingerprints }}
-  when: item.archive_system_fingerprints is defined
-  with_items:
-    - "{{ archive_groups }}"
+  when: archive_all_fingerprints is defined and archive_all_fingerprints | length > 0
+  with_items: "{{ archive_all_fingerprints | unique }}"
   become: true
 
 - name: Configure ssh to check for extra configration files in conf.d

@@ -1,17 +1,13 @@
 ---
-- name: Find all .automount files in /etc/systemd/system
+- name: Find all .auto/.automount files in /etc/systemd/system
   ansible.builtin.find:
     paths: /etc/systemd/system
-    patterns: "*.automount"
+    patterns:
+      - "*.*mount"
+      - "*.*automount"
     recurse: true
   register: automounts_all_existing
-
-- name: Find all .mount files in /etc/systemd/system
-  ansible.builtin.find:
-    paths: /etc/systemd/system
-    patterns: "*.mount"
-    recurse: true
-  register: mounts_all_existing
+  become: true
 
 - name: Search for files containing 'ansible_systemd_archive'
   ansible.builtin.command: grep -l 'ansible_systemd_archive' "{{ item.path }}"
@@ -22,29 +18,14 @@
   ignore_errors: true # Ignore errors from grep when no matches are found
   become: true
 
-- name: Search for files containing 'ansible_systemd_archive'
-  ansible.builtin.command: grep -l 'ansible_systemd_archive' "{{ item.path }}"
-  with_items: "{{ mounts_all_existing.files }}"
-  register: mounts_grep
-  changed_when: false
-  failed_when: false  # Avoid failure if no matches are found
-  ignore_errors: true # Ignore errors from grep when no matches are found
-  become: true
-
 - name: Make a list of file paths with ansible_systemd_archive label
   ansible.builtin.set_fact:
     automounts_tagged_files: "{{ automounts_grep.results | selectattr('rc', 'equalto', 0) | map(attribute='item.path') | default([]) | list }}"
-    mounts_tagged_files: "{{ mounts_grep.results | selectattr('rc', 'equalto', 0) | map(attribute='item.path') | default([]) | list }}"
 
 - name: Extract basenames from automounts
   ansible.builtin.set_fact:
     automounts_basename: "{{ automounts_basename | default([]) + [item | basename] }}"
   with_items: "{{ automounts_tagged_files }}"
-
-- name: Extract basenames from automounts
-  ansible.builtin.set_fact:
-    mounts_basename: "{{ mounts_basename | default([]) + [item | basename] }}"
-  with_items: "{{ mounts_tagged_files }}"
 
 - name: Make a list of desired mount and automount files
   ansible.builtin.set_fact:
@@ -59,21 +40,13 @@
 - name: Set disable_automounts and disable_mounts
   ansible.builtin.set_fact:
     disable_automounts: "{{ automounts_basename | default([]) | difference(desired_automounts | default([])) }}"
-    disable_mounts: "{{ mounts_basename | default([]) | difference(desired_mounts | default([])) }}"
 
-- name: Join disabled mounts and automounts
-  ansible.builtin.set_fact:
-    disable_joined: "{{ disable_joined | default([]) + [item] }}"
-  with_items:
-    - "{{ disable_automounts }}"
-    - "{{ disable_mounts }}"
-
-- name: Set disable_automounts and disable_mounts
+- name: Set format mountpoints path
   ansible.builtin.set_fact:
     remove_mountpoints: "{{ remove_mountpoints | default([]) + ['/' + item | regex_replace('-', '\/') |
                          regex_replace('\\\\x2d', '-') | regex_replace('\\.(mount|automount)$', '')] }}"
-  with_items: "{{ disable_joined }}"
-  when: disable_joined is defined and disable_joined | length > 0
+  with_items: "{{ disable_automounts }}"
+  when: disable_automounts is defined and disable_automounts | length > 0
 
 - name: Systemd disable automounts
   ansible.builtin.systemd_service:
@@ -110,7 +83,6 @@
     state: absent
   with_items:
     - "{{ disable_automounts }}"
-    - "{{ disable_mounts }}"
   notify:
     - 'archive_systemd_reload'
   become: true
