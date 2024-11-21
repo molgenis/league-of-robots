@@ -1,5 +1,5 @@
 ---
-- name: Configuring surf archive
+- name: Configuring archive
   hosts:
    - user_interface
   roles:
