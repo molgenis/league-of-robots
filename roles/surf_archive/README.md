@@ -1,5 +1,16 @@
 # Surf archiving
 
+## Important
+
+ - note that this role does not do anything with pfs/lfs
+ - this is due to how
+   - the mount points are automatically detected, based on simple archive list of groups
+   - how the mountpoints (folders) are automatically created AND removed when not needed!
+   - the fuse.sshfs needs extra parameters, that are shared across mount points, so they
+     do not need to be provided separately (as for example in the lfs)
+   - and most importantly due to the fact that `/etc/fstab` is not used, but labeled
+     systemd unit files are
+
 ## About
 
 When mount point is accessed
