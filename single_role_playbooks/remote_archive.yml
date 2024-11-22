@@ -3,5 +3,5 @@
   hosts:
    - user_interface
   roles:
-   - surf_archive
+   - remote_archive
 ...

@@ -9,8 +9,8 @@
   register: automounts_all_existing
   become: true
 
-- name: Search for files containing 'ansible_systemd_archive'
-  ansible.builtin.command: grep -l 'ansible_systemd_archive' "{{ item.path }}"
+- name: Search for files containing marker
+  ansible.builtin.command: grep -l 'ansible_remote_archive' "{{ item.path }}"
   with_items: "{{ automounts_all_existing.files }}"
   register: automounts_grep
   changed_when: false
@@ -18,7 +18,7 @@
   ignore_errors: true # Ignore errors from grep when no matches are found
   become: true
 
-- name: Make a list of file paths with ansible_systemd_archive label
+- name: Make a list of file paths with marker
   ansible.builtin.set_fact:
     automounts_tagged_files: "{{ automounts_grep.results | selectattr('rc', 'equalto', 0) | map(attribute='item.path') | default([]) | list }}"
 

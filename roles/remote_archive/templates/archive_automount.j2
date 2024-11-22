@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------------------------------------------#
-# ! This ansible_systemd_archive file was generated autimatically with ansible, don't change the contents ! #
+# ! This ansible_remote_archive file was generated autimatically with ansible, don't change the contents ! #
 #---------------------------------------------------------------------------------------------------------#
 
 [Unit]
@@ -8,7 +8,7 @@ After=network.target
 
 [Automount]
 Where=/groups/{{ item.1 }}/{{ item.0.name }}
-TimeoutIdleSec=60
+TimeoutIdleSec=180
 DirectoryMode=2750
 
 [Install]
