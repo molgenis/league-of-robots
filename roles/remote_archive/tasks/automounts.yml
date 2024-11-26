@@ -67,18 +67,18 @@
 
 - name: List of mount points to be removed
   ansible.builtin.debug:
-    msg: "{{ remove_mountpoints  }}"
+    msg: "{{ remove_mountpoints }}"
   when: remove_mountpoints is defined and remove_mountpoints | length > 0
 
 - name: Make a list of mounts and automounts
   ansible.builtin.set_fact:
-     disable_full_path: "{{ disable_full_path | default([]) + [item + '.automount'] + [item + '.mount'] }}"
+    disable_full_path: "{{ disable_full_path | default([]) + [item + '.automount'] + [item + '.mount'] }}"
   loop: "{{ disable_auto_mounts }}"
 
 - name: Disable and stoping service if exists
   ansible.builtin.systemd:
     service: "{{ item }}"
-    enabled: no
+    enabled: true
     state: stopped
   register: result_systemd_stop
   failed_when: "result_systemd_stop is failed and 'Could not find the requested service' not in result_systemd_stop.msg"
