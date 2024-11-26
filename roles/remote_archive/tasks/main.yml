@@ -1,5 +1,4 @@
 ---
-
 - name: Configure ssh and sshfs
   ansible.builtin.include_tasks:
     file: automounts.yml

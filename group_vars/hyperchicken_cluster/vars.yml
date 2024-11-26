@@ -96,21 +96,12 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 
-# (SURF SARA) Archive settings
+# Remote archive settings
 archive_groups:
-  - name: archives01
+  - name: arc01
     groups:
       - 'umcg-atd'
       - 'solve-rd'
-    archive_system: 'archive.surfsara.nl'
-    archive_user: 'umcg-atd-dm'
-    archive_system_fingerprints:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
-      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
-  - name: archives02
-    groups:
-      - 'umcg-atd'
-      - 'umcg-gsad'
     archive_system: 'archive.surfsara.nl'
     archive_user: 'umcg-atd-dm'
     archive_system_fingerprints:

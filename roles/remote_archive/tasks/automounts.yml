@@ -3,8 +3,8 @@
   ansible.builtin.find:
     paths: /etc/systemd/system
     patterns:
-      - "*.*mount"
-      - "*.*automount"
+      - "*.mount"
+      - "*.automount"
     recurse: true
   register: automounts_all_existing
   become: true
@@ -24,37 +24,66 @@
 
 - name: Extract basenames from automounts
   ansible.builtin.set_fact:
-    automounts_basename: "{{ automounts_basename | default([]) + [item | basename] }}"
+    automounts_existing_marked: "{{ automounts_existing_marked | default([]) + [item | basename | regex_replace('\\.(mount|automount)+$', '')] }}"
   with_items: "{{ automounts_tagged_files }}"
+
+- name: Collect unique automount files without extension
+  ansible.builtin.set_fact:
+    automounts_existing_unique: "{{ automounts_existing_marked | default([]) | unique }}"
 
 - name: Make a list of desired mount and automount files
   ansible.builtin.set_fact:
-    desired_automounts: "{{ desired_automounts | default([])  + ['groups-' + item.1 | regex_replace('-', '\\\\x2d') +
-                         '-' + item.0.name | regex_replace('-', '\\\\x2d') + '.automount'] }}"
-    desired_mounts: "{{ desired_mounts | default([])  + ['groups-' + item.1 | regex_replace('-', '\\\\x2d') +
-                     '-' + item.0.name | regex_replace('-', '\\\\x2d') + '.mount'] }}"
+    desired_auto_mounts: "{{ desired_auto_mounts | default([])  + ['groups-' + item.1 | regex_replace('-', '\\\\x2d') +
+                         '-' + item.0.name | regex_replace('-', '\\\\x2d')] }}"
   with_subelements:
     - "{{ archive_groups | list }}"
     - 'groups'
 
-- name: Set disable_automounts and disable_mounts
+- name: Set disable_auto_mounts
   ansible.builtin.set_fact:
-    disable_automounts: "{{ automounts_basename | default([]) | difference(desired_automounts | default([])) }}"
+    disable_auto_mounts: "{{ automounts_existing_unique | difference(desired_auto_mounts | default([])) }}"
 
 - name: Set format mountpoints path
   ansible.builtin.set_fact:
     remove_mountpoints: "{{ remove_mountpoints | default([]) + ['/' + item | regex_replace('-', '\/') |
                          regex_replace('\\\\x2d', '-') | regex_replace('\\.(mount|automount)$', '')] }}"
-  with_items: "{{ disable_automounts }}"
-  when: disable_automounts is defined and disable_automounts | length > 0
+  with_items: "{{ disable_auto_mounts }}"
+  when: disable_auto_mounts is defined and disable_auto_mounts | length > 0
 
-- name: Systemd disable automounts
-  ansible.builtin.systemd_service:
-    name: "{{ item }}"
+- name: List of existing auto/mounts with correct marker
+  ansible.builtin.debug:
+    msg: "{{ automounts_existing_unique }}"
+  when: automounts_existing_unique is defined and automounts_existing_unique | length > 0
+
+- name: List of desired auto/mounts
+  ansible.builtin.debug:
+    msg: "{{ desired_auto_mounts }}"
+  when: desired_auto_mounts is defined and desired_auto_mounts | length > 0
+
+- name: List of auto/mounts to be disabled
+  ansible.builtin.debug:
+    msg: "{{ disable_auto_mounts }}"
+  when: disable_auto_mounts is defined and disable_auto_mounts | length > 0
+
+- name: List of mount points to be removed
+  ansible.builtin.debug:
+    msg: "{{ remove_mountpoints  }}"
+  when: remove_mountpoints is defined and remove_mountpoints | length > 0
+
+- name: Make a list of mounts and automounts
+  ansible.builtin.set_fact:
+     disable_full_path: "{{ disable_full_path | default([]) + [item + '.automount'] + [item + '.mount'] }}"
+  loop: "{{ disable_auto_mounts }}"
+
+- name: Disable and stoping service if exists
+  ansible.builtin.systemd:
+    service: "{{ item }}"
+    enabled: no
     state: stopped
-    enabled: false
-  with_items:
-    - "{{ disable_automounts }}"
+  register: result_systemd_stop
+  failed_when: "result_systemd_stop is failed and 'Could not find the requested service' not in result_systemd_stop.msg"
+  when: disable_full_path is defined
+  with_items: "{{ disable_full_path | union(automounts_existing_unique) }}"
   become: true
 
 - name: Unmount mountpoints
@@ -81,13 +110,14 @@
   ansible.builtin.file:
     path: "/etc/systemd/system/{{ item }}"
     state: absent
+  when: disable_full_path is defined
   with_items:
-    - "{{ disable_automounts }}"
+    - "{{ disable_full_path | union(automounts_existing_unique) }}"
   notify:
     - 'archive_systemd_reload'
   become: true
 
-- name: Create archive directory for each group
+- name: Create archive directory mountpoint for each group
   ansible.builtin.file:
     path: "/groups/{{ item.1 }}/{{ item.0.name }}"
     owner: "{{ item.1 }}-dm"
