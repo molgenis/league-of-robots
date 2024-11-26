@@ -309,10 +309,10 @@ if [[ -e "${node_state_file_old}" ]]; then
 		# E.g. load was too high and changed slightly, but is still is too high.
 		#
 		sed 's/:  [^:]*$//' "${node_state_file_old}" \
-			| grep -i 'drain\|down\|fail\|maint\|respond' \
+			| { grep -i 'drain\|down\|fail\|maint\|respond' || test "${?}" == 1 ;} \
 			| sort > "${node_state_file_old_short}"
 		sed 's/:  [^:]*$//' "${node_state_file_new}" \
-			| grep -i 'drain\|down\|fail\|maint\|respond' \
+			| { grep -i 'drain\|down\|fail\|maint\|respond' || test "${?}" == 1 ;} \
 			| sort > "${node_state_file_new_short}"
 		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "Created ${node_state_file_old_short} and ${node_state_file_new_short}."
 		if cmp -s "${node_state_file_old_short}" "${node_state_file_new_short}"; then
