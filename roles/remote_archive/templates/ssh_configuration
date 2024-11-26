@@ -5,7 +5,6 @@ Host {{ archive_host }}
     IdentityFile "{{ archive_ssh_key_location }}"
     PasswordAuthentication no
     Compression yes
-    CompressionLevel 6
     ControlMaster auto
     ControlPath ~/.ssh/tmp/%C
     ControlPersist 120m
