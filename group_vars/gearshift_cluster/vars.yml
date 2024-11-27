@@ -159,7 +159,6 @@ regular_groups:
   - 'umcg-mic'
   - 'umcg-micompany'
   - 'umcg-msb'
-  - 'umcg-muhas'
   - 'umcg-nawijn'
   - 'umcg-neonatology'
   - 'umcg-pgx'
@@ -257,8 +256,6 @@ regular_users:
     groups: ['umcg-micompany']
   - user: 'umcg-msb-dm'
     groups: ['umcg-msb']
-  - user: 'umcg-muhas-dm'
-    groups: ['umcg-muhas']
   - user: 'umcg-nawijn-dm'
     groups: ['umcg-nawijn']
   - user: 'umcg-neonatology-dm'
@@ -374,8 +371,6 @@ sudoers:
     become: 'umcg-micompany-dm'
   - who: ['%umcg-msb']
     become: 'umcg-msb-dm'
-  - who: ['%umcg-muhas-dms']
-    become: 'umcg-muhas-dm'
   - who: ['%umcg-nawijn-dms']
     become: 'umcg-nawijn-dm'
   - who: ['%umcg-neonatology-dms']
@@ -487,8 +482,6 @@ lfs_mounts:
       - name: umcg-mic
       - name: umcg-micompany
       - name: umcg-msb
-      - name: umcg-muhas
-        mode: '2750'
       - name: umcg-nawijn
         mode: '2750'
       - name: umcg-neonatology
@@ -556,7 +549,6 @@ lfs_mounts:
       - name: umcg-mic
       - name: umcg-micompany
       - name: umcg-msb
-      - name: umcg-muhas
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-pgx
