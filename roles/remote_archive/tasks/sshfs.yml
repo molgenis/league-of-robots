@@ -11,7 +11,14 @@
     generate_ssh_key: true
     ssh_key_file: "{{ archive_ssh_key_location }}"
     ssh_key_type: "{{ archive_ssh_key_type }}"
+  register: make_root_keypair
   become: true
+
+- name: Keys generated and we stop the role
+  ansible.builtin.debug:
+    msg: " ... key pair was created, now you must copy public key to remote system's authorized_keys."
+  when: make_root_keypair.changed is true # noqa no-handler
+  failed_when: true
 
 - name: Create .ssh folder structure
   ansible.builtin.file:
