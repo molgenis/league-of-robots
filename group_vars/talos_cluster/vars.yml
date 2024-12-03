@@ -127,7 +127,7 @@ hpc_env_prefix: '/apps'
 archive_groups:
   - name: arc01
     groups:
-      - 'umcg-atd'
+      - umcg-atd
     archive_system: 'archive.surfsara.nl'
     archive_user: 'umcg-atd-dm'
     archive_system_fingerprints:
