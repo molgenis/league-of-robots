@@ -109,3 +109,36 @@ The `.mount` file declares mounting from remote system, by using `fuse.sshfs`.
 In the back it uses a regular `ssh` connection. The conneciton is defined in the
 `/root/.ssh/conf.d/remote_archive`.
 Connection is multiplexed for all groups and persistent (2h).
+
+# Debug
+
+## Check if services are running
+
+For both .automount and .mount services.
+
+You can either look for the available services in the `systemctl` (and look for .automount and .mount).
+Or browse for those file extensions in the `/etc/systemd/systemd/`.
+
+    [root@talos system]# systemctl status 'groups-umcg\x2datd-arc01.automount'
+    [root@talos system]# systemctl status 'groups-umcg\x2datd-arc01.mount'
+
+## Changes in the service files
+
+Will not be automatically reflected in the systemd. You must first run the
+
+    [root@talos system]# systemctl daemon-reload
+
+and then either of the
+
+    [root@talos system]# systemctl status 'groups-umcg\x2datd-arc01.automount'
+    [root@talos system]# systemctl restart 'groups-umcg\x2datd-arc01.automount'
+
+
+## Check the connection to the remote system
+
+    [root@talos system]# ssh umcg-atd-dm@archive.surfsara.nl
+
+## Check if multiplexing is working
+
+    [root@talos system]# netstat -tpn | grep 145
+    tcp        0      0 10.10.1.195:52316       145.100.5.8:22          ESTABLISHED 194899/ssh

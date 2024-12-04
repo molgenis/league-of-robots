@@ -5,6 +5,14 @@
   listen: 'archive_systemd_reload'
   become: true
 
+- name: Stop mounts
+  ansible.builtin.systemd_service:
+    name: "{{ item + '.mount' }}"
+    state: stopped
+  listen: 'archive_mount_stop'
+  with_items: "{{ desired_auto_mounts }}"
+  become: true
+
 - name: Enable and start automounts
   ansible.builtin.systemd_service:
     name: "{{ item + '.automount' }}"

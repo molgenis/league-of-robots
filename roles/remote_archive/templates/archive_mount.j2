@@ -9,7 +9,15 @@ Description=Mount for {{ item.1 }}
 What={{ item.0.archive_user }}@{{ item.0.archive_system }}:/home/{{ item.0.archive_user }}/{{ item.0.name }}/{{ item.1 }}
 Where=/groups/{{ item.1 }}/{{ item.0.name }}
 Type=fuse.sshfs
-Options=users,idmap=user,IdentityFile="{{ archive_ssh_key_location }}",reconnect,default_permissions,allow_other,uid={{ item.1 }}-dm,gid={{ item.1 | trim() }}
+# ServerAliveInterval - ssh sends every 2 seconds a message to the server requesting a response
+# ServerAliveCountMax - and max 2 times if responding
+# max_conns - each sshfs mount allows up to this number of connections
+# ControlPersist - automount disconnects after 3 minutes, this ssh connection stays for 5 min
+# ControlPath - even tho every connection to server should and *does* use ssh settings from ~/.ssh/conf.d
+#               the sshfs somehow ignores global settings and creates new connections - this prevents it
+Options=ServerAliveCountMax=2,ServerAliveInterval=2,max_conns=2,ControlPersist=300,ControlPath=/root/.ssh/tmp/%%C,users,idmap=user,IdentityFile="{{ archive_ssh_key_location }}",reconnect,default_permissions,allow_other,uid={{ item.1 }}-dm,gid={{ item.1 | trim() }},_netdev
+# This prevents: when redeploying the role, systemd must restart .mount service, which fails when users are using mount point
+LazyUnmount=true
 
 [Install]
 WantedBy=multi-user.target
