@@ -83,6 +83,8 @@ all:
               cloud_flavor: umcg.v1.bm.64-512-0
               host_type: baremetal
               host_networks:
+                - name: brmtl_ntwrk
+                  security_group: "{{ stack_prefix }}_cluster"
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
                 - name: "{{ stack_prefix }}_internal_storage"

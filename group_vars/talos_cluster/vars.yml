@@ -111,16 +111,18 @@ cloud_image: RockyLinux-9.3_xfs
 cloud_user: cloud-user
 availability_zone: nova
 stack_networks:
+  - name: brmtl_ntwrk
+    cidr: '172.23.68.0/24'
+    #gateway: '172.23.68.1'
+    #router_network: ???
+    type: management
+    external: true
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
     gateway: '10.10.1.1'
     router_network: vlan16
     type: management
     external: false
-  - name: provision-net
-    cidr: '172.23.66.0/24'
-    type: management
-    external: true
   - name: "{{ stack_prefix }}_internal_storage"
     cidr: '10.10.2.0/24'
     type: storage
