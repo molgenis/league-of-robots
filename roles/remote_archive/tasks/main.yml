@@ -43,7 +43,7 @@
     - 'groups'
   notify:
     - 'archive_systemd_reload'
-    - 'archive_mount_enable'
+    - 'archive_automount_enable'
   when:
     - archive_groups is defined
     - inventory_hostname in groups['user_interface'] | default([])

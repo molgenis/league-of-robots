@@ -10,7 +10,7 @@
     name: "{{ item + '.automount' }}"
     state: started
     enabled: true
-  listen: 'archive_mount_enable'
+  listen: 'archive_automount_enable'
   with_items: "{{ desired_auto_mounts }}"
   become: true
 ...
