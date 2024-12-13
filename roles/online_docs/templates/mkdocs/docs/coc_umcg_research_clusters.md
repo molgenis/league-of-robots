@@ -1,4 +1,4 @@
-#Code of Conduct UMCG Research IT High Performance Compute Clusters
+# Code of Conduct UMCG Research IT High Performance Compute Clusters
 Version 26-9-2024
 
 The following is the Code of Conduct that the Investigator agrees to abide by as a user of the UMCG HPC clusters. 
@@ -7,7 +7,7 @@ all data and groups obtained through the HPC clusters.
 
 The code of conduct consists of 2 parts: part 1 for the user, part 2 for the owner of a group on the cluster
 
-##Part 1: Rules for users of the UMCG HPC cluster:
+## Part 1: Rules for users of the UMCG HPC cluster:
 - Permission to access the HPC cluster is limited to users who have completed the UMCG
 e-learing: "Privacy in research". If you have a contract (aanstelling) with the UMCG go to lms.umcg.nl and search 
 for privacy to find the e-learing. If this does not work or you do not have a UMCG contract please go to:
@@ -46,7 +46,7 @@ data integrity.
 indirect, consequential or incidental, damages or losses arising from any use of the HPC cluster by anyone, or 
 arising from the unavailability of, or break in access to, the HPC cluster for whatever reason.
 
-###General
+### General
 - We assume that you are familiar with some basic knowledge about Linux command line (shell) navigation and shell 
 scripting. If you never worked on the command line, consider some Linux tutorials on the subject first and sign 
 up for the RUG cluster courses. Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)
@@ -54,18 +54,18 @@ Hábrók geavanceerd | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)
 - We expect you to exploit our documentation before asking for help:
 http://docs.gcc.rug.nl/
 
-###Mailing List
+### Mailing List
 - We communicate upcoming events (e.g. maintenance downtimes) on our low volume
 mailing list. You will automatically be subscribed to this list during activation of your
 cluster account.
 
-###Security
+### Security
 - Do not share your account
 - If using public key authentication, never share your private key (also not with our
 helpdesk!). If you by accident shared your private key with anyone (including our
 helpdesk) you have to make
 
-###General Communication with the Cluster Administrators
+### General Communication with the Cluster Administrators
 - Please mail us at hpc.helpdesk@umcg.nl for questions, issues or comments regarding our clusters.
 - Do not use the personal email address of a cluster administrator. This is important
 because it keeps all administrators informed about the ongoing problem-solving process, and if one administrator 
@@ -74,7 +74,7 @@ is not available, another administrator can help you with your question.
 answer mail from the last problem that you received from us or even worse by replying to a mailing list email you 
 received from us.
 
-###Problem-Solving Process
+### Problem-Solving Process
 - Exploit resources provided by your institute/research group before asking our staff about domain-specific 
 problems. We make an effort to help you, but we are no experts in your field, hence a colleague from your group 
 who uses the cluster to solve a similar problem like you do might be a better first contact
@@ -87,7 +87,7 @@ to provide further support
 error messages, the path to the job script, the id of the job, and other hints that make the problem-solving 
 process as economic as possible (screenshots are very welcome).
 
-###Housekeeping
+### Housekeeping
 - Clean up your home directory frequently, in particular before asking for an increase of your quota limit
 - Do not save thousands of files in a single directory. Distribute the files to subdirectories.
 - If you have any results from your computations that you want to store, do not keep them on the temporary (tmp) 
@@ -95,12 +95,12 @@ storage systems but as the datamanager of your group to move them to the permane
 prm filesystem is regularly backed up to tape whereas data on tmp is not. If anything happens to the tmp 
 filesystem all data on there can be gone with no possibility to restore it.
 
-###Job Submission
+### Job Submission
 - Before submitting the same job a hundred times, please verify that the job finishes
 successfully. We often experience that hundreds of jobs getting killed due to an invalid path referenced in the 
 job script.
 
-###Cluster Performance
+### Cluster Performance
 - DO NOT run resource-intensive computations directly on the login node AKA submit
 node AKA Head node. This will have a negative impact on the performance of the whole cluster. Instead, generate a 
 job script that carries out the computations and submit this job script to the cluster using sbatch.
@@ -108,7 +108,7 @@ job script that carries out the computations and submit this job script to the c
 Such a program usually run as a background process (daemon) rather than being under the direct control of an 
 interactive user. We will immediately kill such processes.
 
-##Part 2: Rules for owners of a group on the UMCG HPC cluster:
+## Part 2: Rules for owners of a group on the UMCG HPC cluster:
 
 The rules for users (part 1 of this Code of Conduct) also apply for group owners
 Group owners are responsible for :
@@ -119,7 +119,7 @@ Group owners are responsible for :
 - paying the annual costs associated with their cluster group. For this the group owner will need to provide a 
 budget number or “kostenplaats”.
 
-Conclusion and signature:
+### Conclusion and signature:
 
 I read and understand the UMCG HPC Code of Conduct. I declare that I will abide by it and will act accordingly. I 
 understand that failure to adhere to the Code of Conduct will have repercussions for my access to the HPC 
