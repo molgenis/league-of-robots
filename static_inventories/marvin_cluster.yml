@@ -15,7 +15,7 @@ all:
               assign_floating_ip: true
     docs:
       hosts:
-        docs_on_merlin:
+        docs-on-bateleur:
     sys_admin_interface:
       hosts:
         marvin:

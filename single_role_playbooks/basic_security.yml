@@ -5,9 +5,11 @@
     - basic_security
 - hosts:
     - build_server
+    - cluster
     - data_transfer
     - docs
     - irods
+    - jenkins
     - logs
     - repo
   roles:

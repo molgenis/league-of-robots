@@ -14,12 +14,12 @@
     #
     # ToDo: Management of network interfaces changed in EL >= 8,
     # which uses NetworkManager and a different way of device naming.
-    # This role needs an update...
+    # This role will only modify generic settings for all interfaces on EL >= 8,
+    # but needs an update to manage specific interfaces...
     #
     - role: interfaces
       when:
         - ansible_facts['os_family'] == "RedHat"
-        - ansible_facts['distribution_major_version'] <= "7"
     - iptables
     - ssh  # client
     - grub

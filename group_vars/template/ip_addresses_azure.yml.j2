@@ -1,0 +1,38 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
+---
+{# #
+   # For Azure
+   #}
+ip_addresses:
+{% for server_info in relevant_servers_info | sort(attribute='name') %}
+  {% set each_hostname = server_info.name %}
+  {% if hostvars[each_hostname]['azure_flavor'] is defined %}
+  {{ each_hostname }}:
+  {% for each_network in hostvars[each_hostname]['host_networks'] | default([]) | sort %}
+    {% for private_ip_results in hostvars[each_hostname]['nic_info']['results'] %}
+    {% if private_ip_results['item']['name'] == each_network.name %}
+    {{ each_network.name }}:
+      address: {{ private_ip_results['networkinterfaces'][0]['ip_configurations'][0]['private_ip_address'] }}
+      netmask: /32
+      {% if each_network.assign_floating_ip is defined and each_network.assign_floating_ip is true %}
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
+      {% endif %}
+    {% endif %}
+    {% endfor %}
+    {% for public_ip_results in hostvars[each_hostname]['public_ips']['results'] %}
+    {% if public_ip_results['item']['name'] == each_network.name and public_ip_results['publicipaddresses']|length > 0 %}
+    {{ each_network.name }}_public:
+      address: {{ public_ip_results['publicipaddresses'][0]['ip_address'] }}
+      netmask: /32
+      {% if public_ip_results['publicipaddresses'][0]['dns_settings']['fqdn'] is defined %}
+      {% set fqdn = public_ip_results['publicipaddresses'][0]['dns_settings']['fqdn'] %}
+      fqdn: '{{ fqdn }}'
+      {% else %}
+      fqdn: 'WARNING: Check manually for DNS CNAME records a.k.a. aliases: we cannot reverse lookup an alias automagically.' %}
+      {% endif %}
+    {% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% endif %}
+{% endfor %}
+...

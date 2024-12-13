@@ -77,13 +77,13 @@
         - {{ public_key }}
         {% endif %}
       {% endfor %}
-      {% if volumes | default([]) is defined and volumes | default([]) | length > 0 %}
+      {% if local_mounts | default([]) is defined and local_mounts | default([]) | length > 0 %}
       mounts:
-        {% for extra_volume in volumes | default([]) %}
-        - - {{ extra_volume['device'] }}
-          - {{ extra_volume['mount_point'] }}
-          - {{ extra_volume['type'] }}
-          - {{ extra_volume['mount_options'] }}
+        {% for extra_mount in local_mounts | default([]) %}
+        - - {{ extra_mount['device'] }}
+          - {{ extra_mount['mount_point'] }}
+          - {{ extra_mount['type'] }}
+          - {{ extra_mount['mount_options'] }}
         {% endfor %}
       {% endif %}
     availability_zone: "{{ availability_zone }}"

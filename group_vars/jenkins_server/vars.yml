@@ -86,7 +86,7 @@ jenkins_plugins:
   - name: analysis-model-api
     version: 12.3.3
   - name: ghprb
-    version: 1.142.2
+    version: 1.42.2
   - name: github-api
     version: 1.318-461.v7a_c09c9fa_d63
   - name: git-client
@@ -99,7 +99,7 @@ jenkins_plugins:
     version: 1291.v51fd2a_625da_7
   - name: workflow-job
     version: 1400.v7fd111b_ec82f
-  - name: workflow-multibrach
+  - name: workflow-multibranch
     version: 773.vc4fe1378f1d5
   - name: workflow-basic-steps
     version: 1058.vcb_fc1e3a_21a_9

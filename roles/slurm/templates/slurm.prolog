@@ -14,7 +14,7 @@ LOCAL_SCRATCH_DIR='{{ slurm_local_scratch_dir }}'
 #
 # Check if local scratch dir is mountpoint and hence not a dir on the system disk.
 #
-if [[ $(stat -c '%d' "${LOCAL_SCRATCH_DIR}") -eq $(stat -c '%d' "${LOCAL_SCRATCH_DIR}/..") ]]; then
+if [[ $(stat -c '%d' "${LOCAL_SCRATCH_DIR}") -eq $(stat -c '%d' "/") ]]; then
     logger -s "WARN: local scratch disk (${LOCAL_SCRATCH_DIR}) for Slurm jobs is not mounted/available."
 else
     #

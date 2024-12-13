@@ -17,19 +17,20 @@ UseDNS no
 Protocol 2
 
 {% if ansible_facts['os_family'] == "RedHat"
-  and ansible_facts['distribution_major_version'] >= "8" %}
+  and ansible_facts['distribution_major_version'] >= "9" %}
 #
 # Minimal RSA key size
 #
 RequiredRSASize 4096
-
+{% endif %}
+{% if ansible_facts['os_family'] == "RedHat"
+  and ansible_facts['distribution_major_version'] >= "8" %}
 #
 # Disable printing of MOTD by sshd itself,
 # which is already printed by the pluggable authentication module (PAM) motd.so
 # configured in /etc/pam.d/sshd
 #
 PrintMotd no
-
 #
 # Include additional config files including one used to follow the "system wide crypto policies"
 # See manual pages for update-crypto-policies(8) and sshd_config(5).

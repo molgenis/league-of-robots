@@ -9,6 +9,7 @@
     - role: sssd
       when: use_sssd | default(false) | bool
     - sshd
+    - basic_security
     - regular_users
     - lustre_client
     - nfs_client

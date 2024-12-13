@@ -9,8 +9,8 @@ If you are completely new here, please:
 
  * [follow these instructions to request an account](../accounts/).
  * [follow these instructions to login using your account](../logins/).
-
-## 1. Using the EGA FUSE client.
+{% if ega_fuse_client_mounts is defined %}
+## Using the EGA FUSE client.
 
 Solve-RD samples are read-only available on {{ slurm_cluster_name | capitalize }} via the
 [EGA FUSE client](https://github.com/EGA-archive/ega-fuse-client).
@@ -41,8 +41,8 @@ followed by cleanup from ```tmp``` to free up space for a next batch.
 Unfortunately the _EGA FUSE client_ is not so fast,
 so you may prefer to use the _EGA FUSE client_ client only to lookup which data is available from which paths
 and then do the staging of large files using the _EGA Python API_ with _pyEGA3_ (see below).
-
-## 2. Using the EGA Python API with pyEGA3.
+{% endif %}
+## Using the EGA Python API with pyEGA3.
 
 To be able to use pyEGA3 you need a username and password provided by the [EGA](https://ega-archive.org).
 These EGA credentials are not the same as your account for the {{ slurm_cluster_name | capitalize }} cluster 

@@ -30,4 +30,5 @@ cluster_common_packages:
     - vim
     - wget
     - yum-utils
+repo_manager: 'none'
 ...

@@ -26,19 +26,4 @@
     enabled: true
   become: true
   listen: rsyslog_enable
-
-- name: Enable rsyslog-restart.service
-  ansible.builtin.service:
-    name: rsyslog-restart.service
-    enabled: true
-  become: true
-  listen: restart_service_enable
-
-- name: Start and enable rsyslog-restart.timer
-  ansible.builtin.service:
-    name: rsyslog-restart.timer
-    state: started
-    enabled: true
-  become: true
-  listen: restart_timer_enable
 ...

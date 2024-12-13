@@ -2,7 +2,7 @@
 ip_addresses:
   airlock:
     vlan983:
-      address: 172.23.40.36
+      address: 172.23.40.39
       netmask: /32
     vlan16:
       address: 129.125.60.196

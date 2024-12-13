@@ -8,27 +8,32 @@ set -ue
 _PRM_MOUNT="{{ each_ogm_server['prm_location'] }}"
 # check if mount point is set
 if ! mountpoint -q "${_PRM_MOUNT}"; then
-   logger -t ogm_backup "${0}: backup folder '${_PRM_MOUNT}' is not mounted, exiting the backup script!"
+   echo "$(date +%Y%m%d-%H%M%S) ${0}: ${_OGM_SERVER} backup folder '${_PRM_MOUNT}' is not mounted, exiting the backup script!"
    exit 1
 fi
 _OGM_SERVER="{{ each_ogm_server['server'] | default("error_remote_server")}}"
 _OGM_USER="{{ each_ogm_server['user'] | default("error_remote_user") }}"
 _PRM_SERVER_DIR="${_PRM_MOUNT}/${_OGM_SERVER}"
 
+if ! test -d "${_PRM_SERVER_DIR}"; then
+   echo "$(date +%Y%m%d-%H%M%S) Directory missing, making one now (${_PRM_SERVER_DIR}) ..."
+   mkdir -m 0750 "${_PRM_SERVER_DIR}"
+fi
+
 #
 ## Running commands on remote server
 #
 {% if each_ogm_server['backup_commands'] is defined and each_ogm_server['backup_commands'] | length > 0 %}
 {% for each_command in each_ogm_server['backup_commands'] %}
-logger -t ogm_backup "${0}: started command {{ each_command['label'] }} ..."
+echo "$(date +%Y%m%d-%H%M%S) ${0}: ${_OGM_SERVER} started command {{ each_command['label'] }} ..."
 # Postgres dump of entire database, compressed and stored in the postgres location
 # Prevent timeout during long dump operation, max 4h
 ssh -o ServerAliveInterval=120 -o ServerAliveCountMax=120 "${_OGM_USER}"@"${_OGM_SERVER}" "{{ each_command['command'] }}"
 EXITVALUE=$?
 if [[ "${EXITVALUE}" -eq "0" ]]; then
-   logger -t ogm_backup "${0}: running command '{{ each_command['label'] }}' succeed"
+   echo "$(date +%Y%m%d-%H%M%S) ${0}: ${_OGM_SERVER} running command '{{ each_command['label'] }}' succeed"
 else
-   logger -t ogm_backup "${0}: running command '{{ each_command['label'] }}' failed (exited with ${EXITVALUE})"
+   echo "$(date +%Y%m%d-%H%M%S) ${0}: ${_OGM_SERVER} running command '{{ each_command['label'] }}' failed (exited with ${EXITVALUE})"
 fi
 
 {% endfor %}
@@ -41,14 +46,18 @@ fi
 {% for each_directory in each_ogm_server['backup_source_dirs'] %}
 _SERVER_EACHDIR="{{ each_directory | default("wrong_server_dir")}}"
 _PRM_EACHDIR="/${_PRM_SERVER_DIR:-error_prm_dir}/${_SERVER_EACHDIR:-error_server_dir}"
-test -d "${_PRM_EACHDIR}" || echo "${_PRM_EACHDIR} does not exist"
-logger -t ogm_backup "${0}: backup ${_SERVER_EACHDIR} started"
+if ! test -d "${_PRM_EACHDIR}"; then
+   echo "$(date +%Y%m%d-%H%M%S) Directory missing, making one now (${_PRM_EACHDIR}) ..."
+   mkdir -m 0750 -p "${_PRM_EACHDIR}"
+fi
+
+echo "$(date +%Y%m%d-%H%M%S) ${0} ${_OGM_SERVER}: backup begin ${_SERVER_EACHDIR}"
 rsync -rtogp --log-file="${_PRM_SERVER_DIR}/rsync.${_SERVER_EACHDIR##*\/}.log" --bwlimit=50m --rsync-path='sudo -u root rsync' "${_OGM_USER}"@"${_OGM_SERVER}":"${_SERVER_EACHDIR}"/ "${_PRM_EACHDIR}"/ 2>&1 1>/dev/null
 EXITVALUE=$?
 if [[ "${EXITVALUE}" -eq "0" ]]; then
-   logger -t ogm_backup "${0}: backup of ${_SERVER_EACHDIR} successfully finished"
+   echo "$(date +%Y%m%d-%H%M%S) ${0} ${_OGM_SERVER}: backup ended ${_SERVER_EACHDIR} (success)"
 else
-   logger -t ogm_backup "${0}: backup of ${_SERVER_EACHDIR} had an error: ${EXITVALUE}"
+   echo "$(date +%Y%m%d-%H%M%S) ${0} ${_OGM_SERVER}: backup error ${_SERVER_EACHDIR} with exit value of ${EXITVALUE}"
 fi
 
 {% endfor %}

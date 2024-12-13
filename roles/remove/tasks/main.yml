@@ -1,7 +1,9 @@
 ---
 #
-# Note we cannot simply delete the subscription-manager RPM,
-# because the docker RPMs have a silly dependency on this subscription-manager.
+# Note we delete the subscription-manager RPMs,
+# but the docker RPMs have a silly dependency on this subscription-manager.
+# So if anything installs Docker later on, then it could re-enable the subscription-manager.
+# Therefore we also explicitly disable it in the config file if that exists.
 #
 - name: Check if /etc/yum/pluginconf.d/subscription-manager.conf exists.
   ansible.builtin.stat:
@@ -26,12 +28,19 @@
   ansible.builtin.package:
     state: absent
     name:
+      - containers-common  # Used by Docker
+      - docker
+      - docker-client
+      - docker-common
       - tuned
       - polkit  # Security risk due to bug and we don't need it!
       - polkit-pkla-compat # polkit dependency.
       - cockpit-system  # EL9 only
       - cockpit-bridge  # EL9 only
       - cockpit-ws  # EL9 only
+      - subscription-manager
+      - subscription-manager-rhsm
+      - subscription-manager-rhsm-certificates
   become: true
 
 - name: 'Remove old Singularity config if present (Superseeded by Apptainer config).'
@@ -39,4 +48,10 @@
     state: absent
     path: /etc/singularity/
   become: true
+
+- name: 'Clean azure image of microsoft bloatware.'
+  ansible.builtin.include_tasks:
+    file: clean_azure_image.yml
+  when:
+    - hostvars[inventory_hostname]['azure_flavor'] is defined
 ...

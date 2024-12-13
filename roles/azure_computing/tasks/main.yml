@@ -1,0 +1,65 @@
+---
+# Create the servers.
+- name: Create network ports, volumes and servers.
+  ansible.builtin.include_tasks:
+    file: azure_servers.yml
+  when:
+    - hostvars[inventory_hostname]['azure_flavor'] is defined
+
+- name: Get the existing network interface of the VM
+  azure.azcollection.azure_rm_networkinterface_info:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ inventory_hostname }}-{{ item.name }}_nic"
+  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
+  when:
+    - hostvars[inventory_hostname]['azure_flavor'] is defined
+  register: nic_info
+
+- name: Get VMs public IP
+  azure.azcollection.azure_rm_publicipaddress_info:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
+  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
+  when:
+    - hostvars[inventory_hostname]['azure_flavor'] is defined
+  register: public_ips
+
+- name: Get facts for all virtual machines of a resource group
+  azure.azcollection.azure_rm_virtualmachine_info:
+    resource_group: "{{ azure_resource_group }}"
+  register: azure_vms_info
+
+- name: "Add IP addresses to {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new"
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/group_vars/template/ip_addresses_azure.yml.j2"
+    dest: "{{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new"
+    mode: '0644'
+  vars:
+    relevant_servers_info: "{{ azure_vms_info.vms | selectattr('name', 'in', stack_hosts_created_in_azure) | list }}"
+  run_once: true
+
+- name: "Create {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new"
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/group_vars/template/ssh_client_settings.yml.j2"
+    dest: "{{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new"
+    mode: '0644'
+  run_once: true
+
+- name: "ToDo"
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+                    Ansible created:
+                        {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new
+                        {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new
+                    Please inspect these files carefully with:
+                        diff -y {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml{.new,}
+                        diff -y {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml{.new,}
+                    and if both are Ok execute:
+                        mv {{ playbook_dir }}/group_vars/{{ stack_name }}//ip_addresses.yml{.new,}
+                        mv {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml{.new,}
+         ***********************************************************************************************************
+  run_once: true
+  failed_when: true  # Make sure to always interrupt any playbook here.
+...

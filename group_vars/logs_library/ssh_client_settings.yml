@@ -7,6 +7,8 @@ ssh_client_known_hosts: "\
   *earl2,\
   *earl3,\
   *earl4,\
+  *earl5,\
+  *earl6,\
   *logs-* \
   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFKkqDp9toXqd25SjKzjhoitXPGPPvmCENcTTVF+4nqu CA key for logs_library"
 ...

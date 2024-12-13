@@ -10,7 +10,7 @@ ssh_client_known_hosts: "\
   *fd-sai,\
   *fd-dai,\
   *fender,\
-  *docs_on_merlin,\
+  *docs-on-bateleur,\
   *fd-* \
   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGCB51l3C8hBmEvkokKCWHCV+N/69PiKhv6gNEVNGDab CA key for Fender cluster"
 ...

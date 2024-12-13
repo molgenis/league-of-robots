@@ -1,0 +1,9 @@
+- name: Mount extra local file systems.
+  hosts:
+     - nfs_server
+     - compute_node
+     - deploy_admin_interface
+     - data_transfer
+  roles:
+     - local_storage
+...

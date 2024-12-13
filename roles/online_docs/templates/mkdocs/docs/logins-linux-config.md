@@ -93,6 +93,10 @@ Open your ```${HOME}/.ssh/conf.d/{{ slurm_cluster_name }}``` file in a text edit
 #
 Host {% for jumphost in groups['jumphost'] %}{{ jumphost }}* {% endfor %}{% raw %}{% endraw %}
     #
+    # Include generic settings for multiple stacks.
+    #
+    Include conf.d/generic
+    #
     # Default account name when not specified explicitly.
     #
     User youraccount

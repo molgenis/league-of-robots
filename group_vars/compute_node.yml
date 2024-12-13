@@ -1,5 +1,5 @@
 ---
-volumes:
+local_mounts:
   - mount_point: "{{ slurm_local_scratch_dir }}"
     device: '/dev/vdb'
     mounted_owner: root

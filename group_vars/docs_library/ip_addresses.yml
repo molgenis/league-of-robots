@@ -1,12 +1,20 @@
 ---
 ip_addresses:
-  docs_on_merlin:
+  docs-on-bateleur:
     docs_internal_management:
-      address: 10.10.1.165
+      address: 10.10.1.158
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    vlan16:
-      address: 195.169.22.179
+    external:
+      address: 195.169.23.109
       netmask: /32
       fqdn: 'docs.gcc.rug.nl'
+  docs_internal_management-external-router:
+    docs_internal_management:
+      address: 10.10.1.1
+      netmask: /32
+    external:
+      address: 195.169.23.169
+      netmask: /32
+      fqdn: 'NXDOMAIN'
 ...

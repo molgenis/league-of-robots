@@ -3,5 +3,6 @@
   hosts:
     - data_transfer
   roles:
-    - cleanup_gs_data
+    - role: cleanup_gs_data
+      when: '"umcg-genomescan" in regular_groups'
 ...

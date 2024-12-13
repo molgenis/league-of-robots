@@ -10,7 +10,7 @@ ssh_client_known_hosts: "\
   *cf-transfer*,\
   195.169.23.88,\
   *copperfist,\
-  *docs_on_merlin,\
+  *docs-on-bateleur,\
   *cf-* \
   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOgd3uhXGZ1cYE+/EcT3Gd4AsY6rnX/zr0IYcod7vj+c CA key for Copperfist"
 ...

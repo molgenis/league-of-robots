@@ -1,0 +1,16 @@
+---
+- name: Create security groups.
+  ansible.builtin.include_tasks:
+    file: security_groups.yml
+
+- name: Create networks and subnets.
+  ansible.builtin.include_tasks:
+    file: networks.yml
+  vars:
+    network_name: "{{ item }}"
+    network_cidr: "{{ azure_networks | selectattr('name', 'equalto', item) | map(attribute='cidr') | first }}"
+    network_security_group: "{{ azure_networks | selectattr('name', 'equalto', item) | map(attribute='security_group') | first }}"
+  with_items: "{{ azure_networks | map(attribute='name') }}"
+
+# TODO: storage networks.
+...

@@ -11,8 +11,7 @@ wh_infra_catalog:
         wh-sai:
         wh-repo:
         wh-transfer:
-        wh-node-a01:
-        wh-node-a02:
+        wh-node-b01:
     wh_vm_2:
       vars:
         location: MIT cloud in CBC and DCE # VMware stretched cluster in multiple data centers.

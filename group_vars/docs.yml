@@ -1,5 +1,5 @@
 ---
-os_distribution: 'centos7'
+os_distribution: 'rocky9'
 # This is enforcing that docs server uses `yum_repos` to create
 # yum repositories, since docs servers do not use Pulp.
 repo_manager: 'none'
@@ -23,7 +23,6 @@ iptables_allow_icmp_inbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
-  - "{{ marvin_cluster.ip_addresses['dock']['Internet-GDR'] }}"
 iptables_allow_ssh_inbound:
   - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
   - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
@@ -34,7 +33,6 @@ iptables_allow_ssh_inbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
-  - "{{ marvin_cluster.ip_addresses['dock']['Internet-GDR'] }}"
 iptables_allow_http_inbound:
   - ANY
 iptables_allow_https_inbound:

@@ -52,7 +52,7 @@ prereq_pip_packages:
   - Jinja2==3.1.2
   - jsonschema==4.19.0
   - jsonschema-specifications==2023.7.1
-  - libcomps==0.1.15.post1
+  - libcomps==0.1.21.post1
   - lxml==4.9.3
   - MarkupPy==1.14
   - MarkupSafe==2.1.3

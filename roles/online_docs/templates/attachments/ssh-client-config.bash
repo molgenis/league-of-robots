@@ -334,6 +334,10 @@ EOFGENERIC
 #
 Host{% for jumphost in groups['jumphost'] %} {{ jumphost }}*{% endfor %}
     #
+    # Include generic settings for multiple stacks.
+    #
+    Include conf.d/generic
+    #
     # Default account name when not specified explicitly.
     #
     User ${_user}

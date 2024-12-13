@@ -14,7 +14,7 @@
   with_items: "{{ soft_partitions }}"
   become: true
 
-- name: Create a disk image file - this will take a lot of time ...
+- name: Create a disk image file
   community.general.filesize:
     path: "{{ item.src }}"
     size: "{{ item.size }}G"
@@ -22,6 +22,7 @@
     owner: root
     group: root
     force: false
+    sparse: true    # speedup: most modern file systems (ones we use xfs, btrfs, ext4 ...) support sparse files
   with_items: "{{ soft_partitions }}"
   when:
     - ansible_mounts | selectattr('mount', 'equalto', item.path) | list | length == 0
@@ -33,6 +34,7 @@
     force: false        # prevent formatting the existing filesystem!
     fstype: "{{ item.fstype }}"
     dev: "{{ item.src }}"
+    opts: "{{ item.fsopts }}"
   with_items: "{{ soft_partitions }}"
   when:
     - ansible_mounts | selectattr('mount', 'equalto', item.path) | list | length == 0

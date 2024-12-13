@@ -3,6 +3,7 @@ slurm_cluster_name: 'copperfist'
 stack_domain: ''  # Only add hpc.rug.nl domain when jumphost is registered in DNS.
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'cf'
+stack_dtap_state: production
 slurm_version: '22.05.2-1.el7.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
@@ -14,6 +15,15 @@ slurm_partitions:
     local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G"'
+  - name: dragen  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: cf-dragen  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['dragen']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G" PreemptMode=off'
 slurm_qos_limit_fractions:
   regular-medium:
     group: 1
@@ -39,22 +49,22 @@ motd: |
           Welcome to {{ slurm_cluster_name | capitalize }}
       =========================================================
 additional_etc_hosts:
-  - group: docs_library
+  - group: betabarrel_cluster
     nodes:
-      - name: docs_on_merlin
-        network: vlan16
+      - name: betabarrel
+        network: vlan990
+  - group: betabarrel_cluster
+    nodes:
+      - name: bb-dragen
+        network: vlan990
+  - group: copperfist_cluster
+    nodes:
+      - name: copperfist
+        network: vlan990
   - group: copperfist_cluster
     nodes:
       - name: cf-dragen
         network: vlan990
-  - group: betabarrel_cluster
-    nodes:
-      - name: betabarrel
-        network: vlan13
-  - group: copperfist_cluster
-    nodes:
-      - name: copperfist
-        network: vlan13
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -111,7 +121,7 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-    - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13']['netmask'] }}"
+    - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['netmask'] }}"
 cloud_image: CentOS 7
 cloud_user: centos
 availability_zone: nova
@@ -383,20 +393,33 @@ soft_partitions:
 #
 # Local storage variables.
 #
-volume_group_folders: [
-  { mount_point: '/groups',
-    machines: "{{ groups['data_transfer'] }}",
-    mode: '2750',
-    groups: [
-        "{{ data_transfer_only_group }}"
-      ]},
-  { mount_point: '/groups',
-    machines: "{{ groups['data_transfer'] }}",
-    mode: '2770',
-    groups: [
-        'umcg-genomescan', 'umcg-gst'
-      ]},
-]
+local_mount_subfolders:
+  - mount_point: '/groups'
+    machines: "{{ groups['data_transfer'] }}"
+    folders:
+      - rel_paths:
+          - "{{ data_transfer_only_group }}"
+        mode: '2750'
+        owner: root
+        group: "{{ data_transfer_only_group }}"
+      - rel_paths:
+          - umcg-genomescan
+          - umcg-gst
+        mode: '2770'
+        owner: root
+  - mount_point: '/staging'
+    machines: "{{ groups['dragen'] }}"
+    folders:
+      - rel_paths:
+          - development
+        mode: '0770'
+        owner: umcg-atd-ateambot
+        group: umcg-atd
+      - rel_paths:
+          - slurm
+        mode: '0755'
+        owner: root
+        group: root
 #
 # Shared storage related variables
 #
@@ -459,7 +482,7 @@ pfs_mounts:
 lfs_mounts:
   - lfs: home
     pfs: local_raid
-    rw_machines: "{{ groups['cluster'] }}"
+    rw_machines: "{{ groups['user_interface'] }}"
   - lfs: tmp06
     pfs: local_raid
     groups:
@@ -473,9 +496,9 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
-      - name: umcg-pr
+#      - name: umcg-pr
       - name: umcg-vipt
-    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
     groups:
@@ -636,7 +659,7 @@ lfs_mounts:
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: env06
     pfs: local_raid
-    rw_machines: "{{ groups['deploy_admin_interface'] + groups['compute_node'] + groups['user_interface'] }}"
+    rw_machines: "{{ groups['deploy_admin_interface'] + groups['user_interface'] }}"
 smb_server_users:
   - name: sbsuser
     uid: 501

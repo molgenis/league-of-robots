@@ -1,0 +1,21 @@
+---
+- name: Copy script to destination folder
+  ansible.builtin.template:
+    src: "templates/{{ item }}"
+    dest: "/root/"
+    owner: root
+    group: root
+    mode: '0750'
+  with_items:
+    - cleanup_gs.bash
+  become: true
+
+- name: 'Create cron for weekly cleanup'
+  ansible.builtin.cron:
+    name: "cleanup_gs_data"
+    hour: "9"
+    minute: "0"
+    job: /root/cleanup_gs.bash
+    user: root
+  become: true
+...

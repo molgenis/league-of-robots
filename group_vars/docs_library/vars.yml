@@ -2,16 +2,17 @@
 stack_prefix: 'docs'
 stack_domain: 'gcc.rug.nl'
 stack_name: "{{ stack_prefix }}_library"  # stack_name must match the name of the folder that contains this vars.yml file.
-cloud_image: CentOS 7
-cloud_user: centos
+cloud_image: RockyLinux-9.3_xfs
+cloud_user: cloud-user
 availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
     gateway: '10.10.1.1'
-    router_network: vlan16
+    router_network: external
     type: management
     external: false
+    mtu_size: '1500'
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -19,15 +20,10 @@ nameservers: [
 local_admin_groups:
   - 'admin'
 local_admin_users:
-  - 'egon'
   - 'gerben'
-  - 'henkjan'
   - 'marieke'
-  - 'marloes'
-  - 'morris'
   - 'pieter'
   - 'sandi'
-  - 'wim'
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -69,8 +65,4 @@ external_jumphosts:
     hosts:
       - hostname: cf-porch
         network: external
-  - group: marvin_cluster
-    hosts:
-      - hostname: dock
-        network: Internet-GDR
 ...

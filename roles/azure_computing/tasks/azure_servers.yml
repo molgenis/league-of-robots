@@ -1,0 +1,113 @@
+---
+- name: Compile facts for VMs
+  ansible.builtin.set_fact:
+    public_keys: |
+      {% for public_key in public_keys_of_local_admins %}
+      {% if 'ssh-rsa' not in public_key %}
+      - path: "/home/{{ cloud_user }}/.ssh/authorized_keys"
+        key_data: {{ public_key }}
+      {% endif %}
+      {% endfor %}
+
+- name: Print IPs for each VM
+  ansible.builtin.debug:
+    msg: "{{ vm_ip_configs | from_yaml }}"
+  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
+  vars:
+    vm_ip_configs: |
+      - name: "{{ inventory_hostname }}-{{ item.name }}"
+      {% if ip_addresses[inventory_hostname][item.name]['address'] is defined %}
+        private_ip_address: {{ ip_addresses[inventory_hostname][item.name]['address'] }}
+      {% endif %}
+      {% if item.assign_floating_ip is defined %}
+        public_ip_address_name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
+      {% endif %}
+
+- name: Create network interface(s) for VM
+  azure.azcollection.azure_rm_networkinterface:
+    name: "{{ inventory_hostname }}-{{ item.name }}_nic"
+    virtual_network: "{{ item.name }}"
+    subnet_name: "{{ item.name }}_subnet"
+    ip_configurations: "{{ vm_ip_configs | from_yaml }}"
+    enable_accelerated_networking: true
+    create_with_security_group: true
+    security_group: "{{ item.security_group }}"
+    resource_group: "{{ azure_resource_group }}"
+    location: "{{ azure_location }}"
+  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
+  vars:
+    vm_ip_configs: |
+      - name: "{{ inventory_hostname }}-{{ item.name }}"
+      {% if ip_addresses[inventory_hostname][item.name]['address'] is defined %}
+        private_ip_address: {{ ip_addresses[inventory_hostname][item.name]['address'] }}
+        private_ip_allocation_method: "Static"
+      {% endif %}
+      {% if item.assign_floating_ip is defined and item.assign_floating_ip is true %}
+        public_ip_address_name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
+        public_ip_allocation_method: "Static"
+      {% endif %}
+  register: nic
+
+- name: Assign FQDN to all the public IPs
+  azure.azcollection.azure_rm_publicipaddress:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
+    allocation_method: static
+    domain_name_label: "{{ stack_prefix }}-{{ inventory_hostname }}-{{ (item.name | ansible.builtin.hash('sha1'))[:4] }}"
+  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
+  when:
+    - item.assign_floating_ip is defined
+    - item.assign_floating_ip is true
+
+- name: Create an Azure VM
+  azure.azcollection.azure_rm_virtualmachine:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ inventory_hostname }}"
+    location: "{{ azure_location }}"
+    vm_size: "{{ azure_flavor }}"
+    admin_username: "{{ cloud_user }}"
+    ssh_password_enabled: false
+    ssh_public_keys: "{{ public_keys | from_yaml }}"
+    custom_data: |
+      #jinja2: trim_blocks:True, lstrip_blocks:True
+      #cloud-config
+      password: "{{ cloud_console_pass }}"
+      chpasswd: { expire: False }
+      #
+      # Add each entry to ~/.ssh/authorized_keys for the configured user
+      # or the first user defined in the user definition directive.
+      #
+      ssh_authorized_keys:
+      {% for public_key in public_keys_of_local_admins %}
+        {% if 'ssh-rsa' not in public_key %}
+        - {{ public_key }}
+        {% endif %}
+      {% endfor %}
+    network_interface_names: "{{ vm_nics | from_yaml }}"
+    managed_disk_type: Standard_LRS
+    image:
+      offer: "{{ azure_image[os_distribution].offer }}"
+      publisher: "{{ azure_image[os_distribution].publisher }}"
+      sku: "{{ azure_image[os_distribution].sku }}"
+      version: "{{ azure_image[os_distribution].version }}"
+    plan:
+      name: "{{ azure_image[os_distribution].sku }}"
+      product: "{{ azure_image[os_distribution].offer }}"
+      publisher: "{{ azure_image[os_distribution].publisher }}"
+    started: true
+  vars:
+    vm_nics: |
+      {% for item in hostvars[inventory_hostname]['host_networks'] %}
+      - {{ inventory_hostname }}-{{ item.name }}_nic
+      {% endfor %}
+
+- name: Mount the managed disk to VM
+  azure.azcollection.azure_rm_manageddisk:
+    name: "{{ inventory_hostname }}_managed_disk_{{ local_volume_size_extra }}g"
+    location: "{{ azure_location }}"
+    resource_group: "{{ azure_resource_group }}"
+    disk_size_gb: "{{ local_volume_size_extra }}"
+    managed_by: "{{ inventory_hostname }}"
+    attach_caching: read_only
+  when: local_volume_size_extra is defined and local_volume_size_extra > 0
+...

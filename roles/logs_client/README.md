@@ -176,7 +176,10 @@ will appears on the server side. To run the test, you can execute role with a ta
 
 ## VI. Client debugging
 
-Run:
+Logs do not appear in logs_server / `single_role_playbooks/logs_client.yml -t test` fails?
+Restart rsyslog service on both the logs server and all the problematic clients.
+
+If this fails, then try
 
 - check that the `rsyslog.conf` is in correct format: `rsyslogd -N1 -f /etc/rsyslog.conf`
 - see if rsyslog service is running correctly, and if there are any errors: `systemctl status rsyslog`

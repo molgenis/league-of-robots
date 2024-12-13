@@ -1,0 +1,18 @@
+---
+azure_resource_group: "{{ stack_name }}"
+azure_location: "westeurope"
+
+openstack_api_timeout: 180
+#
+# network_names_of_all_hosts_created_in_azure are the ones specified in the inventory for hosts,
+# which also have a `azure_flavor` specified, indicating these machines are created in Azure
+#
+network_names_of_all_hosts_created_in_azure: "{{ hostvars
+    | json_query('* | [?azure_flavor] | [].host_networks[].name')
+    | flatten
+    | unique }}"
+inventory_groups_with_hosts_created_in_azure: "{{ hostvars
+    | json_query('* | [?azure_flavor] | [].group_names')
+    | flatten
+    | unique }}"
+...

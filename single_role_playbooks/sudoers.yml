@@ -1,5 +1,6 @@
 ---
 - hosts:
+    - sys_admin_interface
     - user_interface
     - chaperone
     - build_server

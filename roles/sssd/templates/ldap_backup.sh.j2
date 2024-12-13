@@ -1,0 +1,31 @@
+#!/bin/bash
+set -euo pipefail
+umask 0077
+
+_ldap_credentials="/etc/openldap/readonly-ldapsearch-credentials.bash"
+if ! test -e "${_ldap_credentials}"; then
+   logger -t ldap_backup "${0}: Error, no LDAP credentials file ${_ldap_credentials}"
+   exit 1
+fi
+source "${_ldap_credentials}"
+
+_ldap_root="/root/ldap_backup"
+cd "${_ldap_root}"
+
+for _each_ldap in "${domain_names[@]}"; do
+   test -e "${_ldap_root}/${_each_ldap}" || mkdir -p -m 700 "${_ldap_root}/${_each_ldap}"
+   _destination="${_ldap_root}/${_each_ldap}"
+   test -e "${_destination}" || mkdir "${_destination}"
+   cd "${_destination}" || { logger -t ldap_backup "${0}: Error, problem with changing dir to ${_destination}"; exit 1; }
+   logger -t ldap_backup "$0: running backup for ${_each_ldap}"
+   /usr/bin/ldapsearch -H "${domain_configs[${_each_ldap}'_uri']}" -D"${domain_configs[${_each_ldap}'_bind_dn']}" -b"${domain_configs[${_each_ldap}'_search_base']}" -w"${domain_configs[${_each_ldap}'_bind_pw']}" -LLL | gzip > "${_destination}/daily-$(date +%u).ldif.gz"
+   ## Check if this weeks backup has been made and if not, make it
+   if ! test -e "${_destination}/weekly-$(date +%Y%U).ldif.gz"; then
+      # Make a copy of the _latest backup as a weekly backup
+      _latest=$(ls -1 "${_destination}"/*.ldif.gz | tail -n 1)
+      logger -t ldap_backup "${0}: Making WEEKLY backup (weekly-$(date +%Y%U).ldif.gz) out of today's backup"
+      cp "${_destination}/daily-$(date +%u).ldif.gz" "${_destination}/weekly-$(date +%Y%U).ldif.gz"
+   fi
+   # Backup-compress all files that are not from this year
+   find . ! -path . ! -name "daily-*.ldif.gz" ! -name "weekly-$(date +%Y)*.ldif.gz" -exec tar --remove-files -czf ${_ldap_root}/${_each_ldap}/backup-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 8).tar.gz {} +
+done

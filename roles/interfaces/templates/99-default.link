@@ -1,0 +1,15 @@
+#
+# This file was deployed with the Ansible interfaces role from the league-of-robots repo
+# and overrides the default from /usr/lib/systemd/network/99-default.link
+# to prefer path-based interface naming over slot-based naming.
+# Slot-based naming is unstable as it initially was not implemented yet, added later
+# and then removed again for virtual interfaces, because it can cause naming conflicts.
+#
+
+[Match]
+OriginalName=*
+
+[Link]
+NamePolicy=keep kernel database onboard path slot
+AlternativeNamesPolicy=database onboard path slot
+MACAddressPolicy=none

@@ -88,6 +88,8 @@ auth_groups:
     gid: 20022
   umcg-ogm:
     gid: 20023
+  umcg-pgx:
+    gid: 20024
 #
 # Default for a group of users that are only allowd to transfer data.
 # Is used by the sshd role and listed in
@@ -114,7 +116,7 @@ pulp_repos:
       remote_url: http://vault.centos.org/centos/7/extras/x86_64/
     - name: epel7
       description: 'Extra Packages for Enterprise Linux 7 (EPEL).'
-      remote_url: https://download.fedoraproject.org/pub/epel/7/x86_64/
+      remote_url: https://download.fedoraproject.org/pub/archive/epel/7/x86_64/
     - name: cpel7
       description: 'UMCG Custom Packages for Enterprise Linux 7 (CPEL).'
       #remote_url: no remote for our homebrew packages.
@@ -242,36 +244,43 @@ yum_repos:
   rocky9:
     - file: rocky.repo
       id: baseos
+      name: Rocky Linux 9 - BaseOS
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-9
       enabled: 1
       gpgcheck: 1
     - file: rocky.repo
       id: baseos-debug
+      name: Rocky Linux 9 - BaseOS Debug
       enabled: 0
     - file: rocky.repo
       id: baseos-source
       enabled: 0
     - file: rocky.repo
       id: appstream
+      name: Rocky Linux 9 - AppStream
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-9
       enabled: 1
       gpgcheck: 1
     - file: rocky.repo
       id: appstream-debug
+      name: Rocky Linux 9 - AppStream Debug
       enabled: 0
     - file: rocky.repo
       id: appstream-source
       enabled: 0
     - file: rocky.repo
       id: crb
+      name: Rocky Linux 9 - CRB
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-9
       enabled: 1
       gpgcheck: 1
     - file: rocky.repo
       id: crb-debug
+      name: Rocky Linux 9 - CRB Debug
       enabled: 0
     - file: rocky.repo
       id: crb-source
+      name: Rocky Linux 9 - CRB Source
       enabled: 0
     #
     # Rocky Security
@@ -288,92 +297,119 @@ yum_repos:
     #
     - file: rocky-addons.repo
       id: highavailability
+      name: Rocky Linux 9 - Addons High Availability
       enabled: 0
     - file: rocky-addons.repo
       id: highavailability-debug
+      name: Rocky Linux 9 - Addons High Availability Debug
       enabled: 0
     - file: rocky-addons.repo
       id: highavailability-source
+      name: Rocky Linux 9 - Addons High Availability Source
       enabled: 0
     - file: rocky-addons.repo
       id: resilientstorage
+      name: Rocky Linux 9 - Addons Resilient Storage
       enabled: 0
     - file: rocky-addons.repo
       id: resilientstorage-debug
+      name: Rocky Linux 9 - Addons Resilient Storage Debug
       enabled: 0
     - file: rocky-addons.repo
       id: resilientstorage-source
+      name: Rocky Linux 9 - Addons Resilient Storage Source
       enabled: 0
     - file: rocky-addons.repo
       id: nfv
+      name: Rocky Linux 9 - Addons NFV
       enabled: 0
     - file: rocky-addons.repo
       id: nfv-debug
+      name: Rocky Linux 9 - Addons NFV Debug
       enabled: 0
     - file: rocky-addons.repo
       id: nfv-source
+      name: Rocky Linux 9 - Addons NFV Source
       enabled: 0
     - file: rocky-addons.repo
       id: rt
+      name: Rocky Linux 9 - Addons RT
       enabled: 0
     - file: rocky-addons.repo
       id: rt-debug
+      name: Rocky Linux 9 - Addons RT Debug
       enabled: 0
     - file: rocky-addons.repo
       id: rt-source
+      name: Rocky Linux 9 - Addons RT Source
       enabled: 0
     - file: rocky-addons.repo
       id: sap
+      name: Rocky Linux 9 - Addons SAP
       enabled: 0
     - file: rocky-addons.repo
       id: sap-debug
+      name: Rocky Linux 9 - Addons SAP Debug
       enabled: 0
     - file: rocky-addons.repo
       id: sap-source
+      name: Rocky Linux 9 - Addons SAP source
       enabled: 0
     - file: rocky-addons.repo
       id: saphana
+      name: Rocky Linux 9 - Addons Saphana
       enabled: 0
     - file: rocky-addons.repo
       id: saphana-debug
+      name: Rocky Linux 9 - Addons Saphana Debug
       enabled: 0
     - file: rocky-addons.repo
       id: saphana-source
+      name: Rocky Linux 9 - Addons Saphana Source
       enabled: 0
     #
     # Rocky Devel
     #
     - file: rocky-devel.repo
       id: devel
+      name: Rocky Linux 9 - Development
       enabled: 0
     - file: rocky-devel.repo
       id: devel-debug
+      name: Rocky Linux 9 - Development Debug
       enabled: 0
     - file: rocky-devel.repo
       id: devel-source
+      name: Rocky Linux 9 - Development Source
       enabled: 0
     #
     # Rocky Extras
     #
     - file: rocky-extras.repo
       id: extras
+      name: Rocky Linux 9 - Extras
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-9
       enabled: 1
       gpgcheck: 1
     - file: rocky-extras.repo
       id: extras-debug
+      name: Rocky Linux 9 - Extras Debug
       enabled: 0
     - file: rocky-extras.repo
       id: extras-source
+      name: Rocky Linux 9 - Extras Source
       enabled: 0
     - file: rocky-extras.repo
       id: plus
+      name: Rocky Linux 9 - Extras Plus
       enabled: 0
     - file: rocky-extras.repo
       id: plus-debug
+      name: Rocky Linux 9 - Extras Plus Debug
       enabled: 0
     - file: rocky-extras.repo
       id: plus-source
+      name: Rocky Linux 9 - Extras Plus Source
       enabled: 0
     #
     # EPEL
@@ -443,13 +479,197 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
+    #
+    # perun
+    #
     - file: perun.repo
       id: perun
       name: 'Perun IdM Slave Scripts'
-      baseurl: 'https://homeproj.cesnet.cz/rpm/perunv3/stable/noarch/'
-      enabled: 1
+      baseurl: 'https://repo.cerit-sc.cz/el-perun/noarch/'
+      gpgkey: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
       gpgcheck: 1
-      gpgkeysource: 'https://homeproj.cesnet.cz/rpm/perunv3/RPM-GPG-KEY-perunv3'
+      enabled: 1
+  oracle8:
+    - file: oracle-linux-ol8.repo
+      id: ol8_baseos_latest
+      name: 'Oracle Linux 8 BaseOS Latest ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/baseos/latest/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: oracle-linux-ol8.repo
+      id: ol8_appstream
+      name: 'Oracle Linux 8 Application Stream ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/appstream/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: virt-ol8.repo
+      id: ol8_kvm_appstream
+      name: 'Oracle Linux $releasever KVM Application Stream ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/kvm/appstream/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_codeready_builder
+      name: 'Oracle Linux 8 CodeReady Builder ($basearch) - Unsupported'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/codeready/builder/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_distro_builder
+      name: 'Oracle Linux 8 Distro Builder ($basearch) - Unsupported'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/distro/builder/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u0_baseos_base
+      name: 'Oracle Linux 8 BaseOS GA ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/0/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u1_baseos_base
+      name: 'Oracle Linux 8.1 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/1/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u2_baseos_base
+      name: 'Oracle Linux 8.2 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/2/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u3_baseos_base
+      name: 'Oracle Linux 8.3 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/3/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u4_baseos_base
+      name: 'Oracle Linux 8.4 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/4/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u5_baseos_base
+      name: 'Oracle Linux 8.5 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/5/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u6_baseos_base
+      name: 'Oracle Linux 8.6 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/6/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u7_baseos_base
+      name: 'Oracle Linux 8.7 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/7/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u8_baseos_base
+      name: 'Oracle Linux 8.8 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/8/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u9_baseos_base
+      name: 'Oracle Linux 8.9 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/9/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_MODRHCK
+      name: 'Latest RHCK with fixes from Oracle for Oracle Linux $releasever ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/MODRHCK/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      priority: 20
+    #
+    # EPEL
+    #  
+    - file: oracle-epel-ol8.repo
+      id: ol8_developer_EPEL
+      name: 'Oracle Linux $releasever EPEL Packages for Development ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/developer/EPEL/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: oracle-epel-ol8.repo
+      id: ol8_developer_EPEL_modular
+      name: 'Oracle Linux $releasever EPEL Modular Packages for Development ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/developer/EPEL/modular/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    #
+    # Addons
+    #
+    - file: oracle-linux-ol8.repo
+      id: ol8_addons
+      name: 'Oracle Linux 8 Addons ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/addons/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    #
+    # Security
+    #
+    - file: oracle-linux-ol8.repo
+      id: ol8_u4_security_validation
+      name: 'Oracle Linux $releasever Update 4 ($basearch) Security Validations'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/4/security/validation/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    #
+    # Kernel
+    #
+    - file: uek-ol8.repo
+      id: ol8_UEKR7
+      name: 'Latest Unbreakable Enterprise Kernel Release 7 for Oracle Linux $releasever ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR7/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0    
+    - file: uek-ol8.repo
+      id: ol8_UEKR6
+      name: 'Latest Unbreakable Enterprise Kernel Release 6 for Oracle Linux $releasever ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1    
+    - file: uek-ol8.repo
+      id: ol8_UEKR7_RDMA
+      name: 'Oracle Linux 8 UEK7 RDMA ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR7/RDMA/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: uek-ol8.repo
+      id: ol8_UEKR6_RDMA
+      name: 'Oracle Linux 8 UEK6 RDMA ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/RDMA/$basearch/
+      gpgkey:file: ///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
 #
 # Iptables additional configurations 
 #
@@ -463,11 +683,19 @@ logs_server_public_networks:
     - name: earl1
       network: vlan16
     - name: earl2
-      network: logs_external_network
+      network: logs_external_public
   diagnostics:
     - name: earl3
-      network: logs_external_network
+      network: logs_external_public
     - name: earl4
       network: vlan16
-
+  research:
+    - name: earl5
+      network: vlan16
+    - name: earl6
+      network: logs_external_public
+#
+## Azure
+#
+azure_location: westeurope
 ...

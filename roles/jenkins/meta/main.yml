@@ -1,0 +1,4 @@
+---
+dependencies:
+    - role: include_vars_from_other_groups
+...

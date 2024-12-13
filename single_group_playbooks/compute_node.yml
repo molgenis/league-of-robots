@@ -13,6 +13,6 @@
   roles:
     - role: perc_cli
       when: perc_devices is defined
-    - mount_volume
+    - local_storage
     - slurm
 ...

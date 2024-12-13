@@ -3,7 +3,10 @@
   ansible.builtin.package:
     state: latest
     update_cache: true
-    name: perun-slave-process-ldap-lsaai
+    name: "{{ item }}"
+  loop:
+    - perun-slave-process-ldap-lsaai
+    - perl-LDAP
   become: true
 
 - name: "Get indexes of the openldap databases"
@@ -81,6 +84,23 @@
       mode: '0640'
       owner: root
       group: lsaai
+  become: true
+
+- name: Make sure files have correct permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  loop:
+    - path: /opt/perun/lib/ldap_lsaai/ldifsort.pl
+      owner: root
+      group: lsaai
+      mode: '0750'
+    - path: /opt/perun/lib//ldap_lsaai/ldifdiff.pl
+      owner: root
+      group: lsaai
+      mode: '0750'
   become: true
 
 - name: "Collect the status of important files and directories"

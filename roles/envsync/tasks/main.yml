@@ -34,14 +34,14 @@
         create_home: false
       become: false
 
-- name: "Create {{ hpc_env_prefix }} folder on root partition unless the machine already has a dedicated mount for {{ hpc_env_prefix }}."
+- name: "Create {{ hpc_env_prefix }} folder in the root of the filesystem unless the machine already has a dedicated mount for {{ hpc_env_prefix }}."
   ansible.builtin.file:
     path: "{{ hpc_env_prefix }}"
     state: directory
     owner: root
     group: "{{ envsync_group }}"
     mode: '2775'
-  when: volumes | default([])
+  when: local_mounts | default([])
         | selectattr('mount_point', 'defined')
         | selectattr('mount_point', 'equalto', hpc_env_prefix)
         | length <= 0

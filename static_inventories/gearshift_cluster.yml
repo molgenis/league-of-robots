@@ -9,6 +9,7 @@ all:
       hosts:
         airlock:
           cloud_flavor: 2C-4GB
+          os_distribution: 'rocky9'
           host_networks:
             - name: vlan983
     repo:
@@ -19,7 +20,7 @@ all:
             - name: vlan983
     docs:
       hosts:
-        docs_on_merlin:
+        docs-on-bateleur:
     sys_admin_interface:
       hosts:
         imperator:

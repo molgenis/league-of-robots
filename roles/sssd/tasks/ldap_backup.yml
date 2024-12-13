@@ -1,0 +1,29 @@
+---
+- name: Create /root/ldap_backups
+  ansible.builtin.file:
+    path: /root/ldap_backup
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: 'Deploy ldap_backup script'
+  ansible.builtin.template:
+    src: ldap_backup.sh.j2
+    dest: /root/ldap_backup.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: 'Install daily cron for ldap backups'
+  ansible.builtin.cron:
+    name: 'Make daily ldap backup - do not change it manually!'
+    hour: '3'
+    minute: '57'
+    user: 'root'
+    disabled: false
+    job: /root/ldap_backup.sh
+  become: true
+...

@@ -1,9 +1,0 @@
-- name: Mount extra volumes.
-  hosts:
-     - nfs_server
-     - compute_node
-     - deploy_admin_interface
-     - data_transfer
-  roles:
-     - mount_volume
-...

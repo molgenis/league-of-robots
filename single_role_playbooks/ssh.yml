@@ -15,6 +15,7 @@
     - jenkins
     - repo
     - chaperone
+    - logs
   roles:
     - ssh
 ...

@@ -7,6 +7,13 @@ ip_addresses:
     subnet-nfs-data-2541:
       address: 10.35.141.105
       netmask: /32
+  hc-node-a01:
+    hc_internal_management:
+      address: 10.10.1.18
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.125
+      netmask: /32
   hc-repo:
     hc_internal_management:
       address: 10.10.1.87
@@ -17,13 +24,6 @@ ip_addresses:
       netmask: /32
     subnet-nfs-data-2541:
       address: 10.35.141.41
-      netmask: /32
-  hc-vcompute01:
-    hc_internal_management:
-      address: 10.10.1.18
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.125
       netmask: /32
   hyperchicken:
     hc_internal_management:

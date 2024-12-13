@@ -7,7 +7,7 @@ all:
           ansible_python_interpreter: /usr/bin/env python
     docs:
       hosts:
-        docs_on_merlin:
+        docs-on-bateleur:
     sys_admin_interface:
       hosts:
         forkhead:
@@ -18,7 +18,7 @@ all:
     deploy_admin_interface:
       hosts:
         forkhead:
-          volumes:
+          local_mounts:
             - mount_point: '/apps'
               device: '/mnt/env12/apps/'
               mounted_owner: root

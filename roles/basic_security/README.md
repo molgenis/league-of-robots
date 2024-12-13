@@ -17,12 +17,6 @@ These values must end up in the sshd.conf as `yes` or `no` and therefore must be
     basic_security_ssh_restart_handler_state: restarted
   ```
 
-- Whether to install/enable `yum-cron` (RedHat-based systems).
-  System restarts will not happen automatically in any case, and automatic upgrades are no excuse for sloppy patch and package management, but automatic updates can be helpful as yet another security measure.
-  ```
-    basic_security_autoupdate_enabled: true
-  ```
-
 - Whether to install/enable `fail2ban`. You might not want to use fail2ban if you're already using some other service for login and intrusion detection (e.g. [ConfigServer](http://configserver.com/cp/csf.html)).
   ```
     basic_security_fail2ban_enabled: true

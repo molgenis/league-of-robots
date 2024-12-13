@@ -16,7 +16,7 @@
         that: "ansible_version.full is version_compare(minimal_ansible_version, '>=')"
         msg: "You must update Ansible to at least {{ minimal_ansible_version }}.x to use this playbook."
       vars:
-        minimal_ansible_version: 2.11
+        minimal_ansible_version: 2.13
       run_once: true  # noqa run-once
       delegate_to: localhost
       connection: local
@@ -34,7 +34,7 @@
       connection: local
       loop:
         - ANSIBLE_ROLES_PATH
-        - ANSIBLE_COLLECTIONS_PATHS
+        - ANSIBLE_COLLECTIONS_PATH
     - name: 'Verify that the group_vars were parsed.'
       ansible.builtin.assert:
         that: stack_name is defined
@@ -42,21 +42,12 @@
       run_once: true  # noqa run-once
       delegate_to: localhost
       connection: local
-    - name: 'Get the major version of the installed Python openstacksdk module.'
-      ansible.builtin.shell:
-        cmd: |
-             set -o pipefail
-             pip show openstacksdk | fgrep -i Version | awk '{print $2}' | grep -o '^[0-9]*'
-      run_once: true  # noqa run-once
-      delegate_to: localhost
-      connection: local
-      register: openstacksdk_major_version
       changed_when: false
     - name: 'Download dependencies from Ansible Galaxy on the Ansible control host.'
       ansible.builtin.command:
         cmd: |
              ansible-galaxy install
-                            -r requirements-{{ openstacksdk_major_version.stdout }}.yml
+                            -r requirements.yml
                             {% if ansible_version.full is version_compare('2.14', '>=') %} --timeout 120{% endif %}
       run_once: true  # noqa run-once
       delegate_to: localhost
@@ -130,6 +121,34 @@
       connection: local
       loop: "{{ find_target_py_result.files | map(attribute='path') | list }}"
       when: find_target_py_result.files | map(attribute='path') | first is defined
+    - name: 'Find the path to pulp/squeezer/plugins/module_utils/pulp_glue.py'
+      ansible.builtin.find:
+        path: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV') }}"
+        pattern: 'pulp_glue.py'
+        recurse: true
+      register: find_pulp_glue_py_result
+      run_once: true  # noqa run-once
+      delegate_to: localhost
+      connection: local
+    - name: "Report the found path to Pulp Squeezer's pulp_glue.py."
+      ansible.builtin.debug:
+        msg: "INFO: Found {{ item }}"
+      run_once: true  # noqa run-once
+      delegate_to: localhost
+      connection: local
+      loop: "{{ find_pulp_glue_py_result.files | map(attribute='path') | list }}"
+      when: find_pulp_glue_py_result.files | map(attribute='path') | first is defined
+    - name: 'Patch list of campatible pulp-glue.py versions for Pulp Squeezer 0.0.16.'
+      ansible.builtin.replace:
+        dest: "{{ item }}"
+        regexp: '^(\s*GLUE_VERSION_SPEC = ">=[0-9\.]+,<0.2)[0-9\.]*"$'
+        replace: '\g<1>9"'
+        backup: true
+      run_once: true  # noqa run-once
+      delegate_to: localhost
+      connection: local
+      loop: "{{ find_pulp_glue_py_result.files | map(attribute='path') | list }}"
+      when: find_pulp_glue_py_result.files | map(attribute='path') | first is defined
     - name: "Find all ip_addresses.yml files in {{ playbook_dir }}/group_vars/*."
       ansible.builtin.find:
         paths: "{{ playbook_dir }}/group_vars/"

@@ -1,0 +1,13 @@
+---
+- name: "Create sub folders in {{ mount_point }}."
+  ansible.builtin.file:
+    path: "{{ mount_point }}/{{ folder[1] }}"
+    owner: "{{ folder[0]['owner'] }}"
+    group: "{{ folder[0]['group'] | default(folder[1]) }}"
+    mode: "{{ folder[0]['mode'] }}"
+    state: 'directory'
+  loop: "{{ folders | subelements('rel_paths') }}"
+  loop_control:
+    loop_var: folder
+  become: true
+...

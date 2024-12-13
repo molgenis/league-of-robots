@@ -10,6 +10,21 @@
   register: create_iptables_extras_d
   loop: "{{ logs_class_servers }}"
   become: true
+  ignore_errors: true
+  ignore_unreachable: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: Count log servers online and offline
+  ansible.builtin.set_fact:
+    logs_failed: "{{ create_iptables_extras_d.results | selectattr('failed', 'defined') | select('equalto', true) | list | length
+            + create_iptables_extras_d.results | rejectattr('failed', 'defined') | list | length }}"
+    logs_all: "{{ logs_class_servers | list | length }}"
+
+- name: Fail if all log servers are offline
+  ansible.builtin.fail:
+    msg: "All attempts to connect to any of log server have failed."
+  failed_when: logs_failed == logs_all
 
 - name: Get public IP of all the clients
   ansible.builtin.uri:
@@ -36,6 +51,10 @@
   loop: "{{ logs_class_servers }}"
   become: true
   notify: restart_server_firewall
+  ignore_errors: true
+  ignore_unreachable: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Force all services to restart, before we continue to configure logs clients
   ansible.builtin.meta: flush_handlers

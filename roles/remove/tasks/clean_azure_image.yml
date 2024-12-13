@@ -1,0 +1,46 @@
+---
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Check and make a list of MS services that are enabled or running
+  ansible.builtin.set_fact:
+    ms_active_services: "{{ ms_active_services | default([]) + [item] }}"
+  when:
+    - item in ansible_facts.services
+  loop:
+    - waagent.service   # Azure Linux Agent
+                        # https://github.com/Azure/WALinuxAgent
+    - auoms.service     # OMS-Auditd-Plugin
+                        # https://github.com/microsoft/OMS-Auditd-Plugin
+    - gcd.service       # The Guest Configuration Extension for Linux
+                        # https://github.com/Azure/Guest-Configuration-Extension
+    - omid.service      # Open Management Infrastructure
+                        # https://github.com/microsoft/omi
+
+- name: Remove MS Azure services
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  with_items: "{{ ms_active_services }}"
+  become: true
+
+- name: Remove MS Azure packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - mdatp
+    - mde-netfilter
+  become: true
+
+- name: Remove all the directories and clean al potentially claimed space
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /var/lib/waagent/
+    - /opt/omi/
+    - /opt/microsoft/
+  become: true
+...

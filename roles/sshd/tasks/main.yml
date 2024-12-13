@@ -62,7 +62,7 @@
     owner: root
     group: root
     mode: '0644'
-  loop: "{{ sshd_crypto_policies }}"
+  loop: "{{ sshd_crypto_policies[os_distribution] }}"
   notify: update-crypto-policies
   become: true
   when:
@@ -126,6 +126,15 @@
   notify: restart_sshd
   become: true
 
+- name: Create /etc/ssh/sshd_config.d if it does not exist
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0655'
+  become: true
+
 - name: Deploy extra sshd config to use patched system wide crypto policy.
   ansible.builtin.template:
     src: 50-crypto-policies.conf
@@ -138,7 +147,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - ansible_facts['distribution_major_version'] >= "9"
 
 #
 # All Diffie-Hellman moduli used for diffie-hellman-group-exchange-sha256 should be at least sshd_moduli_minimum bit long.
@@ -240,7 +249,7 @@
   vars:
     sshd_active_crypto_policies: "{{ sshd_show_crypto_policies.stdout | split(':') }}"
   changed_when: false
-  failed_when: item not in sshd_active_crypto_policies
+  failed_when: item.result not in sshd_active_crypto_policies
   when:
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= "8"
@@ -248,19 +257,25 @@
 
 - name: Check if the configured system-wide crypto policies were applied correctly.
   ansible.builtin.command:
-    cmd: |
-         {{ item.cmd }}
-  register: sshd_check_crypto_policies
+    cmd: 'update-crypto-policies --is-applied'
+  register: sshd_applied_crypto_policies
   changed_when: false
-  loop:
-    - cmd: 'update-crypto-policies --is-applied'
-      result: 'The configured policy is applied'
-    - cmd: 'update-crypto-policies --check'
-      result: 'The configured policy matches the generated policy'
   failed_when:
-    - item.result not in sshd_check_crypto_policies.stdout
+    - "'The configured policy is applied' not in sshd_applied_crypto_policies.stdout"
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= "8"
+
+- name: Check the configured system-wide crypto policies.
+  ansible.builtin.command:
+    cmd: 'update-crypto-policies --check'
+  register: sshd_check_crypto_policies
+  changed_when: false
+  failed_when:
+    - "'The configured policy matches the generated policy' not in sshd_check_crypto_policies.stdout"
+  become: true
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] >= "9"
 ...

@@ -8,6 +8,9 @@ all:
     jumphost:
       hosts:
         corridor:
+          cloud_image: RockyLinux-9.3_xfs
+          os_distribution: 'rocky9'
+          ansible_python_interpreter: /usr/bin/python3
           cloud_flavor: 1c2m20d
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
@@ -22,7 +25,7 @@ all:
               security_group: "{{ stack_prefix }}_repo"
     docs:
       hosts:
-        docs_on_merlin:
+        docs-on-bateleur:
     sys_admin_interface:
       hosts:
         fd-sai:

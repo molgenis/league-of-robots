@@ -11,7 +11,7 @@
     validate_certs: false
   when: pulp_repo['remote_url'] is defined
   vars:
-    ansible_python_interpreter: "/admin/{{ repo_management_user }}/pulp-cli.venv/bin/python"
+    ansible_python_interpreter: "/admin/{{ repo_management_user }}/pulp-cli.venv/bin/python3"
   become: true
   become_user: "{{ repo_management_user }}"
   no_log: true
@@ -20,13 +20,14 @@
   pulp.squeezer.rpm_repository:
     name: "{{ pulp_repo['name'] }}"
     description: "{{ pulp_repo['description'] }}"
+    remote: "{{ omit if pulp_repo['remote_url'] is not defined else pulp_repo['name'] + '-remote' }}"
     state: present
     pulp_url: "{{ pulp_api_baseurl }}"
     username: "{{ pulp_api_user }}"
     password: "{{ pulp_api_password }}"
     validate_certs: false
   vars:
-    ansible_python_interpreter: "/admin/{{ repo_management_user }}/pulp-cli.venv/bin/python"
+    ansible_python_interpreter: "/admin/{{ repo_management_user }}/pulp-cli.venv/bin/python3"
   become: true
   become_user: "{{ repo_management_user }}"
   no_log: true

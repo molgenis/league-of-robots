@@ -13,7 +13,7 @@ ssh_client_known_hosts: "\
   74.234.160.235,\
   *bb-transfer*,\
   *betabarrel,\
-  *docs_on_merlin,\
+  *docs-on-bateleur,\
   *bb-* \
   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINvebE71gLqMX8Qfouj1JoBOP0PkY9cvWDX2v+f5jGXe CA key for betabarrel_cluster"
 ...

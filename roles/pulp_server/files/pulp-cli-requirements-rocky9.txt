@@ -1,0 +1,16 @@
+certifi==2024.8.30
+charset-normalizer==3.3.2
+click==8.1.7
+click-shell==2.1
+idna==3.9
+importlib_metadata==7.0.2
+packaging==23.2
+pulp-cli==0.28.4
+pulp-glue==0.28.4
+Pygments==2.18.0
+PyYAML==6.0.2
+requests==2.31.0
+schema==0.7.7
+toml==0.10.2
+urllib3==2.2.3
+zipp==3.20.2

@@ -12,26 +12,6 @@ ip_addresses:
       netmask: /32
   wh-node-a01:
     vlan1068:
-      address: 172.23.60.17
-      netmask: /32
-    wh_internal_management:
-      address: 10.10.1.65
-      netmask: /32
-    wh_internal_storage:
-      address: 10.10.2.64
-      netmask: /32
-  wh-node-a02:
-    vlan1068:
-      address: 172.23.60.27
-      netmask: /32
-    wh_internal_management:
-      address: 10.10.1.110
-      netmask: /32
-    wh_internal_storage:
-      address: 10.10.2.73
-      netmask: /32
-  wh-node-b01:
-    vlan1068:
       address: 172.23.60.2
       netmask: /32
     wh_internal_management:

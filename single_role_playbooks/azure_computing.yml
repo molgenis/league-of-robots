@@ -1,0 +1,10 @@
+---
+- name: Create servers using Azure API.
+  hosts: all
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: python
+  roles:
+    - azure_computing
+...

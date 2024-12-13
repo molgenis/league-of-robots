@@ -5,23 +5,59 @@
     state: latest
     update_cache: true
   become: true
-- name: 'Update all installed packages (except Slurm and iRODS).'
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] <= "7"
+
+- name: 'Enable automatic updates on EL <= 7.'
+  ansible.builtin.import_tasks:
+    file: auto_update_el7.yml
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] <= "7"
+    - autoupdate_enabled | default(true) | bool
+
+- name: 'Enable automatic updates on EL >= 8.'
+  ansible.builtin.import_tasks:
+    file: auto_update_el8.yml
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] >= "8"
+    - autoupdate_enabled | default(true) | bool
+
+- name: 'Update all installed packages (except Slurm and iRODS) now.'
   ansible.builtin.package:
     name: '*'
     state: latest
     update_cache: true
     exclude: 'slurm*,irods*' # These packages are version locked and we don't want to change that.
-  notify: reboot_for_kernel_update
   become: true
-- name: 'Install cron job to reboot server regularly to activate kernel updates.'
-  ansible.builtin.cron:
-    name: 'Reboot to load new kernel.'
-    weekday: '1'
-    minute: '45'
-    hour: '11'
-    user: root
-    job: /bin/needs-restarting -r >/dev/null 2>&1 || /sbin/shutdown -r +60 "Restarting to apply updates..."
-    cron_file: reboot
-  when: inventory_hostname not in groups['cluster']|default([])
+
+- name: 'Set correct command for testing if a reboot is needed on EL <= 7.'
+  ansible.builtin.set_fact:
+    update_needs_restarting_cmd: /bin/needs-restarting -r
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] <= "7"
+
+- name: 'Set correct command for testing if a reboot is needed on EL >= 8.'
+  ansible.builtin.set_fact:
+    update_needs_restarting_cmd: dnf needs-restarting -r
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] >= "8"
+
+- name: 'Check if we need to reboot now.'
+  ansible.builtin.command:
+    cmd: "{{ update_needs_restarting_cmd }}"
+  register: reboot_required
+  changed_when: reboot_required.rc == 1
+  failed_when: reboot_required.rc >= 2
   become: true
+
+- name: 'Reboot now (triggered by updates).'
+  ansible.builtin.reboot:
+    msg: Reboot initiated by Ansible role "update" from League of Robots playbook/repo.
+  become: true
+  when: reboot_required.rc == 1
 ...

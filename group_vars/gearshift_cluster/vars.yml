@@ -3,6 +3,7 @@ slurm_cluster_name: 'gearshift'
 stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'gs'
+stack_dtap_state: production
 slurm_version: '22.05.2-1.el7.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
@@ -23,6 +24,7 @@ slurm_partitions:
     local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
+logs_class: 'research'
 repo_manager: 'pulp'
 os_distribution: 'centos7'
 figlet_font: 'cyberlarge'
@@ -37,8 +39,8 @@ motd: |
 additional_etc_hosts:
   - group: docs_library
     nodes:
-      - name: docs_on_merlin
-        network: vlan16
+      - name: docs-on-bateleur
+        network: external
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
@@ -102,7 +104,6 @@ local_admin_groups:
   - 'docker'
 local_admin_users:
   - 'bob'
-  - 'egon'
   - 'fokke'
   - 'ger'
   - 'gerben'
@@ -131,7 +132,6 @@ regular_groups:
   - 'umcg-biogen'
   - 'umcg-bionic-mdd-gwama'
   - 'umcg-bios'
-  - 'umcg-cineca'
   - 'umcg-dag3'
   - 'umcg-datateam'
   - 'umcg-ejp-rd'
@@ -159,10 +159,10 @@ regular_groups:
   - 'umcg-mic'
   - 'umcg-micompany'
   - 'umcg-msb'
-  - 'umcg-muhas'
   - 'umcg-nawijn'
+  - 'umcg-neonatology'
+  - 'umcg-pgx'
   - 'umcg-pmb'
-  - 'umcg-pub'
   - 'umcg-radicon'
   - 'umcg-rehabilitation'
   - 'umcg-reki'
@@ -198,8 +198,6 @@ regular_users:
     groups: ['umcg-bionic-mdd-gwama']
   - user: 'umcg-bios-dm'
     groups: ['umcg-bios']
-  - user: 'umcg-cineca-dm'
-    groups: ['umcg-cineca']
   - user: 'umcg-dag3-dm'
     groups: ['umcg-dag3']
   - user: 'umcg-datateam-dm'
@@ -258,14 +256,14 @@ regular_users:
     groups: ['umcg-micompany']
   - user: 'umcg-msb-dm'
     groups: ['umcg-msb']
-  - user: 'umcg-muhas-dm'
-    groups: ['umcg-muhas']
   - user: 'umcg-nawijn-dm'
     groups: ['umcg-nawijn']
+  - user: 'umcg-neonatology-dm'
+    groups: ['umcg-neonatology']
+  - user: 'umcg-pgx-dm'
+    groups: ['umcg-pgx']
   - user: 'umcg-pmb-dm'
     groups: ['umcg-pmb']
-  - user: 'umcg-pub-dm'
-    groups: ['umcg-pub']
   - user: 'umcg-radicon-dm'
     groups: ['umcg-radicon']
   - user: 'umcg-rehabilitation-dm'
@@ -313,8 +311,6 @@ sudoers:
     become: 'umcg-bionic-mdd-gwama-dm'
   - who: ['%umcg-bios']
     become: 'umcg-bios-dm'
-  - who: ['%umcg-cineca-dms']
-    become: 'umcg-cineca-dm'
   - who: ['%umcg-dag3-dms']
     become: 'umcg-dag3-dm'
   - who: ['%umcg-datateam']
@@ -375,14 +371,14 @@ sudoers:
     become: 'umcg-micompany-dm'
   - who: ['%umcg-msb']
     become: 'umcg-msb-dm'
-  - who: ['%umcg-muhas-dms']
-    become: 'umcg-muhas-dm'
   - who: ['%umcg-nawijn-dms']
     become: 'umcg-nawijn-dm'
+  - who: ['%umcg-neonatology-dms']
+    become: 'umcg-neonatology-dm'
+  - who: ['%umcg-pgx-dms']
+    become: 'umcg-pgx-dm'
   - who: ['%umcg-pmb-dms']
     become: 'umcg-pmb-dm'
-  - who: ['%umcg-pub-dms']
-    become: 'umcg-pub-dm'
   - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
     become: 'umcg-radicon-dm'
   - who: ['%umcg-rehabilitation-dms']
@@ -432,12 +428,6 @@ pfs_mounts:
     rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime'
     ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
-  - pfs: umcgst01
-    source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
-    type: lustre
-    rw_options: 'defaults,_netdev,flock'
-    ro_options: 'defaults,_netdev,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst02
     source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
     type: lustre
@@ -460,7 +450,6 @@ lfs_mounts:
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
-      - name: umcg-cineca
       - name: umcg-dag3
       - name: umcg-datateam
       - name: umcg-ejp-rd
@@ -493,13 +482,13 @@ lfs_mounts:
       - name: umcg-mic
       - name: umcg-micompany
       - name: umcg-msb
-      - name: umcg-muhas
-        mode: '2750'
       - name: umcg-nawijn
         mode: '2750'
-      - name: umcg-pmb
-      - name: umcg-pub
+      - name: umcg-neonatology
         mode: '2750'
+      - name: umcg-pgx
+        mode: '2750'
+      - name: umcg-pmb
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
@@ -521,63 +510,6 @@ lfs_mounts:
     pfs: umcgst10
     groups:
       - name: umcg-atd
-    rw_machines: "{{ groups['user_interface'] }}"
-  - lfs: prm02
-    pfs: umcgst01
-    quota_type: 'project'
-    quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
-    groups:
-      - name: umcg-aad
-      - name: umcg-as
-      - name: umcg-atd
-      - name: umcg-biogen
-      - name: umcg-bionic-mdd-gwama
-      - name: umcg-bios
-      - name: umcg-cineca
-      - name: umcg-dag3
-      - name: umcg-datateam
-      - name: umcg-ejp-rd
-      - name: umcg-endocrinology
-      - name: umcg-fg
-      - name: umcg-franke-scrna
-      - name: umcg-fu
-      - name: umcg-gaf
-      - name: umcg-gap
-      - name: umcg-gastrocol
-      - name: umcg-gcc
-      - name: umcg-gdi
-      - name: umcg-gdio
-      - name: umcg-gonl
-      - name: umcg-griac
-      - name: umcg-grip
-      - name: umcg-gsad
-      - name: umcg-hematology
-      - name: umcg-hlhs
-      - name: umcg-immunogenetics
-      - name: umcg-impact
-      - name: umcg-lifelines
-      - name: umcg-lld
-      - name: umcg-llnext
-      - name: umcg-mic
-      - name: umcg-micompany
-      - name: umcg-msb
-      - name: umcg-muhas
-      - name: umcg-nawijn
-      - name: umcg-pmb
-      - name: umcg-pub
-      - name: umcg-radicon
-      - name: umcg-rehabilitation
-      - name: umcg-reki
-      - name: umcg-solve-rd
-      - name: umcg-sommer
-      - name: umcg-sysops
-      - name: umcg-tifn
-      - name: umcg-ukb
-      - name: umcg-ugli
-      - name: umcg-verbeek
-      - name: umcg-vdakker
-      - name: umcg-weersma
-      - name: umcg-wijmenga
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
@@ -617,10 +549,10 @@ lfs_mounts:
       - name: umcg-mic
       - name: umcg-micompany
       - name: umcg-msb
-      - name: umcg-muhas
       - name: umcg-nawijn
+      - name: umcg-neonatology
+      - name: umcg-pgx
       - name: umcg-pmb
-      - name: umcg-pub
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
@@ -651,7 +583,6 @@ lfs_mounts:
       - name: umcg-fg
       - name: umcg-franke-scrna
       - name: umcg-fu
-      - name: umcg-gaf
       - name: umcg-gap
       - name: umcg-gastrocol
       - name: umcg-gcc
@@ -672,8 +603,9 @@ lfs_mounts:
       - name: umcg-micompany
       - name: umcg-msb
       - name: umcg-nawijn
+      - name: umcg-neonatology
+      - name: umcg-pgx
       - name: umcg-pmb
-      - name: umcg-pub
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
@@ -694,7 +626,6 @@ lfs_mounts:
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
 ega_fuse_client_mounts:
-  cineca: '/groups/umcg-cineca/prm02/ega-fuse-client'
   solve_rd: '/groups/umcg-solve-rd/prm02/ega-fuse-client'
 ega_fuse_client_java_home: '/etc/alternatives/jre_11_openjdk'
 ...

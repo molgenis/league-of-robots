@@ -102,7 +102,7 @@ The steps are:
   file, and in the `group_vars/logs_library/ip_addresses.yml`
 - initialize the apropriate client LOR stack environment and on them deploy the same `single_group_playbooks/logs.yml`
 - in order for jumphost jump to work (explained in VI.) the invididual stack have to have the logs servers added in the
-  `additional_etc_hosts` in the file `group_vars/[stack]/vars.yml` and the `single_role_playbooks/static_hostname_lookup.yml` 
+  `additional_etc_hosts` in the file `group_vars/[stack]/vars.yml` and the `single_role_playbooks/static_hostname_lookup.yml`
   needs to be run on the jumphosts of that individual stack.
 
 
@@ -128,6 +128,9 @@ service. As according to the [rsyslog documentation](https://www.rsyslog.com/doc
 *... Rsyslog will reopen the file whenever it receives a HUP signal. This allows the file to be externally rotated (using a tool like logrotate): after each rotation of the file, make sure a HUP signal is sent to rsyslogd.*
 
 ## VIII. Debugging
+
+Logs do not appear in logs_server / `single_role_playbooks/logs_client.yml -t test` fails?
+Restart rsyslog service on both the logs server and all the problematic clients.
 
 Get the connections to the server from the clients
 
@@ -160,3 +163,44 @@ rate of approximately 100MB per hour (with current default settings).
 ```
   sudo yum remove -y rsyslog* librelp*
 ```
+
+## X. Adding new type of log servers
+
+For example you want to add `earl5` for `research`
+
+1. Define `earl5` in the `static_inventories/logs_library.yml`
+    ```
+        earl5:
+          logs_class: 'research'
+          cloud_flavor: m1.small
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_logservers"
+              assign_floating_ip: true
+          local_volume_size_extra: 100
+    ```
+
+2. Run the playbook to deploy the server.
+
+3. Check public IP's network name in the `group_vars/all/vars.yml  group_vars/logs_library/ip_addresses.yml`
+
+4. Edit `group_vars/all/vars.yml`
+
+ - configure the `logs_server_public_networks:` variable
+ - make sure its also containing the group `research`
+
+5. Depends which jumphost you want to use as a `AI_PROXY`, but it needs to have `earl5` defined in the `/etc/hosts`
+
+- therefore you must deploy the `single_role_playbooks/static_hostname_lookup.yml` on (at least) that jumphost
+
+6. Create `research` CA key and certificate
+    ```
+        openssl req -x509 -newkey rsa:4096 -keyout files/logs_library/logs_research.key -out files/logs_library/logs_research.pem -sha256 -days 3650 -nodes -subj "/C=NL/ST=Groningen/L=Groningen/O=UMCG/OU=GCC/CN="
+    ```
+
+7. Configure earl as you would configure any other server
+    ```
+        export AI_PROXY=tunnel
+        export JUMPHOST_USER=your_admin_account
+        ansible-playbook -u cloud-user -l earl5 single_group_playbooks/logs.yml
+    ```

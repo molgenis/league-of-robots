@@ -11,6 +11,6 @@ nb_infra_catalog:
         nb-sai:
         nb-repo:
         nb-transfer:
-        nb-node-a[01:03]:
+        nb-node-a[01:05]:
         nb-node-b[01:02]:
 ...

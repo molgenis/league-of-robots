@@ -10,6 +10,6 @@
   hosts:
     - nfs_server
   roles:
-    - mount_volume
+    - local_storage
     - nfs_server
 ...

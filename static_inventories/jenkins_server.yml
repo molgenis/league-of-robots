@@ -9,7 +9,7 @@ all:
       hosts:
         jenkins:
           cloud_flavor: general.v1.tiny
-          ansible_host: foyer+jenkins
+          ansible_host: foyer+jenkins.gcc.rug.nl
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_webservers"

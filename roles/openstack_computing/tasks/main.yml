@@ -57,7 +57,7 @@
   run_once: true
 - name: "Add IP addresses to {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new"
   ansible.builtin.template:
-    src: "{{ playbook_dir }}/group_vars/template/ip_addresses.yml.j2"
+    src: "{{ playbook_dir }}/group_vars/template/ip_addresses_openstack.yml.j2"
     dest: "{{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new"
     mode: '0644'
   vars:

@@ -1,20 +1,20 @@
 ---
 - name: Deploy Slurm management.
-  ansible.builtin.include_tasks:
+  ansible.builtin.import_tasks:
     file: management.yml
   when: inventory_hostname in groups['sys_admin_interface']
 
 - name: Deploy Slurm clients.
-  ansible.builtin.include_tasks:
+  ansible.builtin.import_tasks:
     file: client.yml
   when: inventory_hostname in groups['compute_node'] or
         inventory_hostname in groups['user_interface']
 
 - name: Deploy Slurm notifications for admins.
-  ansible.builtin.include_tasks:
+  ansible.builtin.import_tasks:
     file: notifications.yml
   when:
     - inventory_hostname in groups['sys_admin_interface']
-    - slurm_notification_slack_webhook is defined
-    - slurm_notification_slack_webhook | length >= 1
+    - slurm_notification_slack_webhook[stack_dtap_state] is defined
+    - slurm_notification_slack_webhook[stack_dtap_state] | length >= 1
 ...

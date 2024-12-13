@@ -52,10 +52,10 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan13'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
           iptables_allow_https_inbound:
             # On data_transfer servers port 443 is used for SSH too.
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -69,10 +69,10 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan13'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -85,13 +85,13 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan13'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
     docs:
       hosts:
-        docs_on_merlin:
+        docs-on-bateleur:
     sys_admin_interface:
       hosts:
         wh-sai:
@@ -138,14 +138,14 @@ all:
           slurm_local_disk: 0
           slurm_features: 'tmp07'
           slurm_ethernet_interfaces:
-            - ens3
-            - ens4
-            - ens5
+            - enp3s0
+            - enp4s0
+            - enp5s0
     compute_node:
       children:
         regular_big_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
-            wh-node-b01:
+            wh-node-a01:
           vars:
             cloud_flavor: umcg.v1.vm.63-500
             host_networks:
@@ -164,9 +164,9 @@ all:
             slurm_local_disk: 900
             slurm_features: 'tmp07'
             slurm_ethernet_interfaces:
-              - ens3
-              - ens4
-              - ens5
+              - enp3s0
+              - enp4s0
+              - enp5s0
     chaperone:
       hosts:
         wh-chaperone:
@@ -192,6 +192,7 @@ all:
             - 'umcg-logstoprm'
             - 'umcg-ogm'
             - 'umcg-patho'
+            - 'umcg-pgx'
             - 'umcg-pr'
             - 'umcg-vipt'
           ssh_client_configs:
@@ -199,6 +200,20 @@ all:
     nfs_server:
       hosts:
         wh-sai:
+          local_mounts:
+            - mount_point: '/mnt/umcgst12'
+              device: /dev/vdb
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: 'rw,relatime,nofail,x-systemd.device-timeout=10'
+              type: ext4
+          nfs_server_shares:
+            - path: '/mnt/umcgst12'
+              clients: "{{ stack_networks
+                           | selectattr('name', 'equalto', stack_prefix + '_internal_storage')
+                           | map(attribute='cidr')
+                           | first }}(rw,sync,no_root_squash,no_subtree_check)"
     smb_server:
       hosts:
         wh-sai:

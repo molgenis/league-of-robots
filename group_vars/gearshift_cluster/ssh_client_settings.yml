@@ -9,7 +9,7 @@ ssh_client_known_hosts: "\
   *imperator,\
   *sugarsnax,\
   *gearshift,\
-  *docs_on_merlin,\
+  *docs-on-bateleur,\
   *gs-* \
   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDN8m3uPzwVJxsW3gvXTwc7f2WRwHFQ9aBXTGRRgdW/qVZydDC+rBTR1ZdapGtOqnOJ6VNzI7c2ziYWfx7kfYhFjhDZ3dv9XuOn1827Ktw5M0w8Y47bHfX+E/D9xMX1htdHGgja/yh0mTbs7Ponn3zOne8e8oUTUd7q/w/kO4KVsXaBsUz1ZG9wXjOA8TacwdoqMhzdhhQkhhKKGLArYeQ4gsa6N2MnXqd3glkhITQGOUQvFHxKP8nArfYeOK15UgzhkitcBsi4lkx1THuOu+u/oGskmacSaBWSUObP7LHKdw4v15/5S8qjD6NSm6ezfEtw1ltO3eVA6ZD5NbhHMZ3IkCeMlRKmVqQUmNqkcMSPwi91K5rcfduL4EYLT5nq+Z0Kv2UO8QXH9zBCb0K8zSdwtpoABfk0rbbdxtZXZD1y20DkRlbC3WMS79O9HsWAkugnwJ8LANGS3odY6spDAF6Rt7By/bcS+TobBLCUA6eQ+W1oml5hCCLPSsa0BPvIR1YxYxWbD6Gb/PDsTwZJ7ZDgEHd67ylrdL+aQvnJXVC3V0uEjyQbLN2txjgO3okFpzcOz9ERWEvz6fQgi387Idyy8fsmFOJ4RjEPlnUs/T4PfThZgo2hZYlYWMmRFxUK1PzC0zHcTnaTS9qoHogRZYJUn1kiiF6dB7atu1julDJzTw== CA key for Gearshift"
 ...

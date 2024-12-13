@@ -10,7 +10,7 @@ ssh_client_known_hosts: "\
   *vt-sai,\
   *vt-dai,\
   *vaxtron,\
-  *docs_on_merlin,\
+  *docs-on-bateleur,\
   *vt-* \
   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILfs1tLiyQuOTdyV696pDjY9MhaejceB2/vZYN/6abVE CA key for vaxtron_cluster"
 ...

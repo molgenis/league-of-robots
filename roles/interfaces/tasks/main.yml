@@ -1,17 +1,14 @@
 ---
-- name: Create network device configuration file based on template.
-  ansible.builtin.template:
-    src: interface_template.j2
-    dest: "/etc/sysconfig/network-scripts/{{ network_device_file_prefix }}{{ item.device }}"
-    mode: '0644'
-  become: true
-  with_items: "{{ interfaces }}"
-  when: interfaces is defined
-  notify: restart_network
+- name: 'Manage network interfaces on EL <= 7'
+  ansible.builtin.import_tasks:
+    file: el7.yml
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] <= "7"
 
-- name: Enable network.service at boot.
-  ansible.builtin.systemd:
-    name: network.service
-    enabled: true
-    state: started
-  become: true
+- name: 'Manage network connections and devices on EL >= 8'
+  ansible.builtin.import_tasks:
+    file: el8.yml
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] >= "8"

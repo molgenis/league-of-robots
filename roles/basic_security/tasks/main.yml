@@ -1,14 +1,14 @@
 ---
 - name: Configure fail2ban.
-  ansible.builtin.include_tasks: fail2ban.yml
-  when: basic_security_fail2ban_enabled | bool
+  ansible.builtin.include_tasks: enable_fail2ban.yml
+  when: basic_security_fail2ban_enabled is true
+
+- name: Remove fail2ban.
+  ansible.builtin.include_tasks: disable_fail2ban.yml
+  when: basic_security_fail2ban_enabled is false
 
 - name: Configure SSH and sudo.
   ansible.builtin.include_tasks: ssh.yml
-
-- name: Configure automatic updates.
-  ansible.builtin.include_tasks: autoupdate.yml
-  when: basic_security_autoupdate_enabled | bool
 
 - name: Configure systemd.
   ansible.builtin.include_tasks: systemd.yml

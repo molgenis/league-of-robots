@@ -10,8 +10,10 @@
     - iptables
     - grub
     - locale
+    - regular_users
     - ssh  # client
     - update
+    - remove
     - role: yum_local
       when: local_yum_repository is defined
     - logrotate

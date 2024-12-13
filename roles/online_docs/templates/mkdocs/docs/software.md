@@ -1,6 +1,6 @@
 #jinja2: trim_blocks:True
 # Software - How to use and install software on {{ slurm_cluster_name | capitalize }}
-
+{% set example_tmp_lfs = lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | map(attribute='lfs') | first %}
 ## Introduction
 
 Software can be installed using different methods; some are only available to admins and some you can use yourself.
@@ -228,7 +228,21 @@ But the are also disadvantages:
    If you compile the software from source on the cluster instead,
    you will notice during compilation if there are issues due to missing dependencies.
 
-Therefore we strongly suggest to only try _Conda_ as last resort when all else has failed.
+Therefore we strongly suggest to *only try _Conda_ as last resort when all else has failed*.
+
+When you do use _Conda_, then make sure to specify custom locations for both
+
+ * The new _Conda_ environment
+ * The cache dir where _Conda_ caches downloaded packages
+
+Failure to do that means _Conda_ will use your small home dir and you will run into the storage quota limit for your home dir rather sooner than later.
+You can change the defaults for these locations like this:
+
+```
+export CONDA_PKGS_DIRS=/groups/${choose_one_of_your_groups}/{{ example_tmp_lfs }}/some/example/folder/conda/packages/
+conda info
+conda create --prefix /groups/${choose_one_of_your_groups}/{{ example_tmp_lfs }}/some/example/folder/conda/environment/
+```
 
 ###### Containers
 

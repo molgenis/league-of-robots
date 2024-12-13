@@ -1,0 +1,39 @@
+---
+- name: Create /etc/systemd/network directory.
+  ansible.builtin.file:
+    path: /etc/systemd/network
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+#
+# Slot-based naming scheme has priority over path-based naming scheme,
+# but is not stable: was introduced later and the removed again for virtual network interfaces,
+# because it can cause naming conflicts.
+#
+- name: Deploy /etc/systemd/network/99-default.link for customised udev network device renaming policy ordering.
+  ansible.builtin.template:
+    src: 99-default.link
+    dest: /etc/systemd/network/99-default.link
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+
+#
+# Network Manager is a mess and not idempotent in most cases creating yet another config.
+#
+# - name: Create network connection with nmcli.
+#   community.general.nmcli:
+#     conn_name: "{{ item['device'] }}"
+#     ifname: "{{ item['device'] }}"
+#     type: ethernet
+#     method4: "{{ item['method4'] }}"
+#     method6: disabled
+#     state: present
+#     autoconnect: true
+#   loop: "{{ interfaces }}"
+#   become: true
+...

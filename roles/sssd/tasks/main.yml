@@ -148,6 +148,14 @@
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] <= "7"
 
+- name: Create LDAP backups.
+  ansible.builtin.include_tasks:
+    file: ldap_backup.yml
+  when:
+    - ldap_domains is defined
+    - ldap_domains | length > 0
+    - inventory_hostname in groups['sys_admin_interface'] | default([])
+
 - name: Flush handlers.
   ansible.builtin.meta: flush_handlers
 ...

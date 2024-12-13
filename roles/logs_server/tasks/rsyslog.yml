@@ -37,6 +37,20 @@
     update_cache: true
   become: true
   notify: restart-rsyslog.service
+  when: ansible_facts['distribution_major_version'] <= "7"
+
+- name: Install gnutls and newer openssl
+  ansible.builtin.package:
+    name:
+      - gnutls
+      - gnutls-utils
+      - openssl
+      - openssl-devel
+    state: latest
+    update_cache: true
+  become: true
+  notify: restart-rsyslog.service
+  when: ansible_facts['distribution_major_version'] >= "9"
 
 - name: Install rsyslog and gnutls with all plugins
   ansible.builtin.package:
@@ -131,28 +145,6 @@
   notify:
     - systemd_reload
     - rsyslog_enable
-  become: true
-
-- name: Deploy rsyslog-restart.service
-  ansible.builtin.copy:
-    src: files/rsyslog-restart.service
-    dest: /usr/lib/systemd/system/rsyslog-restart.service
-    force: true
-    mode: '0644'
-  notify:
-    - systemd_reload
-    - restart_service_enable
-  become: true
-
-- name: Deploy rsyslog-restart.timer
-  ansible.builtin.copy:
-    src: files/rsyslog-restart.timer
-    dest: /usr/lib/systemd/system/rsyslog-restart.timer
-    force: true
-    mode: '0644'
-  notify:
-    - systemd_reload
-    - restart_timer_enable
   become: true
 
 - name: Add logrotate to compress and move old logs to subfolder called 'compressed_logs'

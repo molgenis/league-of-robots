@@ -28,8 +28,11 @@ sshd_algorithms:
     macs: hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
     keys: ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,ssh-rsa,ssh-rsa-cert-v01@openssh.com
 sshd_crypto_policies:
-  - CUSTOM
-  - CVE-2023-48795 # Terrapin Attack: https://terrapin-attack.com/
+  oracle8:
+    - DEFAULT
+  rocky9:
+    - CUSTOM
+    - CVE-2023-48795 # Terrapin Attack: https://terrapin-attack.com/
 sshd_moduli_minimum: 3072
 data_transfer_only_group: sftp-only
 #

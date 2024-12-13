@@ -1,0 +1,54 @@
+---
+- name: Install dnf-automatic update utility.
+  ansible.builtin.package:
+    name: dnf-automatic
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Configure dnf-autoupdate.
+  ansible.builtin.lineinfile:
+    dest: /etc/dnf/automatic.conf
+    regexp: '^{{ item.key }} = .+'
+    line: '{{ item.key }} = {{ item.val }}'
+    mode: '0644'
+  loop:
+    - key: apply_updates
+      val: 'yes'
+    - key: reboot
+      val: 'when-needed'
+  become: true
+
+#
+# This prevents the update procedure to fail for example due to dependency resolution problems
+# and hence continue to update the packages that can be updated.
+#
+- name: Do not fail if the latest version cannot be installed and continue to use the previously installed version.
+  ansible.builtin.lineinfile:
+    dest: /etc/dnf/dnf.conf
+    regexp: '^best=.+'
+    line: 'best=False'
+    mode: '0644'
+  become: true
+
+- name: Patch dnf-automatic-install.timer to update and hence reboot at a more convenient moment.
+  ansible.builtin.lineinfile:
+    dest: /usr/lib/systemd/system/dnf-automatic-install.timer
+    regexp: '^{{ item.key }}=.+'
+    line: '{{ item.key }}={{ item.val }}'
+    mode: '0644'
+  loop:
+    - key: OnCalendar
+      val: '*-*-* 4:00'
+    - key: RandomizedDelaySec
+      val: '30m'
+  become: true
+
+- name: Ensure dnf-automatic update utility is running and enabled on boot.
+  ansible.builtin.systemd:
+    name: dnf-automatic-install.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+  become: true
+...

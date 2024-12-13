@@ -1,4 +1,9 @@
 ---
-#ansible_python_interpreter: /usr/bin/python2.7
 slurm_local_scratch_dir: '/local'
+autoupdate_enabled: false
+#
+# Do not use fail2ban for machines behind the jumphost to prevent the jumphost from getting blocked.
+# We already have fail2ban on the jumphost to block external IPs the produce too many failed logins.
+#
+basic_security_fail2ban_enabled: false
 ...

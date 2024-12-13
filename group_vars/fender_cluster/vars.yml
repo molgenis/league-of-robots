@@ -3,6 +3,7 @@ slurm_cluster_name: 'fender'
 stack_domain: ''
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'fd'
+stack_dtap_state: production
 slurm_version: '22.05.2-1.el7.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
@@ -23,6 +24,7 @@ slurm_partitions:
     local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
+logs_class: 'research'
 repo_manager: 'pulp'
 os_distribution: 'centos7'
 figlet_font: 'slant'
@@ -30,8 +32,8 @@ motd: "To solve or not to solve, that's the question."
 additional_etc_hosts:
   - group: docs_library
     nodes:
-      - name: docs_on_merlin
-        network: vlan16
+      - name: docs-on-bateleur
+        network: external
   - group: donbot_azure
     nodes:
       - name: ladap
@@ -76,18 +78,14 @@ nameservers: [
 ]
 local_admin_groups:
   - 'admin'
-  - 'docker'
 local_admin_users:
-  - 'egon'
+  - 'dick'
   - 'gerben'
-  - 'henkjan'
   - 'marieke'
   - 'marloes'
-  - 'morris'
   - 'pieter'
   - 'roan'
   - 'sandi'
-  - 'wim'
 envsync_user: 'envsync'
 envsync_group: 'depad'
 functional_admin_group: 'funad'
@@ -221,8 +219,6 @@ regular_users:
     groups: ['users', 'solve-rd']
   - user: 'mbeukers'
     groups: ['users', 'solve-rd']
-  - user: 'rsietsma'
-    groups: ['users', 'solve-rd']
   - user: 'fgao'
     groups: ['users', 'solve-rd']
   - user: 'druvolo'
@@ -354,6 +350,7 @@ pfs_mounts:
     rw_options: 'defaults,_netdev,noatime,nodiratime,rw'
     ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
+    check_fs_free: '8%'
 lfs_mounts:
   - lfs: home
     pfs: ecst02

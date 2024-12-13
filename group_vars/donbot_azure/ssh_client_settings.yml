@@ -1,0 +1,8 @@
+---
+ssh_client_known_hosts: "\
+  @cert-authority \
+  *ladap,\
+  *ladap.westeurope.cloudapp.azure.com,\
+  172.201.133.1 \
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExjTxW0aWn25+zPaY3kMYOfqXdKAor+kP5EHgxtrYwi CA key for azure"
+...

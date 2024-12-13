@@ -34,7 +34,7 @@ all:
 #          local_volume_size_extra: 10000
     docs:
       hosts:
-        docs_on_merlin:
+        docs-on-bateleur:
     sys_admin_interface:
       hosts:
         vt-sai:
@@ -97,7 +97,7 @@ all:
                   security_group: "{{ stack_prefix }}_storage"
               lustre_client_networks: "{{ lustre_client_networks_baremetal }}"
               perc_devices: true
-              volumes:
+              local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
                   device: '/dev/sdb'
                   mounted_owner: root
@@ -141,7 +141,7 @@ all:
 #              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
 #              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
 #              slurm_local_disk: 975
-#              slurm_features: 'tmp03'
+#              slurm_features: 'tmp04'
 #              slurm_ethernet_interfaces:
 #                - ens3
 #                - ens4

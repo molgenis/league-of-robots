@@ -3,6 +3,7 @@ slurm_cluster_name: 'marvin'
 stack_domain: ''
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'mv'
+stack_dtap_state: development
 slurm_version: '22.05.2-1.el7.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
@@ -14,6 +15,7 @@ slurm_partitions:
     local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+logs_class: 'development'
 repo_manager: 'none'
 os_distribution: 'centos7'
 figlet_font: 'speed'
@@ -28,8 +30,8 @@ motd: |
 additional_etc_hosts:
   - group: docs_library
     nodes:
-      - name: docs_on_merlin
-        network: vlan16
+      - name: docs-on-bateleur
+        network: external
 use_ldap: true
 use_sssd: true
 ldap_domains:

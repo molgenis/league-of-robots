@@ -24,7 +24,7 @@ ssh_host_signer_hostnames: "{{ inventory_hostname }}\
        | map(attribute='hostname') %}\
       ,{{ external_jumphost }}+{{ inventory_hostname }}\
     {% endfor %}"
-volumes:
+local_mounts:
   - mount_point: '/groups'
     device: '/dev/vdb'
     mounted_owner: root

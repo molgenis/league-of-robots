@@ -35,7 +35,7 @@
          -auth {{ jenkins_admin_username }}:{{ jenkins_admin_api_token }} \
          update-job "{{ item }}" < "{{ jenkins_xml_dest }}/{{ item }}_config.xml"
   loop: "{{ jenkins_projects }}"
-  when: item in "{{ existing_jenkins_jobs.stdout_lines }}"
+  when: item in existing_jenkins_jobs.stdout_lines
   become: true
 
 - name: Create Jenkins project if it does not exist yet
@@ -46,5 +46,5 @@
          -auth {{ jenkins_admin_username }}:{{ jenkins_admin_api_token }} \
          create-job "{{ item }}" < "{{ jenkins_xml_dest }}/{{ item }}_config.xml"
   loop: "{{ jenkins_projects }}"
-  when: item not in "{{ existing_jenkins_jobs.stdout_lines }}"
+  when:  item not in existing_jenkins_jobs.stdout_lines
 ...

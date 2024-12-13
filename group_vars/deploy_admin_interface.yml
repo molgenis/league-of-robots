@@ -1,5 +1,5 @@
 ---
-volumes:
+local_mounts:
   - mount_point: "{{ hpc_env_prefix }}"
     device: '/dev/vdb'
     mounted_owner: root

@@ -155,7 +155,7 @@
     #   repo_management_user@repo> pip install --upgrade pulp-cli
     #   repo_management_user@repo> pip freeze > pulp-cli-requirements.txt
     #
-    src: 'files/pulp-cli-requirements.txt'
+    src: "files/pulp-cli-requirements-{{ os_distribution }}.txt"
     dest: "/admin/{{ repo_management_user }}/pulp-cli-requirements.txt"
     owner: "{{ repo_management_user }}"
     group: "{{ repo_management_user }}"
@@ -194,15 +194,23 @@
   become: true
   become_user: "{{ repo_management_user }}"
 
-- name: "Deploy ~.config/pulp/settings.toml file for {{ repo_management_user }} user."
+- name: "Deploy ~.config/pulp/cli.toml file for {{ repo_management_user }} user."
   ansible.builtin.template:
-    src: templates/repo_management_user.settings.toml.j2
-    dest: "/admin/{{ repo_management_user }}/.config/pulp/settings.toml"
+    src: templates/repo_management_user.cli.toml.j2
+    dest: "/admin/{{ repo_management_user }}/.config/pulp/cli.toml"
     mode: '0600'
     owner: "{{ repo_management_user }}"
     group: "{{ repo_management_user }}"
   become: true
   become_user: "{{ repo_management_user }}"
+
+- name: "Delete deprecated ~.config/pulp/settings.toml."
+  ansible.builtin.file:
+    path: "/admin/{{ repo_management_user }}/.config/pulp/settings.toml"
+    state: absent
+  become: true
+  become_user: "{{ repo_management_user }}"
+  when: os_distribution == 'rocky9'
 
 - name: Read status from pulp API server and refresh API cache.
   pulp.squeezer.status:
@@ -248,7 +256,6 @@
          This is as far as we can get with the current limited support for RPM repositories in pulp-sequeezer.
          You will need to login to {{ inventory_hostname }} and use the pulp-cli as user {{ repo_management_user }}
          and
-          * For repos with upstream remotes: add the remote to the repo (once) and sync the repo with the remote.
           * For repos that without upstream remote: upload RPM files to Pulp creating artifacts,
                                                     create RPMs in Pulp from the artifacts
                                                     and finally add the Pulp RPMs to the the Pulp RPM repository.

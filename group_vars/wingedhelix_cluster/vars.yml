@@ -3,11 +3,12 @@ slurm_cluster_name: 'wingedhelix'
 stack_domain: ''
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'wh'
+stack_dtap_state: production
 slurm_version: '23.02.7-2.el9.umcg'
 slurm_partitions:
   - name: regular_big_vm  # Must be in sync with group listed in Ansible inventory.
     default: yes
-    nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
+    nodes: "{{ stack_prefix }}-node-a01"  # Must be in sync with Ansible hostnames listed in inventory.
     max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['regular_big_vm']|list|length }}{% else %}1{% endif %}"
     max_cores_per_node: "{{ groups['regular_big_vm'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
     max_mem_per_node: "{{ groups['regular_big_vm'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
@@ -50,16 +51,16 @@ motd: |
 additional_etc_hosts:
   - group: docs_library
     nodes:
-      - name: docs_on_merlin
-        network: vlan16
+      - name: docs-on-bateleur
+        network: external
   - group: betabarrel_cluster
     nodes:
       - name: betabarrel
-        network: vlan13
+        network: vlan16
   - group: copperfist_cluster
     nodes:
       - name: copperfist
-        network: vlan13
+        network: vlan16
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -77,6 +78,7 @@ external_jumphosts:
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
 ssh_client_configs:
+  - logs_library
   - betabarrel_cluster
   - copperfist_cluster
 #
@@ -218,6 +220,7 @@ regular_groups:
   - 'umcg-labgnkbh'
   - 'umcg-logstoprm'
   - 'umcg-patho'
+  - 'umcg-pgx'
   - 'umcg-pr'
   - 'umcg-vipt'
 regular_users:
@@ -264,6 +267,8 @@ regular_users:
     groups: ['umcg-patho', "{{ functional_users_group }}"]
   - user: 'umcg-patho-dm'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
+  - user: 'umcg-pgx-dm'
+    groups: ['umcg-pgx', "{{ functional_users_group }}"]
   - user: 'umcg-pr-ateambot'
     groups: ['umcg-pr', "{{ functional_users_group }}"]
   - user: 'umcg-pr-dm'
@@ -311,6 +316,10 @@ sudoers:
     become: 'umcg-patho-ateambot'
   - who: ['%umcg-patho']
     become: 'umcg-patho-dm'
+  - who: ['%umcg-pgx']
+    become: 'umcg-pgx-ateambot'
+  - who: ['%umcg-pgx']
+    become: 'umcg-pgx-dm'
   - who: ['%umcg-pr']
     become: 'umcg-pr-ateambot'
   - who: ['%umcg-pr']
@@ -323,14 +332,14 @@ remote_users_in_local_groups:
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - user: 'bijlsmam'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - user: 'charbonb'
     groups: [
@@ -342,7 +351,7 @@ remote_users_in_local_groups:
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - user: 'hendriksend'
     groups: [
@@ -354,28 +363,28 @@ remote_users_in_local_groups:
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - user: 'kanningaroj'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - user: 'neerincxp'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - user: 'vriesgb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
 #
 ## Limit the storage for specific folder, by using a loop mount of formatted file
@@ -383,7 +392,8 @@ remote_users_in_local_groups:
 soft_partitions:
   - path: /mnt/umcgst04_slice1/groups/umcg-lab/tmp07/sequencers_incoming
     src: /mnt/umcgst04_slice1/groups/umcg-lab/tmp07/sequencers_incoming.disk.img
-    fstype: btrfs             # btrfs supports the 4k formatting and works on sequencers
+    fstype: xfs                        # xfs and btrfs support 4k that works on sequencers
+    fsopts: ' -b size=4k -s size=4k'   # extra options for 4k filesystem formatting
     size: 600                 # in GB
     user: sbsuser
     group: umcg-lab
@@ -396,11 +406,16 @@ ogm_servers:
   - server: bas1.umcg.nl  # FQDN of OGM machine to backup.
     user: ADMINIT
     prm_location: /groups/umcg-ogm/prm67
-    backup_commands:
-      - label: "pg_dump: create"
-        command: sudo -u postgres bash -c 'cd; pg_dump --no-owner --no-privileges IrysView_Dev | /usr/bin/gzip -f -6' > pg_dump/$(date +%Y%m%d-%H%M%S).sql.gz
-      - label: "pg_dump: remove old"
-        command: find /home/ADMINIT/pg_dump/ -type f -mtime +4 -name '*.sql.gz' -exec rm -f {} \;
+    backup_source_dirs:
+      - /home/bionano/access/web/Server/databaseFiles/molecules_files
+      - /var/log
+      - /home/bionano/access/web/Server/Log
+      - /home/bionano/access/web/Server/anchorFiles
+      - /home/ADMINIT/pg_dump
+    psql_dump_location: /home/ADMINIT/pg_dump
+  - server: bas3.umcg.nl  # FQDN of OGM machine to backup.
+    user: ADMINIT
+    prm_location: /groups/umcg-ogm/prm67
     backup_source_dirs:
       - /home/bionano/access/web/Server/databaseFiles/molecules_files
       - /var/log
@@ -411,34 +426,33 @@ ogm_servers:
 #
 # Local storage variables.
 #
-volume_group_folders: [
-  { mount_point: '/groups',
-    machines: "{{ groups['data_transfer'] }}",
-    mode: '2750',
-    groups: [
-        "{{ data_transfer_only_group }}"
-      ]},
-  { mount_point: '/groups',
-    machines: "{{ groups['data_transfer'] }}",
-    mode: '2770',
-    groups: [
-        'umcg-genomescan', 'umcg-gst'
-      ]},
-]
+local_mount_subfolders:
+  - mount_point: '/groups'
+    machines: "{{ groups['data_transfer'] }}"
+    folders:
+      - rel_paths:
+          - "{{ data_transfer_only_group }}"
+        mode: '2750'
+        owner: root
+        group: "{{ data_transfer_only_group }}"
+      - rel_paths:
+          - umcg-genomescan
+          - umcg-gst
+        mode: '2770'
+        owner: root
 #
 # Shared storage related variables
 #
 lustre_client_networks:
   - name: tcp20
-    interface: ens5
+    interface: enp5s0
 pfs_mounts:
   - pfs: umcgst12
-    device: /dev/vdb
-    source: "{{ ip_addresses[groups['nfs_server'][0]][stack_prefix + '_internal_storage']['address'] }}:/mnt"
+    source: "{{ ip_addresses['wh-sai'][stack_prefix + '_internal_storage']['address'] }}:/mnt"
     type: nfs4    # checked with cat /proc/filesystem
     rw_options: 'defaults,_netdev,noatime,nodiratime,local_lock=flock'
     ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
+    machines: []  # Complete PFS not mounted over NFS anywhere.
   - pfs: umcgst04/slice1
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre
@@ -496,7 +510,7 @@ pfs_mounts:
 lfs_mounts:
   - lfs: home
     pfs: umcgst12
-    rw_machines: "{{ groups['cluster'] }}"
+    rw_machines: "{{ groups['cluster'] | difference(groups['nfs_server']) }}"
   - lfs: tmp07
     pfs: umcgst04/slice1
     groups:
@@ -510,6 +524,7 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
+      - name: umcg-pgx
       - name: umcg-pr
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
@@ -521,6 +536,7 @@ lfs_mounts:
       - name: umcg-gd
       - name: umcg-gsad
       - name: umcg-logstoprm
+      - name: umcg-pgx
       - name: umcg-vipt
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat05
@@ -542,6 +558,7 @@ lfs_mounts:
       - name: umcg-gd
       - name: umcg-gsad
       - name: umcg-logstoprm
+      - name: umcg-pgx
       - name: umcg-vipt
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat06
@@ -563,6 +580,7 @@ lfs_mounts:
       - name: umcg-gd
       - name: umcg-gsad
       - name: umcg-logstoprm
+      - name: umcg-pgx
       - name: umcg-vipt
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat07

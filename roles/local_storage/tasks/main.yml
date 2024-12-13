@@ -1,0 +1,63 @@
+---
+- name: Check if file system source is a device.
+  ansible.builtin.stat:
+    path: "{{ item.device }}"
+  register: local_storage_device_stat
+  loop: "{{ local_mounts }}"
+
+- name: Create a file system on unformatted device.
+  ansible.builtin.include_tasks:
+    file: create_filesystem_on_device.yml
+  vars:
+    volume_mount_point: "{{ item.mount_point }}"
+    volume_device: "{{ item.device }}"
+    volume_type: "{{ item.type }}"
+  when:
+    - local_storage_device_stat['results']
+      | selectattr('item', 'equalto', item)
+      | map(attribute='stat')
+      | map(attribute='isblk')
+      | first is true
+  loop: "{{ local_mounts }}"
+
+- name: Mount the local file system.
+  ansible.builtin.include_tasks:
+    file: mount.yml
+  vars:
+    volume_path: "{{ item.mount_point }}"
+    volume_src: "{{ item.device }}"
+    volume_fstype: "{{ item.type }}"
+    volume_opts: "{{ item.mount_options }}"
+    volume_device: "{{ item.device }}"
+  loop: "{{ local_mounts }}"
+
+- name: Recheck the mount point.
+  ansible.builtin.command: "mountpoint {{ item.mount_point }}"
+  register: local_storage_mount_point_status
+  failed_when: false
+  changed_when: false
+  loop: "{{ local_mounts }}"
+
+- name: Configure permissions for mounted file system.
+  ansible.builtin.file:
+    path: "{{ item.item.mount_point }}"
+    state: directory
+    owner: "{{ item.item.mounted_owner }}"
+    group: "{{ item.item.mounted_group }}"
+    mode: "{{ item.item.mounted_mode }}"
+  when: item.rc == 0
+  become: true
+  loop: "{{ local_storage_mount_point_status.results }}"
+
+- name: Create sub folders on local file systems.
+  ansible.builtin.include_tasks:
+    file: create_sub_folders.yml
+  vars:
+    mount_point: "{{ item.1.mount_point }}"
+    folders: "{{ item.1.folders | list }}"
+  when:
+    - local_mount_subfolders is defined
+    - item.0.mount_point == item.1.mount_point
+    - inventory_hostname in item.1.machines
+  loop: "{{ local_mounts | product(local_mount_subfolders) | list }}"
+...

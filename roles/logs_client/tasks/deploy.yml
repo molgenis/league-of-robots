@@ -79,28 +79,6 @@
     - rsyslog_enable
   become: true
 
-- name: Deploy rsyslog-restart.service
-  ansible.builtin.copy:
-    src: files/rsyslog-restart.service
-    dest: /usr/lib/systemd/system/rsyslog-restart.service
-    force: true
-    mode: '0644'
-  notify:
-    - systemd_reload
-    - restart_service_enable
-  become: true
-
-- name: Deploy rsyslog-restart.timer
-  ansible.builtin.copy:
-    src: files/rsyslog-restart.timer
-    dest: /usr/lib/systemd/system/rsyslog-restart.timer
-    force: true
-    mode: '0644'
-  notify:
-    - systemd_reload
-    - restart_timer_enable
-  become: true
-
 - name: Remove problematic /etc/rsyslog.d/listen.conf file
   ansible.builtin.file:
     path: /etc/rsyslog.d/listen.conf

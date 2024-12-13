@@ -31,7 +31,8 @@ _rsync_log="${_script_path_dir}/${0##*/}.cron.log"
 
 if test -e "${_rsync_log}"; then
    if test -e "${_rsync_log}.old"; then
-      cat "${_rsync_log}.old" "${_rsync_log}" 2>/dev/null | tail -n 10000 > "${_rsync_log}.tmp" # Keep only 10k of old rsync logs
+      # Keep only 100k of old rsync logs
+      cat "${_rsync_log}.old" "${_rsync_log}" 2>/dev/null | tail -n 100000 > "${_rsync_log}.tmp"
       mv "${_rsync_log}.tmp" "${_rsync_log}.old"
    else
       cp ${_rsync_log} ${_rsync_log}.old
@@ -284,7 +285,7 @@ for _each_server in "${earl_servers[@]}"; do
    fi
 done
 
-~/deduplicate_logs.sh
+~/deduplicate_logs.sh -d
 
 # Cleanning up
 remove_locks

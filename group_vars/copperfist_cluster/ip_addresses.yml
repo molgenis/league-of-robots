@@ -1,12 +1,15 @@
 ---
 ip_addresses:
   cf-dragen:
+    vlan16:
+      address: 195.169.22.43
+      netmask: /32
     vlan990:
-      address: '192.168.1.62'
-      netmask: '/32'
+      address: 192.168.1.62
+      netmask: /32
     vlan990_bmc:
-      address: '10.10.1.102'
-      netmask: '/32'
+      address: 10.10.1.102
+      netmask: /32
   cf-porch:
     cf_internal_management:
       address: 10.10.1.86
@@ -29,8 +32,8 @@ ip_addresses:
     vlan983:
       address: 172.23.41.226
       netmask: /32
-    vlan13:
-      address: 129.125.55.14
+    vlan16:
+      address: 195.169.22.4
       netmask: /32
     vlan990:
       address: 192.168.1.22

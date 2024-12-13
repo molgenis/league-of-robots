@@ -6,6 +6,7 @@
     - cluster
     - irods
     - ldap_server
+    - logs
   roles:
     - role: static_hostname_lookup
 

@@ -7,7 +7,7 @@
   connection: local
   run_once: true
 
-- name: Add public keys from CAs that signed host keys from other stacks to /etc/ssh/ssh_known_hosts.
+- name: "Add public key for {{ external_stack }} CA to /etc/ssh/ssh_known_hosts."
   ansible.builtin.lineinfile:
     dest: /etc/ssh/ssh_known_hosts
     mode: '0644'

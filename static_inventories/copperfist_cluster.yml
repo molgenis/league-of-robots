@@ -26,6 +26,23 @@ all:
             - "{{ all.ip_addresses['rug']['operator'] }}"
           ssh_client_configs:
             - logs_library
+          additional_etc_hosts:
+            - group: docs_library
+              nodes:
+                - name: docs-on-bateleur
+                  network: external
+            - group: copperfist_cluster
+              nodes:
+                - name: cf-dragen
+                  network: vlan16
+            - group: betabarrel_cluster
+              nodes:
+                - name: betabarrel
+                  network: vlan16
+            - group: copperfist_cluster
+              nodes:
+                - name: copperfist
+                  network: vlan16
     data_transfer:
       hosts:
         cf-transfer:
@@ -49,10 +66,10 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan13'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
           iptables_allow_https_inbound:
             # On data_transfer servers port 443 is used for SSH too.
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -66,10 +83,10 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan13'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -82,13 +99,13 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan13'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}" 
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan13'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
     docs:
       hosts:
-        docs_on_merlin:
+        docs-on-bateleur:
     sys_admin_interface:
       hosts:
         copperfist:
@@ -115,7 +132,7 @@ all:
     deploy_admin_interface:
       hosts:
         copperfist:
-          volumes:
+          local_mounts:
             - mount_point: '/apps'
               device: '/mnt/env06/apps/'
               mounted_owner: root
@@ -139,6 +156,14 @@ all:
         regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             copperfist:
+              local_mounts:
+                - mount_point: '/local'
+                  device: '/mnt/local_raid/local'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '2755'
+                  mount_options: 'bind,nofail'
+                  type: none
               slurm_sockets: 2
               slurm_cores_per_socket: 64
               slurm_real_memory: 515456
@@ -149,6 +174,41 @@ all:
               slurm_ethernet_interfaces:
                 - em1
                 - em3
+        dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            cf-dragen:
+              ansible_host: cf-porch+copperfist+cf-dragen
+              local_mounts:
+                - mount_point: '/staging'
+                  device: 'LABEL=staging'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: 'defaults,noatime,nofail'
+                  type: xfs
+                - mount_point: '/local'
+                  device: '/staging/slurm'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: 'bind,nofail'
+                  type: none
+              slurm_sockets: 2
+              slurm_cores_per_socket: 16
+              slurm_threads_per_core: 2
+              slurm_real_memory: 515109
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket * slurm_threads_per_core - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
+              slurm_local_disk: 102400
+              slurm_features: 'dragen'
+              slurm_ethernet_interfaces:
+                - enp26s0f0  # VLAN990
+                - enp5s0  # BMC
+                - ens3f0.16  # VLAN16
+              slurm_weight: 10
+              slurm_version: '20.11.9-1.el8.umcg'
+              os_distribution: 'oracle8'
+              local_yum_repository: true # enable local yum repository
     chaperone:
       hosts:
         cf-chaperone:

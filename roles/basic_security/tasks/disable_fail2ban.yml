@@ -1,0 +1,26 @@
+---
+- name: Populate service facts.
+  ansible.builtin.service_facts:
+
+- name: Ensure fail2ban service is stopped and disabled on boot.
+  ansible.builtin.service:
+    name: fail2ban
+    state: stopped
+    enabled: false
+  when:
+    - ansible_facts.services is defined
+    - "'fail2ban.service' in ansible_facts.services"
+  become: true
+
+- name: Remove fail2ban package.
+  ansible.builtin.package:
+    name: fail2ban
+    state: absent
+  become: true
+
+- name: Remove fail2ban custom configuration file.
+  ansible.builtin.file:
+    path: /etc/fail2ban/jail.local
+    state: absent
+  become: true
+...

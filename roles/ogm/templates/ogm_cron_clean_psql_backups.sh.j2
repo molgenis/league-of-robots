@@ -19,7 +19,7 @@ WEEKLY_KEEP=52    # one year worth
 _PRM_MOUNT="{{ each_ogm_server['prm_location'] }}"
 # check if mount point is set
 if ! mountpoint -q "${_PRM_MOUNT}"; then
-   logger -t ogm_backup "${0}: backup folder '${_PRM_MOUNT}' is not mounted, exiting the backup script!"
+   echo "$(date +%FT%T) ${0}: backup folder '${_PRM_MOUNT}' is not mounted, exiting the backup script!"
    exit 1
 fi
 _OGM_SERVER="{{ each_ogm_server['server'] | default("error_remote_server")}}"
@@ -35,7 +35,7 @@ cd "${PSQL_DUMP_LOCATION:-does_not_exists}" || { echo "Failed to change director
 if ! ls ${PSQL_DUMP_LOCATION}/*-weekly-$(date +%Y%U).sql.gz 1>/dev/null 2>&1; then
    # Make a copy of the latest backup as a weekly backup
    LATEST=$(ls -1 ${PSQL_DUMP_LOCATION}/*.sql.gz | tail -n 1)
-   logger -t ogm_backup "${0}: Making WEEKLY backup: $(date +%Y%m%d-%H%M%S)-weekly-$(date +%Y%U).sql.gz"
+   echo "$(date +%FT%T) ${0}: Making WEEKLY backup: $(date +%Y%m%d-%H%M%S)-weekly-$(date +%Y%U).sql.gz"
    cp -l "${LATEST}" "${PSQL_DUMP_LOCATION}/$(date +%Y%m%d-%H%M%S)-weekly-$(date +%Y%U).sql.gz"
 fi
 
@@ -46,7 +46,7 @@ DAILY_COUNT="$(ls -1 *.sql.gz | grep -v weekly | wc -l)"
 if [[ "${DAILY_COUNT}" -gt "${DAILY_KEEP}" ]]; then
   DELETE_DAILY_COUNT=$((DAILY_COUNT - DAILY_KEEP))
   # find the oldest files and delete them (not weekly)
-  logger -t ogm_backup "${0}: $(echo -e "Deleted DAILY backups:\n$(ls -1 *.sql.gz | grep -v weekly | head -n "${DELETE_DAILY_COUNT}" | sed 's/^/  - /')")"
+  echo "$(date +%FT%T) ${0}: $(echo -e "Deleted DAILY backups:\n$(ls -1 *.sql.gz | grep -v weekly | head -n "${DELETE_DAILY_COUNT}" | sed 's/^/  - /')")"
   ls -1 *.sql.gz | grep -v weekly | head -n "${DELETE_DAILY_COUNT}" | xargs rm -f
 fi
 
@@ -56,7 +56,7 @@ WEEKLY_COUNT="$(ls -1 *-weekly-*.sql.gz | wc -l)"
 if [[ "${WEEKLY_COUNT}" -gt "${WEEKLY_KEEP}" ]]; then
   DELETE_WEEKLY_COUNT=$((WEEKLY_COUNT - WEEKLY_KEEP))
   # find the oldest weekly backups and delete them
-  logger -t ogm_backup "${0}: $(echo -e "Deleted WEEKLY backups:\n$(ls -1 *-weekly-*.sql.gz | head -n "${DELETE_WEEKLY_COUNT}" | sed 's/^/  - /')")"
+  echo "$(date +%FT%T) ${0}: $(echo -e "Deleted WEEKLY backups:\n$(ls -1 *-weekly-*.sql.gz | head -n "${DELETE_WEEKLY_COUNT}" | sed 's/^/  - /')")"
   ls -1 *-weekly-*.sql.gz | head -n "${DELETE_WEEKLY_COUNT}" | xargs rm -f
 fi
 

@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path: '{{ logstoprm_rsyncd_module.rsyncd_dir }}'
     state: directory
-    mode: '0750'
+    mode: '0770'
     owner: 'root'
     group: '{{ logstoprm_rsyncd_module.group }}'
   become: true
@@ -17,13 +17,25 @@
     mode: '0700'
   become: true
 
-- name: 'Create cron for staging logs into folder, to be picked by rsync'
+- name: 'Create root cron to stage logs into folder - to be picked by rsync'
   ansible.builtin.cron:
     name: 'Stage logs to be later transfered to prm - do not change it manually!'
-    hour: '5'
+    hour: '2'
     minute: '22'
     user: 'root'
     disabled: '{{ logstoprm_rsyncd_module.cron_disabled | default("true") }}'
     job: /root/logstoprm_staging.sh
+    cron_file: 'logstoprm_staging'
+  become: true
+
+- name: 'Create logstoprm cron to clean logs older than half a year'
+  ansible.builtin.cron:
+    name: 'Stage logs to be later transfered to prm - do not change it manually!'
+    hour: '5'
+    minute: '7'
+    user: '{{ logstoprm_rsyncd_module.username }}'
+    disabled: '{{ logstoprm_rsyncd_module.cron_disabled | default("true") }}'
+    job: "bash -c 'find {{ logstoprm_rsyncd_module.rsyncd_dir }} -mtime +180 -exec rm -f {} \\;'"
+    cron_file: 'logstoprm_remove_old'
   become: true
 ...

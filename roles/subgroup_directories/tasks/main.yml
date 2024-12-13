@@ -14,7 +14,6 @@
     loop_var: main_group
   changed_when: false
   register: getent_versioned_subgroups
-  when: inventory_hostname in groups['user_interface']
 
 - name: "Get list of all subgroups without version number and excluding *-dms, *owners & primary groups."
   ansible.builtin.shell: |
@@ -37,20 +36,20 @@
     loop_var: main_group
   changed_when: false
   register: getent_unversioned_subgroups
-  when: inventory_hostname in groups['user_interface']
 
 - name: 'Loop over "prm" file systems.'
   ansible.builtin.include_tasks:
     file: create_subgroup_directories.yml
   vars:
-    lfs: "{{ lfs_item.0.lfs }}"
     main_group: "{{ lfs_item.1.name }}"
+    pfs_path: "/mnt/{{ lfs_item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}"
+    lfs_path: "{{ pfs_path }}/groups/{{ main_group }}/{{ lfs_item.0.lfs }}"
     versioned_sub_groups: "{{ getent_versioned_subgroups.results
-                              | selectattr('main_group', 'equalto', lfs_item.1.name)
+                              | selectattr('main_group', 'equalto', main_group)
                               | map(attribute='stdout_lines')
                               | flatten }}"
     unversioned_sub_groups: "{{ getent_unversioned_subgroups.results
-                                | selectattr('main_group', 'equalto', lfs_item.1.name)
+                                | selectattr('main_group', 'equalto', main_group)
                                 | map(attribute='stdout_lines')
                                 | flatten }}"
     mode_project: '2750'
@@ -62,21 +61,22 @@
   loop_control:
     loop_var: lfs_item
   when:
-    - inventory_hostname in groups['user_interface']
+    - inventory_hostname in groups['sys_admin_interface']
     - (versioned_sub_groups | length > 0) or (unversioned_sub_groups | length > 0)
 
 - name: 'Loop over "rsc" file systems.'
   ansible.builtin.include_tasks:
     file: create_subgroup_directories.yml
   vars:
-    lfs: "{{ lfs_item.0.lfs }}"
     main_group: "{{ lfs_item.1.name }}"
+    pfs_path: "/mnt/{{ lfs_item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}"
+    lfs_path: "{{ pfs_path }}/groups/{{ main_group }}/{{ lfs_item.0.lfs }}"
     versioned_sub_groups: "{{ getent_versioned_subgroups.results
-                              | selectattr('main_group', 'equalto', lfs_item.1.name)
+                              | selectattr('main_group', 'equalto', main_group)
                               | map(attribute='stdout_lines')
                               | flatten }}"
     unversioned_sub_groups: "{{ getent_unversioned_subgroups.results
-                                | selectattr('main_group', 'equalto', lfs_item.1.name)
+                                | selectattr('main_group', 'equalto', main_group)
                                 | map(attribute='stdout_lines')
                                 | flatten }}"
     mode_project: '2750'
@@ -88,21 +88,22 @@
   loop_control:
     loop_var: lfs_item
   when:
-    - inventory_hostname in groups['user_interface']
+    - inventory_hostname in groups['sys_admin_interface']
     - (versioned_sub_groups | length > 0) or (unversioned_sub_groups | length > 0)
 
 - name: 'Loop over "tmp" file systems.'
   ansible.builtin.include_tasks:
     file: create_subgroup_directories.yml
   vars:
-    lfs: "{{ lfs_item.0.lfs }}"
     main_group: "{{ lfs_item.1.name }}"
+    pfs_path: "/mnt/{{ lfs_item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}"
+    lfs_path: "{{ pfs_path }}/groups/{{ main_group }}/{{ lfs_item.0.lfs }}"
     versioned_sub_groups: "{{ getent_versioned_subgroups.results
-                              | selectattr('main_group', 'equalto', lfs_item.1.name)
+                              | selectattr('main_group', 'equalto', main_group)
                               | map(attribute='stdout_lines')
                               | flatten }}"
     unversioned_sub_groups: "{{ getent_unversioned_subgroups.results
-                                | selectattr('main_group', 'equalto', lfs_item.1.name)
+                                | selectattr('main_group', 'equalto', main_group)
                                 | map(attribute='stdout_lines')
                                 | flatten }}"
     mode_project: '2770'
@@ -114,6 +115,6 @@
   loop_control:
     loop_var: lfs_item
   when:
-    - inventory_hostname in groups['user_interface']
+    - inventory_hostname in groups['sys_admin_interface']
     - (versioned_sub_groups | length > 0) or (unversioned_sub_groups | length > 0)
 ...

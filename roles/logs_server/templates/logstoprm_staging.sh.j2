@@ -1,19 +1,18 @@
 #!/bin/bash
-# {% raw %}
+{% raw %}
+set -eEuo pipefail
 
-set -eE
 # Everything is logged in the system logs with logger
 trap 'logger -t logstoprm-cron "The command (${BASH_COMMAND}) failed on line number (${LINENO})"' ERR
 
-{% endraw %}
-
-# Where the logs will be stored to
-destination_dir="{{ logstoprm_rsyncd_module.rsyncd_dir }}"
-
-# {% raw %}
-
-# Where the logs will be collected
+# Where log server stores logs when receiving them from client machines
 source_dir="/var/log/remote/"
+
+{% endraw %}
+# Location to move logs after a week, and where they remain
+# (they are picked up and copied to permanent location)
+destination_dir="{{ logstoprm_rsyncd_module.rsyncd_dir }}"
+{% raw %}
 
 # check the rest of environment
 test -d "${source_dir}" || \
@@ -39,21 +38,10 @@ logger -t logstoprm "Starting to move log files to ${destination_dir}"
 find ./ -type f -size +21c -mtime +7 -name "*.gz" -exec rsync \
    --remove-source-files --ignore-existing -a -R --min-size=21 \
    --chown=root:{% endraw %}{{ logstoprm_rsyncd_module.group }}{% raw %} \
-   --chmod=D750,F640 ./{} /mnt/logstoprm/ 2>>${0}.logs \;
+   --chmod=D770,F660 ./{} /mnt/logstoprm/ \;
 if [[ "$?" -eq "0" ]]; then
    logger -t logstoprm "Logs have been successfully moved"
 else
    logger -t logstoprm "There has been error while moving logs"
 fi
-   
-
-# the folder are created while copying, so permissions need to be additionally fixed
-cd ${destination_dir}
-# TODO
-# - clean zero bytes logs files that have not been changed for more than a week
-#   (logrotate already compressed the logs and left the empty sized ones for
-#   longer time - which should be removed after a while)
-# - remove all old logs after 6 months - in this time they should be copied
-#   anyway
-
-# {% endraw %}
+{% endraw %}

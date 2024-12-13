@@ -1,0 +1,27 @@
+#
+# Install roles and collections from the default Ansible Galaxy server.
+#
+---
+roles:
+  - src: geerlingguy.postgresql
+    version: 3.5.0
+collections:
+  - name: ansible.utils
+    version: '>=5.1.0'
+  - name: ansible.posix
+    version: '>=1.5.4'
+  - name: community.crypto
+    version: '>=2.21.0'
+  - name: community.general
+    version: '>=8.6.3'
+  - name: community.mysql
+    version: '>=3.9.0'
+  - name: openstack.cloud
+    version: '>=2.2.0'
+  - name: pulp.pulp_installer
+    version: '==3.22.1'
+  - name: pulp.squeezer
+    version: '>=0.0.16'
+  - name: azure.azcollection
+    version: '>=2.6.0'
+...

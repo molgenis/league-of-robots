@@ -1,5 +1,5 @@
 ---
-- name: Restart firewall
+- name: Restart server firewall
   ansible.builtin.command:
     /etc/sysconfig/iptables-init.bash
   register: fw_reg
@@ -9,6 +9,8 @@
   become: true
   notify: client_restart_rsyslog
   listen: restart_server_firewall
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Restart server rsyslog.service
   ansible.builtin.service:
@@ -18,8 +20,10 @@
   loop: "{{ logs_class_servers }}"
   become: true
   listen: restart_server_rsyslog
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
-- name: Force systemd to reread configs
+- name: Force client systemd to reread configs
   ansible.builtin.systemd:
     daemon_reload: true
   become: true
@@ -32,26 +36,11 @@
   listen: client_restart_rsyslog
   become: true
 
-- name: Start and enable rsyslog.service
+- name: Start and enable client rsyslog.service
   ansible.builtin.service:
     name: rsyslog.service
     state: started
     enabled: true
   become: true
   listen: rsyslog_enable
-
-- name: Enable rsyslog-restart.service
-  ansible.builtin.service:
-    name: rsyslog-restart.service
-    enabled: true
-  become: true
-  listen: restart_service_enable
-
-- name: Start and enable rsyslog-restart.timer
-  ansible.builtin.service:
-    name: rsyslog-restart.timer
-    state: started
-    enabled: true
-  become: true
-  listen: restart_timer_enable
 ...
