@@ -23,7 +23,6 @@
   with_items:
     - "{{ groups['jumphost'] }}"
     - "{{ groups['user_interface'] }}"
-    - "{{ groups['compute_node'] }}"
 
 - name: 'Get Slurm version from scontrol on UI.'
   ansible.builtin.shell:
@@ -65,7 +64,8 @@
     cmd: |
       set -o pipefail
       ssh-keygen -lf <(ssh-keyscan {{ groups['data_transfer'] | first }} 2>/dev/null) \
-        | awk '{print $2,$4}'
+        | awk '{print $2,$4}' \
+        | sort -k 2,1
   args:
     executable: '/bin/bash'
   delegate_to: "{{ groups['jumphost'] | first }}"
@@ -91,7 +91,7 @@
       - 'rsync'
   become: true
 
-- name: 'Install nano, PHP, Pythopn and Apache webserver.'
+- name: 'Install nano, PHP, Python and Apache webserver.'
   ansible.builtin.package:
     state: 'latest'
     update_cache: true
