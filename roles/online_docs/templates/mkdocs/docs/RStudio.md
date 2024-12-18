@@ -45,7 +45,7 @@ Data access policies may differ, but in most cases it is allowed to download agg
 E.g. if you create a bar plot of the median of variable X for different cohorts, this will not contain any data for an individual sample.
 Using RStudio to look at such a plot would be compatible with such a data access policy.
 
-Note that if you include measurements for individual samples to the plot - e.g. you include outliers and label them with sample IDs - 
+Note that if you include measurements for individual samples in the plot - e.g. you include outliers and label them with sample IDs - 
 then you may not be allowed to download that to your local computer.
 
 #### 1. Install software on your own computer

@@ -139,7 +139,7 @@ R> BiocManager::install(c('myFavoritePackage', 'packageAlsoNeeded'))
 ```
 
 
-#### C. Install R package from an archive file without (CRAN) repository
+#### C. Install R package from an archive file without (CRAN/BioConductor) repository
 
 If the (version of the) ```R``` package you need is not available from _CRAN_ nor from _BioConductor_ nor from another ```R``` _repository_,
 but you do have the source code of the package in a compressed archive file, then you can try to install that using the ```R CMD INSTALL``` command.
@@ -166,6 +166,10 @@ R CMD INSTALL path/to/your/uploaded/abctools_1.1.4.tar.gz
 
 #### D. Install R package from a GitHub repository
 
+Note that this is sub optimal; when the code you need is available from a curated repo like _CRAN_ or _BioConductor_, use those repos instead.
+Code that was not published in a curated repo for R packages usually lacks basic testing and documentation.
+This may be OK if you are co-developing or beta testing, but not for reproducible science.
+
 Load and start R.
 
 ```bash
@@ -175,7 +179,7 @@ R
 
 You can use the ```remotes::install_github``` command from the ```remotes``` package to install other packages from a GitHub repository.
 If not already present the ```remotes``` package must be installed from _CRAN_ first.
-In the example below we will install the package _methylCIPHER_ from a GitHub repo.
+In the example below we will install the package _devtools_ located in the corresponding GitHub repo from developer/organisation _r-lib_.
 
 When no version is specified, the ```remotes::install_github``` command will install the latest commit from whatever the main branch is.
 *WARNING*: this may be unstable, unreleased, untested code. In order to install the latest *released* version use ```ref = github_release()```.
@@ -184,6 +188,6 @@ You can also specify a specific version number; see the [documentation for ```re
 ```R
 R> install.packages('remotes')
 R> library('remotes')
-R> remotes::install_github('MorganLevineLab/methylCIPHER', ref = github_release())
+R> remotes::install_github('r-lib/devtools', ref = github_release())
 ```
 
