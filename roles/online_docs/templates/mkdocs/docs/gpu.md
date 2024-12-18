@@ -1,18 +1,23 @@
 #jinja2: trim_blocks:False
-{%if groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | sum > 0 %}{# checks if this group is having GPUs and then creates content #}
+{%if groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | sum > 0 %}{# checks if this stack has GPUs or not #}
 # How to use GPU nodes
 
 ## About GPU nodes
 
-{{ slurm_cluster_name | capitalize }} has in total {{ groups['compute_node'] | default([0], true) | map('int') | count }} compute nodes. {{ groups['compute_node'] | default([0], true) | map('int') | count - groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | count }} regular nodes and {{ groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | count }}  GPU nodes with {{ groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | max }} x GPU ({{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | unique | join(', ') }}) devices. The GPU nodes are placed in slurm partitions called `{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | unique | join('` `') }}`.
+{{ slurm_cluster_name | capitalize }} has in total {{ groups['compute_node'] | default([0], true) | map('int') | count }} compute nodes.
+There are {{ groups['compute_node'] | default([0], true) | map('int') | count - groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | count }} regular nodes and {{ groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | count }}  GPU nodes with {{ groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | max }} x GPU ({{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | unique | join(', ') }}) devices.
 
-GPU jobs can be submitted to Slurm with either [sbatch](../analysis/#1-batch-jobs) or [srun](../analysis/#2-interactive-jobs) commands, containing either:
+GPU jobs can be submitted to Slurm with either [sbatch](../analysis/#1-batch-jobs) or [srun](../analysis/#2-interactive-jobs) commands, containing:
 
- - `gres=gpu:{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:#` argument - where `#` is the number of specific node of nodes to be reserved. For example, a job that uses 1 node with 2 GPU's, would use `gres=gpu:{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:2`, where `{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}` is the type of GPU card requested. Alternatively you can also provide
- -  `--gpus-per-node={{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:#`, where `#` is again the number of GPUs requested per node.
+ - Either `gres=gpu:{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:#` argument, where `#` is the number of the specified GPUs to be reserved.  
+   For example, a job that needs 1 node with 2 GPUs, would use `gres=gpu:{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:2`, 
+   where `{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}` is the type of GPU card requested.
+ - Or `--gpus-per-node={{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:#`, where `#` is again the number of GPUs requested per node.
 
-Note that users can request only a number of **entire** GPUs and hence **NOT partial** GPU resources. For example, you can request 1, 2 or more GPU(s), but you cannot request 1 GPU with a specific amount of `GPU cores` or `GPU memory`.
-The selection of individual resources is possible on newer GPUs that support [MIG](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html) feature. This feature is available only on newer types, like A30 and A100, but not on our A40.
+Note that users can request only a number of **entire** GPUs and hence **NOT partial** GPU resources.
+For example, you can request 1, 2 or more GPU(s), but you cannot request 1 GPU with a specific amount of `GPU cores` or `GPU memory`.
+(The selection of individual resources is possible on newer GPUs that support [MIG](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html) feature,
+but this feature is not available for the GPUs on {{ slurm_cluster_name | capitalize }}.)
 
 ## Examples 1 and 2: Submitting a batch and an interactive job
 
@@ -51,11 +56,11 @@ Example 2 runs the same GPU example in an interactive session using `srun`.
     2  
 ```
 
-Replace `GROUP` and `tmpXX` placeholders with correct values for group and tmp filesystem. The returned value is the number of GPU's available for the job. Use the `nvidia-smi` command to see more information about the GPU devices that are available inside the job.
+Replace `GROUP` and `tmpXX` placeholders with correct values for group and tmp filesystem. The returned value is the number of GPUs available for the job. Use the `nvidia-smi` command to see more information about the GPU devices that are available inside the job.
 
 ```bash
     $ nvidia-smi 
-    Mon Jul 24 12:45:15 2023       
+    Mon Jul 24 12:45:15 2023
     +---------------------------------------------------------------------------------------+
     | NVIDIA-SMI 535.54.03              Driver Version: 535.54.03    CUDA Version: 12.2     |
     |-----------------------------------------+----------------------+----------------------+
@@ -83,22 +88,27 @@ Replace `GROUP` and `tmpXX` placeholders with correct values for group and tmp f
 
 Note that like any other interactive jobs, this one is also limited to one interactive job per user.
 
-As you can tell from the example above, once the job has started, the environment variable called `SLURM_GPUS_ON_NODE` is created. It contains the number of available GPU's of the currently running job. The value from the example above would be set to `2`. Furthermore, you can access only the two that are assigned to the job. This means you won't be able to use any other GPU's on the node. This is limited by SLURM's control groups and prevents users consuming resources that they have not requested.
+As you can tell from the example above, once the job has started, the environment variable called `SLURM_GPUS_ON_NODE` is created.
+It contains the number of available GPUs of the currently running job.
+The value from the example above would be set to `2`. Furthermore, you can access only the two that are assigned to the job.
+This means you won't be able to use any other GPUs on the node.
+This is limited by SLURM's control groups and prevents users consuming resources that they have not requested.
 
-To show the current jobs and how much GPU's they are using
-
+To list the current jobs and how much GPUs they are using you can use the `squeue` command like this
 ```bash
-    $ squeue -o "%.10i %.20j %.10u %.2t %.10M %.5D %.15R %.15b %.15P"  
-        JOBID       NAME       USER  ST      TIME NODES  NODELIST(REASON)  TRES_PER_NODE   PARTITION  
-         1234       bash umcg-user1  R       8:27     1   nb-vcompute05   gres:gpu:a40:2     gpu_a40 
-         1235    somejob umcg-user2  R    2:09:14     1   nb-vcompute05              N/A     gpu_a40  
-         1236    somejob umcg-user3  R    2:19:53     1   nb-vcompute04              N/A     gpu_a40  
-          ...
+squeue -o "%.10i %.20j %.10u %.2t %.10M %.5D %.15R %.15b"
+```
+which will list the type and number of GPUs used in the last column like this:
+
+```
+        JOBID    NAME     USER        ST      TIME  NODES  NODELIST(REASON)  TRES_PER_NODE
+         1234    bash     umcg-user1  R       8:27      1  nb-vcompute05     gres:gpu:a40:2
+         1235    somejob  umcg-user2  R    2:09:14      1  nb-vcompute05     N/A
+         1236    somejob  umcg-user3  R    2:19:53      1  nb-vcompute04     N/A
+         ...
 ```
 
-and the GPU's used are available on the column before the last.
-
-## Example 2: Build and run CUDA source sample
+## Example 3: Build and run CUDA source sample
 
 This example shows how to build and run [CUDA code sample](https://developer.nvidia.com/cuda-code-samples) (version 12.2.0 compiled with CUDA/12.2.0) in the interactive job.
 
@@ -108,23 +118,28 @@ First you must be sure that you have a driver version same or higher as the samp
     [ driver version ] and [ CUDA version ] >= [ samples version ]
 ```
 
-To check the driver and cuda version, run `nvidia-smi` on the compute node and check version numbers - they should be printed on the top-middle and top-right corner of the output.
+To check the driver and cuda version, run `nvidia-smi` on the compute node:
 
 ```bash
-    [nibbler ~]$ # replace the YYY with apropriate values
-    [nibbler ~]$ mkdir -p /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
-    [nibbler ~]$ cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
-    [nibbler cuda_samples]$ wget https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.2.tar.gz -O - | tar -xz
-    [nibbler UnifiedMemoryPerf]$ cd cuda-samples-12.2/Samples/6_Performance/UnifiedMemoryPerf
-    [nibbler UnifiedMemoryPerf]$ # increase the matrix size, so that the calulation takes long enough to capture on nvidia-smi
-    [nibbler UnifiedMemoryPerf]$ sed -i 's/maxSampleSizeInMb = 64/maxSampleSizeInMb = 1024/' matrixMultiplyPerf.cu
-    [nibbler UnifiedMemoryPerf]$ srun --qos=interactive-short --gpus-per-node={{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:2 --mem=20G --time=01:00:00 --pty bash -i
-    [nb-node-b02 UnifiedMemoryPerf]$ ml CUDA/12.2.0          # load CUDA compiler and libraries
-    [nb-node-b02 UnifiedMemoryPerf]$ make                    # compile the current example
-    [nb-node-b02 UnifiedMemoryPerf]$ # run test on second device (note first device is '0',second is '1' etc.)
-    [nb-node-b02 UnifiedMemoryPerf]$ ./UnifiedMemoryPerf -device=1 > gpu_test.log &
-    [nb-node-b02 UnifiedMemoryPerf]$ nvidia-smi 
-    Mon Jul 24 12:53:08 2023       
+    # Replace the YYY with apropriate values.
+    mkdir -p /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
+    cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
+    wget https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.2.tar.gz -O - | tar -xz
+    cd cuda-samples-12.2/Samples/6_Performance/UnifiedMemoryPerf
+    # Increase the matrix size, so that the calulation takes long enough to capture with nvidia-smi.
+    sed -i 's/maxSampleSizeInMb = 64/maxSampleSizeInMb = 1024/' matrixMultiplyPerf.cu
+    srun --qos=interactive-short --gpus-per-node={{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:2 --mem=20G --time=01:00:00 --pty bash -i
+    ml CUDA/12.2.0          # load CUDA compiler and libraries
+    make                    # compile the current example
+    # Run test on second device (note first device is '0',second is '1' etc.)
+    ./UnifiedMemoryPerf -device=1 > gpu_test.log &
+    nvidia-smi
+```
+
+Check version numbers; they should be printed on the top-middle and top-right corner of the output, which should look like this:
+
+```
+    Mon Jul 24 12:53:08 2023
     +---------------------------------------------------------------------------------------+
     | NVIDIA-SMI 535.54.03              Driver Version: 535.54.03    CUDA Version: 12.2     |
     |-----------------------------------------+----------------------+----------------------+
@@ -150,7 +165,7 @@ To check the driver and cuda version, run `nvidia-smi` on the compute node and c
     +---------------------------------------------------------------------------------------+
 ```
 
-## Example 3: Tensorflow inside Apptainer
+## Example 4: Tensorflow inside Apptainer
 
 This example shows how to run a Tensorflow python job inside Apptainer, using 1 node with 2 GPU devices and CUDA module.
 
@@ -159,14 +174,15 @@ This example shows how to download the latest GPU tensorflow container image and
 To run this example
 
 1. create the working directory on the `tmp` filesystem and navigate into it
-   ```bash
-   [nibbler ~]$ # create a working directory and set it as a working directory
-   [nibbler ~]$ mkdir /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
-   [nibbler ~]$ cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
-   ```
-2. Create two file
-    1. a `apptainer_tensorflow.slurm` - a job description file for the SLURM queuing system
-    2. a `training.py` - a simplest Tensorflow traning example script, containing only 30 lines
+
+```bash
+   mkdir /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
+   cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
+```
+
+2. Create two files
+    1. `apptainer_tensorflow.slurm` - a job description file for the SLURM queuing system.
+    2. `training.py` - a simple Tensorflow traning example script, containing only 30 lines.
 
 Where `apptainer_tensorflow.slurm` file contains
 
