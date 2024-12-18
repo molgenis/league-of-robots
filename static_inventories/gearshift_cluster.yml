@@ -47,7 +47,7 @@ all:
           slurm_cores_per_socket: 12
           slurm_real_memory: 217778
           slurm_local_disk: 0
-          slurm_features: 'prm02,prm03,tmp01'
+          slurm_features: 'prm02,prm03,rsc01,tmp01'
           slurm_ethernet_interfaces:
             - 'vlan983'
             - 'vlan985.isilon'

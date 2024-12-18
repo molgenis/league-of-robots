@@ -116,6 +116,12 @@ Commonly used options:
       Therefore it does not make sense to distribute a job over multiple nodes and the only accepted value for ```--nodes``` on {{ slurm_cluster_name | capitalize }} is ```1```.
  * ```--cpus-per-task=X``` 
     * Requests X CPUs (cores) for your job.
+    * This **should be equal to the amount of threads started/used by your code**.
+    * Note that our HPC systems do **not** use _hyperthreading_, which is a marketing gimmick providing two _virtual_ cores for each _physical_ core and acts as a performance killer for most workloads.
+    * When your code starts more threads than the amount of requested cores, then those threads will have to compete for the CPU cycles by taking turns and waiting on each other.
+      This will result in overloading the requested cores exceeding thresholds for healthy load average statistics, which will trigger the Node Health Check (NHC) to drain the compute node.
+      At best your code will run slower than it could and as drained nodes will refuse new jobs it will reduce the total capacity of the cluster.
+    * When your code starts less threads than the amount of requested cores, then the extra cores cannot do anything useful and their CPU cycles are wasted reducing the total capacity of the cluster.
  * ```--mem=Xgb```
     * Requests X GB RAM total per job
  * ```--tmp=Xgb```

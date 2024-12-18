@@ -5,7 +5,7 @@ ip_addresses:
       address: 172.23.40.39
       netmask: /32
     vlan16:
-      address: 129.125.60.196
+      address: 195.169.22.196
       netmask: /32
       fqdn: 'airlock.hpc.rug.nl'
   gs-vcompute01:
