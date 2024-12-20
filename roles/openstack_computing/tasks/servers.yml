@@ -7,7 +7,9 @@
         name: "{{ inventory_hostname }}-{{ item.name }}"
         network: "{{ item.name }}"
         security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ hostvars[inventory_hostname]['host_type'] | default('normal') }}"
+        binding_vnic_type: "{{ item.vnic_type
+            | default(hostvars[inventory_hostname]['host_type'])
+            | default('normal') }}"
         fixed_ips:
           #
           # We must specify the subnet ID in addition to the IP address in order for the openstack.cloud.port task to be idempotent.
@@ -28,7 +30,9 @@
         name: "{{ inventory_hostname }}-{{ item.name }}"
         network: "{{ item.name }}"
         security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ hostvars[inventory_hostname]['host_type'] | default('normal') }}"
+        binding_vnic_type: "{{ item.vnic_type
+            | default(hostvars[inventory_hostname]['host_type'])
+            | default('normal') }}"
         wait: true
         timeout: "{{ openstack_api_timeout }}"
       with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"

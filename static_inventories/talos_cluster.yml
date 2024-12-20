@@ -13,9 +13,10 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
-            #- name: provision-net
-            #  security_group: "{{ stack_prefix }}_cluster"
-            #  assign_floating_ip: false
+            - name: brmtl_ntwrk
+              security_group: "{{ stack_prefix }}_jumphosts"
+              assign_floating_ip: false
+              vnic_type: baremetal  # Required for this network even when the machine is a VM.
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
@@ -85,10 +86,10 @@ all:
               host_networks:
                 - name: brmtl_ntwrk
                   security_group: "{{ stack_prefix }}_cluster"
-                - name: "{{ stack_prefix }}_internal_management"
-                  security_group: "{{ stack_prefix }}_cluster"
-                - name: "{{ stack_prefix }}_internal_storage"
-                  security_group: "{{ stack_prefix }}_storage"
+                #- name: "{{ stack_prefix }}_internal_management"
+                #  security_group: "{{ stack_prefix }}_cluster"
+                #- name: "{{ stack_prefix }}_internal_storage"
+                #  security_group: "{{ stack_prefix }}_storage"
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
               lustre_client_networks: "{{ lustre_client_networks_baremetal }}"
