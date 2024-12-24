@@ -400,10 +400,20 @@ function applyLustreQuota () {
 			# because chattr returns exit 1 when it encounters data that is not a file nor directory.
 			# E.g. it will return exit 1 when it encounters a symlink and
 			# there is no simple commandline argument to skip/ignore symlinks.
+			# Moreover using
+			#	"set +e && chattr -R -f +P ${_lfs_path}"
+			#	"set +e && chattr -R -f -p ${_id} ${_lfs_path}"
+			# in "${_cmds[@]" and looping over those command lines in a sub shell with
+			#	mixed_stdouterr="$(${_cmd} 2>&1)" || ....
+			# does not work either: it will not generate an error, but will not apply the attributes recursively either.
 			#
+			log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" "${?}" '   Applying project quota attributes recursively with chattr; This may take a long time ...'
+			{ set +e
+			  chattr -R -f +P "${_lfs_path}"
+			  chattr -R -f -p ${_id} "${_lfs_path}"
+			  set -e
+			} || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" '   Failed to apply chattr recursively.'
 			_cmds=(
-				"set +e && chattr -R -f +P ${_lfs_path}"
-				"set +e && chattr -R -f -p ${_id} ${_lfs_path}"
 				"lfs setquota -p ${_id} --block-softlimit ${_soft_quota_limit} --block-hardlimit ${_hard_quota_limit} ${_lfs_path}"
 			)
 		else
@@ -424,6 +434,8 @@ function applyLustreQuota () {
 		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "   Command: ${_cmd}"
 		if [[ "${apply_settings}" -eq 1 ]]; then
 			mixed_stdouterr="$(${_cmd} 2>&1)" || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Failed to execute: ${_cmd}"
+		else
+			log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' '     Dry run: nothing changed.'
 		fi
 	done
 }
