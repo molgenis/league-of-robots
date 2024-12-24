@@ -553,15 +553,6 @@ lfs_mounts:
       - name: umcg-ugli
         mode: '2750'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
-#  - lfs: prm01
-#    pfs: umcgst06
-#    quota_type: 'project'
-#    quota_pid_increment: 400000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
-#    groups:
-#      - name: umcg-atd
-#      - name: umcg-fg
-#      - name: umcg-franke-scrna
-#    rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm02
     pfs: umcgst01
     quota_type: 'project'
