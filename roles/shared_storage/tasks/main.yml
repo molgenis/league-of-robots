@@ -131,6 +131,70 @@
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.pfs) | map(attribute='machines') | first | default([])
   become: true
 
+- name: Use getent to fetch GIDs.
+  ansible.builtin.getent:
+    database: group
+    split: ':'
+
+#
+# For project quota we need unique project IDs (PIDs).
+# Project IDs are based on group IDs (GIDs) + a unique value per LFS: lfs_total_project_id_increment.
+# This number is added to the GID to create the PID and must either be specified in
+#   group_vars/all/quota.conf
+# for each LFS or can be computed based on the LFS name:
+#   arc += 0
+#   prm += 200,000
+#   rsc += 400,000
+#   tmp += 600,000
+#   Furthermore the LFS number is multiplied with 1,000,000.
+# E.g. the project_id for LFS prm11 and a group with GID 55100210 is:
+#   55,100,210 + 200,000 + (11 * 1,000,000) == 66,300,210
+#
+- name: 'Create quota config files for prm, rsc and tmp Logical File Systems (LFSs) on Physical File Systems (PFSs).'
+  ansible.builtin.template:
+    src: 'templates/quotaconfig.j2'
+    dest: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups/{{ item.1.name }}/{{ item.0.lfs }}.quotaconfig"
+    owner: root
+    group: "{{ item.1.name }}"
+    mode: '0644'
+  vars:
+    group_id: "{{ getent_group[item.1.name][1] }}"
+    lfs_type: "{{ item.0.lfs | regex_search('((tmp)|(rsc)|(prm))[0-9]+$', '\\1') | first }}"
+    lfs_type_project_id_increment: "
+      {%- if lfs_type == 'arc' -%}
+        0
+      {%- elif lfs_type == 'prm' -%}
+        200000
+      {%- elif lfs_type == 'rsc' -%}
+        400000
+      {%- elif lfs_type == 'tmp' -%}
+        600000
+      {%- endif -%}"
+    lfs_number: "{{ item.0.lfs | regex_search('((tmp)|(rsc)|(prm))([0-9]+)$', '\\5') | first }}"
+    lfs_number_project_id_increment: "{{ lfs_number | int * 1000000 }}"
+    lfs_total_project_id_increment: "{{ lfs_quota[item.0.lfs]['quota_pid_increment']
+        | default(lfs_type_project_id_increment | int + lfs_number_project_id_increment | int) }}"
+    project_id: "{{ group_id | int + lfs_total_project_id_increment | int }}"
+    size_soft_limit: "{{ lfs_quota[item.0.lfs]['quota_limits'][item.1.name] | default(0) | int }}"
+    size_hard_limit: "
+      {%- if size_soft_limit | int < 10 -%}
+        {{ size_soft_limit | int }}
+      {%- elif size_soft_limit | int < 10240 -%}
+        {{ size_soft_limit | int + 1024 }}
+      {%- else -%}
+        {{ size_soft_limit | int + 2048 }}
+      {%- endif -%}"
+    # items_soft_limit: a.k.a inodes; not implemented yet.
+    # items_hard_limit: a.k.a inodes; not implemented yet.
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm))[0-9]+$')
+            | list
+            | subelements('groups') }}"
+  loop_control:
+    label: "{{ item.1.name }}@{{ item.0.lfs }}: project_id = {{ project_id }} | size_soft_limit = {{ size_soft_limit }} | size_hard_limit = {{ size_hard_limit }}"
+  when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
+  become: true
+
 #
 ##
 ### Unmount LFS-ses, which are no longer configured to be mounted.
