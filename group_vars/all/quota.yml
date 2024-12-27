@@ -97,6 +97,13 @@ lfs_quota:
       umcg-vdakker: 1024
       umcg-weersma: 8192
       umcg-wijmenga: 4096
+  prm08:
+    quota_type: 'project'
+    quota_limits:  # All values in GB.
+      umcg-atd: 512
+      umcg-gcc: 128
+      umcg-gsad: 512
+      umcg-sysops: 128
   rsc01:
     quota_limits:  # All values in GB.
       umcg-atd: 1024
@@ -126,6 +133,13 @@ lfs_quota:
     quota_pid_increment: 100000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
       #umcg-biogen: value not approved yet.
+  rsc08:
+    quota_type: 'project'
+    quota_limits:  # All values in GB.
+      umcg-atd: 512
+      umcg-gcc: 128
+      umcg-gsad: 512
+      umcg-sysops: 128
   tmp01:
     quota_limits:  # All values in GB.
       umcg-aad: 1024
@@ -242,4 +256,11 @@ lfs_quota:
       umcg-llnext: 1024
       umcg-tifn: 1024
       umcg-ugli: 1024
+  tmp08:
+    quota_type: 'project'
+    quota_limits:  # All values in GB.
+      umcg-atd: 512
+      umcg-gcc: 128
+      umcg-gsad: 512
+      umcg-sysops: 128
 ...
