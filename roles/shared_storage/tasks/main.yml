@@ -191,7 +191,10 @@
             | list
             | subelements('groups') }}"
   loop_control:
-    label: "{{ item.1.name }}@{{ item.0.lfs }}: project_id = {{ project_id }} | size_soft_limit = {{ size_soft_limit }} | size_hard_limit = {{ size_hard_limit }}"
+    label: "{{ item.1.name }}@{{ item.0.lfs }}:
+        project_id = {{ project_id }} |
+        size_soft_limit = {{ size_soft_limit }} |
+        size_hard_limit = {{ size_hard_limit }}"
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
   become: true
 
