@@ -1,7 +1,6 @@
 ---
 lfs_quota:
   prm02:
-    quota_type: 'project'
     quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
       umcg-aad: 1024
@@ -49,7 +48,6 @@ lfs_quota:
       umcg-weersma: 40960
       umcg-wijmenga: 22528
   prm03:
-    quota_type: 'project'
     quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
       umcg-aad: 1024
@@ -98,7 +96,6 @@ lfs_quota:
       umcg-weersma: 8192
       umcg-wijmenga: 4096
   prm08:
-    quota_type: 'project'
     quota_limits:  # All values in GB.
       umcg-atd: 512
       umcg-gcc: 128
@@ -116,7 +113,6 @@ lfs_quota:
       umcg-solve-rd: 5120
       umcg-sysops: 1024
   rsc02:
-    quota_type: 'project'
     quota_pid_increment: 500000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
       umcg-atd: 1024
@@ -129,12 +125,9 @@ lfs_quota:
       umcg-solve-rd: 5120
       umcg-sysops: 1024
   rsc04:
-    quota_type: 'project'
-    quota_pid_increment: 100000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
       #umcg-biogen: value not approved yet.
   rsc08:
-    quota_type: 'project'
     quota_limits:  # All values in GB.
       umcg-atd: 512
       umcg-gcc: 128
@@ -192,7 +185,6 @@ lfs_quota:
       umcg-weersma: 20480
       umcg-wijmenga: 3072
   tmp02:
-    quota_type: 'project'
     quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
       umcg-aad: 1024
@@ -238,7 +230,6 @@ lfs_quota:
       umcg-weersma: 1024
       umcg-wijmenga: 10240
   tmp04:
-    quota_type: 'project'
     quota_pid_increment: 300000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
       umcg-as: 1024
@@ -257,7 +248,6 @@ lfs_quota:
       umcg-tifn: 1024
       umcg-ugli: 1024
   tmp08:
-    quota_type: 'project'
     quota_limits:  # All values in GB.
       umcg-atd: 512
       umcg-gcc: 128
