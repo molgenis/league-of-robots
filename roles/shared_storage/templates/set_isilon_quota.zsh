@@ -48,7 +48,7 @@ function showHelp() {
 	cat <<EOH
 ===============================================================================================================
 Script to apply quota settings to shares served by an Isilon OneFS cluster.
-Quota settings are parsed from cache files stored on the shares.
+Quota settings are parsed from *.quotaconfig files stored on the shares.
 
 Usage:
 
@@ -299,22 +299,22 @@ for pfs in "${pfss[@]}"; do
 			log4Zsh 'DEBUG' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "No group dirs found in ${pfs}/groups/."
 		else
 			for group_dir in "${group_dirs[@]}"; do
-				quota_cache_file="${group_dir}.quotacache"
-				unset soft
-				unset hard
-				if [[ -f "${quota_cache_file}" && -r "${quota_cache_file}" ]]; then
-					source "${quota_cache_file}" 2>&1 || {
-						log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" "${?}" "Cannot source ${quota_cache_file}."
+				quota_config_file="${group_dir}.quotaconfig"
+				unset size_soft_limit
+				unset size_hard_limit
+				if [[ -f "${quota_config_file}" && -r "${quota_config_file}" ]]; then
+					source "${quota_config_file}" 2>&1 || {
+						log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" "${?}" "Cannot source ${quota_config_file}."
 						continue
 					}
 				else
-					log4Zsh 'WARN' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "${quota_cache_file} missing or not readable."
+					log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "${quota_config_file} missing or not readable."
 					continue
 				fi
-				if [[ -n "${soft:-}" && -n "${hard:-}" ]]; then
-					setIisilonDirectoryQuota "${group_dir}" "${soft}" "${hard}" '14D' 'true'
+				if [[ -n "${size_soft_limit:-}" && -n "${size_hard_limit:-}" ]]; then
+					setIisilonDirectoryQuota "${group_dir}" "${size_soft_limit}" "${size_hard_limit}" '14D' 'true'
 				else
-					log4Zsh 'WARN' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "Skipping setting quota limits for ${group_dir}, because ${quota_cache_file} was malformed."
+					log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "Skipping setting quota limits for ${group_dir}, because ${quota_config_file} was malformed."
 				fi
 			done
 		fi

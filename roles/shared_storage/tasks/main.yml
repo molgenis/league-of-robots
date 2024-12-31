@@ -142,10 +142,13 @@
 # This number is added to the GID to create the PID and must either be specified in
 #   group_vars/all/quota.conf
 # for each LFS or can be computed based on the LFS name:
-#   arc += 0
-#   prm += 200,000
-#   rsc += 400,000
-#   tmp += 600,000
+#   arc += 200,000
+#   prm += 400,000
+#   rsc += 600,000
+#   tmp += 800,000
+#   home += 0    not used here to create *.quotaconfig files,
+#                but hard coded range reserved for home dirs
+#                and used in set_quota.bash.
 #   Furthermore the LFS number is multiplied with 1,000,000.
 # E.g. the project_id for LFS prm11 and a group with GID 55100210 is:
 #   55,100,210 + 200,000 + (11 * 1,000,000) == 66,300,210
@@ -161,14 +164,16 @@
     group_id: "{{ getent_group[item.1.name][1] }}"
     lfs_type: "{{ item.0.lfs | regex_search('((tmp)|(rsc)|(prm))[0-9]+$', '\\1') | first }}"
     lfs_type_project_id_increment: "
-      {%- if lfs_type == 'arc' -%}
+      {%- if lfs_type == 'home' -%}
         0
-      {%- elif lfs_type == 'prm' -%}
+      {%- elif lfs_type == 'arc' -%}
         200000
-      {%- elif lfs_type == 'rsc' -%}
+      {%- elif lfs_type == 'prm' -%}
         400000
-      {%- elif lfs_type == 'tmp' -%}
+      {%- elif lfs_type == 'rsc' -%}
         600000
+      {%- elif lfs_type == 'tmp' -%}
+        800000
       {%- endif -%}"
     lfs_number: "{{ item.0.lfs | regex_search('((tmp)|(rsc)|(prm))([0-9]+)$', '\\5') | first }}"
     lfs_number_project_id_increment: "{{ lfs_number | int * 1000000 }}"
@@ -467,54 +472,72 @@
 ### Deploy quota management
 ##
 #
-- name: Deploy config file with quota_pid_increments for project quota.
-  ansible.builtin.template:
-    src: 'templates/quota.conf'
-    dest: '/etc/quota.conf'
-    owner: 'root'
-    group: 'root'
-    mode: '0644'
+- name: 'Remove old deprecated quota config file.'
+  ansible.builtin.file:
+    path: '/etc/quota.conf'
+    state: absent
   when: inventory_hostname in lfs_mounts
-            | rejectattr('quota_type', 'undefined')
             | rejectattr('rw_machines', 'undefined')
-            | selectattr('quota_type', 'equalto', 'project')
             | map(attribute='rw_machines')
             | flatten | unique or
         inventory_hostname in lfs_mounts
-            | rejectattr('quota_type', 'undefined')
             | rejectattr('ro_machines', 'undefined')
-            | selectattr('quota_type', 'equalto', 'project')
             | map(attribute='ro_machines')
             | flatten | unique or
-        (lfs_mounts
-            | rejectattr('quota_type', 'undefined')
-            | selectattr('quota_type', 'equalto', 'project')
-            | length >= 1
-           and
-           inventory_hostname in pfs_mounts
-              | rejectattr('machines', 'undefined')
-              | map(attribute='machines')
-              | flatten | unique)
+        inventory_hostname in pfs_mounts
+            | rejectattr('machines', 'undefined')
+            | map(attribute='machines')
+            | flatten | unique
   become: true
 
-- name: 'Deploy script to fetch quota limits from an LDAP and set them on shared storage mounts.'
+- name: Remove old deprecated quota config script.
+  ansible.builtin.file:
+    path: '/root/ldapquota.bash'
+    state: absent
+  when: inventory_hostname in groups['sys_admin_interface'] | default([])
+  become: true
+
+- name: Remove cron job for old deprecated quota config script.
+  ansible.builtin.file:
+    path: '/etc/cron.d/ldapquota'
+    state: absent
+  when: inventory_hostname in groups['sys_admin_interface'] | default([])
+  become: true
+
+- name: 'Deploy script to apply quota limits on Lustre file systems.'
   ansible.builtin.template:
-    src: 'templates/ldapquota.bash'
-    dest: '/root/ldapquota.bash'
+    src: 'templates/set_quota.bash'
+    dest: '/root/set_quota.bash'
     owner: 'root'
     group: 'root'
     mode: '0700'
   when: inventory_hostname in groups['sys_admin_interface'] | default([])
   become: true
 
-- name: 'Create cron job for ldapquota.bash script.'
+- name: 'Create cron job for set_quota.bash script.'
   ansible.builtin.cron:
-    name: 'Apply quota limits from LDAP to shared storage mounts.'
+    name: 'Apply quota limits to shared storage mounts.'
     minute: '15'
-    hour: '9,11,13,15,17,19,21'
+    hour: '7-21'
     user: 'root'
-    job: '/root/ldapquota.bash -a'
-    cron_file: 'ldapquota'
+    job: '/root/set_quota.bash -a'
+    cron_file: 'set_quota'
   when: inventory_hostname in groups['sys_admin_interface'] | default([])
   become: true
+
+#
+# We cannot acces our Isilon backend using a playbook.
+# Files must be copied manually into the right location on an Isilon node.
+#
+#     src: 'templates/set_isilon_quota.bash'
+#     dest: '/ifs/scripts/set_isilon_quota.bash'
+#     owner: 'root'
+#     group: 'root'
+#     mode: '0700'
+#
+#     src: 'files/crontab.smbtime'
+#     dest: '/etc/mcp/override/crontab.smbtime'
+#     owner: 'root'
+#     group: 'wheel'
+#     mode: '0644'
 ...
