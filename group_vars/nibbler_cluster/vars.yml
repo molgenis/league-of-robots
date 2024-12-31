@@ -561,12 +561,9 @@ pfs_mounts:
 lfs_mounts:
   - lfs: home
     pfs: umcgst04/slice2
-    quota_type: 'project'
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp02
     pfs: umcgst04/slice2
-    quota_type: 'project'
-    quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-atd
         mode: '2750'
@@ -669,8 +666,6 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm02
     pfs: umcgst01
-    quota_type: 'project'
-    quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-atd
       - name: umcg-biogen
@@ -722,8 +717,6 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
-    quota_type: 'project'
-    quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-atd
       - name: umcg-biogen
@@ -776,8 +769,6 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: rsc02
     pfs: umcgst04/slice3
-    quota_type: 'project'
-    quota_pid_increment: 500000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-atd
       - name: umcg-biogen
@@ -831,7 +822,6 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env02
     pfs: umcgst04/slice2
-    quota_type: 'project'
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
 ...
