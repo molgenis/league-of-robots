@@ -276,7 +276,7 @@ function processGroupDirs () {
 			continue
 		fi
 		#
-		# Check if soft limit is larger than the hard limit as that will quota commands to fail.
+		# Check if soft limit is larger than the hard limit as that will result in failed quota commands.
 		#
 		if [[ "${size_soft_limit}" -gt "${size_hard_limit}" ]]; then
 			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "   Quota values malformed for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path}. Soft limit cannot be larger than hard limit."

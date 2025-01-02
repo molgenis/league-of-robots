@@ -282,7 +282,7 @@ for pfs in "${pfss[@]}"; do
 	if [[ -e "${pfs}/home" ]]; then
 		log4Zsh 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "Processing LFS home on PFS ${pfs} ..."
 		declare -a home_dirs
-		home_dirs=($(find "${pfs}/home/" -mindepth 1 -maxdepth 1 -type d))
+		home_dirs=($(find "${pfs}/home/" -mindepth 1 -maxdepth 1 -type d | sort))
 		if [[ "${#home_dirs[@]:-0}" -eq 0 ]]; then
 			log4Zsh 'TRACE' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "No home dirs found in ${pfs}/home/."
 		else
@@ -294,7 +294,7 @@ for pfs in "${pfss[@]}"; do
 	if [[ -e "${pfs}/groups" ]]; then
 		log4Zsh 'INFO' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "Processing groups on PFS ${pfs} ..."
 		declare -a groups
-		group_dirs=($(find "${pfs}/groups/" -mindepth 2 -maxdepth 2 -type d))
+		group_dirs=($(find "${pfs}/groups/" -mindepth 2 -maxdepth 2 -type d | sort))
 		if [[ "${#group_dirs[@]:-0}" -eq 0 ]]; then
 			log4Zsh 'DEBUG' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "No group dirs found in ${pfs}/groups/."
 		else
@@ -311,11 +311,25 @@ for pfs in "${pfss[@]}"; do
 					log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "${quota_config_file} missing or not readable."
 					continue
 				fi
-				if [[ -n "${size_soft_limit:-}" && -n "${size_hard_limit:-}" ]]; then
-					setIisilonDirectoryQuota "${group_dir}" "${size_soft_limit}" "${size_hard_limit}" '14D' 'true'
-				else
+				if [[ -z "${size_soft_limit:-}" || -z "${size_hard_limit:-}" ]]; then
 					log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "Skipping setting quota limits for ${group_dir}, because ${quota_config_file} was malformed."
+					continue
 				fi
+				if [[ "${size_soft_limit}" -eq 0 ]]; then
+					size_soft_limit='2M'
+					log4Zsh 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Converted soft quota limit of 0 (zero) to lowest possible value of ${size_soft_limit}."
+				else
+					# Just append unit: all quota values from the IDVault are in GB.
+					size_soft_limit="${size_soft_limit}G"
+				fi
+				if [[ "${size_hard_limit}" -eq 0 ]]; then
+					size_hard_limit='4M'
+					log4Zsh 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Converted hard quota limit of 0 (zero) to lowest possible value of ${size_hard_limit}."
+				else
+					# Just append unit: all quota values from the IDVault are in GB.
+					size_hard_limit="${size_hard_limit}G"
+				fi
+				setIisilonDirectoryQuota "${group_dir}" "${size_soft_limit}" "${size_hard_limit}" '14D' 'true'
 			done
 		fi
 	fi
