@@ -323,8 +323,9 @@ function processGroupDirs () {
 		if [[ "${apply_settings}" -eq 1 ]]; then
 			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Creating ${_lfs_path}/.quotacache file ..."
 			{
-				cp "${_lfs_path}.quotaconfig" "${_lfs_path}/.quotacache.new"
-				mv "${_lfs_path}/.quotacache.new" "${_lfs_path}/.quotacache"
+				cp -p "${_lfs_path}.quotaconfig" "${_lfs_path}/.quotacache.new"
+				mv -f "${_lfs_path}/.quotacache.new" "${_lfs_path}/.quotacache"
+				chmod 644 "${_lfs_path}/.quotacache"
 			} || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "   Failed to create ${_lfs_path}/.quotacache."
 		fi
 	done

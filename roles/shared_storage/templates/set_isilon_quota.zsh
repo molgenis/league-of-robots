@@ -311,8 +311,11 @@ for pfs in "${pfss[@]}"; do
 					# Create .quotacache file for use by clients.
 					#
 					if [[ "${apply_settings}" -eq 1 ]]; then
-						cp "${quota_config_file}" "${group_dir}/.quotacache" \
-							|| log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" "${?}" "Cannot create ${group_dir}/.quotacache"
+						{
+							cp -p "${quota_config_file}" "${group_dir}/.quotacache.new"
+							mv -f "${group_dir}/.quotacache.new" "${group_dir}/.quotacache"
+							chmod 644 "${group_dir}/.quotacache"
+						} || log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" "${?}" "Cannot create ${group_dir}/.quotacache"
 					fi
 				else
 					log4Zsh 'ERROR' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "${quota_config_file} missing or not readable."
