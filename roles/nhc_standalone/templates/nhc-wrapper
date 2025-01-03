@@ -283,22 +283,22 @@ function nhcwrap_check_output() {
 
 function nhcwrap_report_results() {
 	# If we get here, we have results to report.
-	if [[ -n "${PREV_RESULTS}" ]]
+	if [[ ! -s "${SAVEFILE}" && -n "${PREV_RESULTS}" ]]
 	then
-		# We have empty results this time but non-empty previous
-		# results.  This means a prior error is now cleared.
+		# We have empty results this time but non-empty previous results.
+		# This means a prior error is now cleared.
 		if [[ "${NOTIFY}" == "1" ]]
 		then
-			read -r -d '' message << EOM
-{
-	"type": "mrkdwn",
-	"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster is healthy again*:
-\`\`\`
-The following error(s) on ${cluster_name} have now been CLEARED:
-${PREV_RESULTS}
-\`\`\`"
-}
-EOM
+			read -r -d '\0' message <<- EOM
+				{
+					"type": "mrkdwn",
+					"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster is healthy again*:
+				\`\`\`
+				The following error(s) on ${cluster_name} have now been CLEARED:
+				${PREV_RESULTS}
+				\`\`\`"
+				}\0
+			EOM
 			echo -n "Notifying Slack channel that the NHC error was cleared ... "
 			curl -X POST "${slack_webhook}" \
 				-H 'Content-Type: application/json' \
@@ -310,15 +310,15 @@ EOM
 	else
 		if [[ "${NOTIFY}" == "1" ]]
 		then
-			read -r -d '' message << EOM
-{
-	"type": "mrkdwn",
-	"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster needs help*:
-\`\`\`
-$(tr \" \' < "${SAVEFILE}")
-\`\`\`"
-}
-EOM
+			read -r -d '\0' message <<- EOM
+				{
+					"type": "mrkdwn",
+					"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster needs help*:
+				\`\`\`
+				$(tr \" \' < "${SAVEFILE}")
+				\`\`\`"
+				}\0
+			EOM
 			echo -n "Notifying Slack channel for new NHC error ... "
 			curl -X POST "${slack_webhook}" \
 				-H 'content-type:application/json' \
