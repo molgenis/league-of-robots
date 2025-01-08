@@ -4,12 +4,11 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'tl'
 stack_dtap_state: development
-slurm_version: '22.05.2-1.el7.umcg'
-slurm_allow_jobs_to_span_nodes: true
+slurm_version: '23.02.7-2.el9.umcg'
 slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
     default: yes
-    nodes: "{{ stack_prefix }}-vcompute[01-03]"  # Must be in sync with Ansible hostnames listed in inventory.
+    nodes: "{{ stack_prefix }}-node-a01"  # Must be in sync with Ansible hostnames listed in inventory.
     max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['regular']|list|length }}{% else %}1{% endif %}"
     max_cores_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
     max_mem_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
@@ -25,19 +24,17 @@ slurm_partitions:
     local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
+logs_class: 'development'
 repo_manager: 'pulp'
-os_distribution: 'centos7'
+os_distribution: 'rocky9'
 figlet_font: 'ogre'
 motd: |
-      =========================================================
-      !!! WARNING: {{ slurm_cluster_name | capitalize }} is in beta testing
-      =========================================================
-          This cluster may be redeployed from scratch, which
-          may result in complete data loss of home dirs 
-          and tmp0* group folders: You have been warned!!!
-          This does not affect prm0* group folders,
-          which are on a different (production) storage system.
-      =========================================================
+      =========================================================================
+      !!! WARNING: {{ slurm_cluster_name | capitalize }} is a {{ stack_dtap_state }} cluster
+      =========================================================================
+          This cluster may be redeployed from scratch,
+          which may result in complete data loss of all file systems!!!
+      =========================================================================
 additional_etc_hosts:
   - group: docs_library
     nodes:
@@ -48,17 +45,27 @@ additional_etc_hosts:
       - name: ladap
         network: donbot_external_network
 #
-# Remote logging settings - for diagnostics servers
+# Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
-logs_class: 'development'
-
-ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/umcg-hpc-development-ca"
+ssh_client_configs:
+  - hyperchicken_cluster
 use_ldap: true
 create_ldap: false
 use_sssd: true
 ldap_domains:
+  sram:
+    uri: ldaps://sv-sram.id.rug.nl
+    base: ou=sram-umcg,ou=users,o=id
+    schema: rfc2307bis
+    min_id: 70000000
+    max_id: 72999999
+    user_object_class: posixAccount
+    user_name: uid
+    user_ssh_public_key: sshPublicKey
+    user_member_of: groupMembership
+    group_member: member
   idvault:
-    uri: ldaps://172.23.40.249
+    uri: ldaps://svrs.id.rug.nl
     base: ou=umcg,o=asds
     schema: rfc2307
     min_id: 50100000
@@ -86,24 +93,54 @@ ldap_domains:
     group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
     group_quota_hard_limit_template: ruggroupumcgquotaLFS
     # listserv_mailinglist: Be careful not to use a production mailinglist for testing!
+pam_weblogin:
+  machines: "{{ groups['jumphost'] }}"
+  excluded:
+    - 'LOCAL'
+    - "{{ all.ip_addresses['umcg']['net1']['address'] }}{{ all.ip_addresses['umcg']['net1']['netmask'] }}"
+    - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
+    - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
+    - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
+  url: https://sram.surf.nl/pam-weblogin
+  user_name: email
+  min_uid: "{{ ldap_domains['sram']['min_id'] }}"
+  max_uid: "{{ ldap_domains['sram']['max_id'] }}"
+  retries: 3
+  cache_duration: 3600  # seconds
+cloud_image: RockyLinux-9.3_xfs
+cloud_user: cloud-user
+availability_zone: nova
 stack_networks:
-  - name: vlan983
+  - name: "{{ stack_prefix }}_internal_management"
+    cidr: '10.10.1.0/24'
+    gateway: '10.10.1.1'
     router_network: vlan16
     type: management
+    external: false
+  - name: provision-net
+    cidr: '172.23.66.0/24'
+    type: management
     external: true
-  - name: vlan985
+  - name: "{{ stack_prefix }}_internal_storage"
+    cidr: '10.10.2.0/24'
+    type: storage
+    external: false
+  - name: vlan1068  # Private Lustre
+    cidr: '172.23.60.0/24'
+    allow_ingress:
+      - 172.23.60.161/32  # Lustre server
+      - 172.23.60.162/32  # Lustre server
+      - 172.23.60.163/32  # Lustre server
+      - 172.23.60.164/32  # Lustre server
     type: storage
     external: true
 nameservers: [
-  '/gcc-storage001.stor.hpc.local/172.23.40.244',  # Local DNS lookups for shared storage.
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
 ]
 local_admin_groups:
   - 'admin'
-  - 'docker'
 local_admin_users:
-  - 'alex2'
   - 'ger'
   - 'gerben'
   - 'henkjan'
@@ -127,10 +164,8 @@ regular_groups:
   - "{{ envsync_group }}"
   - "{{ functional_admin_group }}"
   - 'umcg-atd'
-  - 'umcg-endocrinology'
   - 'umcg-gcc'
   - 'umcg-gsad'
-  - 'umcg-lifelines'
   - 'umcg-sysops'
 regular_users:
   - user: "{{ envsync_user }}"
@@ -139,16 +174,12 @@ regular_users:
     groups: ['umcg-atd']
   - user: 'umcg-atd-dm'
     groups: ['umcg-atd']
-  - user: 'umcg-endocrinology-dm'
-    groups: ['umcg-endocrinology']
   - user: 'umcg-gcc-dm'
     groups: ['umcg-gcc']
   - user: 'umcg-gsad-ateambot'
     groups: ['umcg-gsad']
   - user: 'umcg-gsad-dm'
     groups: ['umcg-gsad']
-  - user: 'umcg-lifelines-dm'
-    groups: ['umcg-lifelines']
   - user: 'umcg-sysops-dm'
     groups: ['umcg-sysops']
 sudoers:
@@ -156,68 +187,69 @@ sudoers:
     become: 'umcg-atd-dm'
   - who: ['%umcg-atd']
     become: 'umcg-atd-ateambot'
-  - who: ['%umcg-endocrinology-dms']
-    become: 'umcg-endocrinology-dm'
   - who: ['%umcg-gcc']
     become: 'umcg-gcc-dm'
   - who: ['%umcg-gsad']
     become: 'umcg-gsad-ateambot'
   - who: ['%umcg-gsad']
     become: 'umcg-gsad-dm'
-  - who: ['%umcg-lifelines-dms']
-    become: 'umcg-lifelines-dm'
   - who: ['%umcg-sysops']
     become: 'umcg-sysops-dm'
-
 #
 # Shared storage related variables
 #
+lustre_client_networks_vm:
+  - name: tcp20
+    interface: enp5s0
+lustre_client_networks_baremetal:
+  - name: tcp20
+    interface: enoxxx
 pfs_mounts:
-  - pfs: umcgst11
-    source: 'gcc-storage001.stor.hpc.local:/ifs/rekencluster'
-    type: nfs4
-    rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime'
-    ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro'
+  - pfs: umcgst04/slice4
+    source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
+    type: lustre
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    machines: "{{ groups['sys_admin_interface'] }}"
+  - pfs: umcgst04/slice5
+    source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
+    type: lustre
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
-    pfs: umcgst11
+    pfs: umcgst04/slice4
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp08
-    pfs: umcgst11
+    pfs: umcgst04/slice5
     groups:
       - name: umcg-atd
-      - name: umcg-endocrinology
       - name: umcg-gcc
-      - name: umcg-gsad  
-      - name: umcg-lifelines
         mode: '2750'
+      - name: umcg-gsad
       - name: umcg-sysops
+        mode: '2750'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
-    pfs: umcgst11
+    pfs: umcgst04/slice5
     groups:
       - name: umcg-atd
-      - name: umcg-gsad  
-      - name: umcg-lifelines
+      - name: umcg-gcc
+      - name: umcg-gsad
       - name: umcg-sysops
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
-    pfs: umcgst11
+    pfs: umcgst04/slice5
     groups:
       - name: umcg-atd
       - name: umcg-gcc
-      - name: umcg-gsad  
-      - name: umcg-lifelines
-      - name: umcg-solve-rd
+      - name: umcg-gsad
       - name: umcg-sysops
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env08
-    pfs: umcgst11
+    pfs: umcgst04/slice4
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
-ega_fuse_client_mounts:
-  solve_rd: '/groups/umcg-solve-rd/prm08/ega-fuse-client'
-ega_fuse_client_java_home: '/etc/alternatives/jre_11_openjdk'
 ...

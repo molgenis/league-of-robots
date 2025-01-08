@@ -1,5 +1,5 @@
 ---
-openstack_api_timeout: 180
+openstack_api_timeout: 240
 stack_hosts_created_in_openstack: "{{ hostvars
     | json_query('* | [?cloud_flavor] | [].inventory_hostname')
     | flatten

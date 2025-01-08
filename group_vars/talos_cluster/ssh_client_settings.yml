@@ -11,5 +11,5 @@ ssh_client_known_hosts: "\
   *talos,\
   *docs-on-bateleur,\
   *tl-* \
-  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOUth7HlHn/qVcSlSXFxRdNxtccKnrh0hsWuo4m3FamK UMCG HPC Development CA"
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK53ughHfxrCu1dn3TbemHjR9xjZFz93yhYPoL/Xuif0 CA key for Talos"
 ...

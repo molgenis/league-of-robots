@@ -1,42 +1,54 @@
 ---
 ip_addresses:
   reception:
-    vlan983:
-      address: 172.23.40.38
+    tl_internal_management:
+      address: 10.10.1.31
       netmask: /32
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     vlan16:
-      address: 195.169.22.195
+      address: 195.169.22.179
       netmask: /32
       fqdn: 'reception.hpc.rug.nl'
   talos:
-    vlan983:
-      address: 172.23.40.92
+    tl_internal_management:
+      address: 10.10.1.195
       netmask: /32
-    vlan985:
-      address: 172.23.34.92
+    tl_internal_storage:
+      address: 10.10.2.92
+      netmask: /32
+    vlan1068:
+      address: 172.23.60.30
       netmask: /32
   tl-dai:
-    vlan983:
-      address: 172.23.40.94
+    tl_internal_management:
+      address: 10.10.1.204
+      netmask: /32
+    tl_internal_storage:
+      address: 10.10.2.180
+      netmask: /32
+    vlan1068:
+      address: 172.23.60.21
       netmask: /32
   tl-repo:
-    vlan983:
-      address: 172.23.40.99
+    tl_internal_management:
+      address: 10.10.1.226
       netmask: /32
   tl-sai:
-    vlan983:
-      address: 172.23.40.93
+    tl_internal_management:
+      address: 10.10.1.25
       netmask: /32
-  tl-vcompute01:
-    vlan983:
-      address: 172.23.40.95
+    tl_internal_storage:
+      address: 10.10.2.191
       netmask: /32
-  tl-vcompute02:
-    vlan983:
-      address: 172.23.40.96
+    vlan1068:
+      address: 172.23.60.8
       netmask: /32
-  tl-vcompute03:
-    vlan983:
-      address: 172.23.40.97
+  tl_internal_management-vlan16-router:
+    tl_internal_management:
+      address: 10.10.1.1
       netmask: /32
+    vlan16:
+      address: 195.169.22.69
+      netmask: /32
+      fqdn: 'NXDOMAIN'
 ...

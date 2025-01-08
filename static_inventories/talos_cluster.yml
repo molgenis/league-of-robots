@@ -8,69 +8,113 @@ all:
     jumphost:
       hosts:
         reception:
-          cloud_flavor: 2C-4GB
-          os_distribution: 'rocky9'
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
-            - name: vlan983
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_jumphosts"
+              assign_floating_ip: true
+            #- name: provision-net
+            #  security_group: "{{ stack_prefix }}_cluster"
+            #  assign_floating_ip: false
+          basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
+          local_yum_repository: true
     repo:
       hosts:
         tl-repo:
-          cloud_flavor: 2C-4GB
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
-            - name: vlan983
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_repo"
+          swap_file_size: 2
     docs:
       hosts:
         docs-on-bateleur:
     sys_admin_interface:
       hosts:
         tl-sai:
-          cloud_flavor: 4C-8GB
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
-            - name: vlan983
-            - name: vlan985
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+            - name: "{{ stack_prefix }}_internal_storage"
+              security_group: "{{ stack_prefix }}_storage"
+            - name: vlan1068
+              security_group: "{{ stack_prefix }}_storage"
+          lustre_client_networks: "{{ lustre_client_networks_vm }}"
     deploy_admin_interface:
       hosts:
         tl-dai:
-          cloud_flavor: 4C-8GB
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
-            - name: vlan983
-            - name: vlan985
-          local_volume_size_extra: 614
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+            - name: "{{ stack_prefix }}_internal_storage"
+              security_group: "{{ stack_prefix }}_storage"
+            - name: vlan1068
+              security_group: "{{ stack_prefix }}_storage"
+          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+          local_volume_size_extra: 300
     user_interface:
       hosts:
         talos:
-          cloud_flavor: 4C-8GB
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
-            - name: vlan983
-            - name: vlan985
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+            - name: "{{ stack_prefix }}_internal_storage"
+              security_group: "{{ stack_prefix }}_storage"
+            - name: vlan1068
+              security_group: "{{ stack_prefix }}_storage"
+          lustre_client_networks: "{{ lustre_client_networks_vm }}"
           slurm_sockets: 4
           slurm_cores_per_socket: 1
-          slurm_real_memory: 7820
+          slurm_real_memory: 7684
           slurm_local_disk: 0
           slurm_features: 'prm08,tmp08'
           slurm_ethernet_interfaces:
-            - 'vlan983'
-            - 'vlan985.isilon'
+            - enp3s0
+            - enp4s0
+            - enp5s0
     compute_node:
       children:
         regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
-            tl-vcompute[01:03]:
-              cloud_flavor: 4C-8GB
+            tl-node-a01:
+              cloud_flavor: umcg.v1.bm.64-512-0
+              host_type: baremetal
               host_networks:
-                - name: vlan983
-                - name: vlan985
-              local_volume_size_extra: 100
-              slurm_sockets: 4
-              slurm_cores_per_socket: 1
-              slurm_real_memory: 7820
+                - name: "{{ stack_prefix }}_internal_management"
+                  security_group: "{{ stack_prefix }}_cluster"
+                - name: "{{ stack_prefix }}_internal_storage"
+                  security_group: "{{ stack_prefix }}_storage"
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+              lustre_client_networks: "{{ lustre_client_networks_baremetal }}"
+              perc_devices: true
+#               local_mounts:
+#                 - mount_point: "{{ slurm_local_scratch_dir }}"
+#                   device: '/dev/sdb'
+#                   mounted_owner: root
+#                   mounted_group: root
+#                   mounted_mode: '0755'
+#                   mount_options: >-
+#                     rw,relatime
+#                     {%- if ansible_facts['os_family'] == 'RedHat' and
+#                            ansible_facts['distribution_major_version'] >= '8' -%}
+#                       ,nofail,x-systemd.device-timeout=10
+#                     {%- endif -%}
+#                   type: ext4
+              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
+              slurm_sockets: 2
+              slurm_cores_per_socket: 32
+              slurm_real_memory: 512000
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
-              slurm_local_disk: 93000
+              slurm_local_disk: 0
               slurm_features: 'tmp08'
               slurm_ethernet_interfaces:
-                - 'vlan983'
-                - 'vlan985.isilon'
+                - enoxxx
+                - enoyyy
 administration:
   children:
     sys_admin_interface:
