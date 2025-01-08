@@ -117,11 +117,11 @@ Commonly used options:
  * ```--cpus-per-task=X``` 
     * Requests X CPUs (cores) for your job.
     * This **should be equal to the amount of threads started/used by your code**.
-    * Note that our HPC systems do **not** use _hyperthreading_, which is a marketing gimmick providing two _virtual_ cores for each _physical_ core and acts as a performance killer for most workloads.
+    * Note that our HPC systems do **not** use _hyperthreading_, which is a marketing gimmick by Intel. They add extra registers on a pysical core and presenting each _physical_ core as **two**. These two _virtual_ cores then run on one physical core and act as a performance killer for most HPC workloads. Exception to these are a poorly written jobs that have a lot of waiting time between the core cycles - an exception which we don't support running on our clusters.
     * When your code starts more threads than the amount of requested cores, then those threads will have to compete for the CPU cycles by taking turns and waiting on each other.
       This will result in overloading the requested cores exceeding thresholds for healthy load average statistics, which will trigger the Node Health Check (NHC) to drain the compute node.
-      At best your code will run slower than it could and as drained nodes will refuse new jobs it will reduce the total capacity of the cluster.
-    * When your code starts less threads than the amount of requested cores, then the extra cores cannot do anything useful and their CPU cycles are wasted reducing the total capacity of the cluster.
+      At best your code will run slower than it could and as drained nodes will refuse new jobs it will reduce the total efficiency rate of the cluster.
+    * When your code starts less threads than the amount of requested cores, then the extra cores cannot do anything useful and their CPU cycles are wasted reducing the total efficiency rate of the cluster.
  * ```--mem=Xgb```
     * Requests X GB RAM total per job
  * ```--tmp=Xgb```

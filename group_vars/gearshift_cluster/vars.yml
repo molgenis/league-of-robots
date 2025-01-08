@@ -513,8 +513,6 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
-    quota_type: 'project'
-    quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-aad
       - name: umcg-as
