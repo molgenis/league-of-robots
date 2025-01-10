@@ -1,0 +1,10 @@
+[Unit]
+Description=Archive Queue Recall service
+
+[Service]
+User=root
+Type=oneshot
+ExecStart=/etc/cron.hourly/arcq_{{ item.name }}
+
+[Install]
+WantedBy=multi-user.target

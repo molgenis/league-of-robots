@@ -50,4 +50,11 @@
     - archive_groups is defined
     - inventory_hostname in groups['user_interface'] | default([])
   become: true
+
+- name: Configure file recall (staging) from remote system
+  ansible.builtin.include_tasks:
+    file: recall.yml
+  when:
+    - archive_groups is defined
+    - inventory_hostname in groups['user_interface'] | default([])
 ...
