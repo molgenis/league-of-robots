@@ -122,6 +122,12 @@
 # * Fetch the source code for 2.15.5-RC1
 # * Use the same procedure as above to compile lustre-*2.15.5_RC1-1.el9.*.rpm RPMs.
 #
+# For EL >= 9.5 we need Lustre >= 2.15.6, because Lustre 2.15.5 will no longer compile with DKMS.
+#
+# At the time this comment was written 2.15.6 was not yet released and we need to
+# * Fetch the source code for 2.15.6-RC1
+# * Use the same procedure as above to compile lustre-*2.15.6_RC1-1.el9.*.rpm RPMs.
+#
 - name: Install the Lustre client
   ansible.builtin.package:
     state: latest

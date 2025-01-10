@@ -1,5 +1,5 @@
 ---
-- name: Install mandatory build depedencies.
+- name: Install mandatory build dependencies.
   ansible.builtin.package:
     state: latest
     update_cache: true

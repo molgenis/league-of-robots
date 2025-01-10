@@ -16,6 +16,62 @@ ip_addresses:
     subnet-nfs-data-2541:
       address: 10.35.141.15
       netmask: /32
+  fd-node-a01:
+    fd_internal_management:
+      address: 10.10.1.77
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.13
+      netmask: /32
+  fd-node-a02:
+    fd_internal_management:
+      address: 10.10.1.173
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.32
+      netmask: /32
+  fd-node-a03:
+    fd_internal_management:
+      address: 10.10.1.49
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.75
+      netmask: /32
+  fd-node-a04:
+    fd_internal_management:
+      address: 10.10.1.15
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.197
+      netmask: /32
+  fd-node-a05:
+    fd_internal_management:
+      address: 10.10.1.39
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.237
+      netmask: /32
+  fd-node-a06:
+    fd_internal_management:
+      address: 10.10.1.91
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.208
+      netmask: /32
+  fd-node-a07:
+    fd_internal_management:
+      address: 10.10.1.84
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.209
+      netmask: /32
+  fd-node-a08:
+    fd_internal_management:
+      address: 10.10.1.154
+      netmask: /32
+    subnet-nfs-data-2541:
+      address: 10.35.141.119
+      netmask: /32
   fd-repo:
     fd_internal_management:
       address: 10.10.1.217
@@ -26,90 +82,6 @@ ip_addresses:
       netmask: /32
     subnet-nfs-data-2541:
       address: 10.35.141.132
-      netmask: /32
-  fd-vcompute01:
-    fd_internal_management:
-      address: 10.10.1.191
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.109
-      netmask: /32
-  fd-vcompute02:
-    fd_internal_management:
-      address: 10.10.1.234
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.138
-      netmask: /32
-  fd-vcompute03:
-    fd_internal_management:
-      address: 10.10.1.254
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.59
-      netmask: /32
-  fd-vcompute04:
-    fd_internal_management:
-      address: 10.10.1.173
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.91
-      netmask: /32
-  fd-vcompute05:
-    fd_internal_management:
-      address: 10.10.1.117
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.81
-      netmask: /32
-  fd-vcompute06:
-    fd_internal_management:
-      address: 10.10.1.96
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.119
-      netmask: /32
-  fd-vcompute07:
-    fd_internal_management:
-      address: 10.10.1.105
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.157
-      netmask: /32
-  fd-vcompute08:
-    fd_internal_management:
-      address: 10.10.1.59
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.178
-      netmask: /32
-  fd-vcompute09:
-    fd_internal_management:
-      address: 10.10.1.195
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.20
-      netmask: /32
-  fd-vcompute10:
-    fd_internal_management:
-      address: 10.10.1.253
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.214
-      netmask: /32
-  fd-vcompute11:
-    fd_internal_management:
-      address: 10.10.1.97
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.176
-      netmask: /32
-  fd-vcompute12:
-    fd_internal_management:
-      address: 10.10.1.213
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.146
       netmask: /32
   fender:
     fd_internal_management:

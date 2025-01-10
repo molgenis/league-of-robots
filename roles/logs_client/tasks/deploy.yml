@@ -88,8 +88,8 @@
 
 - name: Fix the syslog logrotate to work correctly with rsyslog
   ansible.builtin.template:
-    src: templates/syslog.logrotate
-    dest: /etc/logrotate.d/syslog
+    src: templates/rsyslog.logrotate
+    dest: /etc/logrotate.d/rsyslog
     mode: '0644'
     force: true
   become: true
