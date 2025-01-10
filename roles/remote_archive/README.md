@@ -9,18 +9,18 @@ vi group_vars/hyperchicken_cluster/vars.yml
 define variable `archive_groups`:
 
 ```yml
+# Remote archive settings
 archive_groups:
   - name: arc01
     groups:
       - 'umcg-atd'
       - 'solve-rd'
-    archive_system: 'archive.surfsara.nl'
     archive_user: 'umcg-atd-dm'
+    archive_system: 'archive.surfsara.nl'
     archive_system_fingerprints:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
       - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
-archive_ssh_key_location: '/root/.ssh/id_ed25519_archive'
-archive_ssh_key_type: 'ed25519'
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion
 ```
 
 this defines for the groups `solve-rd` and `umcg-atd` an archive folders of `arc01`. They will be prepared to be automounted (when accessed) in the folders `/group/[solve-rd,umcg-atd]/arc01/`. The archive are stored on remote systems 'archive.surfsara.nl', which is accessed main user `umcg-atd-dm`. Keys for access are stored on each system inside the `/root/.ssh/id_ed25519_archive{,.pub}`.
