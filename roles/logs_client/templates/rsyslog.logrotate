@@ -1,0 +1,17 @@
+/var/log/cron
+/var/log/maillog
+/var/log/spooler
+/var/log/messages
+/var/log/secure
+{
+    missingok
+    nosharedscripts
+    weekly
+    rotate 10
+    compress
+    delaycompress
+    copytruncate
+    postrotate
+        /bin/systemctl restart rsyslog
+    endscript
+}
