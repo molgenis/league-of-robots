@@ -10,7 +10,7 @@ _system="{{ item.archive_system }}"
 # Derived bash variables
 _lock="/var/cache/arcq/${_arc}-lock"
 _queue_dir="/var/cache/arcq/queue/${_arc}"
-_stdout_dir="/tmp/arcq_stdout/${_arc}"
+_stdout_dir="/tmp/arcq_stdout/"
 
 # Locking mechanism
 # Systemd has only limit burst rate, which is not rate limit. Rate limit of one
@@ -23,56 +23,61 @@ if [[ -f "$_lock" ]]; then
 
     if (( _diff < _delay )); then
         _sleep=$((_delay - _diff))
-        echo "Rate limit hit. Sleeping for ${_sleep} seconds."
+        echo "${0}: Rate limit hit. Sleeping for ${_sleep} seconds."
         sleep "${_sleep}"
     fi
 fi
 date +%s > "${_lock}"
 
-# Make directory structure
-if ! test -d "${_stdout_dir}"; then mkdir -p "${_stdout_dir}"; fi
+# Make directory structure with correct permissions
+if ! test -d "${_stdout_dir}"; then mkdir -m "1777" -p "${_stdout_dir}"; fi
+if ! test -d "${_stdout_dir}" && \
+   ! test -w "${_stdout_dir}" && \
+   ! test -r "${_stdout_dir}" && \
+   ! test -k "${_stdout_dir}"; then chmod "1777" "${_stdout_dir}"; fi
 
 # Clean old outputs
-find "${_stdout_dir:-/error_path_fail}" -mmin +60 -exec rm {} +
+find "${_stdout_dir:-/error_path_fail}" -type f -mmin +60 -exec rm {} +
 
 # Queueing part
-test -d "${_queue_dir:-error_path}" || { echo "error, no ${_queue_dir}, exiting ..."; exit; }
+test -d "${_queue_dir:-error_path}" || { echo "${0} Error, no ${_queue_dir}, exiting ..."; exit; }
 _queue_files="$(find /var/cache/arcq/queue/${_arc} -type f)"
 for _file in ${_queue_files}; do
    _basename="$(basename ${_file})"
    # file structure: one line, first is command, then subdirector's path
    _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
-   logger -t surf_archive "Inf: Received path ${_path}"
+   logger -t surf_archive "${0}: Info: received path ${_path}"
    _command=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    _group="$(echo "${_path}" | cut -s -d'/' -f3)"
    _fs="$(echo "${_path}" | cut -s -d'/' -f4)"
    _subdir="$(echo "${_path}" | cut -s -d'/' -f5-)"
-#   if ! test -d "${_path:-error_path}"; then
-#      logger -t surf_archive "Err: ${_path} must be pointing to the directory, not a file!"
-#      rm -f "${_file}"
-#      continue
-#   fi
+   # Check that it is running on a correct filesystem
    if [[ ! "${_fs}" =~ ^"arc"[0-9][0-9]$ ]]; then
-      logger -t surf_archive "Err: (${_fs}) path not pointing to the arc filesystem!"
+      echo "${0}: Error, (${_fs}) path not pointing to the arc filesystem!"
       rm -f "${_file}"
       continue
    fi
    # Check and format command
    _argument=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    case "${_argument:2}" in
-      dmfind-reg) _command="dmfind ${_arc}/${_group}/${_subdir} -type reg" ;;
-      dmfind-mig) _command="dmfind ${_arc}/${_group}/${_subdir} -type mig" ;;
-      dmfind-dul) _command="dmfind ${_arc}/${_group}/${_subdir} -type dul" ;;
-      dmfind-ofl) _command="dmfind ${_arc}/${_group}/${_subdir} -type ofl" ;;
-      dmfind-unm) _command="dmfind ${_arc}/${_group}/${_subdir} -type unm" ;;
-      dmget)      _command="dmget ${_arc}/${_group}/${_subdir}" ;;
+      dmfind-reg) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state reg" ;;
+      dmfind-mig) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state mig" ;;
+      dmfind-dul) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state dul" ;;
+      dmfind-ofl) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state ofl" ;;
+      dmfind-unm) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state unm" ;;
+      dmget)      _command="dmget -n ${_arc}/${_group}/${_subdir}" ;;
       dmls)       _command="dmls -l ${_arc}/${_group}/${_subdir}" ;;
-      dmput)      _command="dmput -r ${_arc}/${_group}/${_subdir}" ;;
-      *)          _command="dmfind ${_arc}/${_group}/${_subdir} -type reg" ;;
+      dmput)      _command="dmput -n -r ${_arc}/${_group}/${_subdir}" ;;
+      *)          _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state reg" ;;
    esac
+   # Prepare for the output
+   _stdout="/${_stdout_dir}/${_basename}"
+   # "Atomic" action 1/2: first collect the output
+   _reply="$(ssh "${_user}@${_system}" "${_command}" 2>"${_stdout}.err")"
+   # "Atomic" action 2/2: then write the output in one move
 
-   _stdout="/${_stdout_dir}/${_group}.${_basename}"
-   echo "ssh ${_user}@${_system} dmfind ${_arc}/ -type f" >> "${_stdout}"
+   echo "${_reply}" > "${_stdout}" && sync
    chown "${_group}-dm":"${_group}" "${_stdout}"
+   chown "${_group}-dm":"${_group}" "${_stdout}.err"
    rm -f "${_file:-error_path}"
 done
