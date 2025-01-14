@@ -6,6 +6,8 @@
   hosts:
     - chaperone
   roles:
+    - role: ssh_host_signer
+      when: test_chaperone is defined and test_chaperone
     - role: admin_users
       when:
         - test_chaperone is defined and test_chaperone
@@ -13,8 +15,7 @@
       when:
         - local_mounts is defined
         - test_chaperone is defined and test_chaperone
-
-- name: '###==-> Roles for UNmanaged chaperones. <-==###'
+    - name: '###==-> Roles for UNmanaged chaperones. <-==###'
   hosts:
     - chaperone
   roles:
