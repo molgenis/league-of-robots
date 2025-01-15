@@ -59,8 +59,8 @@ for _file in ${_queue_files}; do
    _append=""
    _submitter_uid="$(stat -c '%u' "${_file}")"
    _submitter_gid=$(id -G "${_submitter_uid}")
-   _archive_uid=$(stat -c "%u" "${2}")
-   _archive_gid=$(stat -c "%g" "${2}")
+   _archive_uid=$(stat -c "%u" "${_path}")
+   _archive_gid=$(stat -c "%g" "${_path}")
    echo "${0}: Info: received path ${_path}"
    touch "${_stdout}" && chown "${_submitter_uid}":"${_group}" "${_stdout}"
    touch "${_stdout}.err" && chown "${_submitter_uid}":"${_group}" "${_stdout}.err"
