@@ -6,16 +6,16 @@ set -euo pipefail
 _arc="{{ item.name }}"
 _user="{{ item.archive_user }}"
 _system="{{ item.archive_system }}"
-
-# Derived bash variables
 _lock="/var/cache/arcq/${_arc}-lock"
 _queue_dir="/var/cache/arcq/queue/${_arc}"
-_stdout_dir="/tmp/arcq_stdout/"
-
+_stdout_dir="/tmp/arcq_stdout"
+_nl="
+"
 # Locking mechanism
 # Systemd has only limit burst rate, which is not rate limit. Rate limit of one
-# ssh command per 10 seconds seems reasonable.
-_delay=10
+# ssh command per ${_delay} seconds seems reasonable.
+_delay=5
+
 if [[ -f "$_lock" ]]; then
     _last_run=$(cat "${_lock}")
     _now=$(date +%s)
@@ -23,7 +23,7 @@ if [[ -f "$_lock" ]]; then
 
     if (( _diff < _delay )); then
         _sleep=$((_delay - _diff))
-        echo "${0}: Rate limit hit. Sleeping for ${_sleep} seconds."
+        echo "${0} info: rate limit hit. Sleeping for ${_sleep} seconds."
         sleep "${_sleep}"
     fi
 fi
@@ -40,20 +40,30 @@ if ! test -d "${_stdout_dir}" && \
 find "${_stdout_dir:-/error_path_fail}" -type f -mmin +60 -exec rm {} +
 
 # Queueing part
-test -d "${_queue_dir:-error_path}" || { echo "${0} Error, no ${_queue_dir}, exiting ..."; exit; }
+if ! test -d "${_queue_dir:-error_path}"; then
+   echo "${0} error: no ${_queue_dir}, exiting ..."
+   exit
+fi
 _queue_files="$(find /var/cache/arcq/queue/${_arc} -type f)"
 for _file in ${_queue_files}; do
-   _basename="$(basename ${_file})"
-   # file structure: one line, first is command, then subdirector's path
+   # Prepare variables
+   #  the file structure: from queue file. All send in one line = [command] [subdirectory]
    _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
    logger -t surf_archive "${0}: Info: received path ${_path}"
    _command=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    _group="$(echo "${_path}" | cut -s -d'/' -f3)"
    _fs="$(echo "${_path}" | cut -s -d'/' -f4)"
    _subdir="$(echo "${_path}" | cut -s -d'/' -f5-)"
+   #  the output: based on basename of queued file
+   _basename="$(basename ${_file})"
+   _stdout="/${_stdout_dir}/${_basename}"
+   _append=""
+   touch "${_stdout}" && chown "${_group}-dm":"${_group}" "${_stdout}"
+   touch "${_stdout}.err" && chown "${_group}-dm":"${_group}" "${_stdout}.err"
+   echo "${0} info: output set to '${_stdout}{,.err}'"
    # Check that it is running on a correct filesystem
    if [[ ! "${_fs}" =~ ^"arc"[0-9][0-9]$ ]]; then
-      echo "${0}: Error, (${_fs}) path not pointing to the arc filesystem!"
+      echo "${0} error: (${_fs}) path not pointing to the arc filesystem!" > "${_stdout}.err"
       rm -f "${_file}"
       continue
    fi
@@ -68,16 +78,15 @@ for _file in ${_queue_files}; do
       dmget)      _command="dmget -n ${_arc}/${_group}/${_subdir}" ;;
       dmls)       _command="dmls -l ${_arc}/${_group}/${_subdir}" ;;
       dmput)      _command="dmput -n -r ${_arc}/${_group}/${_subdir}" ;;
-      *)          _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state reg" ;;
+      *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}.err"
+                  rm -f "${_file:-error_path}" && continue ;;
    esac
-   # Prepare for the output
-   _stdout="/${_stdout_dir}/${_basename}"
-   # "Atomic" action 1/2: first collect the output
-   _reply="$(ssh "${_user}@${_system}" "${_command}" 2>"${_stdout}.err")"
-   # "Atomic" action 2/2: then write the output in one move
-
-   echo "${_reply}" > "${_stdout}" && sync
-   chown "${_group}-dm":"${_group}" "${_stdout}"
-   chown "${_group}-dm":"${_group}" "${_stdout}.err"
    rm -f "${_file:-error_path}"
+   # "Atomic" action 1/2: first collect the output
+   echo "${0} info: running command '${_command}'"
+   # We capture the error ourselve, we don't want -o pipefail to jump in here
+   _reply="$(timeout -s 9 $((_delay*2)) ssh "${_user}@${_system}" "${_command}" 2>"${_stdout}.err" || true)"
+   [[ "${?}" -ne "0" ]] && _append="Error: command not finished normally ..."
+   # "Atomic" action 2/2: then write the output in one move
+   echo "${_reply}${_nl}${_append}" > "${_stdout}" && sync
 done

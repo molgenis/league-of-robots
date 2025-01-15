@@ -1,9 +1,11 @@
 #!/bin/bash
 set -euo pipefail
-_tag="surf_archive"
-_queue_dir="/var/cache/arcq/queue/"
-_stdout_dir="/tmp/arcq_stdout/"
 
+_tmp_basename="$(basename $(mktemp -u))"
+_tag="surf_archive"
+_queue_dir="/var/cache/arcq/queue"
+_stdout_dir="/tmp/arcq_stdout"
+_delay=0.5
 
 function _print_help(){
    cat << EOF
@@ -42,15 +44,21 @@ if [[ ! "${_third}" =~ ^"arc"[0-9][0-9]$ ]]; then
    exit 1
 fi
 
-_tmp_basename="$(basename $(mktemp -u))"
 echo "${_arg} ${_path}" >> "${_queue_dir}/${_third}/${_tmp_basename}"
 
 echo "Archive: command submitted, waiting for reply ..."
-while ! test -e "${_stdout_dir}/${_tmp_basename}"; do sleep 0.2; done
+sleep ${_delay} && sync
+while ! test -s "${_stdout_dir}/${_tmp_basename}" && \
+      ! test -s "${_stdout_dir}/${_tmp_basename}.err"; do
+   sleep ${_delay}
+done
+
+sync
 if test -s "${_stdout_dir}/${_tmp_basename}.err";
    then echo "Error, command failed:"
    cat "${_stdout_dir}/${_tmp_basename}.err"
 else
    cat "${_stdout_dir}/${_tmp_basename}"
 fi
-rm -f "${_stdout_dir}/${_tmp_basename}*"
+rm -f "${_stdout_dir}/${_tmp_basename}"
+rm -f "${_stdout_dir}/${_tmp_basename}.err"
