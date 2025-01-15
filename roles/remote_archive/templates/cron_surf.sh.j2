@@ -49,7 +49,6 @@ for _file in ${_queue_files}; do
    # Prepare variables
    #  the file structure: from queue file. All send in one line = [command] [subdirectory]
    _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
-   logger -t surf_archive "${0}: Info: received path ${_path}"
    _command=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    _group="$(echo "${_path}" | cut -s -d'/' -f3)"
    _fs="$(echo "${_path}" | cut -s -d'/' -f4)"
@@ -58,12 +57,22 @@ for _file in ${_queue_files}; do
    _basename="$(basename ${_file})"
    _stdout="/${_stdout_dir}/${_basename}"
    _append=""
-   touch "${_stdout}" && chown "${_group}-dm":"${_group}" "${_stdout}"
-   touch "${_stdout}.err" && chown "${_group}-dm":"${_group}" "${_stdout}.err"
+   _submitter_uid="$(stat -c '%u' "${_file}")"
+   _submitter_gid=$(id -G "${_submitter_uid}")
+   _archive_uid=$(stat -c "%u" "${2}")
+   _archive_gid=$(stat -c "%g" "${2}")
+   echo "${0}: Info: received path ${_path}"
+   touch "${_stdout}" && chown "${_submitter_uid}":"${_group}" "${_stdout}"
+   touch "${_stdout}.err" && chown "${_submitter_uid}":"${_group}" "${_stdout}.err"
    echo "${0} info: output set to '${_stdout}{,.err}'"
+   if [ "${_submitter_uid}" -ne "${_archive_uid}" ] && ! grep -qw "${_archive_gid}" <<< "${_submitter_gid}"; then
+      echo "${0} error: you must have access to the path in order to work with archive." > "${_stdout}.err"
+      rm -f "${_file}"
+      continue
+   fi
    # Check that it is running on a correct filesystem
    if [[ ! "${_fs}" =~ ^"arc"[0-9][0-9]$ ]]; then
-      echo "${0} error: (${_fs}) path not pointing to the arc filesystem!" > "${_stdout}.err"
+      echo "error: (${_fs}) path not pointing to the arc filesystem!" > "${_stdout}.err"
       rm -f "${_file}"
       continue
    fi
