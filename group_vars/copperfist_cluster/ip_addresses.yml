@@ -23,6 +23,9 @@ ip_addresses:
     cf_internal_management:
       address: 10.10.1.72
       netmask: /32
+    vlan990:
+      address: 192.168.1.145
+      netmask: /32
   cf-transfer:
     cf_internal_management:
       address: 10.10.1.42
