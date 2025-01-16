@@ -2,7 +2,19 @@
 - name: Import pre deploy checks.
   ansible.builtin.import_playbook: pre_deploy_checks.yml
 
-- name: '###==-> Roles for chaperones. <-==###'
+- name: '###==-> Roles for MANAGED chaperones <-==###'
+  hosts:
+    - chaperone
+  roles:
+    - role: admin_users
+      when:
+        - test_chaperone is defined and test_chaperone
+    - role: local_storage
+      when:
+        - local_mounts is defined
+        - test_chaperone is defined and test_chaperone
+
+- name: '###==-> Roles for UNmanaged chaperones. <-==###'
   hosts:
     - chaperone
   roles:
