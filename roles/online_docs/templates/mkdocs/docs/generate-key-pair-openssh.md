@@ -56,7 +56,9 @@ ssh-keygen -p -f ~/.ssh/id_ed25519
 ## Request account and have the public key linked to your account
 
 To request an account, [contact the helpdesk via email](../contact/) and
-
+{% if 'gearshift' in slurm_cluster_name or 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
+ * Make sure you have read the [Code of Conduct](../coc_umcg_research_clusters/) and tell us you agree with it using this email
+{% endif %}
  * Attach the ```~/.ssh/id_ed25519.pub``` public key file generated with the ```ssh-keygen``` command.  
    If you cannot see / find the public key file, you most likely stored the file in a folder starting with a ```.```; e.g. in your ```~/.ssh``` folder which is the default.
    Folders and files that start with a ```.``` are *hidden* files and not displayed by default.

@@ -51,7 +51,9 @@ Now make sure you:
 ## Request account and have the public key linked to your account
 
 To request an account, [contact the helpdesk via email](../contact/) and
-
+{% if 'gearshift' in slurm_cluster_name or 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
+ * Make sure you have read the [Code of Conduct](../coc_umcg_research_clusters/) and tell us you agree with it using this email
+{% endif %}
  * Paste the contents of the public key as displayed in MobaKeyGen's *Public key for pasting into OpenSSH authorized_keys file* field in the email.
  * Please motivate your account request and
      * For **guest** accounts to access only a data transfer machine associated with the cluster:

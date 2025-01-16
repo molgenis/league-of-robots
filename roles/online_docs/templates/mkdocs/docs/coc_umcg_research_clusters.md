@@ -131,9 +131,9 @@ We wish you many fruitful computations!
 
 Name: ____________________
 
-Role (please tick appropriate boxes) :
-- [ ] cluster user
-- [ ] owner of a group on the cluster
+Role (please tick appropriate boxes):  
+&#x25a2; cluster user  
+&#x25a2; owner of a group on the cluster  
 
 Date: ____________________
 
