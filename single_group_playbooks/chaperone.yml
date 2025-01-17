@@ -23,9 +23,6 @@
     - role: admin_users
       when:
         - cloud_flavor is defined or azure_flavor is defined
-    - role: ssh_host_signer
-      when:
-        - cloud_flavor is defined or azure_flavor is defined
     - role: local_storage
       when:
         - local_mounts is defined
