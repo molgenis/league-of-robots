@@ -20,12 +20,23 @@
       when:
         - repo_manager == 'none'
         - cloud_flavor is defined or azure_flavor is defined
+    # needed for the rest of the roles
+    - role: update
+      when:
+        - cloud_flavor is defined or azure_flavor is defined
     - role: admin_users
       when:
         - cloud_flavor is defined or azure_flavor is defined
     - role: local_storage
       when:
         - local_mounts is defined
+        - cloud_flavor is defined or azure_flavor is defined
+    - role: sshd
+      when:
+        - cloud_flavor is defined or azure_flavor is defined
+    - role: sssd
+      when:
+        - use_sssd | default(false) | bool
         - cloud_flavor is defined or azure_flavor is defined
 
 - name: '###==-> Roles for UNmanaged chaperones. <-==###'
