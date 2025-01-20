@@ -157,7 +157,7 @@ Match all
     AllowGroups admin
 {% elif inventory_hostname in groups['storage_server'] | default([]) %}
 #
-# Only allow (local) admin users on documentation servers.
+# Only allow (local) admin users on storage servers.
 #
 Match all
     AllowGroups admin
