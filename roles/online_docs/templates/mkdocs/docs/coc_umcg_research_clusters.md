@@ -11,14 +11,14 @@ The code of conduct consists of 2 parts: part 1 for the user, part 2 for the own
 - Permission to access the HPC cluster is limited to users who have completed the UMCG
 e-learing: "Privacy in research". If you have a contract (aanstelling) with the UMCG go to lms.umcg.nl and search 
 for privacy to find the e-learing. If this does not work or you do not have a UMCG contract please go to:
-Privacy in Research - GDPR / AVG (E-learning only; PWO) (capp12.nl)
+[Privacy in Research - GDPR / AVG (E-learning only; PWO)](capp12.nl)
 - Permission to access the HPC cluster is limited to scientists that have signed this Code of Conduct and 
-submitted a pdf scan of the signed document in sRAM or mailed it to hpc.helpdesk@umcg.nl.
+submitted a pdf scan of the signed document in sRAM or mailed it to [the helpdesk](../contact/).
 - In addition users of the HPC cluster also have to abide by the UMCG IT User Guidelines (accessible via 
 https://umcg.zenya.work/portal/ search for “UMCG Richtlijn IT Gebruik”).
 - Users of the HPC cluster need to abide by the Research Code UMCG, accessible via
 https://umcg.zenya.work/portal/ search for “Research Code UMCG” or via this link:
-UMCG research code
+[UMCG research code](https://researchcode.umcgresearch.org/en/w/introduction)
 - Users of the HPC cluster are obliged to adhere to the UMCG clear-screen policy: assure no unauthorized people 
 can read your screen. When you leave your computer you must lock the screen.
 - Human-related data is only allowed to be uploaded to the HPC cluster when in line with the obtained informed 
@@ -28,10 +28,9 @@ the HPC cluster to private or institutional computers, unless approved by the da
 - Cluster users are bound to GDPR and other relevant regulations.
 - Cluster users are responsible for reporting inadvertent data release, breach of data
 security, or other data management incidents contrary to the terms of data access
-specified in this Code of Conduct to the HPC helpdesk (hpc.helpdesk@umcg.nl)
+specified in this Code of Conduct to the [HPC helpdesk](../contact/)
 - in case of a potential data breach this needs to be reported to the UMCG privacy work organisation by phone via 
-+31(0)50-3611111; or via the Orange SOS button on the UMCG Intranet page and also to the HPC helpdesk 
-(hpc.helpdesk@umcg.nl)
++31(0)50-3611111; or via the Orange SOS button on the UMCG Intranet page and also to the [HPC helpdesk](../contact/) 
 - Only use pseudonimized or anonimyzed data on the UMCG HPC cluster.
 - Do not store the key of your pseudonimisation on the cluster. The key should be stored in RedCap.
 - Do not store any data containing names, addresses, or any other contact information or identifiers of study 
@@ -49,10 +48,11 @@ arising from the unavailability of, or break in access to, the HPC cluster for w
 ### General
 - We assume that you are familiar with some basic knowledge about Linux command line (shell) navigation and shell 
 scripting. If you never worked on the command line, consider some Linux tutorials on the subject first and sign 
-up for the RUG cluster courses. Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)
-Hábrók geavanceerd | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)
+up for the RUG cluster courses.  
+[Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://www.rug.nl/corporate-academy/courses/habrok-basis?lang=en)  
+[Hábrók geavanceerd | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://www.rug.nl/corporate-academy/courses/habrok-advanced?lang=en)
 - We expect you to exploit our documentation before asking for help:
-http://docs.gcc.rug.nl/
+<http://docs.gcc.rug.nl/>
 
 ### Mailing List
 - We communicate upcoming events (e.g. maintenance downtimes) on our low volume
@@ -63,7 +63,7 @@ cluster account.
 - Do not share your account
 - If using public key authentication, never share your private key (also not with our helpdesk!). If you by 
 accident shared your private key with anyone (including our helpdesk) you have to make a new keypair and send the 
-public key to hpc.helpdesk@umcg.nl
+public key to [the helpdesk](../contact/).
 
 ### General Communication with the Cluster Administrators
 - Please mail us at hpc.helpdesk@umcg.nl for questions, issues or comments regarding our clusters.
@@ -124,7 +124,7 @@ I read and understand the UMCG HPC Code of Conduct. I declare that I will abide 
 understand that failure to adhere to the Code of Conduct will have repercussions for my access to the HPC 
 cluster.
 
-Please, sign this Code of Conduct and send a scanned copy to hpc.helpdesk@umcg.nl.
+Please, sign this Code of Conduct and send a scanned copy to [the helpdesk](../contact/).
 
 We wish you many fruitful computations!
 
