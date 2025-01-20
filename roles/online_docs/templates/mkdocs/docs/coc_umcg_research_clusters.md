@@ -61,9 +61,9 @@ cluster account.
 
 ### Security
 - Do not share your account
-- If using public key authentication, never share your private key (also not with our
-helpdesk!). If you by accident shared your private key with anyone (including our
-helpdesk) you have to make
+- If using public key authentication, never share your private key (also not with our helpdesk!). If you by 
+accident shared your private key with anyone (including our helpdesk) you have to make a new keypair and send the 
+public key to hpc.helpdesk@umcg.nl
 
 ### General Communication with the Cluster Administrators
 - Please mail us at hpc.helpdesk@umcg.nl for questions, issues or comments regarding our clusters.
@@ -109,15 +109,14 @@ Such a program usually run as a background process (daemon) rather than being un
 interactive user. We will immediately kill such processes.
 
 ## Part 2: Rules for owners of a group on the UMCG HPC cluster:
-
 The rules for users (part 1 of this Code of Conduct) also apply for group owners
-Group owners are responsible for :
+Group owners are responsible for:
+  
 - the research project should be registered in the UMCG research register
 - the data inside their group
 - giving or rejecting access to their group including the end-date of acces given.
 - appointing data managers for their group
-- paying the annual costs associated with their cluster group. For this the group owner will need to provide a 
-budget number or “kostenplaats”.
+- paying the annual costs associated with their cluster group. For this the group owner will need to provide a budget number or “kostenplaats”.
 
 ### Conclusion and signature:
 
