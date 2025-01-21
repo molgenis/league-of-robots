@@ -118,7 +118,6 @@ all:
     chaperone:
       hosts:
         tl-chaperone:
-          test_chaperone: true
           local_mounts:
             - mount_point: "/groups/"
               device: '/dev/sdb'
