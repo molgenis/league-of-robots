@@ -1,0 +1,6 @@
+---
+beegfs_install_services:
+  - beegfs-mgmtd
+  - beegfs-meta
+  - beegfs-storage
+...

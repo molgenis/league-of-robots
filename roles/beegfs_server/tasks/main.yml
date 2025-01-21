@@ -1,0 +1,44 @@
+---
+- name: Install BeeGFS services
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+    name: "{{ item }}"
+  become: true
+  loop: "{{ beegfs_install_services }}"
+
+- name: Format storage devices
+  ansible.builtin.include_tasks:
+    file: format.yml
+  tags:
+    - never # this role will never run
+    - format_beegfs_server # except when we say so
+
+- name: Configure BeeGFS management service
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-mgmtd.conf
+    regexp: "^storeMgmtdDirectory="
+    line: "storeMgmtdDirectory=/mnt/beegfs-storage/mgmtd"
+  notify: restart beegfs-mgmtd
+
+- name: Configure BeeGFS metadata service
+  lineinfile:
+    path: /etc/beegfs/beegfs-meta.conf
+    regexp: "^storeMetaDirectory="
+    line: "storeMetaDirectory=/mnt/beegfs-storage/meta"
+  notify: restart beegfs-meta
+
+- name: Configure BeeGFS storage service
+  lineinfile:
+    path: /etc/beegfs/beegfs-storage.conf
+    regexp: "^storeStorageDirectory="
+    line: "storeStorageDirectory=/mnt/beegfs-storage/storage"
+  notify: restart beegfs-storage
+
+- name: Configure BeeGFS caching
+  lineinfile:
+    path: /etc/beegfs/beegfs-storage.conf
+    regexp: "^storeCacheDirectory="
+    line: "storeCacheDirectory=/mnt/beegfs-cache"
+  notify: restart beegfs-storage
+...

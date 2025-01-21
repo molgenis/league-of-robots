@@ -272,6 +272,8 @@ all:
     beegfs_server:
       hosts:
         cf-storage:
+          beegfs_cache_device: "/dev/nvme2n1"
+          beegfs_storage_device: "/dev/sda"
 administration:
   children:
     sys_admin_interface:

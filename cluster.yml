@@ -28,6 +28,12 @@
 - name: Run playbook for NFS servers.
   ansible.builtin.import_playbook: single_group_playbooks/nfs_server.yml
 
+- name: Run playbook for Storage servers.
+  ansible.builtin.import_playbook: single_group_playbooks/storage_server.yml
+
+- name: Run playbook for Beegfs servers.
+  ansible.builtin.import_playbook: single_group_playbooks/beegfs_server.yml
+
 - name: Run playbook for all cluster machines part 2.
   ansible.builtin.import_playbook: single_group_playbooks/cluster_part2.yml
 
