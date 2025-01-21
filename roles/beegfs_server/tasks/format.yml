@@ -1,0 +1,9 @@
+---
+- name: Format storage devices for metadata and object storage
+  filesystem:
+    dev: "{{ item }}"
+    fstype: xfs
+  loop:
+    - "{{ beegfs_cache_device }}"
+    - "{{ beegfs_storage_device }}"
+...

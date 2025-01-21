@@ -1,0 +1,18 @@
+#
+# This play depends on:
+#   * cluster_part1.yml
+#
+---
+- name: Import pre deploy checks.
+  ansible.builtin.import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Extra roles for Storage server. <-==###'
+  hosts:
+    - storage_server
+  roles:
+    - role: perc_cli
+      when:
+        - perc_devices is defined and perc_devices
+    - role: begeefs_server
+        - perc_devices is defined and perc_devices
+...

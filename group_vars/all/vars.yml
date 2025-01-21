@@ -163,6 +163,9 @@ pulp_repos:
     - name: e2fsprogs  # Dependency for Lustre project quota.
       description: 'Ext filesystem utility releases for Enterprise Linux 9.'
       remote_url: https://downloads.whamcloud.com/public/e2fsprogs/latest/el9/
+    - name: beegfs  # Dependency for BeeGFS storage
+      description: 'BeeGFS filesystem official repository for RedHat9 distros'
+      remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/x86_64/
     #
     # Lustre packages still broken and cannot be installed on EL 9.x due to silly Python 2 dependency resulting in:
     # "nothing provides /usr/bin/python2 needed by lustre-client-dkms-2.15.4-1.el9.noarch from lustre"
@@ -487,6 +490,16 @@ yum_repos:
       name: 'Perun IdM Slave Scripts'
       baseurl: 'https://repo.cerit-sc.cz/el-perun/noarch/'
       gpgkey: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
+      gpgcheck: 1
+      enabled: 1
+    #
+    # BeeGFS
+    #
+    - file: beegfs.repo
+      id: beegfs
+      name: 'BeeGFS official RedHat9 repository'
+      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/x86_64/'
+      gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
       gpgcheck: 1
       enabled: 1
   oracle8:
