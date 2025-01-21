@@ -6,13 +6,38 @@
   hosts:
     - chaperone
   roles:
+    - role: ssh_host_signer
+      when:
+        - cloud_flavor is defined or azure_flavor is defined
+    - role: static_hostname_lookup
+      when:
+        - cloud_flavor is defined or azure_flavor is defined
+    - role: pulp_client
+      when:
+        - repo_manager == 'pulp'
+        - cloud_flavor is defined or azure_flavor is defined
+    - role: yum_repos
+      when:
+        - repo_manager == 'none'
+        - cloud_flavor is defined or azure_flavor is defined
+    # needed for the rest of the roles
+    - role: update
+      when:
+        - cloud_flavor is defined or azure_flavor is defined
     - role: admin_users
       when:
-        - test_chaperone is defined and test_chaperone
+        - cloud_flavor is defined or azure_flavor is defined
     - role: local_storage
       when:
         - local_mounts is defined
-        - test_chaperone is defined and test_chaperone
+        - cloud_flavor is defined or azure_flavor is defined
+    - role: sshd
+      when:
+        - cloud_flavor is defined or azure_flavor is defined
+    - role: sssd
+      when:
+        - use_sssd | default(false) | bool
+        - cloud_flavor is defined or azure_flavor is defined
 
 - name: '###==-> Roles for UNmanaged chaperones. <-==###'
   hosts:
@@ -24,8 +49,10 @@
     - regular_users
     - shared_storage
     - sudoers
-    - logs_toprm
     - build_environment
     - envsync
-    - ogm
+    - role: logs_toprm
+      when: cloud_flavor is not defined and azure_flavor is not defined
+    - role: ogm
+      when: cloud_flavor is not defined and azure_flavor is not defined
 ...
