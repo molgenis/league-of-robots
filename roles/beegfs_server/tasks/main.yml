@@ -6,13 +6,18 @@
     name: "{{ item }}"
   become: true
   loop: "{{ beegfs_install_services }}"
+  tags:
+    - never # this role will never run
+    - install_beegfs # except when we say so
+
+- meta: end_play
 
 - name: Format storage devices
   ansible.builtin.include_tasks:
     file: format.yml
   tags:
     - never # this role will never run
-    - format_beegfs_server # except when we say so
+    - reformat_beegfs_server # except when we say so
 
 - name: Configure BeeGFS management service
   ansible.builtin.lineinfile:
