@@ -11,7 +11,7 @@ The code of conduct consists of 2 parts: part 1 for the user, part 2 for the own
 - Permission to access the HPC cluster is limited to users who have completed the UMCG
 e-learing: "Privacy in research". If you have a contract (aanstelling) with the UMCG go to lms.umcg.nl and search 
 for privacy to find the e-learing. If this does not work or you do not have a UMCG contract please go to:
-[Privacy in Research - GDPR / AVG (E-learning only; PWO)](capp12.nl)
+[Privacy in Research - GDPR / AVG (E-learning only; PWO)](https://umcg.capp12.nl/open-courses/recourses/699/storefront)
 - Permission to access the HPC cluster is limited to scientists that have signed this Code of Conduct and 
 submitted a pdf scan of the signed document in sRAM or mailed it to [the helpdesk](../contact/).
 - In addition users of the HPC cluster also have to abide by the UMCG IT User Guidelines (accessible via 
@@ -66,7 +66,7 @@ accident shared your private key with anyone (including our helpdesk) you have t
 public key to [the helpdesk](../contact/).
 
 ### General Communication with the Cluster Administrators
-- Please mail us at hpc.helpdesk@umcg.nl for questions, issues or comments regarding our clusters.
+- Please [mail us](../contact/) for questions, issues or comments regarding our clusters.
 - Do not use the personal email address of a cluster administrator. This is important
 because it keeps all administrators informed about the ongoing problem-solving process, and if one administrator 
 is not available, another administrator can help you with your question.
