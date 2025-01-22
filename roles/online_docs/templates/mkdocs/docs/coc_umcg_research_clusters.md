@@ -101,10 +101,10 @@ successfully. We often experience that hundreds of jobs getting killed due to an
 job script.
 
 ### Cluster Performance
-- DO NOT run resource-intensive computations directly on the login node AKA submit
+- **DO NOT** run resource-intensive computations directly on the login node AKA submit
 node AKA Head node. This will have a negative impact on the performance of the whole cluster. Instead, generate a 
 job script that carries out the computations and submit this job script to the cluster using sbatch.
-- DO NOT run server applications (PostgreSQL server, web server, ...) on the front-end server (submit hosts). 
+- **DO NOT** run server applications (PostgreSQL server, web server, ...) on the front-end server (submit hosts). 
 Such a program usually run as a background process (daemon) rather than being under the direct control of an 
 interactive user. We will immediately kill such processes.
 
@@ -128,12 +128,12 @@ Please, sign this Code of Conduct and send a scanned copy to [the helpdesk](../c
 
 We wish you many fruitful computations!
 
-Name: ____________________
+Name: <u>____________________________________________</u>
 
 Role (please tick appropriate boxes):  
 &#x25a2; cluster user  
 &#x25a2; owner of a group on the cluster  
 
-Date: ____________________
+Date: <u>____________________________________________</u>
 
-Signature: ___________________
+Signature: <u>____________________________________________</u>
