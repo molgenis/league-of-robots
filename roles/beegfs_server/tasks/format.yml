@@ -7,6 +7,7 @@
   loop:
     - "{{ beegfs_cache_device }}"
     - "{{ beegfs_storage_device }}"
+  become: true
 
 - name: RE-format storage devices - create xfs filesytem for metadata and object storage
   community.general.filesystem:
@@ -19,4 +20,5 @@
   tags:
     - never # this role will never run
     - reformat_beegfs_server # except when we say so
+  become: true
 ...

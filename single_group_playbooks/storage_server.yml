@@ -11,8 +11,7 @@
     - storage_server
   roles:
     - role: perc_cli
-      when:
-        - perc_devices is defined and perc_devices
+      when: perc_devices is defined and perc_devices
     - role: begeefs_server
-        - perc_devices is defined and perc_devices
+      when: perc_devices is defined and perc_devices
 ...
