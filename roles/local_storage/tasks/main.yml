@@ -34,7 +34,6 @@
 - name: Recheck the mount point.
   ansible.builtin.command: "mountpoint {{ item.mount_point }}"
   register: local_storage_mount_point_status
-  failed_when: false
   changed_when: false
   loop: "{{ local_mounts }}"
 
