@@ -138,6 +138,8 @@ all:
           regular_users:
             - user: "{{ envsync_user }}"
               groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
+            - user: 'umcg-molgenis'
+              groups: ['umcg-atd', 'umcg-gsad', 'umcg-gst', "{{ functional_users_group }}"]
             - user: 'umcg-atd-ateambot'
               groups: ['umcg-atd', "{{ functional_users_group }}"]
             - user: 'umcg-atd-dm'
@@ -169,6 +171,8 @@ all:
             - user: 'gvdvries'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
           sudoers:
+            - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+              become: 'umcg-molgenis'
             - who: ['%umcg-atd']
               become: 'umcg-atd-dm'
             - who: ['%umcg-atd']

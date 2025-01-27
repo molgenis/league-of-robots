@@ -193,6 +193,8 @@ regular_users:
   - user: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
+  - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+    become: 'umcg-molgenis'
   - who: ['%umcg-atd']
     become: 'umcg-atd-dm'
   - who: ['%umcg-atd']
