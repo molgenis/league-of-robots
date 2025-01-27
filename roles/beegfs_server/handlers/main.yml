@@ -1,0 +1,31 @@
+---
+- name: Force systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+  listen: systemd_reload
+
+- name: Restart beegfs-mgmtd
+  service:
+    name: beegfs-mgmtd
+    enabled: true
+    state: restarted
+  listen: restart-beegfs-mgmtd
+  become: true
+
+- name: Restart beegfs-meta
+  service:
+    name: beegfs-meta
+    enabled: true
+    state: restarted
+  listen: restart-beegfs-meta
+  become: true
+
+- name: Restart beegfs-storage
+  service:
+    name: beegfs-storage
+    enabled: true
+    state: restarted
+  listen: restart-beegfs-storage
+  become: true
+...

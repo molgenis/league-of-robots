@@ -10,5 +10,19 @@
   hosts:
     - beegfs_server
   roles:
+    - iptables
+    - grub
+    - locale
+    - logrotate
+    - remove
+    - update
+    - logins
+    - sshd
+    - basic_security
+    - local_storage
+    - role: perc_cli
+      when: perc_devices is defined and perc_devices
+    - local_storage
     - role: beegfs_server
+      when: perc_devices is defined and perc_devices
 ...

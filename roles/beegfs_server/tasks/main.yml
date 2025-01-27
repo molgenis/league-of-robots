@@ -1,49 +1,80 @@
 ---
-- name: Install BeeGFS services
+- name: Install BeeGFS server services
   ansible.builtin.package:
     state: latest
     update_cache: true
     name: "{{ item }}"
-  become: true
   loop: "{{ beegfs_install_services }}"
-  tags:
-    - never # this role will never run
-    - install_beegfs # except when we say so
-
-- meta: end_play
-
-- name: Format storage devices
-  ansible.builtin.include_tasks:
-    file: format.yml
-  tags:
-    - never # this role will never run
-    - reformat_beegfs_server # except when we say so
+  become: true
 
 - name: Configure BeeGFS management service
   ansible.builtin.lineinfile:
     path: /etc/beegfs/beegfs-mgmtd.conf
-    regexp: "^storeMgmtdDirectory="
-    line: "storeMgmtdDirectory=/mnt/beegfs-storage/mgmtd"
-  notify: restart beegfs-mgmtd
+    regexp: '^storeMgmtdDirectory\s*='
+    line: "storeMgmtdDirectory={{ beegfs_storage_dir }}/mgmtd"
+  notify:
+    - systemd_reload
+    - restart-beegfs-mgmtd
+  become: true
 
 - name: Configure BeeGFS metadata service
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/beegfs/beegfs-meta.conf
-    regexp: "^storeMetaDirectory="
-    line: "storeMetaDirectory=/mnt/beegfs-storage/meta"
-  notify: restart beegfs-meta
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regex: '^storeMetaDirectory\s*=', line: "storeMetaDirectory={{ beegfs_storage_dir }}/meta" }
+    - { regex: '^sysMgmtdHost\s=', line: "sysMgmtdHost={{ inventory_hostname }}" }
+  notify:
+    - systemd_reload
+    - restart-beegfs-meta
+  become: true
 
-- name: Configure BeeGFS storage service
-  lineinfile:
+- name: Configure Storage directory on BeeGFS storage service
+  ansible.builtin.lineinfile:
     path: /etc/beegfs/beegfs-storage.conf
-    regexp: "^storeStorageDirectory="
-    line: "storeStorageDirectory=/mnt/beegfs-storage/storage"
-  notify: restart beegfs-storage
+    regexp: '^storeStorageDirectory\s*='
+    line: "storeStorageDirectory={{ beegfs_storage_dir }}/storage"
+  notify:
+    - systemd_reload
+    - restart-beegfs-storage
+  become: true
 
-- name: Configure BeeGFS caching
-  lineinfile:
+- name: Configure Caching directory on BeeGFS storage service
+  ansible.builtin.lineinfile:
     path: /etc/beegfs/beegfs-storage.conf
-    regexp: "^storeCacheDirectory="
+    regexp: '^storeCacheDirectory\s*='
     line: "storeCacheDirectory=/mnt/beegfs-cache"
-  notify: restart beegfs-storage
+  notify:
+    - systemd_reload
+    - restart-beegfs-storage
+  become: true
+
+- name: Configure connAuthFile
+  ansible.builtin.copy:
+    content: "{{ beegfs_connAuthFile_content }}"
+    dest: /etc/beegfs/connauthfile
+    owner: root
+    group: root
+    mode: '0400'
+  notify:
+    - systemd_reload
+    - restart-beegfs-mgmtd
+    - restart-beegfs-meta
+    - restart-beegfs-storage
+  become: true
+
+- name: Configure all the services to use the connAuthFile
+  ansible.builtin.lineinfile:
+    path: "/etc/beegfs/{{ item }}"
+    regexp: '^connAuthFile\s*='
+    line: "connAuthFile=/etc/beegfs/connauthfile"
+  with_items:
+    - beegfs-mgmtd.conf
+    - beegfs-meta.conf
+    - beegfs-storage.conf
+  notify:
+    - systemd_reload
+    - restart-beegfs-mgmtd
+  become: true
 ...

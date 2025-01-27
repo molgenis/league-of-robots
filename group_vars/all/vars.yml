@@ -177,7 +177,7 @@ pulp_repos:
       remote_url: https://packages.irods.org/yum/pool/el9/x86_64/
     - name: beegfs  # Dependency for BeeGFS storage
       description: 'BeeGFS filesystem for Enterprise Linux 9.'
-      remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/x86_64/
+      remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/
 #
 # List of repos for machines that do not use Pulp.
 #
@@ -504,7 +504,7 @@ yum_repos:
     - file: beegfs.repo
       id: beegfs
       name: 'BeeGFS filesystem for Enterprise Linux 9.'
-      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/x86_64/'
+      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/'
       gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
       gpgcheck: 1
       enabled: 1
@@ -674,7 +674,7 @@ yum_repos:
       baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/$basearch/
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
-      enabled: 1    
+      enabled: 1
     - file: uek-ol8.repo
       id: ol8_UEKR7_RDMA
       name: 'Oracle Linux 8 UEK7 RDMA ($basearch)'
