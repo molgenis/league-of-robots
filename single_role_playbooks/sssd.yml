@@ -3,8 +3,11 @@
   hosts:
     - jumphost
     - cluster
+    - chaperone,!mit_chaperone
     - data_transfer
   roles:
-    - sssd
-    - sshd  # Always re-run sshd role after potentially changing the logic to fetch public keys.
+    - role: sssd
+      when: use_sssd | default(false) | bool
+    - role: sshd  # Always re-run sshd role after potentially changing the logic to fetch public keys.
+      when: use_sssd | default(false) | bool
 ...

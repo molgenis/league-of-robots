@@ -4,6 +4,7 @@
     - jumphost
     - repo
     - cluster
+    - chaperone
     - irods
     - ldap_server
     - logs
@@ -11,7 +12,7 @@
     - role: static_hostname_lookup
 
 - name: Initialization roles for most hosts.
-  hosts: all,!openstack_api,!chaperone
+  hosts: all,!openstack_api,!mit_chaperone
   roles:
     - ssh_host_signer
     #

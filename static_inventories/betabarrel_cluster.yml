@@ -270,4 +270,7 @@ betabarrel_cluster:
     data_transfer:
     docs:
     smb_server:
+mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
+  children:
+    chaperone:
 ...

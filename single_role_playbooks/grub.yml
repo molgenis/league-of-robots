@@ -1,6 +1,6 @@
 ---
 - name: Configure grub on all hosts.
-  hosts: all,!openstack_api,!chaperone
+  hosts: all,!openstack_api,!mit_chaperone
   roles:
     - grub
 ...
