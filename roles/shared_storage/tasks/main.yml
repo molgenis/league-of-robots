@@ -208,7 +208,7 @@
 ### Unmount LFS-ses, which are no longer configured to be mounted.
 ##
 #
-- name: 'Unmount shared storage LFS-ses no longer configured to be mounted.'
+- name: 'Unmount shared storage LFS-ses no longer configured to be mounted. (WARNING: cannot check and unmount autofs mounts.)'
   ansible.posix.mount:  # noqa jinja[spacing]
     path: "{{ item['mount'] }}"
     src: "{{ item['device'] }}"
@@ -258,7 +258,7 @@
     | selectattr('mount', 'defined')
     | selectattr('mount', 'search', '^/(groups/)|(apps)|(home)|(mnt/env[0-9]+)')
     | selectattr('device', 'defined')
-    | selectattr('device', 'search', ':/')
+    | selectattr('device', 'search', '(^//)|(:/)')
     | sort(attribute='device')
     | list }}"
   when: item['device'] not in configured_lfs_mount_devices
@@ -302,10 +302,15 @@
     group: 'root'
     mode: '0755'
     state: 'directory'
-  when: inventory_hostname in groups['compute_node'] | default([]) or
-        inventory_hostname in groups['user_interface'] | default([]) or
-        inventory_hostname in groups['deploy_admin_interface'] | default([]) or
-        inventory_hostname in groups['chaperone'] | default([])
+  when:
+    - lfs_mounts
+      | default([])
+      | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+      | length > 0
+    - inventory_hostname in groups['compute_node'] | default([]) or
+      inventory_hostname in groups['user_interface'] | default([]) or
+      inventory_hostname in groups['deploy_admin_interface'] | default([]) or
+      inventory_hostname in groups['chaperone'] | default([])
   become: true
 
 - name: 'Create folder for each group in /groups.'
