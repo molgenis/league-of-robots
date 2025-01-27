@@ -1,5 +1,5 @@
 ---
-- name: Running > logs_server < role
+- name: Running logs_server role.
   hosts: logs
   roles:
     - regular_users

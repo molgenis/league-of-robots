@@ -8,6 +8,7 @@
     - repo
     - build_server
     - cluster
+    - chaperone,!mit_chaperone
     - data_transfer
     - docs
     - irods

@@ -158,8 +158,10 @@ data_transfer_only_group: 'umcg-sftp-only'
 envsync_user: 'umcg-envsync'
 envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
+functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
 regular_groups:
+  # Note, for chaperone machines this is controlled in the static_inventories.
   - "{{ data_transfer_only_group }}"
   - "{{ envsync_group }}"
   - "{{ functional_admin_group }}"
@@ -169,22 +171,27 @@ regular_groups:
   - 'umcg-gst'
   - 'umcg-sysops'
 regular_users:
+  # Note, for chaperone machines this is controlled in the static_inventories.
   - user: "{{ envsync_user }}"
-    groups: ["{{ envsync_group }}"]
+    groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
   - user: 'umcg-atd-ateambot'
-    groups: ['umcg-atd']
+    groups: ['umcg-atd', "{{ functional_users_group }}"]
   - user: 'umcg-atd-dm'
-    groups: ['umcg-atd']
+    groups: ['umcg-atd', "{{ functional_users_group }}"]
   - user: 'umcg-gcc-dm'
-    groups: ['umcg-gcc']
+    groups: ['umcg-gcc', "{{ functional_users_group }}"]
   - user: 'umcg-gsad-ateambot'
-    groups: ['umcg-gsad']
+    groups: ['umcg-gsad', "{{ functional_users_group }}"]
   - user: 'umcg-gsad-dm'
-    groups: ['umcg-gsad']
+    groups: ['umcg-gsad', "{{ functional_users_group }}"]
+  - user: 'umcg-gst-ateambot'
+    groups: ['umcg-gst', "{{ functional_users_group }}"]
   - user: 'umcg-gst-dm'
-    groups: ['umcg-gst']
+    groups: ['umcg-gst', "{{ functional_users_group }}"]
   - user: 'umcg-sysops-dm'
-    groups: ['umcg-sysops']
+    groups: ['umcg-sysops', "{{ functional_users_group }}"]
+  - user: 'umcg-vipt-dm'
+    groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd']
     become: 'umcg-atd-dm'
@@ -197,22 +204,13 @@ sudoers:
   - who: ['%umcg-gsad']
     become: 'umcg-gsad-dm'
   - who: ['%umcg-gst']
+    become: 'umcg-gst-ateambot'
+  - who: ['%umcg-gst']
     become: 'umcg-gst-dm'
   - who: ['%umcg-sysops']
     become: 'umcg-sysops-dm'
-#
-# Local storage variables.
-#
-local_mount_subfolders:
-  - mount_point: '/groups'
-    machines: "{{ groups['chaperone'] }}"
-    folders:
-      - rel_paths:
-          - umcg-gst
-          - umcg-atd
-          - umcg-gsad
-        mode: '2770'
-        owner: root
+  - who: ['%umcg-vipt']
+    become: 'umcg-vipt-dm'
 #
 # Shared storage related variables
 #
@@ -246,24 +244,22 @@ lfs_mounts:
       - name: umcg-gcc
         mode: '2750'
       - name: umcg-gsad
+      - name: umcg-gst
       - name: umcg-sysops
         mode: '2750'
+      - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
     pfs: umcgst04/slice5
     groups:
-      - name: umcg-atd
       - name: umcg-gcc
-      - name: umcg-gsad
       - name: umcg-sysops
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
     pfs: umcgst04/slice5
     groups:
-      - name: umcg-atd
       - name: umcg-gcc
-      - name: umcg-gsad
       - name: umcg-sysops
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env08

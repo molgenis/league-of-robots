@@ -2,57 +2,45 @@
 - name: Import pre deploy checks.
   ansible.builtin.import_playbook: pre_deploy_checks.yml
 
-- name: '###==-> Roles for MANAGED chaperones <-==###'
-  hosts:
-    - chaperone
-  roles:
-    - role: ssh_host_signer
-      when:
-        - cloud_flavor is defined or azure_flavor is defined
-    - role: static_hostname_lookup
-      when:
-        - cloud_flavor is defined or azure_flavor is defined
-    - role: pulp_client
-      when:
-        - repo_manager == 'pulp'
-        - cloud_flavor is defined or azure_flavor is defined
-    - role: yum_repos
-      when:
-        - repo_manager == 'none'
-        - cloud_flavor is defined or azure_flavor is defined
-    # needed for the rest of the roles
-    - role: update
-      when:
-        - cloud_flavor is defined or azure_flavor is defined
-    - role: admin_users
-      when:
-        - cloud_flavor is defined or azure_flavor is defined
-    - role: local_storage
-      when:
-        - local_mounts is defined
-        - cloud_flavor is defined or azure_flavor is defined
-    - role: sshd
-      when:
-        - cloud_flavor is defined or azure_flavor is defined
-    - role: sssd
-      when:
-        - use_sssd | default(false) | bool
-        - cloud_flavor is defined or azure_flavor is defined
+- name: Import initialization playbook for all hosts.
+  ansible.builtin.import_playbook: init.yml
 
-- name: '###==-> Roles for UNmanaged chaperones. <-==###'
-  hosts:
-    - chaperone
+- name: '###==-> Roles only for completely managed chaperones <-==###'
+  hosts: chaperone,!mit_chaperone
   roles:
-    - ssh
+    - iptables
+    - grub
+    - swap
+    - logrotate
+    - remove
+    - update
+    - logins
+    - role: sssd
+      when: use_sssd | default(false) | bool
+    - sshd
+    - basic_security
+    - figlet_motd
+    - role: logs_client
+      when: logs_class is defined
+    - resolver
+    - coredumps
+
+- name: '###==-> Roles for all chaperones. <-==###'
+  hosts: chaperone
+  roles:
+    - ssh  # client
     - locale
     - cluster
     - regular_users
-    - shared_storage
     - sudoers
+    - local_storage
+    - shared_storage
     - build_environment
     - envsync
-    - role: logs_toprm
-      when: cloud_flavor is not defined and azure_flavor is not defined
-    - role: ogm
-      when: cloud_flavor is not defined and azure_flavor is not defined
+
+- name: '###==-> Roles only for partially managed chaperones <-==###'
+  hosts: mit_chaperone
+  roles:
+    - logs_toprm
+    - ogm
 ...

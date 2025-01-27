@@ -238,4 +238,7 @@ wingedhelix_cluster:
     docs:
     nfs_server:
     smb_server:
+mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
+  children:
+    chaperone:
 ...
