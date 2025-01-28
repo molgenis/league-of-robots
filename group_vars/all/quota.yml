@@ -198,7 +198,7 @@ lfs_quota:
       umcg-gap: 1024
       umcg-gcc: 8192
       umcg-gdi: 1024
-      umcg-gdio: 10240
+      umcg-gdio: 5120
       umcg-griac: 2048
       umcg-grip: 1024
       umcg-gsad: 1024
