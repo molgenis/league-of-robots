@@ -221,7 +221,7 @@ all:
                 - enp134s0f0.16  # VLAN16
               slurm_weight: 10
               local_yum_repository: true # enable local yum repository
-    chaperone:
+    mit_chaperone:
       hosts:
         bb-chaperone:
           ansible_host: bb-chaperone.umcg.nl  # upzkh1055
@@ -270,7 +270,7 @@ betabarrel_cluster:
     data_transfer:
     docs:
     smb_server:
-mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
+chaperone:
   children:
-    chaperone:
+    mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
 ...

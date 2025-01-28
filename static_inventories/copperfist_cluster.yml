@@ -209,7 +209,7 @@ all:
               slurm_version: '20.11.9-1.el8.umcg'
               os_distribution: 'oracle8'
               local_yum_repository: true # enable local yum repository
-    chaperone:
+    mit_chaperone:
       hosts:
         cf-chaperone:
           ansible_host: cf-chaperone.umcg.nl  # upzkh1056
@@ -258,7 +258,7 @@ copperfist_cluster:
     data_transfer:
     docs:
     smb_server:
-mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
+chaperone:
   children:
-    chaperone:
+    mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
 ...
