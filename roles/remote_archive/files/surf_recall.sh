@@ -60,5 +60,5 @@ if test -s "${_stdout_dir}/${_tmp_basename}.err";
 else
    cat "${_stdout_dir}/${_tmp_basename}"
 fi
-rm -f "${_stdout_dir}/${_tmp_basename}"
-rm -f "${_stdout_dir}/${_tmp_basename}.err"
+test -O "${_stdout_dir}/${_tmp_basename}" && rm -f "${_stdout_dir}/${_tmp_basename}"
+test -O "${_stdout_dir}/${_tmp_basename}.err" && rm -f "${_stdout_dir}/${_tmp_basename}.err"

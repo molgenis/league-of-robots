@@ -11,6 +11,15 @@ _queue_dir="/var/cache/arcq/queue/${_arc}"
 _stdout_dir="/tmp/arcq_stdout"
 _nl="
 "
+
+# @ error: clean proccessed files
+function cleanup(){
+   _basename="$(basename ${_file:-error})"
+   rm -f "${_queue_dir}/${_basename}"
+   echo "  Please check your command or run help." > "${_stdout_dir}/${_basename}.err"
+}
+trap 'cleanup' ERR
+
 # Locking mechanism
 # Systemd has only limit burst rate, which is not rate limit. Rate limit of one
 # ssh command per ${_delay} seconds seems reasonable.
