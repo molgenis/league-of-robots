@@ -3,8 +3,9 @@ set -euo pipefail
 
 _tmp_basename="$(basename $(mktemp -u))"
 _tag="surf_archive"
-_queue_dir="/var/cache/arcq/queue"
-_stdout_dir="/tmp/arcq_stdout"
+_main_dir="/var/cache/arcq/"
+_queue_dir="${_main_dir}/queue"
+_stdout_dir="${_main_dir}/output"
 _delay=0.5
 
 function _print_help(){
@@ -18,6 +19,7 @@ function _print_help(){
     --dmget      <path>      recall / stage online FROM TAPE
     --dmls       <path>      list state
     --dmput      <path>      send to offline / stage TO TAPE
+    --sha256sum  <path>      compute the sha256sum of the file
 EOF
 }
 
@@ -46,19 +48,12 @@ fi
 
 echo "${_arg} ${_path}" >> "${_queue_dir}/${_third}/${_tmp_basename}"
 
-echo "Archive: command submitted, waiting for reply ..."
+echo "Submitted to remote host, waiting for reply ..."
+echo "(  You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_basename}  )"
 sleep ${_delay} && sync
-while ! test -s "${_stdout_dir}/${_tmp_basename}" && \
-      ! test -s "${_stdout_dir}/${_tmp_basename}.err"; do
+while ! test -s "${_stdout_dir}/${_tmp_basename}.done"; do
    sleep ${_delay}
 done
 
 sync
-if test -s "${_stdout_dir}/${_tmp_basename}.err";
-   then echo "Error, command failed:"
-   cat "${_stdout_dir}/${_tmp_basename}.err"
-else
-   cat "${_stdout_dir}/${_tmp_basename}"
-fi
-test -O "${_stdout_dir}/${_tmp_basename}" && rm -f "${_stdout_dir}/${_tmp_basename}"
-test -O "${_stdout_dir}/${_tmp_basename}.err" && rm -f "${_stdout_dir}/${_tmp_basename}.err"
+cat "${_stdout_dir}/${_tmp_basename}"
