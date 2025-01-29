@@ -28,7 +28,7 @@
     enabled: true
   listen: 'archive_service_monitor_enable'
   with_items:
-    - "{{ archive_groups | selectattr('recall_cron_script', 'defined')  }}"
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
   become: true
 
 - name: Enable and start path monitoring
@@ -38,6 +38,6 @@
     enabled: true
   listen: 'archive_path_monitor_enable'
   with_items:
-    - "{{ archive_groups | selectattr('recall_cron_script', 'defined')  }}"
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
   become: true
 ...

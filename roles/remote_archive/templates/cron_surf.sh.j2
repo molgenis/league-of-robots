@@ -10,6 +10,7 @@ _arcq_dir="/var/cache/arcq/"
 _lock="${_arcq_dir}/${_arc}-lock"
 _queue_dir="${_arcq_dir}/queue/${_arc}"
 _stdout_dir="${_arcq_dir}/output"
+_ssh_timeout=600 # max 10 min for a command to finish
 _nl="
 "
 
@@ -105,6 +106,6 @@ for _file in ${_queue_files}; do
    esac
    rm -f "${_file:-error_path}"
    echo "${0} info: running command '${_command}'"
-   timeout -s 9 3600 ssh "${_user}@${_system}" "${_command}" 2>&1 >> "${_stdout}"
+   timeout -s 9 "${_ssh_timeout}" ssh "${_user}@${_system}" "${_command}" >> "${_stdout}" 2>&1
    date >> "${_stdout}.done" && chown "${_submitter_uid}":"${_group}" "${_stdout}.done"
 done
