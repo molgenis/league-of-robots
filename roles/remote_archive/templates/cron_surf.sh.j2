@@ -10,15 +10,17 @@ _arcq_dir="/var/cache/arcq/"
 _lock="${_arcq_dir}/${_arc}-lock"
 _queue_dir="${_arcq_dir}/queue/${_arc}"
 _stdout_dir="${_arcq_dir}/output"
-_ssh_timeout=600 # max 10 min for a command to finish
+_ssh_timeout="600" # max 10 min for a command to finish
 _nl="
 "
 
 # upon error clean proccessed files
 function cleanup(){
+   _retval="${?}"
    _basename="$(basename ${_file:-error})"
    rm -f "${_queue_dir}/${_basename}"
-   echo "  Please check your command or run help." > "${_stdout_dir}/${_basename}"
+   [[ "${_retval}" -eq "137" ]] && echo "Error: command timed out ... please submit commands that finish within 10 minutes." >> "${_stdout_dir}/${_basename}"
+   echo "  Please check your command or run help." >> "${_stdout_dir}/${_basename}"
    date >> "${_stdout_dir}/${_basename}.done"
 }
 trap 'cleanup' ERR
@@ -106,6 +108,6 @@ for _file in ${_queue_files}; do
    esac
    rm -f "${_file:-error_path}"
    echo "${0} info: running command '${_command}'"
-   timeout -s 9 "${_ssh_timeout}" ssh "${_user}@${_system}" "${_command}" >> "${_stdout}" 2>&1
+   timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command}" >> "${_stdout}" 2>&1
    date >> "${_stdout}.done" && chown "${_submitter_uid}":"${_group}" "${_stdout}.done"
 done
