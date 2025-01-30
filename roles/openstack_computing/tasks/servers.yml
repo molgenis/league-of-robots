@@ -147,9 +147,9 @@
   when:
     - item.assign_floating_ip is defined
     - item.assign_floating_ip is true
-    - item.name not in (create_instance_result.server.addresses | dict2items(key_name='vlan', value_name='specs') | json_query(query))
+    - item.name not in (create_instance_result.server.addresses | dict2items(key_name='vlan', value_name='specs') | json_query(floating_ip_vlan_query))
   vars:
-    query: '[?specs[?"OS-EXT-IPS:type"==`floating`]].vlan'
+    floating_ip_vlan_query: '[?specs[?"OS-EXT-IPS:type"==`floating`]].vlan'
   with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
 - name: Make sure servers are started.
   openstack.cloud.server_action:

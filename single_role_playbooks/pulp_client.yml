@@ -1,5 +1,7 @@
 ---
-- hosts: cluster
+- hosts:
+    - cluster
+    - chaperone,!mit_chaperone
   roles:
     - role: pulp_client
       when:

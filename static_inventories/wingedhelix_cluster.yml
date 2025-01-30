@@ -167,7 +167,7 @@ all:
               - enp3s0
               - enp4s0
               - enp5s0
-    chaperone:
+    mit_chaperone:
       hosts:
         wh-chaperone:
           ansible_host: wh-chaperone.umcg.nl  # upzkh1054.
@@ -238,4 +238,7 @@ wingedhelix_cluster:
     docs:
     nfs_server:
     smb_server:
+chaperone:
+  children:
+    mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
 ...

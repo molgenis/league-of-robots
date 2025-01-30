@@ -34,8 +34,8 @@
       - "The base path {{ item['base'] }} is missing for samba share {{ item['name'] }}."
       - "Another role should have been deployed first or your config is incomplete."
   vars:
-    query: "[?stat.path=='{{ item.base }}'].stat.exists"
-  when: smb_server_shares_base_status.results | json_query(query) | first is false
+    path_exists_query: "[?stat.path=='{{ item.base }}'].stat.exists"
+  when: smb_server_shares_base_status.results | json_query(path_exists_query) | first is false
   loop: "{{ smb_server_shares | flatten(levels=1) }}"
 
 - name: Create samba users.

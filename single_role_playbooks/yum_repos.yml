@@ -4,11 +4,13 @@
    - jumphost
    - cluster
    - build_server
+   - chaperone,!mit_chaperone
    - data_transfer
    - docs
    - logs
    - repo
   roles:
    - role: yum_repos
-     when: repo_manager == 'none'
+     when:
+       - repo_manager == 'none'
 ...
