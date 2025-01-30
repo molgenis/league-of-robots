@@ -12,11 +12,11 @@ The code of conduct consists of 2 parts: part 1 for the user, part 2 for the own
 e-learing: "Privacy in research". If you have a contract (aanstelling) with the UMCG go to lms.umcg.nl and search 
 for privacy to find the e-learing. If this does not work or you do not have a UMCG contract please go to:
 [Privacy in Research - GDPR / AVG (E-learning only; PWO)](https://umcg.capp12.nl/open-courses/recourses/699/storefront)
-- Permission to access the HPC cluster is limited to scientists that have signed this Code of Conduct and 
-submitted a pdf scan of the signed document in sRAM or mailed it to [the helpdesk](../contact/).
-- In addition users of the HPC cluster also have to abide by the UMCG IT User Guidelines (accessible via 
-https://umcg.zenya.work/portal/ search for “UMCG Richtlijn IT Gebruik”).
-- Users of the HPC cluster need to abide by the Research Code UMCG, accessible via
+- Permission to access the HPC cluster is limited to scientists that have read this Code of Conduct and agree to 
+abide by it and have mailed this agreement to [the helpdesk](../contact/) as specified below under “Conclusion 
+and Signature”.
+- In addition users of the HPC cluster also have to abide by the UMCG IT User Guidelines (accessible via https://umcg.zenya.work/portal/ search for “UMCG Richtlijn IT Gebruik”).
+- Users of the HPC cluster need to abide by the Research Code UMCG, accessible via 
 https://umcg.zenya.work/portal/ search for “Research Code UMCG” or via this link:
 [UMCG research code](https://researchcode.umcgresearch.org/en/w/introduction)
 - Users of the HPC cluster are obliged to adhere to the UMCG clear-screen policy: assure no unauthorized people 
@@ -50,7 +50,7 @@ arising from the unavailability of, or break in access to, the HPC cluster for w
 scripting. If you never worked on the command line, consider some Linux tutorials on the subject first and sign 
 up for the RUG cluster courses.  
 [Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://www.rug.nl/corporate-academy/courses/habrok-basis?lang=en)  
-[Hábrók geavanceerd | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://www.rug.nl/corporate-academy/courses/habrok-advanced?lang=en)
+[Hábrók geavanceerd | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://www.rug.nl/corporate-academy/courses/habrok-geavanceerd?lang=en)
 - We expect you to exploit our documentation before asking for help:
 <http://docs.gcc.rug.nl/>
 
@@ -124,16 +124,6 @@ I read and understand the UMCG HPC Code of Conduct. I declare that I will abide 
 understand that failure to adhere to the Code of Conduct will have repercussions for my access to the HPC 
 cluster.
 
-Please, sign this Code of Conduct and send a scanned copy to [the helpdesk](../contact/).
+Please mail the conclusion above (“I read and understand the UMCG HPC Code of Conduct……”) with your confirmation to [the helpdesk](../contact/) including your name, the date and your role (cluster user or owner of a group on the cluster).
 
 We wish you many fruitful computations!
-
-Name: <u>____________________________________________</u>
-
-Role (please tick appropriate boxes):  
-&#x25a2; cluster user  
-&#x25a2; owner of a group on the cluster  
-
-Date: <u>____________________________________________</u>
-
-Signature: <u>____________________________________________</u>
