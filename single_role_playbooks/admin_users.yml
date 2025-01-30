@@ -10,6 +10,7 @@
   hosts:
     - repo
     - cluster
+    - chaperone,!mit_chaperone
     - docs
     - jenkins
     - build_server
