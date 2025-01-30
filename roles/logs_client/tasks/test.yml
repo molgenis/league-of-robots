@@ -2,6 +2,7 @@
 - name: Force all handlers to flush, before we start testing logs clients
   ansible.builtin.meta: flush_handlers
   tags:
+    - always
     - test
 
 - name: Wait for rsyslog.service to start (can take some time ...)
@@ -10,6 +11,9 @@
   until: services_status.ansible_facts.services['rsyslog.service'].state == 'running'
   retries: 24
   delay: 15
+  tags:
+    - always
+    - test
 
 - name: Generate random 12-character HEX token
   ansible.builtin.set_fact:
@@ -17,12 +21,14 @@
   vars:
     hex_chars: '0123456789ABCDEF'
   tags:
+    - always
     - test
 
 - name: Print the token
   ansible.builtin.debug:
     msg: "Value for {{ inventory_hostname }} is {{ random_tag }}"
   tags:
+    - always
     - test
 
 - name: Create random log event on the client side with token as a tag
@@ -31,6 +37,7 @@
   register: rsyslog_remote_test
   changed_when: false
   tags:
+    - always
     - test
 
 - name: Check that remote server has received the token
@@ -47,5 +54,6 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tags:
+    - always
     - test
 ...
