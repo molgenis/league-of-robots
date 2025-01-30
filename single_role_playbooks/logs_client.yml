@@ -1,8 +1,9 @@
 ---
-- name: Running > logs_client < role
+- name: Running logs_client role.
   hosts:
     - jumphost
     - cluster
+    - chaperone,!mit_chaperone
     - repo
     - logs
   roles:

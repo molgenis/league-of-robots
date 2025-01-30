@@ -9,12 +9,12 @@
   hosts:
     - build_server
     - cluster
+    - chaperone
     - data_transfer
     - docs
     - irods
     - jenkins
     - repo
-    - chaperone
     - logs
   roles:
     - ssh

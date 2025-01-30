@@ -4,6 +4,7 @@
      - compute_node
      - deploy_admin_interface
      - data_transfer
+     - chaperone
   roles:
      - local_storage
 ...
