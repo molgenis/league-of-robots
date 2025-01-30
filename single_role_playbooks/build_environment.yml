@@ -2,6 +2,7 @@
 - hosts:
     - deploy_admin_interface
     - user_interface
+    - chaperone
   roles:
     - build_environment
 ...

@@ -46,9 +46,9 @@
     mode: '0550'
     owner: root
     group: root
-  when: mountpoint_status | json_query(query) | first != 0
+  when: mountpoint_status | json_query(mountpoint_query) | first != 0
   vars:
-    query: "results[?item.key=='{{ item.key }}'].rc"
+    mountpoint_query: "results[?item.key=='{{ item.key }}'].rc"
   with_dict: "{{ ega_fuse_client_mounts }}"
   become: true
   notify: restart_ega-fuse-client

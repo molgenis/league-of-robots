@@ -118,9 +118,82 @@ all:
     chaperone:
       hosts:
         tl-chaperone:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+          #
+          # Overrule regular users and groups compared to rest of Talos:
+          #
+          use_ldap: false
+          use_sssd: false
+          regular_groups:
+            - "{{ envsync_group }}"
+            - "{{ functional_admin_group }}"
+            - "{{ functional_users_group }}"
+            - 'umcg-atd'
+            - 'umcg-gsad'
+            - 'umcg-gst'
+            - 'umcg-vipt'
+          regular_users:
+            - user: "{{ envsync_user }}"
+              groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
+            - user: 'umcg-molgenis'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', "{{ functional_users_group }}"]
+            - user: 'umcg-atd-ateambot'
+              groups: ['umcg-atd', "{{ functional_users_group }}"]
+            - user: 'umcg-atd-dm'
+              groups: ['umcg-atd', "{{ functional_users_group }}"]
+            - user: 'umcg-gsad-ateambot'
+              groups: ['umcg-gsad', "{{ functional_users_group }}"]
+            - user: 'umcg-gsad-dm'
+              groups: ['umcg-gsad', "{{ functional_users_group }}"]
+            - user: 'umcg-gst-dm'
+              groups: ['umcg-gst', "{{ functional_users_group }}"]
+            - user: 'umcg-vipt-dm'
+              groups: ['umcg-vipt', "{{ functional_users_group }}"]
+            - user: 'mbenjamins'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - user: 'mbijlsma'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - user: 'bcharbon'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
+            - user: 'scimerman'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - user: 'dhendriksen'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
+            - user: 'kdelange'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - user: 'rkanninga'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - user: 'pneerincx'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - user: 'gvdvries'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+          sudoers:
+            - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+              become: 'umcg-molgenis'
+            - who: ['%umcg-atd']
+              become: 'umcg-atd-dm'
+            - who: ['%umcg-atd']
+              become: 'umcg-atd-ateambot'
+            - who: ['%umcg-gsad']
+              become: 'umcg-gsad-ateambot'
+            - who: ['%umcg-gsad']
+              become: 'umcg-gsad-dm'
+            - who: ['%umcg-gst']
+              become: 'umcg-gst-ateambot'
+            - who: ['%umcg-gst']
+              become: 'umcg-gst-dm'
+            - who: ['%umcg-vipt']
+              become: 'umcg-vipt-dm'
+          ssh_client_configs:
+            - logs_library
+          lfs_mounts: []  # Overrule the list of network shares; we use local storage instead.
+          local_volume_size_extra: 200  # The extra virtual disk for dat* and prm*
           local_mounts:
-            - mount_point: "/groups/"
-              device: '/dev/sdb'
+            - mount_point: '/groups'
+              device: '/dev/vdb'
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
@@ -131,11 +204,50 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: ext4
-          local_volume_size_extra: 20  # The extra virtual disk for dat* and prm*
-          cloud_flavor: umcg.v1.vm.1-2-20
-          host_networks:
-            - name: "{{ stack_prefix }}_internal_management"
-              security_group: "{{ stack_prefix }}_cluster"
+          local_mount_subfolders:
+            - mount_point: '/groups'
+              machines: "{{ groups['chaperone'] }}"
+              folders:
+                - rel_paths:
+                    - umcg-atd
+                  mode: '0755'
+                  owner: root
+                  group: root
+                - rel_paths:
+                    - umcg-atd/dat08
+                  mode: '2770'
+                  owner: umcg-atd-dm
+                  group: umcg-atd
+                - rel_paths:
+                    - umcg-atd/prm08
+                  mode: '2750'
+                  owner: umcg-atd-dm
+                  group: umcg-atd
+                - rel_paths:
+                    - umcg-gsad
+                  mode: '0755'
+                  owner: root
+                  group: root
+                - rel_paths:
+                    - umcg-gsad/dat08
+                  mode: '2770'
+                  owner: umcg-gsad-dm
+                  group: umcg-gsad
+                - rel_paths:
+                    - umcg-gsad/prm08
+                  mode: '2750'
+                  owner: umcg-gsad-dm
+                  group: umcg-gsad
+                - rel_paths:
+                    - umcg-gst
+                  mode: '0755'
+                  owner: root
+                  group: root
+                - rel_paths:
+                    - umcg-gst/dat08
+                  mode: '2770'
+                  owner: umcg-gst-dm
+                  group: umcg-gst
 administration:
   children:
     sys_admin_interface:

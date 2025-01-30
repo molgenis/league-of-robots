@@ -149,7 +149,8 @@ pip3 install passlib
 # You may skip this step if you already installed Ansible by other means.
 # E.g. with HomeBrew on macOS, with yum or dnf on Linux, etc.
 #
-# Ansible core 2.16 from Ansible 9.x is latest version compatible with Mitogen.
+# Ansible core 2.18 from Ansible 11.x is latest version compatible with Mitogen.
+# Ansible core 2.16 from Ansible 9.x is latest version compatible with Python 3.6.x on CentOS 7.x.
 #
 pip3 install 'ansible<10' # For running playbooks on your local laptop as Ansible control host.
 pip3 install 'ansible<6' # For running playbooks directly on chaperone machines running RHEL8.
