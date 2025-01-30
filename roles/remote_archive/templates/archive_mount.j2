@@ -15,7 +15,7 @@ Type=fuse.sshfs
 # ControlPersist - automount disconnects after 3 minutes, this ssh connection stays for 5 min
 # ControlPath - even tho every connection to server should and *does* use ssh settings from ~/.ssh/conf.d
 #               the sshfs somehow ignores global settings and creates new connections - this prevents it
-Options=ServerAliveCountMax=2,ServerAliveInterval=2,max_conns=2,ControlPersist=300,ControlPath=/root/.ssh/tmp/%%C,users,idmap=user,IdentityFile="{{ archive_ssh_key_location }}",reconnect,default_permissions,allow_other,uid={{ item.1 }}-dm,gid={{ item.1 | trim() }},_netdev
+Options=ServerAliveCountMax=2,ServerAliveInterval=2,max_conns=2,ControlPersist=300,ControlPath=/root/.ssh/tmp/%%C,users,idmap=user,IdentityFile="{{ archive_ssh_key_location }}",reconnect,default_permissions,allow_other,uid={{ item.1 }}-dm,gid={{ item.1 | trim() }}-dm,_netdev
 # This prevents: when redeploying the role, systemd must restart .mount service, which fails when users are using mount point
 LazyUnmount=true
 

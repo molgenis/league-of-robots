@@ -1,5 +1,6 @@
 ---
-- hosts: docs
+- name: Deploy online documentation
+  hosts: docs
   roles:
     - online_docs
 ...
