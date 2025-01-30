@@ -49,7 +49,7 @@ fi
 echo "${_arg} ${_path}" >> "${_queue_dir}/${_third}/${_tmp_basename}"
 
 echo "Submitted to remote host, waiting for reply ..."
-echo "(  You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_basename}  )"
+echo "( You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_basename} )"
 sleep ${_delay} && sync
 while ! test -s "${_stdout_dir}/${_tmp_basename}.done"; do
    sleep ${_delay}

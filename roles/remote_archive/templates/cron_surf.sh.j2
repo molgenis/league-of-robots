@@ -101,6 +101,7 @@ for _file in ${_queue_files}; do
       dmls)       _command="dmls -l ${_arc}/${_group}/${_subdir}" ;;
       dmput)      _command="dmput -n -r ${_arc}/${_group}/${_subdir}" ;;
       sha256sum)  _afile="$(basename ${_subdir})"; _adir="$(dirname ${_subdir})"
+                  echo "If data is available (REG / DUL) sha256sum will be provided, if OFLine, it will be skipped." > "${_stdout}"
                   _command="dmfind ${_arc}/${_group}/${_adir} -name ${_afile} \( -state DUL -or -state REG \) -exec sha256sum {} \;" ;;
       *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
                   date >> "${_stdout}.done"
