@@ -18,15 +18,33 @@ Each group can access only own archive folder and the files in it. Data-manager 
 
 2. Copying data
 
-    2.1. cp or rsync between tmp/prm to arcXX
+Run following commands
+
+```
+     [ regular-user@~ ] $ sudo -u [group]-dm bash
+     [ group-dm@~ ] $ rsync /groups/`GROUP`/`prmXX`/subfolder/file /groups/`GROUP`/`arcXX`/subfolder/
+```
+or alternatively `cp` or another tool can work as well.
 
 3. Validating data
 
-    surf_archive --sha256sum
+If you copied your data recently and therefore it is still residing on regular disks on remote archive server, then you can simply calculate the `sha256sum value of the file, with
+
+```
+    surf_archive --sha256sum /groups/[GROUP]/arcXX/subfolder/file
+```
 
 4. Managing data
 
-    4.1. 
+After some time, all the files on remote archive server get automatically migrated to the tape. When this happens, all the folders and files can be still normally seen in the structure. You can go into any (sub)directory and run `ls`. All the filenames and their permissions and metadata (age, size, ownerhip) can be seen.
+
+The difference is that the file content is not directly available anymore - that is, not without calling it back first. If you happen to do anything with the file content (like `cat` or `grep` for instance), then the command will get stuck, because the file will be automatically recalled from the tapes - which take some time. During this time you have unusable shell.
+
+Therefore the correct procedure is to **first stage (recall from the tape) the file, and when it is available again, then access the content**.
+
+    4.1. Checking the data status
+
+
 
 5. Best practices
 
