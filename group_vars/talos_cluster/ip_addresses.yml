@@ -1,6 +1,9 @@
 ---
 ip_addresses:
   reception:
+    brmtl_ntwrk:
+      address: 172.23.68.250
+      netmask: /32
     tl_internal_management:
       address: 10.10.1.31
       netmask: /32
@@ -32,6 +35,10 @@ ip_addresses:
       netmask: /32
     vlan1068:
       address: 172.23.60.21
+      netmask: /32
+  tl-node-a01:
+    brmtl_ntwrk:
+      address: 172.23.68.149
       netmask: /32
   tl-repo:
     tl_internal_management:
