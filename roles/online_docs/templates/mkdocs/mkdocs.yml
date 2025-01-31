@@ -53,4 +53,8 @@ nav:
   - Group Specific Documentation:
     - 'Solve-RD - How to find and work with Solve-RD data': 'solve-rd.md'
 {% endif %}
+{% if 'gearshift' in slurm_cluster_name or 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
+  - Group Specific Documentation:
+    - 'UMCG research - Code of Conduct': 'coc_umcg_research_clusters.md'
+{% endif %}
 #    - 'Support - FAQs, mailinglists & courses': 'support.md'
