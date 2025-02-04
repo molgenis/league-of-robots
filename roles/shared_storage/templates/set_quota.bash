@@ -308,7 +308,20 @@ function processGroupDirs () {
 			# Just append unit: all quota values from the IDVault are in GB.
 			size_hard_limit="${size_hard_limit}G"
 		fi
-		if [[ "${_fs_type}" == 'lustre' ]]; then
+		#
+		# Check if we have a lustre file system.
+		# Note that when automounts are used for a lustre file system,
+		# then /proc/mounts and hence _fs_type contains redundant entries
+		# in random order. Hence _fs_type can contain either
+		#     lustre
+		# or
+		#     autofs
+		#     lustre
+		# or
+		#     lustre
+		#     autofs
+		#
+		if [[ "${_fs_type}" == *lustre* ]]; then
 				applyLustreQuota "${_lfs_path}" 'project' "${project_id}" "${size_soft_limit}" "${size_hard_limit}"
 		else
 			log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "   Cannot configure quota due to unsupported file system type: ${_fs_type}."
