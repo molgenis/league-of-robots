@@ -535,16 +535,14 @@ pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
     type: lustre
-    #rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    #ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    rw_options: 'defaults,_netdev,flock'
-    ro_options: 'defaults,_netdev,ro'
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
     machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst02
     source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
     type: lustre
-    rw_options: 'defaults,_netdev,flock'
-    ro_options: 'defaults,_netdev,ro'
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
     machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst04/slice2
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
