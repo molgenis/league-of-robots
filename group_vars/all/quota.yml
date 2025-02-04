@@ -16,7 +16,7 @@ lfs_quota:
       umcg-gap: 1024
       umcg-gastrocol: 5120
       umcg-gcc: 26624
-      umcg-gdi: 5120
+      umcg-gdi: 1024
       umcg-gdio: 11264
       umcg-gonl: 5120
       umcg-griac: 9216
@@ -33,9 +33,7 @@ lfs_quota:
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 2048
-      umcg-neonatology: 5120
       umcg-pmb: 2048
-      umcg-radicon: 1024
       umcg-rehabilitation: 1024
       umcg-reki: 1024
       umcg-solve-rd: 1024
@@ -56,7 +54,7 @@ lfs_quota:
       umcg-bionic-mdd-gwama: 13312
       umcg-bios: 12288
       umcg-dag3: 3072
-      umcg-datateam: 2048
+      umcg-datateam: 1024
       umcg-ejp-rd: 1024
       umcg-endocrinology: 1024
       umcg-fg: 3072
@@ -66,7 +64,7 @@ lfs_quota:
       umcg-gap: 1024
       umcg-gastrocol: 5120
       umcg-gcc: 1024
-      umcg-gdi: 3072
+      umcg-gdi: 2048
       umcg-gdio: 12288
       umcg-gonl: 10240
       umcg-griac: 11264
@@ -74,17 +72,17 @@ lfs_quota:
       umcg-gsad: 1024
       umcg-hematology: 5120
       umcg-hlhs: 3072
-      umcg-impact: 4096
+      umcg-impact: 3072
       umcg-lifelines: 17408
       umcg-lld: 3072
       umcg-llnext: 10240
       umcg-mic: 2048
       umcg-micompany: 512
-      umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 2048
+      umcg-neonatology: 5120
       umcg-nephrology: 3072
-      umcg-pgx: 5120
+      umcg-pgx: 1024
       umcg-pmb: 1024
       umcg-radicon: 5120
       umcg-solve-rd: 8192
@@ -153,7 +151,7 @@ lfs_quota:
       umcg-gap: 1024
       umcg-gastrocol: 10240
       umcg-gcc: 3072
-      umcg-gdi: 10240
+      umcg-gdi: 2048
       umcg-gdio: 11264
       umcg-gonl: 3072
       umcg-griac: 2048
@@ -162,18 +160,16 @@ lfs_quota:
       umcg-hematology: 3072
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
-      umcg-impact: 2048
+      umcg-impact: 1024
       umcg-lifelines: 122880
       umcg-lld: 8192
       umcg-llnext: 2048
       umcg-mic: 2048
       umcg-micompany: 1024
-      umcg-msb: 1024
       umcg-nawijn: 4096
       umcg-neonatology: 5120
-      umcg-pgx: 10240
+      umcg-pgx: 1024
       umcg-pmb: 8192
-      umcg-radicon: 1024
       umcg-rehabilitation: 1024
       umcg-solve-rd: 18432
       umcg-sysops: 1024
@@ -194,15 +190,15 @@ lfs_quota:
       umcg-bionic-mdd-gwama: 1024
       umcg-bios: 1024
       umcg-dag3: 1024
-      umcg-datateam: 2048
+      umcg-datateam: 1024
       umcg-endocrinology: 2048
       umcg-fg: 10240
       umcg-franke-scrna: 20480
       umcg-fu: 2048
-      umcg-gap: 2048
-      umcg-gcc: 10240
-      umcg-gdi: 3072
-      umcg-gdio: 10240
+      umcg-gap: 1024
+      umcg-gcc: 8192
+      umcg-gdi: 1024
+      umcg-gdio: 5120
       umcg-griac: 2048
       umcg-grip: 1024
       umcg-gsad: 1024
@@ -214,7 +210,6 @@ lfs_quota:
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 4096
-      umcg-neonatology: 5120
       umcg-nephrology: 1024
       umcg-pmb: 1024
       umcg-radicon: 1024
@@ -223,7 +218,7 @@ lfs_quota:
       umcg-sommer: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
-      umcg-ugli: 5120
+      umcg-ugli: 1024
       umcg-verbeek: 1024
       umcg-vdakker: 1024
       umcg-visclasataxia: 1024
