@@ -18,6 +18,7 @@ Briefly
 - is built around the idea that performance must accomodate occasional (once a year or less) accessing the data
 - data is stored in two physical locations in the Netherlands
 - **tape data does not have a backup**, so be extremely carefull with the data deletion
+- this service has the [ISO 27001 certification](https://www.surf.nl/en/services/data-archive)
 
 It is the storage that is provided on the external host. Currently we only have one archive provider - [SURF](https://www.surf.nl/en/services/data-archive).
 
@@ -70,26 +71,38 @@ Note that the folders are always online (in state `REG`) and as such you can alw
 ### 4.2. Normal workflow and changing the data states
 
 1. Become the data manager  
-    user $ sudo -u [group]-dm bash
+   ```
+   user $ sudo -u [group]-dm bash
+   ```
 1. (optional, but highly recommended) Preperate the data by merging multiple files/folders into one compressed **tar** file  
-    dm-user $ tar -czvf /groups/[group]/arc01/projects/project-x.tar.gz /groups/[group]/prmxx/projects/x/*
+   ```
+   dm-user $ tar -czvf /groups/[group]/arc01/projects/project-x.tar.gz /groups/[group]/prmxx/projects/x/*
+   ```
 1. Upload file(s) to the archive  
-    dm-user $ cp /groups/[group]/prmXX/project-x.tar /groups/[group]/arc01/projects/project-x.tar
+   ```
+   dm-user $ cp /groups/[group]/prmXX/project-x.tar /groups/[group]/arc01/projects/project-x.tar
+   ```
 1. Check the file status  
-    dm-user $ surf_recall.sh --dmls /groups/[group]/arc01/projects/project-x.tar
-    Submitted to remote host, waiting for reply ...
-    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
-    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
+```
+   dm-user $ surf_recall.sh --dmls /groups/[group]/arc01/projects/project-x.tar
+   Submitted to remote host, waiting for reply ...
+   ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
+   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
+```
 1. File is offline, but we can call it back to disks - stage it `online` with  
-    dm-user $ surf_recall.sh --dmget /groups/[group]/arc01/projects/project-x.tar
-    Submitted to remote host, waiting for reply ...
-    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
+   ```
+   dm-user $ surf_recall.sh --dmget /groups/[group]/arc01/projects/project-x.tar
+   Submitted to remote host, waiting for reply ...
+   ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
+   ```
 1. Check the status again  
-    dm-user $ surf_recall.sh --dmls /groups/[group]/arc01/projects/project-x.tar
-    Submitted to remote host, waiting for reply ...
-    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
-    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (UNM) project-x.tar
-    dm-user $ # note that the file is unmigrating now
+   ```
+   dm-user $ surf_recall.sh --dmls /groups/[group]/arc01/projects/project-x.tar
+   Submitted to remote host, waiting for reply ...
+   ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
+   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (UNM) project-x.tar
+   dm-user $ # note that the file is unmigrating now
+   ```
 
 ### Other command line options
 
@@ -112,14 +125,14 @@ Use `--help` argument to get more information
 
 ## 5. Best practices
 
-### 5.1. File sizes are extremely important on the archive. Tape storage performance and management is better when the files are larger size. Reccomended sizes (for SURF) are in between 1 and 100 GB.
+File sizes are extremely important for archive. Tape storage performance and management is better when the files are larger size.
+
+Therefore
+- files should be in range 1 and 100GB (checksums are exception)
+- average file size should not be lower than a **1GB**
+- the archive filesystem was build around the idea of occasional (as in *once or twice a year at most*) accessing the data content
 
 The average size is monitored and the groups with average size lower than this will have **locked accounts**.
-
-- there should be no files smaller than <100M
-- files stored to archive should be in sizes between 1 and 100GB
-- note that checksum files are also small files which reduce the average file size
-- the archive filesystem was build around the idea of occasional (as in *once or twice a year at most*) accessing the data content
 
 ## 6. Performance
 
