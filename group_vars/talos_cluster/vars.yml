@@ -111,20 +111,11 @@ cloud_image: RockyLinux-9.3_xfs
 cloud_user: cloud-user
 availability_zone: nova
 stack_networks:
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
-  - name: "{{ stack_prefix }}_internal_storage"
-    cidr: '10.10.2.0/24'
-    type: storage
-    external: false
-  - name: brmtl_ntwrk
+  - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
     gateway: '172.23.68.1'
-    #router_network: ???
+    router_network: vlan16
+    router_name: vlan1337
     type: management
     external: true
   - name: vlan1068  # Private Lustre
@@ -220,7 +211,7 @@ sudoers:
 #
 lustre_client_networks_vm:
   - name: tcp20
-    interface: enp5s0
+    interface: enp4s0
 lustre_client_networks_baremetal:
   - name: tcp20
     interface: enoxxx
