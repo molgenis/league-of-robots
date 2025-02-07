@@ -38,20 +38,43 @@ ip_addresses:
 {% for stack_network in stack_networks
    | selectattr('router_network', 'defined')
    | sort(attribute='name') %}
-  {% set router_name = 'Router bridging ' + stack_network.router_network + ' and ' + stack_network.name %}
+  {#
+   # Unfortunately, we can only use the router name to lookup the info for the router.
+   # The internal VLAN for which the router is used is not listed in the api_router_info var
+   # and the IP used in that internal VLAN may not be unique as it can be used in multiple VLANs
+   # used in the same or even in other stacks.
+   # Therefore we default to using
+   #    'Router bridging ' + stack_network.router_network + ' and ' + stack_network.name
+   # which is used by the openstack_networking role when we create routers ourselves.
+   # If the router was created by an external cloud admin instead,
+   # then the stack_network must have a router_name attribute with the correct name.
+   #}
+  {% set router_name = stack_network.router_name | default('Router bridging ' + stack_network.router_network + ' and ' + stack_network.name) %}
   {{ stack_network.name }}-{{ stack_network.router_network }}-router:
     {{ stack_network.name }}:
       address: {{ stack_network.gateway }}
       netmask: /32
+    {% if api_router_info['routers']
+          | selectattr('name', 'equalto', router_name)
+          | map(attribute='external_gateway_info')
+          | map(attribute='external_fixed_ips')
+          | first
+       is defined %}
     {{ stack_network.router_network }}:
       address: {{ api_router_info['routers']
                   | selectattr('name', 'equalto', router_name)
                   | map(attribute='external_gateway_info')
-                  | map (attribute='external_fixed_ips')
+                  | map(attribute='external_fixed_ips')
                   | first
-                  | map (attribute='ip_address')
+                  | map(attribute='ip_address')
                   | first }}
       netmask: /32
       fqdn: 'NXDOMAIN'
+    {% else %}
+      {{ api_router_info['routers']
+          | selectattr('name', 'equalto', router_name)
+          | first
+          | mandatory('Cannot find router named ' + router_name + '. See code & comment in group_vars/template/ip_addresses_openstack.yml.j2 for details.') }}
+    {% endif %}
 {% endfor %}
 ...
