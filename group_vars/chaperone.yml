@@ -54,6 +54,8 @@ cluster_common_packages:
     - lsof
     - nano
     - openssl
+    - python3
+    - python3-pip
     - rsync
     - screen
     - strace
