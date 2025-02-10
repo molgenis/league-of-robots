@@ -135,6 +135,8 @@
   ansible.builtin.getent:
     database: group
     split: ':'
+  tags:
+    - quota
 
 #
 # For project quota we need unique project IDs (PIDs).
@@ -201,6 +203,8 @@
         size_soft_limit = {{ size_soft_limit }} |
         size_hard_limit = {{ size_hard_limit }}"
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
+  tags:
+    - quota
   become: true
 
 #
@@ -517,6 +521,8 @@
     group: 'root'
     mode: '0700'
   when: inventory_hostname in groups['sys_admin_interface'] | default([])
+  tags:
+    - quota
   become: true
 
 - name: 'Create cron job for set_quota.bash script.'
@@ -528,6 +534,8 @@
     job: '/root/set_quota.bash -a'
     cron_file: 'set_quota'
   when: inventory_hostname in groups['sys_admin_interface'] | default([])
+  tags:
+    - quota
   become: true
 
 #
