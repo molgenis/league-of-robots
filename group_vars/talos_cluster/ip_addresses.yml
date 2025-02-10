@@ -28,6 +28,9 @@ ip_addresses:
       address: 172.23.68.224
       netmask: /32
   tl-node-a01:
+    vlan1068:
+      address: 172.23.60.11
+      netmask: /32
     vlan1337:
       address: 172.23.68.142
       netmask: /32
@@ -41,6 +44,10 @@ ip_addresses:
       netmask: /32
     vlan1337:
       address: 172.23.68.66
+      netmask: /32
+  tl-transfer:
+    vlan1337:
+      address: 172.23.68.144
       netmask: /32
   vlan1337-vlan16-router:
     vlan1337:
