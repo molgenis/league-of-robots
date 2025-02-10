@@ -125,6 +125,7 @@ stack_networks:
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
+      - 172.23.60.11/32 # tl-node-a01
     type: storage
     external: true
 nameservers: [

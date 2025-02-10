@@ -277,5 +277,6 @@ talos_cluster:
     repo:
     cluster:
     chaperone:
+    data_transfer:
     docs:
 ...
