@@ -225,7 +225,7 @@ sudoers:
 #
 lustre_client_networks_vm:
   - name: tcp20
-    interface: enp4s0
+    interface: enp5s0
 lustre_client_networks_baremetal:
   - name: tcp20
     interface: enoxxx

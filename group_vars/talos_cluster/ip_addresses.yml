@@ -6,9 +6,9 @@ ip_addresses:
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     vlan16:
-      address: 195.169.22.185
+      address: 195.169.22.179
       netmask: /32
-      fqdn: 'jenkins.hpc.rug.nl'
+      fqdn: 'reception.hpc.rug.nl'
   talos:
     vlan1068:
       address: 172.23.60.30
@@ -28,6 +28,9 @@ ip_addresses:
       address: 172.23.68.224
       netmask: /32
   tl-node-a01:
+    vlan1337:
+      address: 172.23.68.142
+      netmask: /32
   tl-repo:
     vlan1337:
       address: 172.23.68.3
