@@ -167,7 +167,7 @@ lfs_quota:
       umcg-mic: 2048
       umcg-micompany: 1024
       umcg-nawijn: 4096
-      umcg-neonatology: 5120
+      umcg-neonatology: 3072
       umcg-pgx: 1024
       umcg-pmb: 8192
       umcg-rehabilitation: 1024
@@ -210,6 +210,7 @@ lfs_quota:
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 4096
+      umcg-neonatology: 2048
       umcg-nephrology: 1024
       umcg-pmb: 1024
       umcg-radicon: 1024
