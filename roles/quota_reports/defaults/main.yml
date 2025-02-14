@@ -1,4 +1,5 @@
 ---
 quota_script_url: https://raw.githubusercontent.com/molgenis/cluster-utils/refs/tags/v25.01.2/bin/quota
-output_folder: /mnt/umcgst02/quota_reports/{{ lookup('pipe', 'date +%Y') }}/
+quota_reports_folder: /mnt/umcgst02/quota_reports/
+output_folder: "{{ quota_reports_folder }}/{{ lookup('pipe', 'date +%Y') }}"
 ...

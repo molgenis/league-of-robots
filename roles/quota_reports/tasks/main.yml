@@ -8,7 +8,7 @@
 
 - name: 'Make sure output folder exists.'
   ansible.builtin.file:
-    path: "/mnt/umcgst02/quota_reports/{{ lookup('pipe', 'date +%Y') }}/"
+    path: "{{ quota_reports_folder }}"
     state: directory
     owner: root
     group: root
@@ -21,7 +21,7 @@
     day: "1"
     hour: "4"
     minute: "0"
-    job: /root/quota -a -p | { head -4; sed -n -e '/\/groups\//,/[-]+/p'; } 
+    job: mkdir -p -m '0750' {{ output_folder }}; /root/quota -a -p | { head -4; sed -n -e '/\/groups\//,/[-]+/p'; } 
          > "{{ output_folder }}/{{ lookup('pipe', 'date +%m') }}-quota_report_{{ inventory_hostname }}" 2>&1
     user: root
   become: true
