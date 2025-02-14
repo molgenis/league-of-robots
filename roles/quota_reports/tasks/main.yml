@@ -1,0 +1,27 @@
+---
+- name: 'Download quota script from cluster-utils repo.'
+  ansible.builtin.get_url:
+    url: 'https://raw.githubusercontent.com/molgenis/cluster-utils/refs/tags/v25.01.2/bin/quota'
+    dest: '/root/'
+    mode: '0750'
+  become: true
+
+- name: 'Make sure output folder exists.'
+  file:
+    path: "/mnt/umcgst02/quota_reports/{{ lookup('pipe', 'date +%Y') }}/"
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+  become: true
+
+- name: 'Create cronjob for monthly quota reports.'
+  ansible.builtin.cron:
+    name: "quota_report"
+    day: "1"
+    hour: "4"
+    minute: "0"
+    job: /root/quota -a -p | { head -4; sed -n -e '/\/groups\//,/[-]+/p'; } > "/mnt/umcgst02/quota_reports/{{ lookup('pipe', 'date +%Y') }}/{{ lookup('pipe', 'date +%m') }}-quota_report_{{ inventory_hostname }}" 2>&1
+    user: root
+  become: true
+...
