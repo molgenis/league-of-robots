@@ -22,8 +22,7 @@
     hour: "4"
     minute: "0"
     job: /root/quota -a -p | { head -4; sed -n -e '/\/groups\//,/[-]+/p'; } 
-         > "/mnt/umcgst02/quota_reports/{{ lookup('pipe', 'date +%Y') }}/{{ 
-lookup('pipe', 'date +%m') }}-quota_report_{{ inventory_hostname }}" 2>&1
+         > "{{ output_folder }}/{{ lookup('pipe', 'date +%m') }}-quota_report_{{ inventory_hostname }}" 2>&1
     user: root
   become: true
 ...
