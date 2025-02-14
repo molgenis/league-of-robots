@@ -218,7 +218,7 @@ all:
               slurm_ethernet_interfaces:
                 - enp26s0f0  # VLAN990
                 - enp5s0  # BMC
-                - enp134s0f0.16  # VLAN16
+                - ens3f0.16  # VLAN16
               slurm_weight: 10
               local_yum_repository: true # enable local yum repository
     mit_chaperone:
