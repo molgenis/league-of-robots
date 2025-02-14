@@ -7,7 +7,7 @@
   become: true
 
 - name: 'Make sure output folder exists.'
-  file:
+  ansible.builtin.file:
     path: "/mnt/umcgst02/quota_reports/{{ lookup('pipe', 'date +%Y') }}/"
     state: directory
     owner: root
