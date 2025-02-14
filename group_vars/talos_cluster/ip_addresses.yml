@@ -34,6 +34,13 @@ ip_addresses:
     vlan1337:
       address: 172.23.68.142
       netmask: /32
+  tl-node-b01:
+    vlan1068:
+      address: 172.23.60.24
+      netmask: /32
+    vlan1337:
+      address: 172.23.68.137
+      netmask: /32
   tl-repo:
     vlan1337:
       address: 172.23.68.3
