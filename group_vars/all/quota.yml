@@ -125,6 +125,7 @@ lfs_quota:
   rsc04:
     quota_limits:  # All values in GB.
       #umcg-biogen: value not approved yet.
+      umcg-fg: 1024
   rsc08:
     quota_limits:  # All values in GB.
       umcg-atd: 512
@@ -233,7 +234,7 @@ lfs_quota:
       umcg-biogen: 56320
       umcg-bios: 1024
       umcg-dag3: 1024
-      umcg-fg: 5120
+      umcg-fg: 4096
       umcg-franke-scrna: 14336
       umcg-gcc: 9216
       umcg-gdio: 8192
