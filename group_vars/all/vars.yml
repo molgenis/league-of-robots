@@ -689,6 +689,16 @@ yum_repos:
       gpgkey:file: ///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+    #
+    # BeeGFS
+    #
+    - file: beegfs.repo
+      id: beegfs
+      name: 'BeeGFS official RedHat8 repository'
+      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel8/'
+      gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
+      gpgcheck: 1
+      enabled: 1
 #
 # Iptables additional configurations 
 #

@@ -1,17 +1,35 @@
 ---
 - name: Install BeeGFS server services
   ansible.builtin.package:
-    state: latest
     update_cache: true
-    name: "{{ item }}"
-  loop: "{{ beegfs_install_services }}"
+    name: "{{ beegfs_server_install }}"
+    state: latest
+  become: true
+
+- name: "Check if {{ beegfs_storage_dir }} folder is mounted"
+  ansible.builtin.command: "mountpoint {{ beegfs_storage_dir }}"
+  register: beegfs_storage_dir_mounted
+  no_log: true
+  changed_when: false
+
+- name: Create folder structure
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0700"
+    state: directory
+  with_items:
+    - "{{ beegfs_storage_dir }}/mgmtd"
+    - "{{ beegfs_storage_dir }}/meta"
+    - "{{ beegfs_storage_dir }}/storage"
   become: true
 
 - name: Configure BeeGFS management service
   ansible.builtin.lineinfile:
     path: /etc/beegfs/beegfs-mgmtd.conf
-    regexp: '^storeMgmtdDirectory\s*='
-    line: "storeMgmtdDirectory={{ beegfs_storage_dir }}/mgmtd"
+    regexp: '^storeMgmtdDirectory(\s+)='
+    line: "storeMgmtdDirectory = {{ beegfs_storage_dir }}/mgmtd"
   notify:
     - systemd_reload
     - restart-beegfs-mgmtd
@@ -23,8 +41,8 @@
     regexp: "{{ item.regex }}"
     line: "{{ item.line }}"
   with_items:
-    - { regex: '^storeMetaDirectory\s*=', line: "storeMetaDirectory={{ beegfs_storage_dir }}/meta" }
-    - { regex: '^sysMgmtdHost\s=', line: "sysMgmtdHost={{ inventory_hostname }}" }
+    - { regex: '^storeMetaDirectory(\s+)=', line: "storeMetaDirectory = {{ beegfs_storage_dir }}/meta" }
+    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ inventory_hostname }}" }
   notify:
     - systemd_reload
     - restart-beegfs-meta
@@ -33,24 +51,17 @@
 - name: Configure Storage directory on BeeGFS storage service
   ansible.builtin.lineinfile:
     path: /etc/beegfs/beegfs-storage.conf
-    regexp: '^storeStorageDirectory\s*='
-    line: "storeStorageDirectory={{ beegfs_storage_dir }}/storage"
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regex: '^storeStorageDirectory(\s+)=', line: "storeStorageDirectory = {{ beegfs_storage_dir }}/storage" }
+    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ inventory_hostname }}" }
   notify:
     - systemd_reload
     - restart-beegfs-storage
   become: true
 
-- name: Configure Caching directory on BeeGFS storage service
-  ansible.builtin.lineinfile:
-    path: /etc/beegfs/beegfs-storage.conf
-    regexp: '^storeCacheDirectory\s*='
-    line: "storeCacheDirectory=/mnt/beegfs-cache"
-  notify:
-    - systemd_reload
-    - restart-beegfs-storage
-  become: true
-
-- name: Configure connAuthFile
+- name: Make /etc/beegfs/connAuthFile
   ansible.builtin.copy:
     content: "{{ beegfs_connAuthFile_content }}"
     dest: /etc/beegfs/connauthfile
@@ -67,14 +78,50 @@
 - name: Configure all the services to use the connAuthFile
   ansible.builtin.lineinfile:
     path: "/etc/beegfs/{{ item }}"
-    regexp: '^connAuthFile\s*='
-    line: "connAuthFile=/etc/beegfs/connauthfile"
+    regexp: '^connAuthFile(\s+)='
+    line: "connAuthFile = /etc/beegfs/connauthfile"
   with_items:
     - beegfs-mgmtd.conf
     - beegfs-meta.conf
     - beegfs-storage.conf
+    - beegfs-client.conf
   notify:
     - systemd_reload
     - restart-beegfs-mgmtd
+  become: true
+
+- name: Configure BeeGFS client
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-client.conf
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ inventory_hostname }}" }
+  notify:
+    - systemd_reload
+    - restart-beegfs-meta
+  become: true
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Check if services are enabled and running
+  ansible.builtin.service_facts:
+  become: true
+
+- name: Verify services are enabled and running
+  ansible.builtin.debug:
+    msg: "services[{{ item }}.service].status={{services[item+'.service'].status}}"
+    msg: "services[{{ item }}.service].state={{services[item+'.service'].state}}"
+  loop: "{{ beegfs_server_services }}"
+  become: true
+
+- name: Verify services are enabled and running
+  ansible.builtin.debug:
+    msg: "The service '{{ item }}' is not enabled and running, fixing it ..."
+  changed_when: services[item+'.service'].status != 'enabled' or services[item+'.service'].state != 'running'
+  when: services[item+'.service'].status != 'enabled' or services[item+'.service'].state != 'running'
+  notify: "restart-{{ item }}"
+  loop: "{{ beegfs_server_services }}"
   become: true
 ...

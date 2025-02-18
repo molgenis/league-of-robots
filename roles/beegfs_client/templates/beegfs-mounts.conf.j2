@@ -1,0 +1,3 @@
+{% for beegfs_mount in pfs_mounts | selectattr('type', 'equalto', 'beegfs') | map(attribute='pfs') %}
+/mnt/{{ beegfs_mount }} /etc/beegfs/beegfs-client.conf
+{% endfor %}                                                                    

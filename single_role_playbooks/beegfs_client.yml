@@ -1,0 +1,9 @@
+---
+- name: Running > beegfs_client < role
+  hosts: cluster
+  roles:
+    - role: beegfs_client
+      when: pfs_mounts | selectattr('type', 'search', 'beegfs') | default([]) | list | length >= 1
+    - role: shared_storage
+      when: pfs_mounts | selectattr('type', 'search', 'beegfs') | default([]) | list | length >= 1
+...

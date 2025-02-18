@@ -65,6 +65,15 @@ additional_etc_hosts:
     nodes:
       - name: cf-dragen
         network: vlan990
+  - group: copperfist_cluster
+    nodes:
+      - name: cf-storage
+        network: vlan990
+# TODO : fix this - bb-storage is still missing
+#  - group: betabarrel_cluster
+#    nodes:
+#      - name: bb-storage
+#        network: vlan990
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -92,7 +101,7 @@ ssh_client_configs:
 logs_class: 'diagnostics'
 #
 # Ldap settings
-#
+##
 use_ldap: true
 create_ldap: false
 use_sssd: true
@@ -479,6 +488,13 @@ pfs_mounts:
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
+  - pfs: 'umcgst16'
+    source: 'beegfs_nodev'   # source for beegfs is 'beegfs_nodev' - a virtualized device name that uses /etc/beegfs/beegfs-client.conf configuration
+    type: beegfs    # checked with cat /proc/filesystem
+    rw_options: 'rw,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
+    ro_options: 'ro,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
+    machines: "{{ groups['beegfs_server'] }}"  # TODO this must be changed!
+    #machines: "{{ groups['dragen'] }}"  # TODO this must be changed!
 lfs_mounts:
   - lfs: home
     pfs: local_raid

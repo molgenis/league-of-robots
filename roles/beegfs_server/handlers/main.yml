@@ -6,7 +6,7 @@
   listen: systemd_reload
 
 - name: Restart beegfs-mgmtd
-  service:
+  ansible.builtin.systemd:
     name: beegfs-mgmtd
     enabled: true
     state: restarted
@@ -14,7 +14,7 @@
   become: true
 
 - name: Restart beegfs-meta
-  service:
+  ansible.builtin.systemd:
     name: beegfs-meta
     enabled: true
     state: restarted
@@ -22,7 +22,7 @@
   become: true
 
 - name: Restart beegfs-storage
-  service:
+  ansible.builtin.systemd:
     name: beegfs-storage
     enabled: true
     state: restarted
