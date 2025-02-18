@@ -56,26 +56,28 @@
     - restart-beegfs-client
   become: true
 
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
-
 - name: Check if services are enabled and running
   ansible.builtin.service_facts:
   become: true
 
-- name: Verify services are enabled and running
+- name: Checking if helperd is enabled and running
   ansible.builtin.debug:
     msg: "services[{{ item }}.service].status = {{services[item+'.service'].status}}"
     msg: "services[{{ item }}.service].state = {{services[item+'.service'].state}}"
-  loop: "{{ beegfs_client_services }}"
+  with_items:
+    - "beegfs-helperd"
   become: true
 
-- name: Verify services are enabled and running
+- name: Make sure helperd is enabled and running
   ansible.builtin.debug:
     msg: "The service '{{ item }}' is not enabled and running, starting it now ..."
   changed_when: services[item+'.service'].status != 'enabled' or services[item+'.service'].state != 'running'
   when: services[item+'.service'].status != 'enabled' or services[item+'.service'].state != 'running'
   notify: "restart-{{ item }}"
-  loop: "{{ beegfs_client_services }}"
+  with_items:
+    - "beegfs-helperd"
   become: true
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 ...
