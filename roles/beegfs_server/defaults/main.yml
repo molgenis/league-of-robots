@@ -1,5 +1,12 @@
 ---
-beegfs_install_services:
+beegfs_server_install:
+  - beegfs-mgmtd
+  - beegfs-meta
+  - beegfs-storage
+  - beegfs-utils # provides beegfs-ctl
+  - beegfs-client # provides /etc/beegfs/beegfs-client.conf
+
+beegfs_server_services: # order matters
   - beegfs-mgmtd
   - beegfs-meta
   - beegfs-storage
