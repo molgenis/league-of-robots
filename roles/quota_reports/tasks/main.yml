@@ -1,15 +1,15 @@
 ---
 - name: 'Download quota script from cluster-utils repo.'
   ansible.builtin.get_url:
-    url: 'https://raw.githubusercontent.com/molgenis/cluster-utils/refs/tags/v25.01.2/bin/quota'
+    url: "{{ quota_script_url }}"
     dest: '/root/'
     mode: '0750'
   become: true
 
-- name: 'Make sure output folder exists.'
-  ansible.builtin.file:
-    path: "{{ quota_reports_folder }}"
-    state: directory
+- name: 'Copy script to destination folder.'
+  ansible.builtin.template:
+    src: "templates/create_quota_report.bash"
+    dest: "/root/"
     owner: root
     group: root
     mode: '0750'
@@ -21,8 +21,7 @@
     day: "1"
     hour: "4"
     minute: "0"
-    job: mkdir -p -m '0750' {{ output_folder }}; /root/quota -a -p | { head -4; sed -n -e '/\/groups\//,/[-]+/p'; }
-         > "{{ output_folder }}/{{ lookup('pipe', 'date +%m') }}-quota_report_{{ inventory_hostname }}" 2>&1
+    job: /root/create_quota_report.bash
     user: root
   become: true
 ...
