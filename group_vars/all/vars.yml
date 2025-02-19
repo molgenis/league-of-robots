@@ -163,6 +163,9 @@ pulp_repos:
     - name: e2fsprogs  # Dependency for Lustre project quota.
       description: 'Ext filesystem utility releases for Enterprise Linux 9.'
       remote_url: https://downloads.whamcloud.com/public/e2fsprogs/latest/el9/
+    - name: irods9
+      description: 'RENCI iRODS Repository for Rocky 9.'
+      remote_url: https://packages.irods.org/yum/pool/el9/x86_64/
     #
     # Lustre packages still broken and cannot be installed on EL 9.x due to silly Python 2 dependency resulting in:
     # "nothing provides /usr/bin/python2 needed by lustre-client-dkms-2.15.4-1.el9.noarch from lustre"
@@ -489,6 +492,15 @@ yum_repos:
       gpgkey: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
       gpgcheck: 1
       enabled: 1
+    #
+    # IRODS
+    #
+    - file: irods9.repo
+      id: irods9-source
+      name: Rocky Linux 9 - irods
+      mirrorlist: https://packages.irods.org/yum/pool/el9/x86_64/
+      enabled: 1
+      gpgcheck: 0
   oracle8:
     - file: oracle-linux-ol8.repo
       id: ol8_baseos_latest
