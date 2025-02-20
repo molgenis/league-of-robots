@@ -37,7 +37,7 @@
     regexp: "{{ item.regex }}"
     line: "{{ item.line }}"
   with_items:
-    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ inventory_hostname }}" }
+    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ groups['beegfs_server'] | default([]) | first }}" }
   notify:
     - systemd_reload
     - restart-beegfs-helperd
