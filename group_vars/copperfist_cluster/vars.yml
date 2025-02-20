@@ -494,7 +494,6 @@ pfs_mounts:
     rw_options: 'rw,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
     ro_options: 'ro,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
     machines: "{{ groups['beegfs_server'] }}"  # TODO this must be changed!
-    #machines: "{{ groups['dragen'] }}"  # TODO this must be changed!
 lfs_mounts:
   - lfs: home
     pfs: local_raid
@@ -676,6 +675,11 @@ lfs_mounts:
   - lfs: env06
     pfs: local_raid
     rw_machines: "{{ groups['deploy_admin_interface'] + groups['user_interface'] }}"
+  - lfs: tmp06
+    pfs: 'umcgst16'
+    groups:
+      - name: umcg-atd
+    rw_machines: "{{ groups['user_interface'] + groups['dragen'] }}"
 smb_server_users:
   - name: sbsuser
     uid: 501

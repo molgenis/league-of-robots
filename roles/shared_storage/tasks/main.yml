@@ -351,7 +351,9 @@
   with_subelements:
     - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
     - 'groups'
-  when: inventory_hostname in item.0.rw_machines | default ([])
+  when:
+    - inventory_hostname in item.0.rw_machines | default ([])
+    - pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first != "beegfs"
   become: true
 
 - name: 'Mount Logical File Systems (LFSs) per group from shared storage read-only.'
@@ -371,7 +373,9 @@
   with_subelements:
     - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
     - 'groups'
-  when: inventory_hostname in item.0.ro_machines | default ([])
+  when:
+    - inventory_hostname in item.0.ro_machines | default ([])
+    - pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first != "beegfs"
   become: true
 
 - name: 'Mount "env" Logical File Systems (LFSs) from shared storage read-write.'
