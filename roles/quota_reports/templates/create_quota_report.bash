@@ -4,8 +4,9 @@ set -e
 set -u
 set -o pipefail
 
+quota_reports_folder="{{ quota_reports_folder }}"
 {% raw %}
-output_folder="/mnt/umcgst02/quota_reports/$(date +%Y)"
+output_folder="${quota_reports_folder}/$(date +%Y)"
 output_file="$(date +%m)-quota_report_$(hostname)"
 
 #create output folder if it does not exist.
