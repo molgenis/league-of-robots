@@ -1,3 +1,4 @@
 ---
 quota_script_url: https://raw.githubusercontent.com/molgenis/cluster-utils/refs/tags/v25.01.2/bin/quota
+quota_reports_folder: /mnt/umcgst02/quota_reports/
 ...
