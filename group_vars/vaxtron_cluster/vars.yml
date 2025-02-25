@@ -657,6 +657,7 @@ lfs_mounts:
     pfs: umcgst05
     groups:
       - name: umcg-biogen
+      - name: umcg-fg
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env04
