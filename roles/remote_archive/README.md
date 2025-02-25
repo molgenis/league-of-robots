@@ -133,7 +133,6 @@ and then either of the
     [root@talos system]# systemctl status 'groups-umcg\x2datd-arc01.automount'
     [root@talos system]# systemctl restart 'groups-umcg\x2datd-arc01.automount'
 
-
 ## Check the connection to the remote system
 
     [root@talos system]# ssh umcg-atd-dm@archive.surfsara.nl
@@ -142,4 +141,23 @@ and then either of the
 
     [root@talos system]# netstat -tpn | grep 145
     tcp        0      0 10.10.1.195:52316       145.100.5.8:22          ESTABLISHED 194899/ssh
+
+## How the arc_surf script works
+
+ - on users side, any user can write freely into folder `/var/cache/arcq/queue/[arcXX]/`
+   - arc_surf script writes into `/var/cache/arcq/queue/arc01/tmp.[random]`
+     - two fields `[command] [/path/to/something]`, each field separated by a space
+ - on systems side, a systemd service checks each of these `arcXX` folders if anything changed in `/var/cache/arcq/queue/[arcXX]/` folder
+   - when service detects a new file inside
+   - is triggers a `/etc/cron.hourly/arcq_arcXX` script
+ - cron script iterates through the tmp files and
+   - cleans outdated requests and outputs
+   - checks if new requests were issued and
+     - if uid and gid of person that requests
+     - matches the uid and gid of owner of archive folder
+     - if command request is one of the valid ones
+     - if archive directory path was requested
+ - assembles command and issue it to remote archive system
+   - collects the output and writes it into `/var/cache/arcq/output/`
+   - changes the ownership and permission to match the user that issued the command
 
