@@ -20,7 +20,7 @@ archive_groups:
     archive_system_fingerprints:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
       - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
-    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
 ```
 
 this defines for the groups `solve-rd` and `umcg-atd` an archive folders of `arc01`. They will be prepared to be automounted (when accessed) in the folders `/group/[solve-rd,umcg-atd]/arc01/`. The archive are stored on remote systems 'archive.surfsara.nl', which is accessed main user `umcg-atd-dm`. Keys for access are stored on each system inside the `/root/.ssh/id_ed25519_archive{,.pub}`.
@@ -49,7 +49,7 @@ archive_groups:
  - note that this role does not do anything with pfs/lfs
  - this is due to how
    - the mount points are automatically detected, based on simple archive list of groups
-   - how the mountpoints (folders) are automatically created AND removed when not needed!
+   - the mountpoints (folders) are automatically created AND removed when not needed!
    - the fuse.sshfs needs extra parameters, that are shared across mount points, so they
      do not need to be provided separately (as for example in the lfs)
    - and most importantly due to the fact that `/etc/fstab` is not used, but labeled
