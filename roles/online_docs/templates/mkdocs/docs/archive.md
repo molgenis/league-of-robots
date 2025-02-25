@@ -6,55 +6,37 @@
 
 ## 1. Overview
 
-### 1.1. What is archive
+### 1.1. Basic overview
 
-Briefly
+It is the storage that is hosted on the tapes on the remote location. Currently we only have one archive provider - [SURF](https://www.surf.nl/en/services/data-archive).
 
-- **Archive is not backup!**
-- it is a storage location that you write once and read almost never
-- it is a storage location with lower costs than a normal disk storage
-- the permissions and metadata of the files are lost, if not properly handled/packaged before
-- there is file size considerations - **no small files** (see 'Best practices' below)
-- is built around the idea that performance must accomodate occasional (once a year or less) accessing the data
-- data is stored in two physical locations in the Netherlands
-- **tape data does not have a backup**, so be extremely carefull with the data deletion
-- this service has the [ISO 27001 certification](https://www.surf.nl/en/services/data-archive)
+The following guidelines apply to this archive storage
 
-It is the storage that is provided on the external host. Currently we only have one archive provider - [SURF](https://www.surf.nl/en/services/data-archive).
+- It is a remote storage to *write once* and *read rarely*.
+- Performance accommodates occasional (once a year or less) access to the existing data on the remote tape storage.
+- **Archive is not a backup**! It provides storage with lower costs than a normal disk storage.
+- **Tape data does not have a backup**, so be extremely careful with the data deletion.
+- If permissions and metadata of the files are needed to be kept, then they should be first packaged before uploading (use of `tar` or similar tool).
+- File size must be considered - there should be **no small files** (see 'Best practices' below)
+- Tape storage has the [ISO 27001 certification](https://www.surf.nl/en/services/data-archive)
+- Data is stored in two physical locations in the Netherlands.
+
 
 ### 1.2. How it works
     
-Archive is automatically mounted when user navigates into /groups/GROUP/arcXX folder. At that moment storage from remote server gets mounted on this folder. The folder remains mounted while being used and gets unmounted after some idle time to save the resources.
+Archive is automatically mounted when user navigates to the `/groups/[GROUP]/arc[XX]` folder. At that moment storage from remote server gets mounted on the folder. It remains accessible until some specific idle time is reached.
 
-Each group can access only own archive folder and the files in it. Data-manager account is the **only** account on the archive subfolder that can **read** or **write** the archive data. This is to prevent the potential problems of accidentally making files online when not needed, and to make sure all the files are stored in correct format (see 'Best practices' below).
+Data-manager account of the specific group is the **only** account that has **read** or **write** access to the archive folder of the group. This is to prevent the potential problems of accidentally recalling files online when not needed. Also to make sure that all the files are stored in correct format (see 'Best practices' below).
 
-## 2. Copying data
+## 2. Managing data
 
-Run following commands
+After some time, all the files on remote archive server get automatically migrated to the tape. When this happens, all the folders and files can be still normally seen in the structure. The access to any (sub)directory is possible and `ls` should list the files. All the filenames and their permissions and metadata (age, size, ownerhip) can be seen.
 
-```
-     [ regular-user@~ ] $ sudo -u [group]-dm bash
-     [ group-dm@~ ] $ rsync /groups/`GROUP`/`prmXX`/subfolder/file /groups/`GROUP`/`arcXX`/subfolder/
-```
-or alternatively `cp` or another tool can work as well.
+The difference is that the file content is not directly available anymore - that is, not without calling it back first. If anything is done on the file content, like edit (like compressing, edit with vim/nano) or read (with `less`, `cat` or `grep`) then the command will get stuck in order to retrieve the file from the tapes - which take a lot of time. During this time the command line will be **stuck** unusable.
 
-## 3. Validating data
+Therefore the correct procedure is to **first stage (recall from the tape) the file, and access the content when it is available again**.
 
-If you copied your data recently and therefore it is still residing on regular disks on remote archive server, then you can simply calculate the `sha256sum value of the file, with
-
-```
-    surf_archive --sha256sum /groups/[GROUP]/arcXX/subfolder/file
-```
-
-## 4. Managing data
-
-After some time, all the files on remote archive server get automatically migrated to the tape. When this happens, all the folders and files can be still normally seen in the structure. You can go into any (sub)directory and run `ls`. All the filenames and their permissions and metadata (age, size, ownerhip) can be seen.
-
-The difference is that the file content is not directly available anymore - that is, not without calling it back first. If you happen to do anything with the file content (like `cat` or `grep` for instance), then the command will get stuck, because the file will be automatically recalled from the tapes - which take some time. During this time you have unusable shell.
-
-Therefore the correct procedure is to **first stage (recall from the tape) the file, and when it is available again, then access the content**.
-
-### 4.1. Data states
+### 2.1. Data states
 
 The data migrates on remote server from disk to tape and during this it has different states. **As long as the data is online (on disks), it is available to the user. It can be read or modified.**.
 
@@ -68,7 +50,7 @@ The data migrates on remote server from disk to tape and during this it has diff
 
 Note that the folders are always online (in state `REG`) and as such you can always browse folders and check file permissions and their metadata information.
 
-### 4.2. Normal workflow and changing the data states
+### 3. Normal workflow of uploading and managing states of the data
 
 1. Become the data manager  
    ```
@@ -82,14 +64,24 @@ Note that the folders are always online (in state `REG`) and as such you can alw
    ```
    dm-user $ cp /groups/[group]/prmXX/project-x.tar /groups/[group]/arc01/projects/project-x.tar
    ```
+1. (highly recommended) If file was copied recently, it *can be* still on regular disks on the remote archive server, so we can simply issue remote command to calculate the `sha256sum` value of it  
+   ```
+   surf_archive --sha256sum /groups/[GROUP]/arcXX/subfolder/file
+   ```
+1. (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)  
+   ```
+   dm-user $ surf_recall.sh --dmput /groups/[group]/arc01/projects/project-x.tar
+   Submitted to remote host, waiting for reply ...
+   ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
+   ```
 1. Check the file status  
-```
+   ```
    dm-user $ surf_recall.sh --dmls /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
-```
-1. File is offline, but we can call it back to disks - stage it `online` with  
+   ```
+1. If file is offline, we can call it back to disks - stage it `online` with  
    ```
    dm-user $ surf_recall.sh --dmget /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
@@ -103,8 +95,9 @@ Note that the folders are always online (in state `REG`) and as such you can alw
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (UNM) project-x.tar
    dm-user $ # note that the file is unmigrating now
    ```
+1. Now wait until status of `UNM` (unmigrating) is changed to `DUL` (Dual-state) or `REG` (Regular state).
 
-### Other command line options
+### 4. Other command line options
 
 Use `--help` argument to get more information
 
@@ -136,7 +129,24 @@ The average size is monitored and the groups with average size lower than this w
 
 ## 6. Performance
 
+The speed of upload and download depends on the following conditions
+
+ - the total bandwidth usage of the network by all the users on the Login node
+ - (for restoring the data) the usage of the prm/tmp disk utilization by all users
+ - load of the data and network on the remote tape archive system that hosts the data
+
+So far the tests have shown the upload speeds in between of 30 and 50 MB/s.
+Which means that archiving and restoring of the large datasets can take (depending on the size) anywhere from several hours to several days.
+
 ## 7. Issues
+
+So far the bugs have been resolved, but it could happen that
+
+ - archive folder is not available - please inform helpdesk, this should not happen, but it can be that remote system is temporarily down,
+ - download/upload perfomance occasionally drops - this most probably depends on the Login node usage (and data copy by other users) - notify helpdesk if it persists for a longer period,
+ - submitting the commands did not provide the results - has happened in first implemenentation of the archive solution, should be fixed now.
+
+If you expirence any issues with the archive solution, please notify helpdesk.
 
 ## 8. Additional information
 
