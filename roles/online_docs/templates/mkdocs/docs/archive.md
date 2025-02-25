@@ -23,7 +23,7 @@ The following guidelines apply to this archive storage
 
 
 ### 1.2. How it works
-    
+
 Archive is automatically mounted when user navigates to the `/groups/[GROUP]/arc[XX]` folder. At that moment storage from remote server gets mounted on the folder. It remains accessible until some specific idle time is reached.
 
 Data-manager account of the specific group is the **only** account that has **read** or **write** access to the archive folder of the group. This is to prevent the potential problems of accidentally recalling files online when not needed. Also to make sure that all the files are stored in correct format (see 'Best practices' below).
@@ -50,59 +50,81 @@ The data migrates on remote server from disk to tape and during this it has diff
 
 Note that the folders are always online (in state `REG`) and as such you can always browse folders and check file permissions and their metadata information.
 
-### 3. Normal workflow of uploading and managing states of the data
+## 3. Workflow example
 
-1. Become the data manager  
-   ```
+How to upload and modify states of the remote files.
+
+### User
+
+Become the data manager
+```
    user $ sudo -u [group]-dm bash
-   ```
-1. (optional, but highly recommended) Preperate the data by merging multiple files/folders into one compressed **tar** file  
-   ```
+```
+
+### Bundling
+
+(optional, but highly recommended) Preperate the data by merging multiple files/folders into one compressed **tar** file
+```
    dm-user $ tar -czvf /groups/[group]/arc01/projects/project-x.tar.gz /groups/[group]/prmxx/projects/x/*
-   ```
-1. Upload file(s) to the archive  
-   ```
+```
+
+### Uploading
+
+Upload file(s) to the archive
+```
    dm-user $ cp /groups/[group]/prmXX/project-x.tar /groups/[group]/arc01/projects/project-x.tar
-   ```
-1. (highly recommended) If file was copied recently, it *can be* still on regular disks on the remote archive server, so we can simply issue remote command to calculate the `sha256sum` value of it  
-   ```
-   surf_archive --sha256sum /groups/[GROUP]/arcXX/subfolder/file
-   ```
-1. (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)  
-   ```
-   dm-user $ surf_recall.sh --dmput /groups/[group]/arc01/projects/project-x.tar
+
+```
+
+### Checksum
+
+(highly recommended) If file was copied recently, it *can be* still on regular disks on the remote archive server, so we can simply issue remote command to calculate the `sha256sum` value of it
+```
+   arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
+```
+
+### Migrating
+
+(optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
+```
+   dm-user $ arc_surf --dmput /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
-   ```
-1. Check the file status  
-   ```
-   dm-user $ surf_recall.sh --dmls /groups/[group]/arc01/projects/project-x.tar
+```
+
+### Status
+
+Check the file status
+```
+   dm-user $ arc_surf --dmls /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
-   ```
-1. If file is offline, we can call it back to disks - stage it `online` with  
-   ```
-   dm-user $ surf_recall.sh --dmget /groups/[group]/arc01/projects/project-x.tar
+```
+### Unmigrating
+
+If file is offline, we can call it back to disks - stage it `online` with
+```
+   dm-user $ arc_surf --dmget /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
-   ```
-1. Check the status again  
-   ```
-   dm-user $ surf_recall.sh --dmls /groups/[group]/arc01/projects/project-x.tar
+```
+Check the status again
+```
+   dm-user $ arc_surf --dmls /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (UNM) project-x.tar
    dm-user $ # note that the file is unmigrating now
-   ```
-1. Now wait until status of `UNM` (unmigrating) is changed to `DUL` (Dual-state) or `REG` (Regular state).
+```
+Now wait until status of `UNM` (unmigrating) is changed to `DUL` (Dual-state) or `REG` (Regular state).
 
-### 4. Other command line options
+## 4. Other command line options
 
 Use `--help` argument to get more information
 
 ```
-   dm-user $ $ surf_recall.sh --help
+   dm-user $ $ arc_surf --help
    Provide one of the following arguments
     --dmfind-reg <path>      print regular files / files that reside only on disk
     --dmfind-mig <path>      print files that are being copied from disk to tape

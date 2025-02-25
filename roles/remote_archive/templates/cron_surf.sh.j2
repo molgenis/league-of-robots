@@ -79,13 +79,15 @@ for _file in ${_queue_files}; do
    install -m 660 -o "${_submitter_uid}" -g "${_group}" /dev/null "${_stdout}"
    echo "${0} info: output set to '${_stdout}'"
    if [ "${_submitter_uid}" -ne "${_archive_uid}" ] && ! grep -qw "${_archive_gid}" <<< "${_submitter_gid}"; then
-      echo "${0} error: you must have access to the path in order to work with archive." > "${_stdout}"
+      echo -e "\n  ${0} error: you must have access to the path in order to work with archive.\n" > "${_stdout}"
+      date >> "${_stdout}.done" && chmod 644 "${_stdout}.done"
       rm -f "${_file}"
       continue
    fi
    # Check that it is running on a correct filesystem
    if [[ ! "${_fs}" =~ ^"arc"[0-9][0-9]$ ]]; then
       echo "error: (${_fs}) path not pointing to the arc filesystem!" > "${_stdout}"
+      date >> "${_stdout}.done" && chmod 644 "${_stdout}.done"
       rm -f "${_file}"
       continue
    fi
