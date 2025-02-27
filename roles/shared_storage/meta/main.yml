@@ -1,5 +1,0 @@
----
-dependencies:
-  - role: beegfs_client
-    when: pfs_mounts | selectattr('type', 'search', 'beegfs') | default([]) | list | length >= 1
-...

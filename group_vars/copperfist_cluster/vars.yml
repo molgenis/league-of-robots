@@ -101,7 +101,7 @@ ssh_client_configs:
 logs_class: 'diagnostics'
 #
 # Ldap settings
-##
+#
 use_ldap: true
 create_ldap: false
 use_sssd: true
