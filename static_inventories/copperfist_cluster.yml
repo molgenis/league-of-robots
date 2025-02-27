@@ -276,10 +276,10 @@ all:
         cf-storage:
 administration:
   children:
+    storage_server:
     sys_admin_interface:
     deploy_admin_interface:
     user_interface:
-    storage_server:
 cluster:
   children:
     compute_node:
