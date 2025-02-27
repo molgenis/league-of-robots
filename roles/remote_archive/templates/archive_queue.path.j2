@@ -1,0 +1,12 @@
+[Unit]
+Description=Archive Queue Recall Path monitoring
+
+# PathChanged= may be used to watch a file or directory and activate the configured
+# unit whenever it changes. It is not activated on every write to the watched file
+# but it is activated if the file which was open for writing gets closed.
+[Path]
+PathChanged=/var/cache/arcq/queue/{{ item.name }}
+Unit=arcq_{{ item.name }}.service
+
+[Install]
+WantedBy = multi-user.target

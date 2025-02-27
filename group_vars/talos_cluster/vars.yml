@@ -160,6 +160,20 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
+
+# Remote archive settings
+archive_groups:
+  - name: arc01
+    groups:
+      - 'umcg-atd'
+      - 'umcg-gcc'
+    archive_user: 'umcg-atd-dm'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+
 regular_groups:
   # Note, for chaperone machines this is controlled in the static_inventories.
   - "{{ data_transfer_only_group }}"
