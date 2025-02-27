@@ -1,11 +1,10 @@
+#
+# This play depends on:
+#   * cluster_part1.yml
+#
 ---
-# Note, that cluster_part1.yml already calls
-#   init.yml
-#   pre_deploy_checks.yml
-# playbooks, so no need to do it again.
-
-- name: Import cluster_part1.yml
-  ansible.builtin.import_playbook: cluster_part1.yml
+- name: Import pre deploy checks.
+  ansible.builtin.import_playbook: pre_deploy_checks.yml
 
 - name: '###==-> Extra roles for BeeGFS server. <-==###'
   hosts:
@@ -15,9 +14,7 @@
       when: perc_devices is defined and perc_devices
     - local_storage
     - beegfs_server
-    - beegfs_client
-
-- name: Import cluster_part2.yml
-  ansible.builtin.import_playbook: cluster_part2.yml
-
+    #
+    # beegfs_client is preferred on server too and will be installed as part of cluster_part2.yml
+    #
 ...
