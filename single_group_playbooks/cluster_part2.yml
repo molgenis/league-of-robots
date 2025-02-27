@@ -11,6 +11,7 @@
     - sshd
     - basic_security
     - regular_users
+    - beegfs_client
     - lustre_client
     - nfs_client
     - shared_storage
