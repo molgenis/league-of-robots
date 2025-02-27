@@ -1,7 +1,26 @@
 ---
-- name: Install NFS utils.
-  ansible.builtin.package:
-    name: nfs-utils
-  when: pfs_mounts | selectattr('type', 'search', 'nfs') | list | length >= 1
-  become: true
+- name: 'Install NFS client.'
+  ansible.builtin.include_tasks:
+    file: 'install.yml'
+  vars:
+    nfs_file_systems: "{{ pfs_mounts
+        | rejectattr('type', 'undefined')
+        | selectattr('type', 'search', 'nfs')
+        | map(attribute='pfs') }}"
+  when: inventory_hostname in lfs_mounts
+            | rejectattr('rw_machines', 'undefined')
+            | selectattr('pfs', 'in', nfs_file_systems)
+            | map(attribute='rw_machines')
+            | flatten | unique
+        or inventory_hostname in lfs_mounts
+            | rejectattr('ro_machines', 'undefined')
+            | selectattr('pfs', 'in', nfs_file_systems)
+            | map(attribute='ro_machines')
+            | flatten | unique
+        or inventory_hostname in pfs_mounts
+            | rejectattr('machines', 'undefined')
+            | rejectattr('type', 'undefined')
+            | selectattr('type', 'search', 'nfs')
+            | map(attribute='machines')
+            | flatten | unique
 ...
