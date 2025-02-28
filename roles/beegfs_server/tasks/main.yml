@@ -41,8 +41,10 @@
     regexp: "{{ item.regex }}"
     line: "{{ item.line }}"
   with_items:
-    - { regex: '^storeMetaDirectory(\s+)=', line: "storeMetaDirectory = {{ beegfs_storage_dir }}/meta" }
-    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ inventory_hostname }}" }
+    - regex: '^storeMetaDirectory(\s+)='
+      line: "storeMetaDirectory = {{ beegfs_storage_dir }}/meta"
+    - regex: '^sysMgmtdHost(\s+)='
+      line: "sysMgmtdHost = {{ inventory_hostname }}"
   notify:
     - systemd_reload
     - restart-beegfs-meta
@@ -54,8 +56,10 @@
     regexp: "{{ item.regex }}"
     line: "{{ item.line }}"
   with_items:
-    - { regex: '^storeStorageDirectory(\s+)=', line: "storeStorageDirectory = {{ beegfs_storage_dir }}/storage" }
-    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ inventory_hostname }}" }
+    - regex: '^storeStorageDirectory(\s+)='
+      line: "storeStorageDirectory = {{ beegfs_storage_dir }}/storage"
+    - regex: '^sysMgmtdHost(\s+)='
+      line: "sysMgmtdHost = {{ inventory_hostname }}"
   notify:
     - systemd_reload
     - restart-beegfs-storage
@@ -96,7 +100,8 @@
     regexp: "{{ item.regex }}"
     line: "{{ item.line }}"
   with_items:
-    - { regex: '^sysMgmtdHost(\s+)=', line: "sysMgmtdHost = {{ inventory_hostname }}" }
+    - regex: '^sysMgmtdHost(\s+)='
+      line: "sysMgmtdHost = {{ inventory_hostname }}"
   notify:
     - systemd_reload
     - restart-beegfs-meta
@@ -111,8 +116,9 @@
 
 - name: Verify services are enabled and running
   ansible.builtin.debug:
-    msg: "services[{{ item }}.service].status={{services[item+'.service'].status}}"
-    msg: "services[{{ item }}.service].state={{services[item+'.service'].state}}"
+    msg:
+      - "services[{{ item }}.service].status={{ services[item+'.service'].status }}"
+      - "services[{{ item }}.service].state={{ services[item+'.service'].state }}"
   loop: "{{ beegfs_server_services }}"
   become: true
 
