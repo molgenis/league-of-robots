@@ -253,9 +253,8 @@ all:
           lustre_client_networks: "{{ lustre_client_networks_baremetal }}"
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
-          beegfs_storage_dir: '/mnt/data_hdd'
           local_mounts:
-            - mount_point: "{{ beegfs_storage_dir }}"
+            - mount_point: '/mnt/umcgst16'
               device: '/dev/data/hdd'
               mounted_owner: root
               mounted_group: root
@@ -271,7 +270,7 @@ all:
     smb_server:
       hosts:
         copperfist:
-    beegfs_server:
+    nfs_server:
       hosts:
         cf-storage:
 administration:
@@ -293,6 +292,7 @@ copperfist_cluster:
     data_transfer:
     docs:
     smb_server:
+    nfs_server:
 chaperone:
   children:
     mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.

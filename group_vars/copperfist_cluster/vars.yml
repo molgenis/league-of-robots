@@ -488,12 +488,19 @@ pfs_mounts:
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
-  - pfs: 'umcgst16'
-    source: 'beegfs_nodev'   # source for beegfs is 'beegfs_nodev' - a virtualized device name that uses /etc/beegfs/beegfs-client.conf configuration
-    type: beegfs    # checked with cat /proc/filesystem
-    rw_options: 'rw,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
-    ro_options: 'ro,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
-    machines: "{{ groups['beegfs_server'] }}"  # TODO this must be changed!
+#   - pfs: 'umcgst16'
+#     source: 'beegfs_nodev'   # source for beegfs is 'beegfs_nodev' - a virtualized device name that uses /etc/beegfs/beegfs-client.conf configuration
+#     type: beegfs    # checked with cat /proc/filesystem
+#     rw_options: 'rw,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
+#     ro_options: 'ro,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
+#     machines: "{{ groups['beegfs_server'] }}"  # TODO this must be changed!
+  - pfs: umcgst16
+    source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
+    type: nfs4    # checked with cat /proc/filesystem
+    rw_options: 'defaults,_netdev,noatime,nodiratime,local_lock=flock'
+    ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
+    machines:
+      - "{{ stack_prefix }}-storage"
 lfs_mounts:
   - lfs: home
     pfs: local_raid
@@ -514,6 +521,11 @@ lfs_mounts:
 #      - name: umcg-pr
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+  - lfs: tmp16
+    pfs: 'umcgst16'
+    groups:
+      - name: umcg-atd
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
     groups:
@@ -675,11 +687,6 @@ lfs_mounts:
   - lfs: env06
     pfs: local_raid
     rw_machines: "{{ groups['deploy_admin_interface'] + groups['user_interface'] }}"
-  - lfs: tmp06
-    pfs: 'umcgst16'
-    groups:
-      - name: umcg-atd
-    rw_machines: "{{ groups['user_interface'] + groups['dragen'] }}"
 smb_server_users:
   - name: sbsuser
     uid: 501
