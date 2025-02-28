@@ -1,0 +1,7 @@
+---
+- name: Configuring archive
+  hosts:
+   - user_interface
+  roles:
+   - remote_archive
+...
