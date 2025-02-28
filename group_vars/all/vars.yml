@@ -175,9 +175,9 @@ pulp_repos:
     - name: irods
       description: 'RENCI iRODS for Enterprise Linux 9.'
       remote_url: https://packages.irods.org/yum/pool/el9/x86_64/
-    - name: beegfs  # Dependency for BeeGFS storage
-      description: 'BeeGFS filesystem for Enterprise Linux 9.'
-      remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/
+    # - name: beegfs  # Dependency for BeeGFS storage
+    #   description: 'BeeGFS filesystem for Enterprise Linux 9.'
+    #   remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/
 #
 # List of repos for machines that do not use Pulp.
 #
@@ -501,13 +501,13 @@ yum_repos:
     #
     # BeeGFS
     #
-    - file: beegfs.repo
-      id: beegfs
-      name: 'BeeGFS filesystem for Enterprise Linux 9.'
-      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/'
-      gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
-      gpgcheck: 1
-      enabled: 1
+    #- file: beegfs.repo
+    #  id: beegfs
+    #  name: 'BeeGFS filesystem for Enterprise Linux 9.'
+    #  baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/'
+    #  gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
+    #  gpgcheck: 1
+    #  enabled: 1
   oracle8:
     - file: oracle-linux-ol8.repo
       id: ol8_baseos_latest
