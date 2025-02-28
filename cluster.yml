@@ -28,19 +28,22 @@
 - name: Run playbook for NFS servers.
   ansible.builtin.import_playbook: single_group_playbooks/nfs_server.yml
 
+- name: Run playbook for Beegfs servers.
+  ansible.builtin.import_playbook: single_group_playbooks/beegfs_server.yml
+
 - name: Run playbook for all cluster machines part 2.
   ansible.builtin.import_playbook: single_group_playbooks/cluster_part2.yml
 
-- name: Run playbook for sys admin interfaces.
+- name: Run playbook for Sys Admin Interfaces.
   ansible.builtin.import_playbook: single_group_playbooks/sys_admin_interface.yml
 
-- name: Run playbook for Samba server
+- name: Run playbook for Samba servers.
   ansible.builtin.import_playbook: single_group_playbooks/smb_server.yml
 
-- name: Run playbook for deploy admin Interfaces.
+- name: Run playbook for Deploy Admin Interfaces.
   ansible.builtin.import_playbook: single_group_playbooks/deploy_admin_interface.yml
 
-- name: Run playbook for user interfaces.
+- name: Run playbook for User Interfaces.
   ansible.builtin.import_playbook: single_group_playbooks/user_interface.yml
 
 - name: Run playbook for compute nodes.

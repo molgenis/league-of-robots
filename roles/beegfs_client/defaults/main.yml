@@ -1,0 +1,10 @@
+---
+beegfs_client_install:
+  - beegfs-client
+  - beegfs-helperd
+  - beegfs-utils
+
+beegfs_client_services: # order matters
+  - beegfs-helperd
+  - beegfs-client
+...

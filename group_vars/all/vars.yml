@@ -163,9 +163,6 @@ pulp_repos:
     - name: e2fsprogs  # Dependency for Lustre project quota.
       description: 'Ext filesystem utility releases for Enterprise Linux 9.'
       remote_url: https://downloads.whamcloud.com/public/e2fsprogs/latest/el9/
-    - name: irods9
-      description: 'RENCI iRODS Repository for Rocky 9.'
-      remote_url: https://packages.irods.org/yum/pool/el9/x86_64/
     #
     # Lustre packages still broken and cannot be installed on EL 9.x due to silly Python 2 dependency resulting in:
     # "nothing provides /usr/bin/python2 needed by lustre-client-dkms-2.15.4-1.el9.noarch from lustre"
@@ -175,12 +172,12 @@ pulp_repos:
     #  # WARNING: There is no LTS release link for el9 yet.
     #  # WARNING: When el9.4 is released the link below for el9.3 will not get updated automatically!
     #  remote_url: https://downloads.whamcloud.com/public/lustre/latest-release/el9.3/client/
-    #
-    # iRODS is not yet available for EL9.
-    #
-    #- name: irods
-    #  description: 'RENCI iRODS Repository for Enterprise Linux 9.'
-    #  remote_url: https://packages.irods.org/yum/pool/el9/x86_64/
+    - name: irods
+      description: 'RENCI iRODS for Enterprise Linux 9.'
+      remote_url: https://packages.irods.org/yum/pool/el9/x86_64/
+    - name: beegfs  # Dependency for BeeGFS storage
+      description: 'BeeGFS filesystem for Enterprise Linux 9.'
+      remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/
 #
 # List of repos for machines that do not use Pulp.
 #
@@ -493,14 +490,24 @@ yum_repos:
       gpgcheck: 1
       enabled: 1
     #
-    # IRODS
+    # iRODS
     #
-    - file: irods9.repo
-      id: irods9-source
-      name: Rocky Linux 9 - irods
+    - file: irods.repo
+      id: irods
+      name: 'RENCI iRODS for Enterprise Linux 9.'
       mirrorlist: https://packages.irods.org/yum/pool/el9/x86_64/
       enabled: 1
       gpgcheck: 0
+    #
+    # BeeGFS
+    #
+    - file: beegfs.repo
+      id: beegfs
+      name: 'BeeGFS filesystem for Enterprise Linux 9.'
+      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/'
+      gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
+      gpgcheck: 1
+      enabled: 1
   oracle8:
     - file: oracle-linux-ol8.repo
       id: ol8_baseos_latest
@@ -667,7 +674,7 @@ yum_repos:
       baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/$basearch/
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
-      enabled: 1    
+      enabled: 1
     - file: uek-ol8.repo
       id: ol8_UEKR7_RDMA
       name: 'Oracle Linux 8 UEK7 RDMA ($basearch)'
@@ -682,6 +689,16 @@ yum_repos:
       gpgkey:file: ///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+    #
+    # BeeGFS
+    #
+    - file: beegfs.repo
+      id: beegfs
+      name: 'BeeGFS filesystem for Enterprise Linux 8.'
+      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel8/'
+      gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
+      gpgcheck: 1
+      enabled: 1
 #
 # Iptables additional configurations 
 #

@@ -1,26 +1,31 @@
 ---
-- name: 'Install NFS client.'
+#
+# Using an include here is silly, but required to prevent an error related to using:
+# "meta: flush_handlers" in combination with a "when" condition.
+# See: https://github.com/ansible/ansible/issues/41313
+#
+- name: 'Install BeeGFS client.'
   ansible.builtin.include_tasks:
     file: 'install.yml'
   vars:
-    nfs_file_systems: "{{ pfs_mounts
+    beegfs_file_systems: "{{ pfs_mounts
         | rejectattr('type', 'undefined')
-        | selectattr('type', 'search', 'nfs')
+        | selectattr('type', 'equalto', 'beegfs')
         | map(attribute='pfs') }}"
   when: inventory_hostname in lfs_mounts
             | rejectattr('rw_machines', 'undefined')
-            | selectattr('pfs', 'in', nfs_file_systems)
+            | selectattr('pfs', 'in', beegfs_file_systems)
             | map(attribute='rw_machines')
             | flatten | unique
         or inventory_hostname in lfs_mounts
             | rejectattr('ro_machines', 'undefined')
-            | selectattr('pfs', 'in', nfs_file_systems)
+            | selectattr('pfs', 'in', beegfs_file_systems)
             | map(attribute='ro_machines')
             | flatten | unique
         or inventory_hostname in pfs_mounts
             | rejectattr('machines', 'undefined')
             | rejectattr('type', 'undefined')
-            | selectattr('type', 'search', 'nfs')
+            | selectattr('type', 'equalto', 'beegfs')
             | map(attribute='machines')
             | flatten | unique
 ...

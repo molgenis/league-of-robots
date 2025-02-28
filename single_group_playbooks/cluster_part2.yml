@@ -11,10 +11,10 @@
     - sshd
     - basic_security
     - regular_users
+    - beegfs_client
     - lustre_client
     - nfs_client
     - shared_storage
     - role: soft_partition
       when: soft_partitions is defined
-    - backup_local
 ...
