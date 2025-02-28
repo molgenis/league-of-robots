@@ -130,7 +130,7 @@ all:
               slurm_ethernet_interfaces:
                 - enp130s0f0
                 - enp130s0f0.1068
-        cpu-b:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_b:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-b01:
               cloud_flavor: umcg.v1.bm.64-512-0
