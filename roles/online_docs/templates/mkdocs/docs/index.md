@@ -15,6 +15,7 @@ in collaboration with and as part of several research projects including
 * [Solve-RD - solving the unsolved rare diseases](http://solve-rd.eu/)
 * [EJP RD - European Joint Programme on Rare Diseases](http://www.ejprarediseases.org/)
 * [CORBEL](https://www.corbel-project.eu/home.html)
+* [ERDERA - European Rare Disease Research Alliance](https://erdera.org/)
 
 See [cluster](cluster/) for an overview of cluster components and features.
 
