@@ -493,8 +493,7 @@ pfs_mounts:
     type: nfs4    # checked with cat /proc/filesystem
     rw_options: 'defaults,_netdev,noatime,nodiratime,local_lock=flock'
     ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
-    machines:
-      - "{{ stack_prefix }}-storage"
+    machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
     pfs: local_raid
