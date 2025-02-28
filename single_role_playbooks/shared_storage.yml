@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Running > shared_storage < role
+  hosts:
     - cluster
     - chaperone
   roles:

@@ -8,8 +8,8 @@ ssh_client_known_hosts: "\
   cf-porch*,\
   195.169.23.116,\
   *cf-transfer*,\
-  195.169.23.88,\
   *copperfist,\
+  *cf-storage,\
   *docs-on-bateleur,\
   *cf-* \
   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOgd3uhXGZ1cYE+/EcT3Gd4AsY6rnX/zr0IYcod7vj+c CA key for Copperfist"

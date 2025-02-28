@@ -1,6 +1,7 @@
 ---
 - name: Running logs_client role.
   hosts:
+    # TODO - we should probably just set it to 'all'
     - jumphost
     - cluster
     - chaperone,!mit_chaperone

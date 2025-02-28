@@ -1,0 +1,7 @@
+---
+- name: Running > beegfs_server < role
+  hosts: beegfs_server
+  roles:
+    - local_storage
+    - beegfs_server
+...

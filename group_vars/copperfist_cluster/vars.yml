@@ -65,6 +65,15 @@ additional_etc_hosts:
     nodes:
       - name: cf-dragen
         network: vlan990
+  - group: copperfist_cluster
+    nodes:
+      - name: cf-storage
+        network: vlan990
+# TODO : fix this - bb-storage is still missing
+#  - group: betabarrel_cluster
+#    nodes:
+#      - name: bb-storage
+#        network: vlan990
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -139,7 +148,7 @@ stack_networks:
   - name: vlan990
     cidr: '192.168.1.0/24'
     allow_ingress:
-      - '192.168.1.0/25'
+      - '192.168.1.0/24'
     type: storage
     external: true
 nameservers: [
@@ -175,12 +184,6 @@ iptables_allow_ssh_outbound:
   - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
-main_backup_folder: '/mnt/local_raid/local_backups/'
-local_backups: # list of folders for cron to make daily backup
-  - name: apps # don't modify after once deployed!
-    src_path: '/apps'
-    frequency:
-     - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
 local_admin_groups:
   - 'admin'
   - 'docker'
@@ -479,6 +482,18 @@ pfs_mounts:
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
+#   - pfs: 'umcgst16'
+#     source: 'beegfs_nodev'   # source for beegfs is 'beegfs_nodev' - a virtualized device name that uses /etc/beegfs/beegfs-client.conf configuration
+#     type: beegfs    # checked with cat /proc/filesystem
+#     rw_options: 'rw,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
+#     ro_options: 'ro,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
+#     machines: "{{ groups['beegfs_server'] }}"  # TODO this must be changed!
+  - pfs: umcgst16
+    source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
+    type: nfs4    # checked with cat /proc/filesystem
+    rw_options: 'defaults,_netdev,noatime,nodiratime,local_lock=flock'
+    ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
+    machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
     pfs: local_raid
@@ -499,6 +514,11 @@ lfs_mounts:
 #      - name: umcg-pr
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+  - lfs: tmp16
+    pfs: 'umcgst16'
+    groups:
+      - name: umcg-atd
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
     groups:
