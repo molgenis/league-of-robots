@@ -32,7 +32,7 @@ ip_addresses:
       address: 172.23.60.11
       netmask: /32
     vlan1337:
-      address: 172.23.68.142
+      address: 172.23.68.9
       netmask: /32
   tl-node-b01:
     vlan1068:
