@@ -5,7 +5,6 @@
     path: '{{ main_backup_folder }}'
     state: directory
     mode: '0755'
-  when: local_backups is defined and local_backups | default([]) | length > 0
   become: true
 
 - name: Create backup subdirectories for each item from list
@@ -13,7 +12,6 @@
     path: '{{ main_backup_folder }}/{{ item.name }}/'
     state: directory
     mode: '0700'
-  when: local_backups is defined and local_backups | default([]) | length > 0
   become: true
   loop: "{{ local_backups }}"
 
@@ -24,7 +22,6 @@
     owner: 'root'
     group: 'root'
     mode: '0700'
-  when: local_backups is defined and local_backups | default([]) | length > 0
   become: true
 
 - name: 'Create cron for daily backup'

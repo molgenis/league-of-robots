@@ -184,12 +184,6 @@ iptables_allow_ssh_outbound:
   - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
-main_backup_folder: '/mnt/local_raid/local_backups/'
-local_backups: # list of folders for cron to make daily backup
-  - name: apps # don't modify after once deployed!
-    src_path: '/apps'
-    frequency:
-     - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
 local_admin_groups:
   - 'admin'
   - 'docker'

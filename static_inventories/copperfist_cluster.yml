@@ -140,6 +140,12 @@ all:
               mounted_mode: '2775'
               mount_options: 'bind'
               type: none
+          main_backup_folder: '/mnt/local_raid/local_backups/'
+          local_backups: # list of folders for cron to make daily backup
+            - name: apps # Name == ID; don't modify after deployed!
+              src_path: '/apps'
+              frequency:
+               - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
         copperfist:
