@@ -6,6 +6,7 @@ ssh_client_jumphosts:
 ssh_client_known_hosts: "\
   @cert-authority \
   reception*,\
+  *tl-transfer*,\
   *tl-sai,\
   *tl-dai,\
   *talos,\
