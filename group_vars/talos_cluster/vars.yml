@@ -15,6 +15,15 @@ slurm_partitions:
     local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_b  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_b']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_b'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_b'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_b'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_b'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -111,20 +120,13 @@ cloud_image: RockyLinux-9.3_xfs
 cloud_user: cloud-user
 availability_zone: nova
 stack_networks:
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
+  - name: vlan1337  # Internal management for VMs and BMs
+    cidr: '172.23.68.0/24'
+    gateway: '172.23.68.1'
     router_network: vlan16
-    type: management
-    external: false
-  - name: provision-net
-    cidr: '172.23.66.0/24'
+    router_name: vlan1337
     type: management
     external: true
-  - name: "{{ stack_prefix }}_internal_storage"
-    cidr: '10.10.2.0/24'
-    type: storage
-    external: false
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
     allow_ingress:
@@ -160,6 +162,20 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
+
+# Remote archive settings
+archive_groups:
+  - name: arc01
+    groups:
+      - 'umcg-atd'
+      - 'umcg-gcc'
+    archive_user: 'umcg-atd-dm'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+
 regular_groups:
   # Note, for chaperone machines this is controlled in the static_inventories.
   - "{{ data_transfer_only_group }}"
@@ -219,9 +235,9 @@ sudoers:
 lustre_client_networks_vm:
   - name: tcp20
     interface: enp5s0
-lustre_client_networks_baremetal:
-  - name: tcp20
-    interface: enoxxx
+#
+# lustre_client_networks for baremetal machines specified in static_inventory.
+#
 pfs_mounts:
   - pfs: umcgst04/slice4
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'

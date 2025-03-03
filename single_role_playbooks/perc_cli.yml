@@ -1,7 +1,7 @@
 - name: Install the PERC CLI.
   hosts:
-     - compute_node
+     - cluster
   roles:
      - name: perc_cli
-       when: perc_devices is defined
+       when: perc_devices is defined and perc_devices
 ...

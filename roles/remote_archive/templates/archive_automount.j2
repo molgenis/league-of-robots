@@ -1,0 +1,15 @@
+#----------------------------------------------------------------------------------------------------------#
+# ! This ansible_remote_archive file was generated autimatically with ansible, don't change the contents ! #
+#----------------------------------------------------------------------------------------------------------#
+
+[Unit]
+Description=Automount for {{ item.1 }}
+After=network.target
+
+[Automount]
+Where=/groups/{{ item.1 }}/{{ item.0.name }}
+TimeoutIdleSec=180
+DirectoryMode=2750
+
+[Install]
+WantedBy=multi-user.target

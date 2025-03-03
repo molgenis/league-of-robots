@@ -27,7 +27,7 @@
       {%- if item.type == 'cifs' -%}
       ,credentials=/etc/sysconfig/{{ item.pfs | regex_replace('\$$', '') | regex_replace('/', '_') }}.cifs,uid=root,gid=root,dir_mode=02750,file_mode=0640
       {%- endif -%}
-  with_items: "{{ pfs_mounts | list }}"
+  with_items: "{{ pfs_mounts | rejectattr('type', 'equalto', 'beegfs') | list }}"
   when: inventory_hostname in item.machines | default([])
   become: true
 
@@ -163,7 +163,7 @@
     group: "{{ item.1.name }}"
     mode: '0644'
   vars:
-    group_id: "{{ getent_group[item.1.name][1] }}"
+    group_id: "{{ getent_group[item.1.name][1] | default('') }}"
     lfs_type: "{{ item.0.lfs | regex_search('((tmp)|(rsc)|(prm))[0-9]+$', '\\1') | first }}"
     lfs_type_project_id_increment: "
       {%- if lfs_type == 'home' -%}
@@ -351,7 +351,9 @@
   with_subelements:
     - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
     - 'groups'
-  when: inventory_hostname in item.0.rw_machines | default ([])
+  when:
+    - inventory_hostname in item.0.rw_machines | default ([])
+    - pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first != "beegfs"
   become: true
 
 - name: 'Mount Logical File Systems (LFSs) per group from shared storage read-only.'
@@ -371,7 +373,9 @@
   with_subelements:
     - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
     - 'groups'
-  when: inventory_hostname in item.0.ro_machines | default ([])
+  when:
+    - inventory_hostname in item.0.ro_machines | default ([])
+    - pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first != "beegfs"
   become: true
 
 - name: 'Mount "env" Logical File Systems (LFSs) from shared storage read-write.'

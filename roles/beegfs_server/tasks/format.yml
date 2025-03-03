@@ -1,0 +1,24 @@
+---
+- name: UNformatted storage devices - create xfs filesytem for metadata and object storage
+  community.general.filesystem:
+    dev: "{{ item }}"
+    fstype: xfs
+    force: false
+  loop:
+    - "{{ beegfs_cache_device }}"
+    - "{{ beegfs_storage_device }}"
+  become: true
+
+- name: RE-format storage devices - create xfs filesytem for metadata and object storage
+  community.general.filesystem:
+    dev: "{{ item }}"
+    fstype: xfs
+    force: true
+  loop:
+    - "{{ beegfs_cache_device }}"
+    - "{{ beegfs_storage_device }}"
+  tags:
+    - never # this role will never run
+    - reformat_beegfs_server # except when we say so
+  become: true
+...

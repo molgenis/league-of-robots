@@ -1,0 +1,6 @@
+---
+- name: Install NFS utils.
+  ansible.builtin.package:
+    name: nfs-utils
+  become: true
+...

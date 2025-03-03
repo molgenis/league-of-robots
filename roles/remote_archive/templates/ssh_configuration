@@ -1,0 +1,11 @@
+{% for archive_host in archive_unique_hosts %}
+Host {{ archive_host }}
+    ServerAliveInterval 60
+    ServerAliveCountMax 5
+    IdentityFile "{{ archive_ssh_key_location }}"
+    PasswordAuthentication no
+    Compression yes
+    ControlMaster auto
+    ControlPath ~/.ssh/tmp/%C
+    ControlPersist 120m
+{% endfor %}

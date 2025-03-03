@@ -1,0 +1,81 @@
+---
+- name: Create /var/cache/arcq directory structure
+  ansible.builtin.file:
+    path: "/var/cache/arcq/queue"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+
+- name: Make a publicly writable queuing subdirectories
+  ansible.builtin.file:
+    path: "/var/cache/arcq/queue/{{ item.name }}"
+    state: directory
+    mode: "1777"
+    owner: root
+    group: root
+  with_items:
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+  become: true
+
+- name: Install recall script
+  ansible.builtin.copy:
+    src: "arc_surf"
+    dest: /usr/local/bin/arc_surf
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+
+- name: Deploy archive_queue service for each group
+  ansible.builtin.template:
+    src: "archive_queue.service.j2"
+    dest: "/etc/systemd/system/arcq_{{ item.name }}.service"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+  notify:
+    - 'archive_systemd_reload'
+    - 'archive_path_monitor_enable'
+  when:
+    - archive_groups is defined
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
+
+- name: Deploy archive_queue service for each group
+  ansible.builtin.template:
+    src: "archive_queue.path.j2"
+    dest: "/etc/systemd/system/arcq_{{ item.name }}.path"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+  notify:
+    - 'archive_systemd_reload'
+    - 'archive_path_monitor_enable'
+  when:
+    - archive_groups is defined
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
+
+- name: Install recall cron script
+  ansible.builtin.template:
+    src: "{{ item.recall_cron_script }}"
+    dest: "/etc/cron.hourly/arcq_{{ item.name }}"
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+  notify:
+    - 'archive_systemd_reload'
+    - 'archive_path_monitor_enable'
+  when:
+    - archive_groups is defined
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
+...
