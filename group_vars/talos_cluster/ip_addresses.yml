@@ -56,6 +56,7 @@ ip_addresses:
     vlan1337:
       address: 172.23.68.144
       netmask: /32
+      fqdn: 'tl-transfer'  # Not really a FQDN as there is no public IP: only for internal use / testing.
   vlan1337-vlan16-router:
     vlan1337:
       address: 172.23.68.1
