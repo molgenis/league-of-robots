@@ -107,6 +107,10 @@ ip_addresses:
     vlan985:
       address: 172.23.59.177
       netmask: /32
+  nb-node-c01:
+    vlan1338:
+      address: 172.23.69.106
+      netmask: /32
   nb-repo:
     nb_internal_management:
       address: 10.10.1.137
@@ -161,12 +165,21 @@ ip_addresses:
       address: 195.169.22.136
       netmask: /32
       fqdn: 'tunnel.hpc.rug.nl'
-  nb_internal_management-vlan16-router:
-    nb_internal_management:
-      address: 10.10.1.1
+  tunnel-1338:
+    vlan1338:
+      address: 172.23.69.79
+      netmask: /32
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
+    vlan16:
+      address: 195.169.22.185
+      netmask: /32
+      fqdn: 'jenkins.hpc.rug.nl'
+  vlan1338-vlan16-router:
+    vlan1338:
+      address: 172.23.68.1
       netmask: /32
     vlan16:
-      address: 195.169.22.49
+      address: 195.169.22.58
       netmask: /32
       fqdn: 'NXDOMAIN'
 ...
