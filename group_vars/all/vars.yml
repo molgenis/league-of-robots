@@ -495,7 +495,7 @@ yum_repos:
     - file: irods.repo
       id: irods
       name: 'RENCI iRODS for Enterprise Linux 9.'
-      mirrorlist: https://packages.irods.org/yum/pool/el9/x86_64/
+      baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
       enabled: 1
       gpgcheck: 0
     #
