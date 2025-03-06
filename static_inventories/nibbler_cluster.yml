@@ -15,6 +15,14 @@ all:
               assign_floating_ip: true
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
+        tunnel-1338:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: vlan1338
+              security_group: "{{ stack_prefix }}_jumphosts"
+              assign_floating_ip: true
+          basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
+          local_yum_repository: true
     repo:
       hosts:
         nb-repo:
@@ -118,13 +126,7 @@ all:
               security_group: "{{ stack_prefix }}_storage"
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks:
-            - name: tcp14
-              interface: ens5
-            - name: tcp20
-              interface: ens6
-            - name: tcp15
-              interface: ens7
+          lustre_client_networks: "{{ lustre_client_networks_vm }}"
     deploy_admin_interface:
       hosts:
         nb-dai:
@@ -140,13 +142,7 @@ all:
               security_group: "{{ stack_prefix }}_storage"
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks:
-            - name: tcp14
-              interface: ens5
-            - name: tcp20
-              interface: ens6
-            - name: tcp15
-              interface: ens7
+          lustre_client_networks: "{{ lustre_client_networks_vm }}"
           local_volume_size_extra: 3000
     user_interface:
       hosts:
@@ -163,13 +159,7 @@ all:
               security_group: "{{ stack_prefix }}_storage"
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks:
-            - name: tcp14
-              interface: ens5
-            - name: tcp20
-              interface: ens6
-            - name: tcp15
-              interface: ens7
+          lustre_client_networks: "{{ lustre_client_networks_vm }}"
           slurm_sockets: 16
           slurm_cores_per_socket: 1
           slurm_real_memory: 63790
@@ -200,6 +190,14 @@ all:
               # DH5 not used on compute nodes (yet).
               #- name: vlan1073
               #  security_group: "{{ stack_prefix }}_storage"
+            lustre_client_networks:
+              - name: tcp14
+                interface: ens5
+              - name: tcp20
+                interface: ens6
+              # DH5 not used on compute nodes (yet).
+              #- name: tcp15
+              #  interface: ens7
             local_volume_size_extra: 1
             slurm_sockets: 63
             slurm_cores_per_socket: 1
@@ -234,6 +232,14 @@ all:
               # DH5 not used on compute nodes (yet).
               #- name: vlan1073
               #  security_group: "{{ stack_prefix }}_storage"
+            lustre_client_networks:
+              - name: tcp14
+                interface: ens5
+              - name: tcp20
+                interface: ens6
+              # DH5 not used on compute nodes (yet).
+              #- name: tcp15
+              #  interface: ens7
             local_volume_size_extra: 1
             slurm_sockets: 31
             slurm_cores_per_socket: 1
@@ -250,6 +256,46 @@ all:
               # DH4 and DH5 not used on compute nodes (yet).
               #- ens6
               #- ens7
+        cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            nb-node-c01:
+              ansible_host: tunnel-1338+nb-node-c01
+              cloud_flavor: umcg.v1.bm.28-256-0
+              host_type: baremetal
+              host_networks:
+                - name: vlan1338
+                  security_group: "{{ stack_prefix }}_cluster"
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+              lustre_client_networks:
+                - name: tcp20
+                  interface: enp130s0f0.1068
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: '/dev/sdb'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
+              slurm_sockets: 2
+              slurm_cores_per_socket: 14
+              slurm_real_memory: 257320
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
+              slurm_local_disk: 3002000
+              slurm_features: 'rsc02,tmp02'
+              slurm_ethernet_interfaces:
+                - enp130s0f0
+                - enp130s0f0.1068
 administration:
   children:
     sys_admin_interface:
