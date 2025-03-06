@@ -249,5 +249,7 @@ lfs_quota:
       umcg-atd: 512
       umcg-gcc: 128
       umcg-gsad: 512
+      umcg-gst: 512
       umcg-sysops: 128
+      umcg-vipt: 512
 ...
