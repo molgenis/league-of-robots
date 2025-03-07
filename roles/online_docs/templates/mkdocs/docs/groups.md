@@ -4,13 +4,14 @@
 A department head or principal investigator can request a new group on the cluster(s).
 The information needed to request a new group, includes:
 
- * Name of the group (umcg-xxx) Name is set in stone!
+ * Name of the group (umcg-xxx) **Name is set in stone!**
  * The names and mailing addresses of the:
     * Group owner(s)
     * Datamanager(s)
     * Group member(s)
 
 For each of the persons mentioned above, we need a confirmation from the secretary on the end date of their contract with the UMCG.
+More information about the responsibilities for each of these members can be found [here](../storage/group-dirs-groupsgroup/).
 
  * The amount of data ([quota](../quota/)) you want to store on ```tmp``` and ```prm``` storage systems.
 
