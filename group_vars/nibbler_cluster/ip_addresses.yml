@@ -107,9 +107,9 @@ ip_addresses:
     vlan985:
       address: 172.23.59.177
       netmask: /32
-  nb-node-c01:
+  nb-node-d01:
     vlan1338:
-      address: 172.23.69.106
+      address: 172.23.69.217
       netmask: /32
   nb-repo:
     nb_internal_management:
@@ -176,7 +176,7 @@ ip_addresses:
       fqdn: 'jenkins.hpc.rug.nl'
   vlan1338-vlan16-router:
     vlan1338:
-      address: 172.23.68.1
+      address: 172.23.69.1
       netmask: /32
     vlan16:
       address: 195.169.22.58

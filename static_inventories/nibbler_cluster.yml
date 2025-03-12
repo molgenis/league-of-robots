@@ -296,6 +296,15 @@ all:
               slurm_ethernet_interfaces:
                 - enp130s0f0
                 - enp130s0f0.1068
+        virtual:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            nb-node-d01:
+              ansible_host: tunnel-1338+nb-node-d01
+              cloud_flavor: umcg.v1.vm.1-2
+              repo_manager: 'none'
+              host_networks:
+                - name: vlan1338
+                  security_group: "{{ stack_prefix }}_cluster"
 administration:
   children:
     sys_admin_interface:
