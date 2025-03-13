@@ -125,7 +125,7 @@ all:
                 - eno12399np0
         R6625:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
-            vt-node-b[01:03]:
+            vt-node-b[01:06]:
               cloud_flavor: umcg.v1.bm.192-768-0
               host_type: baremetal
               host_networks:
