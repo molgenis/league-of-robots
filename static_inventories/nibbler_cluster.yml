@@ -258,8 +258,8 @@ all:
               #- ens7
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
-            nb-node-c01:
-              ansible_host: tunnel-1338+nb-node-c01
+            nb-node-c[01:03]:
+              #ansible_host: tunnel-1338+nb-node-c01
               cloud_flavor: umcg.v1.bm.28-256-0
               host_type: baremetal
               host_networks:

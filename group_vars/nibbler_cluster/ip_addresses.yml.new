@@ -68,19 +68,6 @@ ip_addresses:
     vlan985:
       address: 172.23.59.225
       netmask: /32
-  nb-node-a05:
-    nb_internal_management:
-      address: 10.10.1.28
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.217
-      netmask: /32
-    vlan1068:
-      address: 172.23.60.3
-      netmask: /32
-    vlan985:
-      address: 172.23.59.86
-      netmask: /32
   nb-node-b01:
     nb_internal_management:
       address: 10.10.1.197
@@ -107,13 +94,12 @@ ip_addresses:
     vlan985:
       address: 172.23.59.177
       netmask: /32
+  nb-node-c01:
   nb-node-c02:
     vlan1338:
       address: 172.23.69.51
       netmask: /32
-    vlan1068:
-      address: 172.23.60.13
-      netmask: /32
+  nb-node-c03:
   nb-node-d01:
     vlan1338:
       address: 172.23.69.217
