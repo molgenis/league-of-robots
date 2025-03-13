@@ -163,7 +163,7 @@ lfs_quota:
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
-      umcg-lifelines: 112640
+      umcg-lifelines: 102400
       umcg-lld: 8192
       umcg-llnext: 2048
       umcg-mic: 2048
@@ -205,7 +205,7 @@ lfs_quota:
       umcg-grip: 1024
       umcg-gsad: 1024
       umcg-hlhs: 1024
-      umcg-lifelines: 15360
+      umcg-lifelines: 25600
       umcg-lld: 1024
       umcg-mic: 2048
       umcg-micompany: 512
