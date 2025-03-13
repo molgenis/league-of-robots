@@ -38,6 +38,7 @@ lfs_quota:
       umcg-reki: 1024
       umcg-solve-rd: 1024
       umcg-sommer: 1024
+      umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 6144
       umcg-ugli: 2048
@@ -218,6 +219,7 @@ lfs_quota:
       umcg-reki: 1024
       umcg-solve-rd: 1024
       umcg-sommer: 1024
+      umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
       umcg-ugli: 1024
