@@ -29,21 +29,21 @@
     job: "{{ item.job }}"
     cron_file: "{{ item.cron_file }}"
   loop:
-   - name: 'Backup_OGM_data  # Unique ID required to update existing cronjob: do not modify.'
-     weekday: '*'
-     hour: '02'
-     minute: '31'
-     user: 'umcg-ogm-dm'
-     job: /bin/bash -c '~/make_backup.sh >> ~/make_backup.sh.log'
-     cron_file: 'ogm_make_backup'
-   - name: 'Clean_OGM_psql_backups  # Unique ID required to update existing cronjob: do not modify.'
-     weekday: '*'
-     hour: '07'
-     minute: '23'
-     user: 'umcg-ogm-dm'
-     job: "/bin/bash -c '~/manage_psql_backups.sh >> ~/manage_psql_backups.sh.log'"
-     cron_file: 'ogm_clean_psql_backups'
-  become: true
+    - name: 'Backup_OGM_data  # Unique ID required to update existing cronjob: do not modify.'
+      weekday: '*'
+      hour: '02'
+      minute: '31'
+      user: 'umcg-ogm-dm'
+      job: /bin/bash -c '~/make_backup.sh >> ~/make_backup.sh.log'
+      cron_file: 'ogm_make_backup'
+    - name: 'Clean_OGM_psql_backups  # Unique ID required to update existing cronjob: do not modify.'
+      weekday: '*'
+      hour: '07'
+      minute: '23'
+      user: 'umcg-ogm-dm'
+      job: "/bin/bash -c '~/manage_psql_backups.sh >> ~/manage_psql_backups.sh.log'"
+      cron_file: 'ogm_clean_psql_backups'
+   become: true
 
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
@@ -53,7 +53,7 @@
     minute: '13'
     user: 'umcg-ogm-dm'
     job: "/bin/bash -c '{{ item.trendanalysis_cronjob }}'"
-    cron_file: 'trendanalysis_cronjob-{{ item.server }}'
+    cron_file: "trendanalysis_cronjob-{{ item.server }}"
   loop: ogm_servers
   when: item.trendanalysis_cronjob.exists
 
