@@ -423,11 +423,11 @@ ogm_servers:
       - /home/bionano/access/web/Server/anchorFiles
       - /home/ADMINIT/pg_dump
     psql_dump_location: /home/ADMINIT/pg_dump
-    trendanalysis_cronjob: "curl -s -k -H 'Cookie: token='\"$(curl -s \"https://bas3.umcg.nl:300
-      5/administration/api/userLogin?deviceFingerprint=chaperone&username={{ ogm-api-username }}
-      &password={{ ogm-api-password }}\" | grep -oP '\"token\":\s*\"\K[^\"]+')\"'; userrole=3; u
-      serpk=24' https://bas3.umcg.nl:3005/projectbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?pe
-      riod=90"
+    trendanalysis_cronjob: "curl -s -k -H 'Cookie: token='\"$(curl -s \"https://bas3.umcg.nl:3005
+      /administration/api/userLogin?deviceFingerprint\=chaperone&username={{ ogm-api-username }}&
+      password\={{ ogm-api-password }}\" | grep -oP '\"token\":\s*\"\K[^\"]+')\"'; userrole\=3; u
+      serpk\=24' https://bas3.umcg.nl:3005/projectbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?pe
+      riod\=90"
 #
 # Local storage variables.
 #
