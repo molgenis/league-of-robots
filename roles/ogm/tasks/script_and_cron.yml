@@ -43,7 +43,7 @@
       user: 'umcg-ogm-dm'
       job: "/bin/bash -c '~/manage_psql_backups.sh >> ~/manage_psql_backups.sh.log'"
       cron_file: 'ogm_clean_psql_backups'
-   become: true
+  become: true
 
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
