@@ -21,6 +21,8 @@ nav:
     - 'Accounts, security and privacy': 'accounts.md'
     - 'Generate SSH key pair for Windows': 'generate-key-pair-mobaxterm.md'
     - 'Generate SSH key pair for macOS & Linux': 'generate-key-pair-openssh.md'
+  - Requesting new group:
+    - 'Request a new group on the cluster': 'new_group.md'
   - Logins:
     - 'Jumphosts, UIs and sessions': 'logins.md'
     - 'SSH config & login for Windows clients': 'logins-windows.md'
