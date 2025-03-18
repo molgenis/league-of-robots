@@ -52,9 +52,8 @@
     hour: '06'
     minute: '13'
     user: 'umcg-ogm-dm'
-    job: "/bin/bash -c 'ogm-api-username={{ ogm-api-username }} ogm-api-password={{ ogm-api-password }} {{ item.trendanalysis_cronjob }}'"
+    job: "/bin/bash -c 'ogm_api_username={{ ogm_api_username }} ogm_api_password={{ ogm_api_password }} {{ item.trendanalysis_cronjob }}'"
     cron_file: "trendanalysis_cronjob-{{ item.server }}"
-  loop: ogm_servers | dict2items
+  loop: "{{ ogm_servers }}"
   when: item.trendanalysis_cronjob is defined
-
 ...

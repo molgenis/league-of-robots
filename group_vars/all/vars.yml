@@ -729,6 +729,6 @@ logs_server_public_networks:
 azure_location: westeurope
 
 # Optical Genome Mapping for Trend-analysis
-ogm-api-username: 'umcg-ogm-dm'
+ogm_api_username: 'umcg-ogm-dm'
 
 ...

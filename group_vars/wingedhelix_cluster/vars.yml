@@ -425,7 +425,7 @@ ogm_servers:
     psql_dump_location: /home/ADMINIT/pg_dump
     trendanalysis_cronjob: "curl -s -k -H 'Cookie: token\\='\"$(curl -s \"https://bas3.umcg.n\
       l:3005/administration/api/userLogin?deviceFingerprint\\=chaperone&userna\ 
-      me\\=${ogm-api-username}}&password\\=${ogm-api-password}\" | grep -oP '\"to\
+      me\\=${ogm_api_username}}&password\\=${ogm_api_password}\" | grep -oP '\"to\
       ken\":\\s*\"\\K[^\"]+')\"'; userrole\\=3; userpk\\=24' https://bas3.umcg.nl:3005/proje\
       ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV\\?period\\=90"
 
