@@ -54,7 +54,7 @@
     user: 'umcg-ogm-dm'
     job: "/bin/bash -c '{{ item.trendanalysis_cronjob }}'"
     cron_file: "trendanalysis_cronjob-{{ item.server }}"
-  loop: ogm_servers
+  loop: ogm_servers | dict2items
   when: item.trendanalysis_cronjob.exists
 
 ...
