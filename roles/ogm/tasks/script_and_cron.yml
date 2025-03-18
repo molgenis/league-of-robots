@@ -47,14 +47,14 @@
 
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
-    name: 'trendanalysis_cronjob-{{ item.server }} # Unique ID required to update existing cronjob: do not modify.'
+    name: "trendanalysis_cronjob-{{ item.server }} # Unique ID required to update existing cronjob: do not modify."
     weekday: '*'
     hour: '06'
     minute: '13'
     user: 'umcg-ogm-dm'
-    job: "/bin/bash -c '{{ item.trendanalysis_cronjob }}'"
+    job: "/bin/bash -c 'ogm-api-username={{ ogm-api-username }} ogm-api-password={{ ogm-api-password }} {{ item.trendanalysis_cronjob }}'"
     cron_file: "trendanalysis_cronjob-{{ item.server }}"
   loop: ogm_servers | dict2items
-  when: item.trendanalysis_cronjob.exists
+  when: item.trendanalysis_cronjob is defined
 
 ...
