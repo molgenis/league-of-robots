@@ -68,4 +68,5 @@
     disabled: "{{ item.trendanalysis_cron_disabled }}"
   loop: "{{ ogm_servers }}"
   when: item.trendanalysis_cron_disabled is defined
+  become: true
 ...
