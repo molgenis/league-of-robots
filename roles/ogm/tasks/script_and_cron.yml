@@ -45,15 +45,27 @@
       cron_file: 'ogm_clean_psql_backups'
   become: true
 
+- name: Deploy OGM TrendAnalysis script
+  ansible.builtin.template:
+    src: templates/ogm_cron_trendanalysis.sh.j2
+    dest: ~umcg-ogm-dm/trendanalysis-{{ item.server.split('.')[0] }}.sh
+    owner: umcg-ogm-dm
+    group: umcg-ogm-dm
+    mode: '0750'
+  loop: "{{ ogm_servers }}"
+  when: item.trendanalysis_cron_disabled is defined and item.trendanalysis_cron_disabled is false
+  become: true
+
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
-    name: "trendanalysis_cronjob-{{ item.server }} # Unique ID required to update existing cronjob: do not modify."
-    weekday: '*'
+    name: "trendanalysis_{{ item.server.split('.')[0] }} # Unique ID required to update existing cronjob: do not modify."
+    weekday: '5'
     hour: '06'
-    minute: '13'
+    minute: '{{ 59 | random(seed=inventory_hostname) }}'
     user: 'umcg-ogm-dm'
-    job: "/bin/bash -c 'ogm_api_username={{ ogm_api_username }} ogm_api_password={{ ogm_api_password }} {{ item.trendanalysis_cronjob }}'"
-    cron_file: "trendanalysis_cronjob-{{ item.server }}"
+    job: "/bin/bash -c '~/trendanalysis-{{ item.server.split('.')[0] }}.sh >> ~/trendanalysis-{{ item.server.split('.')[0] }}.sh.log'"
+    cron_file: "trendanalysis_{{ item.server.split('.')[0] }}"
+    disabled: "{{ item.trendanalysis_cron_disabled }}"
   loop: "{{ ogm_servers }}"
-  when: item.trendanalysis_cronjob is defined
+  when: item.trendanalysis_cron_disabled is defined
 ...
