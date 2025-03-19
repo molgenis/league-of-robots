@@ -3,9 +3,11 @@
     - jumphost
   roles:
     - logrotate
+
 - hosts:
     - repo
     - cluster
+    - chaperone,!mit_chaperone
     - docs
   roles:
     - logrotate

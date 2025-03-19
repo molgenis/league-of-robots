@@ -3,9 +3,11 @@
     - jumphost
   roles:
     - logins
+
 - hosts:
     - repo
     - cluster
+    - chaperone,!mit_chaperone
     - data_transfer
   roles:
     - logins

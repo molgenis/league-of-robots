@@ -1,0 +1,27 @@
+---
+- name: 'Download quota script from cluster-utils repo.'
+  ansible.builtin.get_url:
+    url: "{{ quota_script_url }}"
+    dest: '/root/'
+    mode: '0750'
+  become: true
+
+- name: 'Copy script to destination folder.'
+  ansible.builtin.template:
+    src: "templates/create_quota_report.bash"
+    dest: "/root/"
+    owner: root
+    group: root
+    mode: '0750'
+  become: true
+
+- name: 'Create cronjob for monthly quota reports.'
+  ansible.builtin.cron:
+    name: "quota_report"
+    day: "1"
+    hour: "4"
+    minute: "0"
+    job: /root/create_quota_report.bash
+    user: root
+  become: true
+...

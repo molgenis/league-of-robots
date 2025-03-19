@@ -1,0 +1,115 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# Variables built from ansible
+_arc="{{ item.name }}"
+_user="{{ item.archive_user }}"
+_system="{{ item.archive_system }}"
+_arcq_dir="/var/cache/arcq/"
+_lock="${_arcq_dir}/${_arc}-lock"
+_queue_dir="${_arcq_dir}/queue/${_arc}"
+_stdout_dir="${_arcq_dir}/output"
+_ssh_timeout="600" # max 10 min for a command to finish
+_nl="
+"
+
+# upon error clean proccessed files
+function cleanup(){
+   _retval="${?}"
+   _basename="$(basename ${_file:-error})"
+   rm -f "${_queue_dir}/${_basename}"
+   [[ "${_retval}" -eq "137" ]] && echo "Error: command timed out ... please submit commands that finish within 10 minutes." >> "${_stdout_dir}/${_basename}"
+   echo "  Please check your command or run help." >> "${_stdout_dir}/${_basename}"
+   date >> "${_stdout_dir}/${_basename}.done"
+}
+trap 'cleanup' ERR
+
+# Locking mechanism
+# Systemd has only limit burst rate, which is not rate limit. Rate limit of one
+# ssh command per ${_delay} seconds seems reasonable.
+_delay=5
+
+if [[ -f "${_lock}" ]]; then
+    _last_run=$(cat "${_lock}")
+    _now=$(date +%s)
+    _diff=$((_now - _last_run))
+
+    if (( _diff < _delay )); then
+        _sleep=$((_delay - _diff))
+        echo "${0} info: rate limit hit. Sleeping for ${_sleep} seconds."
+        sleep "${_sleep}"
+    fi
+fi
+date +%s > "${_lock}"
+
+# Make directory structure with correct permissions
+if ! test -d "${_stdout_dir}"; then mkdir -m "1777" -p "${_stdout_dir}"; fi
+if ! test -d "${_stdout_dir}" && \
+   ! test -w "${_stdout_dir}" && \
+   ! test -r "${_stdout_dir}" && \
+   ! test -k "${_stdout_dir}"; then chmod "1777" "${_stdout_dir}"; fi
+
+# Clean old outputs after a week
+find "${_stdout_dir:-/error_path_fail}" -type f -mtime +6 -exec rm {} +
+
+# Queueing part
+if ! test -d "${_queue_dir:-error_path}"; then
+   echo "${0} error: no ${_queue_dir}, exiting ..."
+   exit
+fi
+_queue_files="$(find /var/cache/arcq/queue/${_arc} -type f)"
+for _file in ${_queue_files}; do
+   # Prepare variables
+   #  the file structure: from queue file. All send in one line = [command] [subdirectory]
+   _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
+   _command=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
+   _group="$(echo "${_path}" | cut -s -d'/' -f3)"
+   _fs="$(echo "${_path}" | cut -s -d'/' -f4)"
+   _subdir="$(echo "${_path}" | cut -s -d'/' -f5-)"
+   #  the output: based on basename of queued file
+   _basename="$(basename ${_file})"
+   _stdout="/${_stdout_dir}/${_basename}"
+   _append=""
+   _submitter_uid="$(stat -c '%u' "${_file}")"
+   _submitter_gid=$(id -G "${_submitter_uid}")
+   _archive_uid=$(stat -c "%u" "${_path}")
+   _archive_gid=$(stat -c "%g" "${_path}")
+   echo "${0} info: received path ${_path}"
+   install -m 660 -o "${_submitter_uid}" -g "${_group}" /dev/null "${_stdout}"
+   echo "${0} info: output set to '${_stdout}'"
+   if [ "${_submitter_uid}" -ne "${_archive_uid}" ] && ! grep -qw "${_archive_gid}" <<< "${_submitter_gid}"; then
+      echo -e "\n  ${0} error: you must have access to the path in order to work with archive.\n" > "${_stdout}"
+      date >> "${_stdout}.done" && chmod 644 "${_stdout}.done"
+      rm -f "${_file}"
+      continue
+   fi
+   # Check that it is running on a correct filesystem
+   if [[ ! "${_fs}" =~ ^"arc"[0-9][0-9]$ ]]; then
+      echo "error: (${_fs}) path not pointing to the arc filesystem!" > "${_stdout}"
+      date >> "${_stdout}.done" && chmod 644 "${_stdout}.done"
+      rm -f "${_file}"
+      continue
+   fi
+   # Check and format command
+   _argument=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
+   case "${_argument:2}" in
+      dmfind-reg) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state reg" ;;
+      dmfind-mig) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state mig" ;;
+      dmfind-dul) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state dul" ;;
+      dmfind-ofl) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state ofl" ;;
+      dmfind-unm) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state unm" ;;
+      dmget)      _command="dmget -nq ${_arc}/${_group}/${_subdir}" ;;
+      dmls)       _command="dmls -l ${_arc}/${_group}/${_subdir}" ;;
+      dmput)      _command="dmput -n -r ${_arc}/${_group}/${_subdir}" ;;
+      sha256sum)  _afile="$(basename ${_subdir})"; _adir="$(dirname ${_subdir})"
+                  _command="dmfind ${_arc}/${_group}/${_adir} -name ${_afile} \( -state DUL -or -state REG \) -exec sha256sum {} \; ; dmfind ${_arc}/${_group}/${_adir} -name ${_afile} \( ! -state DUL ! -state REG \) -exec echo 'sha256sum unavailable - file is offline' \;" ;;
+      *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
+                  date >> "${_stdout}.done"
+                  rm -f "${_file:-error_path}" && continue ;;
+   esac
+   rm -f "${_file:-error_path}"
+   echo "${0} info: running command '${_command}'"
+   timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command}" >> "${_stdout}" 2>&1
+   date >> "${_stdout}.done" && chown "${_submitter_uid}":"${_group}" "${_stdout}.done"
+done

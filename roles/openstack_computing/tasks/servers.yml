@@ -7,7 +7,9 @@
         name: "{{ inventory_hostname }}-{{ item.name }}"
         network: "{{ item.name }}"
         security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ hostvars[inventory_hostname]['host_type'] | default('normal') }}"
+        binding_vnic_type: "{{ item.vnic_type
+            | default(hostvars[inventory_hostname]['host_type'])
+            | default('normal') }}"
         fixed_ips:
           #
           # We must specify the subnet ID in addition to the IP address in order for the openstack.cloud.port task to be idempotent.
@@ -28,7 +30,9 @@
         name: "{{ inventory_hostname }}-{{ item.name }}"
         network: "{{ item.name }}"
         security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ hostvars[inventory_hostname]['host_type'] | default('normal') }}"
+        binding_vnic_type: "{{ item.vnic_type
+            | default(hostvars[inventory_hostname]['host_type'])
+            | default('normal') }}"
         wait: true
         timeout: "{{ openstack_api_timeout }}"
       with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
@@ -45,7 +49,14 @@
 - name: Create list of network port names for servers.
   ansible.builtin.set_fact:
     instance_nics: "{{ instance_nics | default([]) + [{'port-name': inventory_hostname + '-' + item}] }}"
-  with_items: "{{ hostvars[inventory_hostname]['host_networks'] | map(attribute='name') }}"
+  with_items: "{{ hostvars[inventory_hostname]['host_networks']
+                  | selectattr('attach_port_on_instance_launch', 'true')
+                  | map(attribute='name')
+                  | list
+                + hostvars[inventory_hostname]['host_networks']
+                  | selectattr('attach_port_on_instance_launch', 'undefined')
+                  | map(attribute='name')
+                  | list }}"
 - name: Create virtual servers.
   openstack.cloud.server:
     state: present
@@ -147,9 +158,9 @@
   when:
     - item.assign_floating_ip is defined
     - item.assign_floating_ip is true
-    - item.name not in (create_instance_result.server.addresses | dict2items(key_name='vlan', value_name='specs') | json_query(query))
+    - item.name not in (create_instance_result.server.addresses | dict2items(key_name='vlan', value_name='specs') | json_query(floating_ip_vlan_query))
   vars:
-    query: '[?specs[?"OS-EXT-IPS:type"==`floating`]].vlan'
+    floating_ip_vlan_query: '[?specs[?"OS-EXT-IPS:type"==`floating`]].vlan'
   with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
 - name: Make sure servers are started.
   openstack.cloud.server_action:

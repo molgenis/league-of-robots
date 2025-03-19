@@ -1,0 +1,6 @@
+---
+- name: Create quota report for groups on SAI machines.
+  hosts:
+    - sys_admin_interface
+  roles:
+    - role: quota_reports

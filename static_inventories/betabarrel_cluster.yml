@@ -127,22 +127,6 @@ all:
             - name: vlan983
             - name: vlan990
           local_yum_repository: true # enable local yum repository
-          ldap_domains:
-            idvault:  # Required to override LDAP uri to use internal connection via VLAN 983.
-              uri: ldaps://172.23.40.249
-              base: ou=gd,o=asds
-              schema: rfc2307
-              min_id: 50100000
-              max_id: 55999999
-              user_object_class: posixAccount
-              user_name: uid
-              user_ssh_public_key: sshPublicKey
-              user_member_of: groupMembership
-              group_member: memberUid
-              group_object_class: groupofnames
-              group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-              group_quota_hard_limit_template: ruggroupumcgquotaLFS
-              create_ldap: false
     deploy_admin_interface:
       hosts:
         betabarrel:
@@ -154,6 +138,12 @@ all:
               mounted_mode: '2775'
               mount_options: 'bind'
               type: none
+          main_backup_folder: '/mnt/local_raid/local_backups/'
+          local_backups: # list of folders for cron to make daily backup
+            - name: apps # Name == ID; don't modify after deployed!
+              src_path: '/apps'
+              frequency:
+               - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
         betabarrel:
@@ -218,10 +208,10 @@ all:
               slurm_ethernet_interfaces:
                 - enp26s0f0  # VLAN990
                 - enp5s0  # BMC
-                - enp134s0f0.16  # VLAN16
+                - ens3f0.16  # VLAN16
               slurm_weight: 10
               local_yum_repository: true # enable local yum repository
-    chaperone:
+    mit_chaperone:
       hosts:
         bb-chaperone:
           ansible_host: bb-chaperone.umcg.nl  # upzkh1055
@@ -270,4 +260,7 @@ betabarrel_cluster:
     data_transfer:
     docs:
     smb_server:
+chaperone:
+  children:
+    mit_chaperone:  # Special type of chaperone machine, which is partially managed by MIT.
 ...

@@ -27,26 +27,6 @@ set -o pipefail # Fail when any command in series of piped commands failed as op
 umask 0077
 
 #
-# Quota settings for groups:
-# For Lustre file systems we prefer "project quota" for group folders,
-# but we'll use "group quota" when project quota are not supported (yet).
-#
-declare -A ldap_quota_limits=()
-declare -A quota_types=(
-	{% for lfs_item in lfs_mounts | selectattr('lfs', 'search', '(home|((tmp)|(rsc)|(prm)|(dat))[0-9]+)$') %}
-		{% if lfs_item['quota_type'] is defined %}
-	['{{ lfs_item['lfs'] }}']='{{ lfs_item['quota_type']}}'
-		{% endif %}
-	{% endfor %}
-)
-declare -A quota_pid_increments=(
-	{% for lfs_item in lfs_mounts | selectattr('lfs', 'search', '(home|((tmp)|(rsc)|(prm)|(dat))[0-9]+)$') %}
-		{% if lfs_item['quota_pid_increment'] is defined %}
-	['{{ lfs_item['lfs'] }}']='{{ lfs_item['quota_pid_increment']}}'
-		{% endif %}
-	{% endfor %}
-)
-#
 # No more Ansible variables below this point!
 #
 {% raw %}
@@ -59,8 +39,6 @@ SCRIPT_NAME="$(basename "${0}" '.bash')"
 export TMPDIR
 export SCRIPT_NAME
 declare mixed_stdouterr='' # global variable to capture output from commands for reporting in custom log messages.
-declare ldif_dir="${TMPDIR}/ldifs"
-declare ldap_config_file='/etc/openldap/readonly-ldapsearch-credentials.bash'
 
 #
 # Initialise Log4Bash logging with defaults.
@@ -93,7 +71,26 @@ function showHelp() {
 	#
 	cat <<EOH
 ===============================================================================================================
-Script to fetch quota values from an LDAP server and apply them to a shared File System for a cluster.
+Script to apply quota to Lustre file systems used on HPC clusters from the League of Robots.
+ * For home dirs this script will configure user quota with a small hard coded limit.
+ * For group folders this will be project / file set quota
+   based on values stored in *.quotaconfig files on that file system.
+
+E.g. when a group folder located at
+
+	/mnt/umcgst04_slice5/groups/umcg-sysops/tmp08/
+	
+has a corresponding *.quotaconfig at
+
+	/mnt/umcgst04_slice5/groups/umcg-sysops/tmp08.quotaconfig
+
+With content
+
+	project_id=63700187
+	size_soft_limit=128
+	size_hard_limit=1152
+
+this script will set project quota with project ID 63700187 and the listed values in GB.
 
 Usage:
 
@@ -103,7 +100,7 @@ OPTIONS:
 
 	-h   Show this help.
 	-a   Apply (new) settings to the File System(s).
-	     By default this script will only do a "dry run" and fetch + list the settings as stored in the LDAP.
+	     By default this script will only do a "dry run" and list the settings used.
 	 r   Recursively (re)apply p and P attributes on Lustre project quota dirs.
 	     WARNING: this will take a long time when there is a lot of data on the file system.
 	     Under normal conditions this should not be necessary, but it can be used to add these attributes in
@@ -114,7 +111,6 @@ OPTIONS:
 Details:
 
 	Values are always reported with a dot as the decimal seperator (LC_NUMERIC="en_US.UTF-8").
-	LDAP connection details are fetched from ${ldap_config_file}.
 ===============================================================================================================
 
 EOH
@@ -218,7 +214,7 @@ function log4Bash() {
 }
 
 #
-# Parse LDIF records and apply quota to Physical File Systems (PFSs) containing group dirs.
+# Parse *.quotaconfig files and apply quota to Physical File Systems (PFSs) containing group dirs.
 #
 function processGroupDirs () {
 	local    _lfs_path_regex='/mnt/([^/]+)/groups/([^/]+)/([^/]+)'
@@ -250,33 +246,39 @@ function processGroupDirs () {
 			continue
 		fi
 		#
-		# Reset hash and then query for quota values for this group on this LFS.
+		# Get values from *.quotaconfig file.
 		#
-		ldap_quota_limits=()
-		local _soft_quota_limit
-		local _hard_quota_limit
-		getQuotaFromLDAP "${_lfs_from_lfs_path}" "${_group_from_lfs_path}"
-		if [[ -n "${ldap_quota_limits['soft']+isset}" && \
-			  -n "${ldap_quota_limits['hard']+isset}" ]]; then
-			_soft_quota_limit="${ldap_quota_limits['soft']}"
-			_hard_quota_limit="${ldap_quota_limits['hard']}"
+		unset project_id
+		unset size_soft_limit
+		unset size_hard_limit
+		if [[ -e  "${_lfs_path}.quotaconfig" && -r "${_lfs_path}.quotaconfig" ]]; then
+			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Fetching quota settings from ${_lfs_path}.quotaconfig ..."
+			# shellcheck source=/dev/null
+			source "${_lfs_path}.quotaconfig"
 		else
-			log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "   Quota values missing for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path}."
+			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "   Config file ${_lfs_path}.quotaconfig missing or not readable."
 			continue
 		fi
-		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "      _soft_quota_limit contains: ${_soft_quota_limit}."
-		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "      _hard_quota_limit contains: ${_hard_quota_limit}."
+		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "      project_id      = ${project_id:-}"
+		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "      size_soft_limit = ${size_soft_limit:-}"
+		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "      size_hard_limit = ${size_hard_limit:-}"
+		if [[ -z "${project_id:-}" || \
+			  -z "${size_soft_limit:-}" || \
+			  -z "${size_hard_limit:-}" ]]; then
+			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "   Quota values missing for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path}."
+			continue
+		fi
 		#
 		# Check for negative numbers and non-integers.
 		#
-		if [[ ! "${_soft_quota_limit}" =~ ${_pos_int_regex} || ! "${_hard_quota_limit}" =~ ${_pos_int_regex} ]]; then
+		if [[ ! "${project_id}" =~ ${_pos_int_regex} || ! "${size_soft_limit}" =~ ${_pos_int_regex} || ! "${size_hard_limit}" =~ ${_pos_int_regex} ]]; then
 			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "   Quota values malformed for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path}. Must be integers >= 0."
 			continue
 		fi
 		#
-		# Check if soft limit is larger than the hard limit as that will quota commands to fail.
+		# Check if soft limit is larger than the hard limit as that will result in failed quota commands.
 		#
-		if [[ "${_soft_quota_limit}" -gt "${_hard_quota_limit}" ]]; then
+		if [[ "${size_soft_limit}" -gt "${size_hard_limit}" ]]; then
 			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "   Quota values malformed for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path}. Soft limit cannot be larger than hard limit."
 			continue
 		fi
@@ -292,37 +294,52 @@ function processGroupDirs () {
 		# On Isilon systems the hard limit must be larger than the soft limit,
 		# so therefore we use 4 * the block/stripe size for the hard limit.
 		#
-		if [[ "${_soft_quota_limit}" -eq 0 ]]; then
-			_soft_quota_limit='2M'
-			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Converted soft quota limit of 0 (zero) for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path} to lowest possible value of ${_soft_quota_limit}."
+		if [[ "${size_soft_limit}" -eq 0 ]]; then
+			size_soft_limit='2M'
+			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Converted soft quota limit of 0 (zero) for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path} to lowest possible value of ${size_soft_limit}."
 		else
 			# Just append unit: all quota values from the IDVault are in GB.
-			_soft_quota_limit="${_soft_quota_limit}G"
+			size_soft_limit="${size_soft_limit}G"
 		fi
-		if [[ "${_hard_quota_limit}" -eq 0 ]]; then
-			_hard_quota_limit='4M'
-			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Converted hard quota limit of 0 (zero) for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path} to lowest possible value of ${_hard_quota_limit}."
+		if [[ "${size_hard_limit}" -eq 0 ]]; then
+			size_hard_limit='4M'
+			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Converted hard quota limit of 0 (zero) for group ${_group_from_lfs_path} on LFS ${_lfs_from_lfs_path} to lowest possible value of ${size_hard_limit}."
 		else
 			# Just append unit: all quota values from the IDVault are in GB.
-			_hard_quota_limit="${_hard_quota_limit}G"
+			size_hard_limit="${size_hard_limit}G"
 		fi
-		if [[ "${_fs_type}" == 'lustre' ]]; then
-			#
-			# Get the GID for this group, which will be used as the ID for quota accounting.
-			#
-			local _gid
-			_gid="$(getent group "${_group_from_lfs_path}" | awk -F ':' '{printf $3}')"
-			if [[ "${quota_types[${_lfs_from_lfs_path}]:-group}" == 'project' ]]; then
-				local _pid
-				_pid=$((${_gid} + ${quota_pid_increments[${_lfs_from_lfs_path}]:-0}))
-				applyLustreQuota "${_lfs_path}" 'project' "${_pid}" "${_soft_quota_limit}" "${_hard_quota_limit}"
-			else
-				applyLustreQuota "${_lfs_path}" 'group' "${_gid}" "${_soft_quota_limit}" "${_hard_quota_limit}"
-			fi
-		elif [[ "${_fs_type}" == 'nfs4' ]]; then
-			saveQuotaCache "${_lfs_path}" "${_soft_quota_limit}" "${_hard_quota_limit}"
+		#
+		# Check if we have a lustre file system.
+		# Note that when automounts are used for a lustre file system,
+		# then /proc/mounts and hence _fs_type contains redundant entries
+		# in random order. Hence _fs_type can contain either
+		#     lustre
+		# or
+		#     autofs
+		#     lustre
+		# or
+		#     lustre
+		#     autofs
+		#
+		if [[ "${_fs_type}" == *lustre* ]]; then
+				applyLustreQuota "${_lfs_path}" 'project' "${project_id}" "${size_soft_limit}" "${size_hard_limit}"
 		else
 			log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "   Cannot configure quota due to unsupported file system type: ${_fs_type}."
+		fi
+		#
+		# Create .quotcache file in place that is accessible for users on all systems,
+		# because *.quotaconfig file is not part of the mount and hence only available
+		# on a SAI and not accessible on other systems.
+		# This will allow users to check the quota status of their folders using the quota
+		# command from the cluster-utils module.
+		#
+		if [[ "${apply_settings}" -eq 1 ]]; then
+			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "   Creating ${_lfs_path}/.quotacache file ..."
+			{
+				cp -p "${_lfs_path}.quotaconfig" "${_lfs_path}/.quotacache.new"
+				mv -f "${_lfs_path}/.quotacache.new" "${_lfs_path}/.quotacache"
+				chmod 644 "${_lfs_path}/.quotacache"
+			} || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "   Failed to create ${_lfs_path}/.quotacache."
 		fi
 	done
 }
@@ -357,17 +374,11 @@ function processHomeDirs () {
 		fi
 		if [[ "${_fs_type}" == 'lustre' ]]; then
 			#
-			# Get the primary GID for this user, which will be used as the ID for quota accounting.
+			# Get the UID for this user and use it as a unique quota project ID.
 			#
 			local _uid
 			_uid="$(id -u "${_user_from_lfs_path}")"
-			if [[ "${quota_types[${_lfs_from_lfs_path}]:-group}" == 'project' ]]; then
-				local _pid
-				_pid=$((${_uid} + ${quota_pid_increments[${_lfs_from_lfs_path}]:-0}))
-				applyLustreQuota "${_lfs_path}" 'project' "${_pid}" "${_soft_quota_limit}" "${_hard_quota_limit}"
-			else
-				applyLustreQuota "${_lfs_path}" 'group' "${_gid}" "${_soft_quota_limit}" "${_hard_quota_limit}"
-			fi
+			applyLustreQuota "${_lfs_path}" 'project' "${_uid}" "${_soft_quota_limit}" "${_hard_quota_limit}"
 		else
 			log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "   Cannot configure quota due to unsupported file system type: ${_fs_type}."
 		fi
@@ -376,9 +387,8 @@ function processHomeDirs () {
 
 #
 # Prefer Lustre project a.k.a. file set a.k.a folder quota limits:
-#  * Set project attribute on LFS path using GID as project ID.
-#  * Use lfs setquota to configure quota limit for project.
-# Fallback to group quota if project quota is not supported.
+#  * Set project attribute on LFS path using project ID.
+#  * Use "lfs setquota" to configure quota limit for project.
 #
 function applyLustreQuota () {
 	local    _lfs_path="${1}"
@@ -400,10 +410,20 @@ function applyLustreQuota () {
 			# because chattr returns exit 1 when it encounters data that is not a file nor directory.
 			# E.g. it will return exit 1 when it encounters a symlink and
 			# there is no simple commandline argument to skip/ignore symlinks.
+			# Moreover using
+			#	"set +e && chattr -R -f +P ${_lfs_path}"
+			#	"set +e && chattr -R -f -p ${_id} ${_lfs_path}"
+			# in "${_cmds[@]" and looping over those command lines in a sub shell with
+			#	mixed_stdouterr="$(${_cmd} 2>&1)" || ....
+			# does not work either: it will not generate an error, but will not apply the attributes recursively either.
 			#
+			log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" "${?}" '   Applying project quota attributes recursively with chattr; This may take a long time ...'
+			{ set +e
+			  chattr -R -f +P "${_lfs_path}"
+			  chattr -R -f -p ${_id} "${_lfs_path}"
+			  set -e
+			} || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" '   Failed to apply chattr recursively.'
 			_cmds=(
-				"set +e && chattr -R -f +P ${_lfs_path}"
-				"set +e && chattr -R -f -p ${_id} ${_lfs_path}"
 				"lfs setquota -p ${_id} --block-softlimit ${_soft_quota_limit} --block-hardlimit ${_hard_quota_limit} ${_lfs_path}"
 			)
 		else
@@ -424,173 +444,10 @@ function applyLustreQuota () {
 		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "   Command: ${_cmd}"
 		if [[ "${apply_settings}" -eq 1 ]]; then
 			mixed_stdouterr="$(${_cmd} 2>&1)" || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Failed to execute: ${_cmd}"
+		else
+			log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' '     Dry run: nothing changed.'
 		fi
 	done
-}
-
-#
-# Store quota limits in a cache file.
-# This can then be used by the storage system itself to read the values and apply quota limits.
-# Needed for example for our Isilon systems which do not support the normal NFS quota tools on NFS clients.
-#
-function saveQuotaCache () {
-	local    _lfs_path="${1}"
-	local    _soft_quota_limit="${2}"
-	local    _hard_quota_limit="${3}"
-	local    _cmd
-	local -a _cmds
-	if [[ "${apply_settings}" -eq 1 ]]; then
-		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "   Updating quota cache ..."
-	else
-		log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "   Dry run: the following commands to update the cache would have been executed with the '-a' switch ..."
-	fi
-	_cmds=(
-		"umask 0027; touch ${_lfs_path}.quotacache.new"
-		"printf 'soft=%s\n' ${_soft_quota_limit} >  ${_lfs_path}.quotacache.new"
-		"printf 'hard=%s\n' ${_hard_quota_limit} >> ${_lfs_path}.quotacache.new"
-		"mv -f ${_lfs_path}.quotacache.new ${_lfs_path}.quotacache"
-	)
-	for _cmd in "${_cmds[@]}"; do
-		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "   Applying cmd: ${_cmd}"
-		if [[ "${apply_settings}" -eq 1 ]]; then
-			eval "${_cmd}" || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Failed to execute: ${_cmd}"
-		fi
-	done
-}
-
-function getQuotaFromLDAP () {
-	local    _lfs="${1}"
-	local    _group="${2}"
-	local    _ldap_attr_regex='([^: ]{1,})(:{1,2}) ([^:]{1,})'
-	local    _ldif_file="${ldif_dir}/${_group}.ldif"
-	local _ldap
-	#
-	# Query LDAP
-	#
-	for _ldap in "${domain_names[@]}"; do
-		local _uri="${domain_configs[${_ldap}_uri]}"
-		local _search_base="${domain_configs[${_ldap}_search_base]}"
-		local _bind_dn="${domain_configs[${_ldap}_bind_dn]}"
-		local _bind_pw="${domain_configs[${_ldap}_bind_pw]}"
-		local _group_object_class="${domain_configs[${_ldap}_group_object_class]}"
-		local _group_quota_soft_limit_template="${domain_configs[${_ldap}_group_quota_soft_limit_template]}"
-		local _group_quota_hard_limit_template="${domain_configs[${_ldap}_group_quota_hard_limit_template]}"
-		local _group_quota_soft_limit_key="${_group_quota_soft_limit_template/LFS/${_lfs}}"
-		local _group_quota_hard_limit_key="${_group_quota_hard_limit_template/LFS/${_lfs}}"
-		ldapsearch -LLL -o ldif-wrap=no \
-				-H "${_uri}" \
-				-D "${_bind_dn}" \
-				-w "${_bind_pw}" \
-				-b "${_search_base}" \
-				"(&(ObjectClass=${_group_object_class})(cn:dn:=${_group}))" \
-				"${_group_quota_soft_limit_key}" \
-				"${_group_quota_hard_limit_key}" \
-				>"${_ldif_file}" 2>&1 \
-			|| log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "ldapsearch for user ${_bind_dn} on server ${_uri} failed."
-		#
-		# Parse query results.
-		#
-		local    _ldif_record
-		local -a _ldif_records
-		while IFS= read -r -d '' _ldif_record; do
-			_ldif_records+=("${_ldif_record}")
-		done < <(sed 's/^$/\x0/' "${_ldif_file}") \
-			|| log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Parsing LDIF file (${_ldif_file}) into records failed."
-		#
-		# Loop over records in the array and create a faked-multi-dimensional hash.
-		#
-		for _ldif_record in "${_ldif_records[@]:-}"; do
-			#
-			# Remove trailing white space like the new line character.
-			# And skip blank lines.
-			#
-			_ldif_record="${_ldif_record%%[[:space:]]}"
-			[[ "${_ldif_record}" == '' ]] && continue
-			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "LDIF record contains: ${_ldif_record}"
-			#
-			# Parse record's key:value pairs.
-			#
-			local -A _directory_record_attributes=()
-			local    _ldif_line
-			while IFS=$'\n' read -r _ldif_line; do
-				[[ "${_ldif_line}" == '' ]] && continue # Skip blank lines.
-				log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "LDIF key:value pair contains: ${_ldif_line}."
-				if [[ "${_ldif_line}" =~ ${_ldap_attr_regex} ]]; then
-					local _key="${BASH_REMATCH[1],,}" # Convert key on-the-fly to lowercase.
-					local _sep="${BASH_REMATCH[2]}"
-					local _value="${BASH_REMATCH[3]}"
-					#
-					# Check if value was base64 encoded (double colon as separator)
-					# or plain text (single colon as separator) and decode if necessary.
-					#
-					if [[ "${_sep}" == '::' ]]; then
-						log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "     decoding base64 encoded value..."
-						_value="$(printf '%s' "${_value}" | base64 -di)"
-					fi
-					#
-					# This may be a multi-valued attribute and therefore check if key already exists;
-					# When key already exists make sure we append instead of overwriting the existing value(s)!
-					#
-					if [[ -n "${_directory_record_attributes[${_key}]+isset}" ]]; then
-						_directory_record_attributes["${_key}"]="${_directory_record_attributes["${_key}"]} ${_value}"
-					else
-						_directory_record_attributes["${_key}"]="${_value}"
-					fi
-					log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "     key   contains: ${_key}."
-					log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "     value contains: ${_value}."
-				else
-					log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Failed to parse LDIF key:value pair (${_ldif_line})."
-				fi
-			done < <(printf '%s\n' "${_ldif_record}") || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Parsing LDIF record failed."
-			#
-			# Get Quota from processed LDIF record if this the right group.
-			#
-			local _ldap_group
-			if [[ -n "${_directory_record_attributes['dn']+isset}" ]]; then
-				#
-				# Parse cn from dn.
-				#
-				_ldap_group=$(dn2cn "${_directory_record_attributes['dn']}")
-				log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Found group ${_ldap_group} in dn attribute."
-			else
-				log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "dn attribute missing for ${_ldif_record}"
-			fi
-			if [[ "${_ldap_group}" == "${_group}" ]]; then
-				log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Group from ldap record matches the group we were looking for: ${_ldap_group}."
-			else
-				log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping LDAP group ${_ldap_group} that does not match the LFS group ${_group} we were looking for."
-				continue
-			fi
-			#
-			# Get quota values for this group on this LFS.
-			#
-			if [[ -n "${_directory_record_attributes["${_group_quota_soft_limit_key}"]+isset}" && \
-				  -n "${_directory_record_attributes["${_group_quota_hard_limit_key}"]+isset}" ]]; then
-				ldap_quota_limits['soft']="${_directory_record_attributes["${_group_quota_soft_limit_key}"]}"
-				ldap_quota_limits['hard']="${_directory_record_attributes["${_group_quota_hard_limit_key}"]}"
-				return
-			else
-				log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "   Quota values missing for group ${_ldap_group} on LFS ${_lfs}."
-				log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "      Search keys were ${_group_quota_soft_limit_key} and ${_group_quota_hard_limit_key}."
-				continue
-			fi
-		done
-	done
-}
-
-
-#
-# Extract a CN from a DN LDAP attribute.
-#
-function dn2cn () {
-	# cn=umcg-someuser,ou=users,ou=umcg,o=rs
-	local _dn="$1"
-	local _cn='MIA'
-	local _regex='cn=([^, ]+)'
-	if [[ "${_dn}" =~ ${_regex} ]]; then
-		_cn="${BASH_REMATCH[1]}"
-	fi
-	printf '%s' "${_cn}"
 }
 
 #
@@ -632,23 +489,6 @@ while getopts ":l:ahr" opt; do
 done
 
 #
-# Parse LDAP config file.
-#
-if [[ -e  "${ldap_config_file}" && -r "${ldap_config_file}" ]]; then
-	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Fetching ldapsearch credentials from config file ${ldap_config_file} ..."
-	# shellcheck source=/dev/null
-	source "${ldap_config_file}"
-else
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Config file ${ldap_config_file} missing or not readable."
-fi
-
-if [ "${apply_settings}" -eq 1 ]; then
-	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' 'Found option -a: will fetch, list and apply settings.'
-else
-	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' 'Option -a not specified: will only perform a "dry run" to fetch + list settings. Use -a to apply settings.'
-fi
-
-#
 # Get a list of LFS paths: folders for groups, which we want to apply project quota to.
 # On a SAI always in format/location:
 #	/mnt/${pfs}/groups/${group}/${lfs}/
@@ -656,15 +496,6 @@ fi
 #	/mnt/umcgst02/groups/umcg-atd/prm08/
 #
 readarray -t lfs_paths < <(find /mnt/*/groups/*/ -maxdepth 1 -mindepth 1 -type d -name "[a-z][a-z]*[0-9][0-9]*")
-
-#
-# Create tmp dir for LDIFs with results from LDAP queries.
-#
-mkdir -p "${ldif_dir}"
-
-#
-# Get quota values from LDAP and apply quota limits to file systems.
-#
 processGroupDirs "${lfs_paths[@]:-}"
 
 #
@@ -672,15 +503,6 @@ processGroupDirs "${lfs_paths[@]:-}"
 #
 readarray -t lfs_paths < <(find /mnt/*/home/ -maxdepth 1 -mindepth 1 -type d)
 processHomeDirs "${lfs_paths[@]:-}"
-
-#
-# Cleanup tmp files.
-#
-if [[ "${l4b_log_level_prio}" -lt "${l4b_log_levels['INFO']}" ]]; then
-	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Debug mode: temporary dir ${ldif_dir} won't be removed."
-else
-	rm -Rf "${ldif_dir}"
-fi
 
 #
 # Reset trap and exit.

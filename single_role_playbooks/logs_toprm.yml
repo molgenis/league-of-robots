@@ -1,7 +1,7 @@
 ---
-- name: Running > logs_client < role
+- name: Running logs_toprm role.
   hosts:
-    - chaperone
+    - mit_chaperone
   roles:
     - role: logs_toprm
       when: logs_server_public_networks is defined

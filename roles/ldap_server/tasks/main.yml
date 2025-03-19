@@ -111,10 +111,10 @@
     - attribute-options.ldif
     - root.ldif
     - tls.ldif
-  when: ldap_server_config | json_query(query) | first is true
-  changed_when: ldap_server_config | json_query(query) | first is true
+  when: ldap_server_config | json_query(ldifs_changed_query) | first is true
+  changed_when: ldap_server_config | json_query(ldifs_changed_query) | first is true
   vars:
-    query: "results[?item=='{{ item }}'].changed"
+    ldifs_changed_query: "results[?item=='{{ item }}'].changed"
   become: true
 
 - name: Add additional schema LDIF files.

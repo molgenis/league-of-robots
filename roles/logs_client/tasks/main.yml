@@ -9,6 +9,7 @@
   connection: local
   run_once: true
   tags:
+    - always
     - test
 
 - name: Open logs server firewall for each client
@@ -29,5 +30,6 @@
   when: ( logs_class is defined and ( logs_class|length>0 ) ) or
         ( rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 ))
   tags:
+    - always
     - test
 ...

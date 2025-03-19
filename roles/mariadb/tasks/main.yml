@@ -26,6 +26,22 @@
       og: 'root'
   become: true
 
+- name: 'Deploy /etc/tmpfiles.d/mariadb.conf.'
+  ansible.builtin.template:
+    src: templates/mariadb.conf
+    dest: /etc/tmpfiles.d/mariadb.conf
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+
+- name: 'Create tmp files for MariaDB using systemd-tmpfiles.'
+  ansible.builtin.command:
+    cmd: |
+         systemd-tmpfiles --create /etc/tmpfiles.d/mariadb.conf
+    creates: /run/mariadb
+  become: true
+
 - name: 'Deploy MariaDB/MySQL galara.cnf on node if we have at least three nodes.'
   ansible.builtin.template:
     src: 'files/galera.cnf'

@@ -266,6 +266,6 @@ ip_addresses:
   #
   lsaai:
     perun:
-      address: '78.128.247.160'
+      address: 'perun-lifescience.ics.muni.cz'
       netmask: '/24'
       desc: 'LSAAI Perun server(s) managing our LSAAI LDAP server'

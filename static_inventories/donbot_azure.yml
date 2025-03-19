@@ -13,7 +13,7 @@ all:
             - name: donbot_external_network
               security_group: "{{ stack_prefix }}_cluster"
           use_sssd: true
-          use_ldap: true
+          use_ldap: false
           # Ldap server settings
           create_ldap: true
           ldap_domains:

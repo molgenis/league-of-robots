@@ -515,12 +515,9 @@ pfs_mounts:
 lfs_mounts:
   - lfs: home
     pfs: umcgst06
-    quota_type: 'project'
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp04
     pfs: umcgst06
-    quota_type: 'project'
-    quota_pid_increment: 300000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-as
         mode: '2750'
@@ -553,19 +550,8 @@ lfs_mounts:
       - name: umcg-ugli
         mode: '2750'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
-#  - lfs: prm01
-#    pfs: umcgst06
-#    quota_type: 'project'
-#    quota_pid_increment: 400000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
-#    groups:
-#      - name: umcg-atd
-#      - name: umcg-fg
-#      - name: umcg-franke-scrna
-#    rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm02
     pfs: umcgst01
-    quota_type: 'project'
-    quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-aad
       - name: umcg-as
@@ -617,8 +603,6 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
-    quota_type: 'project'
-    quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-aad
       - name: umcg-as
@@ -653,6 +637,7 @@ lfs_mounts:
       - name: umcg-micompany
       - name: umcg-msb
       - name: umcg-nawijn
+      - name: umcg-pgx
       - name: umcg-pmb
       - name: umcg-radicon
       - name: umcg-rehabilitation
@@ -670,15 +655,13 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: rsc04
     pfs: umcgst05
-    quota_type: 'project'
-    quota_pid_increment: 100000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     groups:
       - name: umcg-biogen
+      - name: umcg-fg
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env04
     pfs: umcgst06
-    quota_type: 'project'
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
 ...

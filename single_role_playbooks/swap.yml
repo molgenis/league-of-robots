@@ -2,5 +2,6 @@
 - hosts:
     - repo
     - cluster
+    - chaperone,!mit_chaperone
   roles:
     - swap

@@ -34,6 +34,9 @@ nav:
 {% if groups['data_transfer'] is defined and groups['data_transfer'] | length >= 1 %}
     - 'Data transfers - Using a dedicated data transfer server': 'dedicated-dt-server-overview.md'
 {% endif %}
+{% if archive_groups is defined and archive_groups | length >= 1 %}
+    - 'Archive - Using a remote archive storage': 'archive.md'
+{% endif %}
   - Compute:
     - 'Crunch - How to manage jobs on {{ slurm_cluster_name | capitalize }}': 'analysis.md'
 {% if groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | sum > 0 %}
@@ -52,5 +55,9 @@ nav:
 {% if 'hyperchicken' in slurm_cluster_name or 'fender' in slurm_cluster_name %}
   - Group Specific Documentation:
     - 'Solve-RD - How to find and work with Solve-RD data': 'solve-rd.md'
+{% endif %}
+{% if 'gearshift' in slurm_cluster_name or 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
+  - Group Specific Documentation:
+    - 'UMCG research - Code of Conduct': 'coc_umcg_research_clusters.md'
 {% endif %}
 #    - 'Support - FAQs, mailinglists & courses': 'support.md'

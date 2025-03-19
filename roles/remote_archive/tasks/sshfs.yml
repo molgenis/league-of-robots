@@ -1,0 +1,88 @@
+---
+- name: Install fuse-sshfs
+  ansible.builtin.package:
+    name: fuse-sshfs
+    state: present
+  become: true
+
+- name: "Create a {{ archive_ssh_key_type }} SSH key for root user"
+  ansible.builtin.user:
+    name: "root"
+    generate_ssh_key: true
+    ssh_key_file: "{{ archive_ssh_key_location }}"
+    ssh_key_type: "{{ archive_ssh_key_type }}"
+  register: make_root_keypair
+  become: true
+
+- name: Keys generated and we stop the role
+  ansible.builtin.debug:
+    msg: " ... key pair was created, now you must copy public key to remote system's authorized_keys."
+  when: make_root_keypair.changed is true # noqa no-handler
+  failed_when: true
+
+- name: Create .ssh folder structure
+  ansible.builtin.file:
+    path: "/root/.ssh/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0700"
+    state: directory
+  with_items:
+    - "conf.d"
+    - "tmp"
+  become: true
+
+- name: Set list of unique ssh hosts
+  ansible.builtin.set_fact:
+    archive_unique_hosts: "{{ archive_groups | map(attribute='archive_system', default='') | unique }}"
+
+- name: Deploy ssh configuration settings for accessing archive
+  ansible.builtin.template:
+    src: templates/ssh_configuration
+    dest: /root/.ssh/conf.d/remote_archive
+    owner: root
+    group: root
+    mode: "0600"
+  become: true
+
+- name: Collect all ssh fingerprints
+  ansible.builtin.set_fact:
+    archive_all_fingerprints: "{{ archive_all_fingerprints | default([]) + [item.0.archive_system + ' ' + item.1] }}"
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'archive_system_fingerprints'
+
+- name: Write public keys into known_hosts
+  ansible.builtin.lineinfile:
+    path: /root/.ssh/known_hosts
+    state: present
+    search_string: "{{ item }}"
+    line: "{{ item }}"
+    create: true
+    owner: root
+    group: root
+    mode: "0600"
+  when: archive_all_fingerprints is defined and archive_all_fingerprints | length > 0
+  with_items: "{{ archive_all_fingerprints | unique }}"
+  become: true
+
+- name: Configure ssh to check for extra configration files in conf.d
+  ansible.builtin.lineinfile:
+    path: /root/.ssh/config
+    line: "Include conf.d/*"
+    create: true
+    owner: root
+    group: root
+    mode: "0600"
+  become: true
+
+- name: Check connection and ensure that group folder on remote archive system exists
+  ansible.builtin.command: |
+    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "mkdir -p /home/{{ archive_user }}/{{ item.0.name }}/{{ item.1 }}"
+  register: archive_dir_test
+  changed_when: false
+  with_subelements:
+    - "{{ archive_groups | list }}"
+    - 'groups'
+  become: true
+...
