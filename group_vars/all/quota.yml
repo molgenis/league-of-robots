@@ -67,7 +67,7 @@ lfs_quota:
       umcg-gdi: 2048
       umcg-gdio: 12288
       umcg-gonl: 10240
-      umcg-griac: 11264
+      umcg-griac: 13312
       umcg-grip: 2048
       umcg-gsad: 1024
       umcg-hematology: 5120
@@ -83,7 +83,7 @@ lfs_quota:
       umcg-neonatology: 5120
       umcg-nephrology: 3072
       umcg-pgx: 1024
-      umcg-pmb: 1024
+      umcg-pmb: 5120
       umcg-radicon: 5120
       umcg-solve-rd: 8192
       umcg-sysops: 1024
