@@ -12,6 +12,8 @@ The information needed to request a new group, includes:
 
 For each of the persons mentioned above, we need a confirmation from the secretary on the end date of their contract with the UMCG.
 
+## Minimal requirements
+
 The minimal requirements for a main group are as follows:
 
  * Group leaders / PIs can request new main groups. When the main group is created they will be registered as the 
@@ -55,6 +57,7 @@ will be asked to allow hardware investments and get a large part of the FAIR Sha
 
 You can share the details with [the helpdesk](../contact/), so we can draft a contract (Dienstverleningsovereenkomst) and proceed from there.
 
+## What's next?
 
 Once the group is made you can create a [public private key pair](../accounts/) and get access.
 We have a [code of conduct](../coc_umcg_research_clusters/). This describes what we expect from the users and group owners on the cluster.
@@ -66,36 +69,3 @@ up for the RUG cluster course, see below.
 
 WIKI HPC cluster RUG with announcements of cluster courses:
 [Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://wiki.hpc.rug.nl/habrok/introduction/courses#basic_habrok_course)
-
-## Minimal requirements
-
-The minimal requirements for a main group are as follows:
-
- * Group leaders / PIs can request new main groups. When the main group is created they will be registered as the 
-group owners.
- * Group owners are responsible for
-    * Processing (accepting or rejecting) requests for group membership.
-    * Securing funding and paying the bills.
-    * Appointing data managers for their group.
- * Data managers are responsible for the group's data on ```prm```, ```rsc``` (if available) and ```arc``` (if 
-available) storage systems and
-    * Ensure the group makes arrangements what to store how and where. E.g file naming conventions, file formats 
-to use, etc.
-    * Enforce the group's policy on what to store how and where by reviewing data sets produced by other group 
-members on ```tmp``` file systems before migrating/copying them to ```prm``` or ```arc``` (if available).
-    * Can put released versions of data sets on ```rsc``` storage, so it can be used as reference data by alle 
-members of the group.
-    * Have read-write access to all file systems including ```prm```, ```rsc``` (if available) and ```arc``` (if 
-available).
- * Other _regular_ group members:
-    * Have read-only access to ```prm```, ```rsc``` (if available) and ```arc``` (if available) file systems to 
-check-out existing data sets.
-    * Have read-write access to ```tmp``` file systems to produce new results.
-    * Can request a data manager to review and migrate a newly produced data set to ```prm``` or ```arc``` (if 
-available) file systems.
- * A group has at least one owner and one data manager, but to prevent delays in processing membership request 
-and data set reviews a group has preferably more than one owner and more than one data manager.
- * Optionally sub groups may be used to create more fine grained permissions to access data.
-    * A sub group inherits group owners, data managers and quota limits from the main group.
-    * All members of the sub group must be members of the main group.
-    * The members of the sub group are a subset of the members of the main group.
