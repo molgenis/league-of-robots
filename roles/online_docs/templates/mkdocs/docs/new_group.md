@@ -45,7 +45,7 @@ and data set reviews a group has preferably more than one owner and more than on
     * All members of the sub group must be members of the main group.
     * The members of the sub group are a subset of the members of the main group.
 
- * The amount of data ([quota](/storage/#quota)) you want to store on ```tmp``` and ```prm``` storage systems.
+ * The amount of data ([quota](../storage/#quota)) you want to store on ```tmp``` and ```prm``` storage systems.
 
 The minimum amount is 1 TB on each of these storage systems and that will cost 500 euro per year combined (so 250 euro/TB/year for tmp and 250 euro/TB/year for prm).
 You can store your data on the prm storage system (this has regular backup to tape) and if you want to compute with it, stage the data on the tmp data storage, that is connected to the compute part of the cluster. The quota on tmp and prm can be different.
