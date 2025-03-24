@@ -144,6 +144,23 @@ all:
               lustre_client_networks:
                 - name: tcp20
                   interface: enp65s0np0.1068
+              network_state:
+                interfaces:
+                  - name: enp65s0np0.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                    state: up
+                    ipv4:
+                      enabled: true
+                      address:
+                        - ip: 192.168.122.250
+                          prefix-length: 24
+                      dhcp: false
+                    ipv6:
+                      enabled: false
+
+
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
