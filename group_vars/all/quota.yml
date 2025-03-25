@@ -73,6 +73,7 @@ lfs_quota:
       umcg-gsad: 1024
       umcg-hematology: 5120
       umcg-hlhs: 3072
+      umcg-immunogenetics: 2048
       umcg-impact: 3072
       umcg-lifelines: 17408
       umcg-lld: 3072
