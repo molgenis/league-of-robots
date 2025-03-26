@@ -4,13 +4,13 @@
 A department head or principal investigator can request a new group on the cluster(s).
 The information needed to request a new group, includes:
 
- * Name of the group (umcg-xxx) **Name is set in stone!**
+ * Name of the group: umcg-$(your_group_name) -  **NAME IS SET IN STONE!**
  * The names and mailing addresses of the:
     * Group owner(s)
     * Datamanager(s)
     * Group member(s)
 
-For each of the persons mentioned above, we need a confirmation from the secretary on the end date of their contract with the UMCG.
+For each of the persons mentioned above, we need a confirmation from the secretary on the enddate of their contract with the UMCG.
 
 ## Minimal requirements
 
@@ -59,13 +59,10 @@ You can share the details with [the helpdesk](../contact/), so we can draft a co
 
 ## What's next?
 
-Once the group is made you can create a [public private key pair](../accounts/) and get access.
-We have a [code of conduct](../coc_umcg_research_clusters/). This describes what we expect from the users and group owners on the cluster.
-If you want to proceed with working our clusters, please read it and confirm by email to [the helpdesk](../contact/) that you read and understood it and will act accordingly (for both group owner and users).
+Once the group is made all group members can create a [public private key pair](../accounts/) and get access. We 
+have a [code of conduct](../coc_umcg_research_clusters/). This describes what we expect from the users and group 
+owners on the cluster. If you want to proceed with working our clusters, please read it and confirm by email to [the helpdesk](../contact/) that you read and understood it and will act accordingly (for both group owner and users).
 
 We assume that you are familiar with some basic knowledge about Linux command line (shell) navigation and shell 
 scripting. If you never worked on the command line, consider some Linux tutorials on the subject first and sign 
-up for the RUG cluster course, see below.
-
-WIKI HPC cluster RUG with announcements of cluster courses:
-[Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://wiki.hpc.rug.nl/habrok/introduction/courses#basic_habrok_course)
+up for the RUG cluster course: [Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://wiki.hpc.rug.nl/habrok/introduction/courses#basic_habrok_course)
