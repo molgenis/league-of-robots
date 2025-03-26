@@ -224,7 +224,7 @@ all:
             local_volume_size_extra: 1
             slurm_sockets: 31
             slurm_cores_per_socket: 1
-            slurm_real_memory: 117398
+            slurm_real_memory: 117397
             slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
             slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
             slurm_local_disk: 900
