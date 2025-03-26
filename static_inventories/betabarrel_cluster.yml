@@ -127,22 +127,6 @@ all:
             - name: vlan983
             - name: vlan990
           local_yum_repository: true # enable local yum repository
-          ldap_domains:
-            idvault:  # Required to override LDAP uri to use internal connection via VLAN 983.
-              uri: ldaps://172.23.40.249
-              base: ou=gd,o=asds
-              schema: rfc2307
-              min_id: 50100000
-              max_id: 55999999
-              user_object_class: posixAccount
-              user_name: uid
-              user_ssh_public_key: sshPublicKey
-              user_member_of: groupMembership
-              group_member: memberUid
-              group_object_class: groupofnames
-              group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-              group_quota_hard_limit_template: ruggroupumcgquotaLFS
-              create_ldap: false
     deploy_admin_interface:
       hosts:
         betabarrel:

@@ -256,6 +256,7 @@ regular_groups:
   - 'umcg-reki'
   - 'umcg-solve-rd'
   - 'umcg-sommer'
+  - 'umcg-surg'
   - 'umcg-sysops'
   - 'umcg-tifn'
   - 'umcg-ukb'
@@ -352,6 +353,8 @@ regular_users:
     groups: ['umcg-solve-rd']
   - user: 'umcg-sommer-dm'
     groups: ['umcg-sommer']
+  - user: 'umcg-surg-dm'
+    groups: ['umcg-surg']
   - user: 'umcg-sysops-dm'
     groups: ['umcg-sysops']
   - user: 'umcg-tifn-dm'
@@ -455,6 +458,8 @@ sudoers:
     become: 'umcg-solve-rd-dm'
   - who: ['%umcg-sommer-dms']
     become: 'umcg-sommer-dm'
+  - who: ['%umcg-surg-dms']
+    become: 'umcg-surg-dm'
   - who: ['%umcg-sysops-dms']
     become: 'umcg-sysops-dm'
   - who: ['%umcg-tifn-dms']
@@ -654,6 +659,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-sommer
         mode: '2750'
+      - name: umcg-surg
+        mode: '2750'
       - name: umcg-sysops
         mode: '2750'
       - name: umcg-tifn
@@ -715,6 +722,7 @@ lfs_mounts:
       - name: umcg-reki
       - name: umcg-solve-rd
       - name: umcg-sommer
+      - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ukb
@@ -767,6 +775,7 @@ lfs_mounts:
       - name: umcg-rehabilitation
       - name: umcg-solve-rd
       - name: umcg-sommer
+      - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ukb
@@ -818,6 +827,7 @@ lfs_mounts:
       - name: umcg-reki
       - name: umcg-solve-rd
       - name: umcg-sommer
+      - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ukb
