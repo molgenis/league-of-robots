@@ -24,6 +24,15 @@ slurm_partitions:
     local_disk: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.333G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-c[01-10]"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r630']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -147,16 +156,13 @@ cloud_image: RockyLinux-9.3_xfs
 cloud_user: cloud-user
 availability_zone: nova
 stack_networks:
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
+  - name: vlan1338  # Internal management for VMs and BMs
+    cidr: '172.23.69.0/24'
+    gateway: '172.23.69.1'
     router_network: vlan16
+    router_name: vlan1338
     type: management
-    external: false
-  - name: "{{ stack_prefix }}_internal_storage"
-    cidr: '10.10.2.0/24'
-    type: storage
-    external: false
+    external: true
   - name: vlan985  # DH4 Lustre
     cidr: '172.23.56.0/22'
     allow_ingress:
@@ -531,11 +537,16 @@ local_mount_subfolders:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
+lustre_client_networks_vm:
   - name: tcp14
-    interface: ens5
+    interface: enp0s3
   - name: tcp20
-    interface: ens6
+    interface: enp0s4
+  - name: tcp15
+    interface: enp0s5
+#
+# lustre_client_networks for baremetal machines specified in static_inventory.
+#
 pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
