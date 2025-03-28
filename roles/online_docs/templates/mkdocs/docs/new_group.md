@@ -4,7 +4,7 @@
 A department head or principal investigator can request a new group on the cluster(s).
 The information needed to request a new group, includes:
 
- * Name of the group: umcg-$(your_group_name) -  **NAME IS SET IN STONE!**
+ * Name of the group: umcg-[groupname] -  **NAME IS SET IN STONE!**
  * The names and mailing addresses of the:
     * Group owner(s)
     * Datamanager(s)
@@ -22,6 +22,7 @@ group owners.
     * Processing (accepting or rejecting) requests for group membership.
     * Securing funding and paying the bills.
     * Appointing data managers for their group.
+    * Approving user membership.
  * Data managers are responsible for the group's data on ```prm```, ```rsc``` (if available) and ```arc``` (if 
 available) storage systems and
     * Ensure the group makes arrangements what to store how and where. E.g file naming conventions, file formats 
@@ -46,12 +47,9 @@ and data set reviews a group has preferably more than one owner and more than on
     * The members of the sub group are a subset of the members of the main group.
 
  * The amount of data ([quota](../storage/#quota)) you want to store on ```tmp``` and ```prm``` storage systems.
-
-The minimum amount is 1 TB on each of these storage systems and that will cost 500 euro per year combined (so 250 euro/TB/year for tmp and 250 euro/TB/year for prm).
-You can store your data on the prm storage system (this has regular backup to tape) and if you want to compute with it, stage the data on the tmp data storage, that is connected to the compute part of the cluster. The quota on tmp and prm can be different.
-
-We expect the pricing system to change in the coming year, so data storage will become cheaper but co-investments 
-will be asked to allow hardware investments and get a large part of the FAIR Share of the cluster.
+    * The minimum amount is 1 TB on each of these storage systems and that will cost 500 euro per year combined (so 250 euro/TB/year for tmp and 250 euro/TB/year for prm).
+    * You can store your data on the prm storage system (this has regular backup to tape) and if you want to compute with it, stage the data on the tmp data storage, that is connected to the compute part of the cluster. The quota on tmp and prm can be different.
+    * We expect the pricing system to change sometime in 2025, so data storage will become cheaper but co-investments will be asked to allow hardware investments and get a large part of the FAIR Share of the cluster.
 
  * The numbers of the UMCG research register under which your studies are registered and a project number or kostenplaats which will be billed for the annual costs.
 
