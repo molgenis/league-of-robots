@@ -1,7 +1,6 @@
 ---
 - name: Install and configure OGM backup
   ansible.builtin.include_tasks: script_and_cron.yml
-  when: ogm_enabled
 
 - name: Install OGM trendanalysis script and cron
   ansible.builtin.include_tasks: trendanalysis.yml

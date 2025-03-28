@@ -20,12 +20,12 @@
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
     name: "trendanalysis_{{ ogm_server.split('.')[0] }} # Unique ID required to update existing cronjob: do not modify."
-    weekday: '*' # on Fridays
-    hour: 17 #"{{ 59 | random(seed=inventory_hostname) }}"
-    minute: 28 #"{{ 59 | random(seed=inventory_hostname) }}"
+    weekday: '6' # on Fridays
+    hour: "14"
+    minute: "{{ 59 | random(seed=inventory_hostname) }}"
     user: 'umcg-ogm-dm'
     job: "/bin/bash -c 'parallax.sh --command=\"~/trendanalysis-{{ ogm_server.split('.')[0] }}.sh >> trendanalysis-{{ ogm_server.split('.')[0] }}.sh.log 2>&1\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/trendanalysis/\" --log-file=\"~/trendanalysis-{{ ogm_server.split('.')[0] }}.cron.log\"'"
-    cron_file: "trendanalysis_{{ ogm_server.split('.')[0] }}"
+    cron_file: "ogm_trendanalysis_{{ ogm_server.split('.')[0] }}"
     disabled: "{{ trendanalysis_cron_disabled }}"
   become: true
 ...

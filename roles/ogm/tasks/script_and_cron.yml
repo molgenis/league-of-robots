@@ -1,47 +1,63 @@
 ---
 - name: Deploy backup script
   ansible.builtin.template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: "{{ item.owner }}"
-    group: "{{ item.group }}"
-    mode: "{{ item.mode }}"
-  loop:
-    - src: templates/ogm_cron_make_backup.sh.j2
-      dest: ~umcg-ogm-dm/make_backup.sh
-      owner: umcg-ogm-dm
-      group: umcg-ogm-dm
-      mode: '0750'
-    - src: templates/ogm_cron_clean_psql_backups.sh.j2
-      dest: ~umcg-ogm-dm/manage_psql_backups.sh
-      owner: umcg-ogm-dm
-      group: umcg-ogm-dm
-      mode: '0750'
+    src: "templates/ogm_cron_make_backup.sh.j2"
+    dest: "~umcg-ogm-dm/make_backup-{{ item.server.split('.')[0] }}.sh"
+    owner: umcg-ogm-dm
+    group: umcg-ogm-dm
+    mode: '0750'
+  with_items: "{{ ogm_servers | default([]) }}"
+  when:
+    - item.prm_location is defined
+    - item.server is defined
+    - item.user is defined
+  become: true
+
+- name: Deploy backup script
+  ansible.builtin.template:
+    src: "templates/ogm_cron_clean_psql_backups.sh.j2"
+    dest: "~umcg-ogm-dm/manage_psql_backups-{{ item.server.split('.')[0] }}.sh"
+    owner: umcg-ogm-dm
+    group: umcg-ogm-dm
+    mode: '0750'
+  with_items: "{{ ogm_servers | default([]) }}"
+  when:
+    - item.prm_location is defined
+    - item.server is defined
+    - item.user is defined
+    - item.psql_dump_location is defined
   become: true
 
 - name: 'Create cron job to make daily backup with the script'
   ansible.builtin.cron:
-    name: "{{ item.name }}"
-    weekday: "{{ item.weekday }}"
-    hour: "{{ item.hour }}"
-    minute: "{{ item.minute }}"
-    user: "{{ item.user }}"
-    job: "{{ item.job }}"
-    cron_file: "{{ item.cron_file }}"
-  loop:
-    - name: 'Backup_OGM_data  # Unique ID required to update existing cronjob: do not modify.'
-      weekday: '*'
-      hour: "03"
-      minute: "11"
-      user: "umcg-ogm-dm"
-      job: /bin/bash -c 'parallax.sh --command="~/make_backup.sh >> ~/make_backup.sh.log" --lock-dir="{{ item.prm_location }}/lock_dirs/" --logger-tag=ogm'
-      cron_file: "ogm_make_backup"
-    - name: 'Clean_OGM_psql_backups  # Unique ID required to update existing cronjob: do not modify.'
-      weekday: '*'
-      hour: "06"
-      minute: "56"
-      user: "umcg-ogm-dm"
-      job: /bin/bash -c 'parallax.sh --command="~/manage_psql_backups.sh >> ~/manage_psql_backups.sh.log" --lock-dir="{{ item.prm_location }}/lock_dirs/" --logger-tag=ogm'
-      cron_file: 'ogm_clean_psql_backups'
+    name: "Backup_OGM_data-{{ item.server.split('.')[0] }}  # Unique ID required to update existing cronjob: do not modify."
+    weekday: '*'
+    hour: "03" # we fix hour for different tasks
+    minute: "{{ 59 | random(seed=inventory_hostname) }}" # but change minutes to random value per hostname
+    user: "umcg-ogm-dm"
+    job: "/bin/bash -c 'parallax.sh --command=\"~/make_backup-{{ item.server.split('.')[0] }}.sh >> ~/make_backup-{{ item.server.split('.')[0] }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/make_backup/\" --logger-tag=ogm'"
+    cron_file: "ogm_make_backup"
+  with_items: "{{ ogm_servers | default([]) }}"
+  when:
+    - item.prm_location is defined
+    - item.server is defined
+    - item.user is defined
+  become: true
+
+- name: 'Create cron job to make daily clean psql backups with the script'
+  ansible.builtin.cron:
+    name: "Clean_OGM_data-{{ item.server.split('.')[0] }}  # Unique ID required to update existing cronjob: do not modify."
+    weekday: '*'
+    hour: "06" # we fix hour for different tasks
+    minute: "{{ 59 | random(seed=inventory_hostname) }}" # but change minutes to random value per hostname
+    user: "umcg-ogm-dm"
+    job: "/bin/bash -c 'parallax.sh --command=\"~/manage_psql_backups-{{ item.server.split('.')[0] }}.sh >> ~/manage_psql_backups-{{ item.server.split('.')[0] }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/manage_psql/\" --logger-tag=ogm'"
+    cron_file: 'ogm_clean_psql_backups'
+  with_items: "{{ ogm_servers | default([]) }}"
+  when:
+    - item.prm_location is defined
+    - item.server is defined
+    - item.user is defined
+    - item.psql_dump_location is defined
   become: true
 ...
