@@ -8,14 +8,23 @@
     mode: '0750'
   become: true
 
+- name: Adds PATH on top of cronjob
+  ansible.builtin.cron:
+    name: PATH
+    env: yes
+    user: 'umcg-ogm-dm'
+    job: /usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
+    cron_file: "trendanalysis_{{ ogm_server.split('.')[0] }}"
+  become: true
+
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
     name: "trendanalysis_{{ ogm_server.split('.')[0] }} # Unique ID required to update existing cronjob: do not modify."
-    weekday: '5' # on Fridays
-    hour: "{{ 59 | random(seed=inventory_hostname) }}"
-    minute: "{{ 59 | random(seed=inventory_hostname) }}"
+    weekday: '*' # on Fridays
+    hour: 17 #"{{ 59 | random(seed=inventory_hostname) }}"
+    minute: 28 #"{{ 59 | random(seed=inventory_hostname) }}"
     user: 'umcg-ogm-dm'
-    job: "/bin/bash -c '~/trendanalysis-{{ ogm_server.split('.')[0] }}.sh >> ~/trendanalysis-{{ ogm_server.split('.')[0] }}.sh.log 2>&1'"
+    job: "/bin/bash -c 'parallax.sh --command=\"~/trendanalysis-{{ ogm_server.split('.')[0] }}.sh >> trendanalysis-{{ ogm_server.split('.')[0] }}.sh.log 2>&1\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/trendanalysis/\" --log-file=\"~/trendanalysis-{{ ogm_server.split('.')[0] }}.cron.log\"'"
     cron_file: "trendanalysis_{{ ogm_server.split('.')[0] }}"
     disabled: "{{ trendanalysis_cron_disabled }}"
   become: true
