@@ -61,8 +61,8 @@
 - name: Checking if helperd is enabled and running
   ansible.builtin.debug:
     msg:
-      - "services[{{ item }}.service].status = {{ services[item+'.service'].status }}"
-      - "services[{{ item }}.service].state = {{ services[item+'.service'].state }}"
+      - "services[{{ item }}.service].status = {{ services[item + '.service'].status }}"
+      - "services[{{ item }}.service].state = {{ services[item + '.service'].state }}"
   with_items:
     - "beegfs-helperd"
   become: true
