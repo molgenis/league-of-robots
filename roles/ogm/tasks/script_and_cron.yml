@@ -2,11 +2,13 @@
 - name: Deploy backup script
   ansible.builtin.template:
     src: "templates/ogm_cron_make_backup.sh.j2"
-    dest: "~umcg-ogm-dm/make_backup-{{ item.server.split('.')[0] }}.sh"
+    dest: "~umcg-ogm-dm/make_backup-{{ srvid }}.sh"
     owner: umcg-ogm-dm
     group: umcg-ogm-dm
     mode: '0750'
   with_items: "{{ ogm_servers | default([]) }}"
+  vars:
+    srvid: "{{ item.server.split('.')[0] }}"
   when:
     - item.prm_location is defined
     - item.server is defined
@@ -16,11 +18,13 @@
 - name: Deploy backup script
   ansible.builtin.template:
     src: "templates/ogm_cron_clean_psql_backups.sh.j2"
-    dest: "~umcg-ogm-dm/manage_psql_backups-{{ item.server.split('.')[0] }}.sh"
+    dest: "~umcg-ogm-dm/manage_psql_backups-{{ srvid }}.sh"
     owner: umcg-ogm-dm
     group: umcg-ogm-dm
     mode: '0750'
   with_items: "{{ ogm_servers | default([]) }}"
+  vars:
+    srvid: "{{ item.server.split('.')[0] }}"
   when:
     - item.prm_location is defined
     - item.server is defined
@@ -30,30 +34,34 @@
 
 - name: 'Create cron job to make daily backup with the script'
   ansible.builtin.cron:
-    name: "Backup_OGM_data-{{ item.server.split('.')[0] }}  # Unique ID required to update existing cronjob: do not modify."
+    name: "Backup_OGM_data-{{ srvid }}  # Unique ID required to update existing cronjob: do not modify."
     weekday: '*'
     hour: "03" # we fix hour for different tasks
     minute: "{{ 59 | random(seed=inventory_hostname) }}" # but change minutes to random value per hostname
     user: "umcg-ogm-dm"
-    job: "/bin/bash -c 'parallax.sh --command=\"~/make_backup-{{ item.server.split('.')[0] }}.sh >> ~/make_backup-{{ item.server.split('.')[0] }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/make_backup/\" --logger-tag=ogm'"
+    job: "/bin/bash -c 'parallax.sh --command=\"~/make_backup-{{ srvid }}.sh >> ~/make_backup-{{ srvid }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/make_backup-{{ srvid }}/\" --logger-tag=ogm'"
     cron_file: "ogm_make_backup"
   with_items: "{{ ogm_servers | default([]) }}"
   when:
     - item.prm_location is defined
     - item.server is defined
     - item.user is defined
+  vars:
+    srvid: "{{ item.server.split('.')[0] }}"
   become: true
 
 - name: 'Create cron job to make daily clean psql backups with the script'
   ansible.builtin.cron:
-    name: "Clean_OGM_data-{{ item.server.split('.')[0] }}  # Unique ID required to update existing cronjob: do not modify."
+    name: "Clean_OGM_data-{{ srvid }}  # Unique ID required to update existing cronjob: do not modify."
     weekday: '*'
     hour: "06" # we fix hour for different tasks
     minute: "{{ 59 | random(seed=inventory_hostname) }}" # but change minutes to random value per hostname
     user: "umcg-ogm-dm"
-    job: "/bin/bash -c 'parallax.sh --command=\"~/manage_psql_backups-{{ item.server.split('.')[0] }}.sh >> ~/manage_psql_backups-{{ item.server.split('.')[0] }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/manage_psql/\" --logger-tag=ogm'"
+    job: "/bin/bash -c 'parallax.sh --command=\"~/manage_psql_backups-{{ srvid }}.sh >> ~/manage_psql_backups-{{ srvid }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/manage_psql-{{ srvid }}/\" --logger-tag=ogm'"
     cron_file: 'ogm_clean_psql_backups'
   with_items: "{{ ogm_servers | default([]) }}"
+  vars:
+    srvid: "{{ item.server.split('.')[0] }}"
   when:
     - item.prm_location is defined
     - item.server is defined
