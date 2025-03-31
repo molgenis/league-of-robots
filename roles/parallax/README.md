@@ -21,4 +21,4 @@ Overview
    is running on remote host
  - when command is executed, the timeout is running and waiting for limit to
    expire, if that happens, command is killed
-
+ - command output goes to stdout, parallax info goes into log file or logger

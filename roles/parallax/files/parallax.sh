@@ -25,6 +25,7 @@ Overview
    is running on remote host
  - when command is executed, the timeout is running and waiting for limit to
    expire, if that happens, command is killed
+ - command's output goes into stdout, parallax output goes into log file or logger
 
 Arguments
    --command=<string>     command to be executed - it can be also multiple commands separated by semicolon ;
