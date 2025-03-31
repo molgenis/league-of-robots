@@ -40,7 +40,7 @@
     minute: "{{ 59 | random(seed=inventory_hostname) }}" # but change minutes to random value per hostname
     user: "umcg-ogm-dm"
     job: "/bin/bash -c 'parallax.sh --command=\"~/make_backup-{{ srvid }}.sh >> ~/make_backup-{{ srvid }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/make_backup-{{ srvid }}/\" --logger-tag=ogm'"
-    cron_file: "ogm_make_backup"
+    cron_file: "ogm"
   with_items: "{{ ogm_servers | default([]) }}"
   when:
     - item.prm_location is defined
@@ -58,7 +58,7 @@
     minute: "{{ 59 | random(seed=inventory_hostname) }}" # but change minutes to random value per hostname
     user: "umcg-ogm-dm"
     job: "/bin/bash -c 'parallax.sh --command=\"~/manage_psql_backups-{{ srvid }}.sh >> ~/manage_psql_backups-{{ srvid }}.sh.log\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/manage_psql-{{ srvid }}/\" --logger-tag=ogm'"
-    cron_file: 'ogm_clean_psql_backups'
+    cron_file: 'ogm'
   with_items: "{{ ogm_servers | default([]) }}"
   vars:
     srvid: "{{ item.server.split('.')[0] }}"
@@ -67,5 +67,15 @@
     - item.server is defined
     - item.user is defined
     - item.psql_dump_location is defined
+  become: true
+
+- name: 'Make sure that cron has right environment variables'
+  ansible.builtin.cron:
+    name: PATH
+    env: yes
+    user: "umcg-ogm-dm"
+    job: "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin"
+    cron_file: "ogm"
+  when: ogm_servers is defined
   become: true
 ...

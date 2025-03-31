@@ -14,7 +14,7 @@
     env: yes
     user: 'umcg-ogm-dm'
     job: /usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
-    cron_file: "trendanalysis_{{ ogm_server.split('.')[0] }}"
+    cron_file: "ogm"
   become: true
 
 - name: Trendanalysis cronjob
@@ -25,7 +25,7 @@
     minute: "{{ 59 | random(seed=inventory_hostname) }}"
     user: 'umcg-ogm-dm'
     job: "/bin/bash -c 'parallax.sh --command=\"~/trendanalysis-{{ srvid }}.sh >> trendanalysis-{{ srvid }}.sh.log 2>&1\" --lock-dir=\"{{ item.prm_location }}/lock_dirs/trendanalysis-{{ srvid }}/\" --log-file=\"~/trendanalysis-{{ srvid }}.cron.log\"'"
-    cron_file: "ogm_trendanalysis_{{ srvid }}"
+    cron_file: "ogm"
     disabled: "{{ trendanalysis_cron_disabled }}"
   vars:
     srvid: "{{ ogm_server.split('.')[0] }}"
