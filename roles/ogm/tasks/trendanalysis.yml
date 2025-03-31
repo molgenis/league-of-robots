@@ -8,15 +8,6 @@
     mode: '0750'
   become: true
 
-- name: Adds PATH on top of cronjob
-  ansible.builtin.cron:
-    name: PATH
-    env: yes
-    user: 'umcg-ogm-dm'
-    job: /usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
-    cron_file: "ogm"
-  become: true
-
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
     name: "trendanalysis_{{ srvid }} # Unique ID required to update existing cronjob: do not modify."
