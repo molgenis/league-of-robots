@@ -217,6 +217,7 @@ regular_groups:
   - "{{ envsync_group }}"
   - "{{ functional_admin_group }}"
   - 'umcg-atd'
+  - 'umcg-as'
   - 'umcg-biogen'
   - 'umcg-bionic-mdd-gwama'
   - 'umcg-bios'
@@ -274,6 +275,10 @@ regular_users:
     groups: ['umcg-atd']
   - user: 'umcg-atd-dm'
     groups: ['umcg-atd']
+  - user: 'umcg-vipbot'
+    groups: ['umcg-as']
+  - user: 'umcg-as-dm'
+    groups: ['umcg-as']
   - user: 'umcg-biogen-dm'
     groups: ['umcg-biogen']
   - user: 'umcg-bionic-mdd-gwama-dm'
@@ -381,6 +386,12 @@ sudoers:
     become: 'umcg-atd-ateambot'
   - who: ['%umcg-atd']
     become: 'umcg-atd-dm'
+  - who: ['%umcg-as']
+    become: 'umcg-capicebot'
+  - who: ['%umcg-as']
+    become: 'umcg-vipbot'
+  - who: ['%umcg-as']
+    become: 'umcg-as-dm'
   - who: ['%umcg-biogen-dms']
     become: 'umcg-biogen-dm'
   - who: ['%umcg-bionic-mdd-gwama-dms']
@@ -497,6 +508,7 @@ local_mount_subfolders:
         group: "{{ data_transfer_only_group }}"
       - rel_paths:
           - umcg-atd
+          - umcg-as
           - umcg-biogen
           - umcg-bionic-mdd-gwama
           - umcg-bios
@@ -585,6 +597,8 @@ lfs_mounts:
     pfs: umcgst04/slice2
     groups:
       - name: umcg-atd
+        mode: '2750'
+      - name: umcg-as
         mode: '2750'
       - name: umcg-biogen
         mode: '2750'
@@ -691,6 +705,7 @@ lfs_mounts:
     pfs: umcgst01
     groups:
       - name: umcg-atd
+      - name: umcg-as
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
@@ -743,6 +758,7 @@ lfs_mounts:
     pfs: umcgst02
     groups:
       - name: umcg-atd
+      - name: umcg-as
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
