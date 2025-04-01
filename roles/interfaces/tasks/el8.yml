@@ -41,7 +41,7 @@
 #     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:43:01:be", NAME="ens6"
 #
 - name: Delete /etc/udev/rules.d/70-persistent-net.rules.
-  ansible.biultin.file:
+  ansible.builtin.file:
     path: /etc/udev/rules.d/70-persistent-net.rules
     state: absent
   become: true
