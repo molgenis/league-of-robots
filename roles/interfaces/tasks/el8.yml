@@ -1,6 +1,6 @@
 ---
 - name: Install NetworkManager and nmstate.
-  package:
+  ansible.builtin.package:
     name:
       - NetworkManager
       - nmstate
