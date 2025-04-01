@@ -32,6 +32,21 @@
   become: true
 
 #
+# Remove /etc/udev/rules.d/70-persistent-net.rules to make our new rules apply
+# and interfaces are stuck on an old name based on a broken rule.
+# File content example with bad slot-based interface names linked tp specific MAC addresses:
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:1d:d9:9a", NAME="ens3"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:34:33:d7", NAME="ens4"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:81:c0:bf", NAME="ens5"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:43:01:be", NAME="ens6"
+#
+- name: Delete /etc/udev/rules.d/70-persistent-net.rules.
+  ansible.biultin.file:
+    path: /etc/udev/rules.d/70-persistent-net.rules
+    state: absent
+  become: true
+
+#
 # To ensure the custom /etc/systemd/network/99-default.link config is included in the initramfs,
 # so it will also be applied during early boot, and that it will be included in future kernel updates,
 # we would have to
