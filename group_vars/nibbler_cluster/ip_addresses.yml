@@ -83,6 +83,13 @@ ip_addresses:
     vlan985:
       address: 172.23.59.177
       netmask: /32
+  nb-node-c01:
+    vlan1338:
+      address: 172.23.69.138
+      netmask: /32
+    vlan1068:
+      address: 172.23.60.26
+      netmask: /32
   nb-node-c02:
     vlan1338:
       address: 172.23.69.51
