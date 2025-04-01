@@ -66,6 +66,8 @@ EOF
    exit 1
 }
 
+_exec_dir=$(pwd)
+
 # default settings
 _script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 _logger_tag=""
@@ -281,7 +283,7 @@ function start_flow(){
                      # _command="{ HOSTALIASES=/etc/hosts-LoR ${_command}; }"
                      # _command_logger="_logme \"($$ ${FUNCNAME})    main command SUCCESSFULLY finished!\""
                      _logme "($$ ${FUNCNAME})    RUNNING MAIN COMMAND"
-                     timeout "${_max_runtime}" bash -c "${_command%;}" & _child="${!}"
+                     timeout "${_max_runtime}" bash -c "cd ${_exec_dir} && ${_command%;}" & _child="${!}"
                      echo "${_child}" >> "${_pidfile}" # storing process ID inside the pid file
                      # Next line ensures that process is killed if lock pid file disappears
                      {  (  while test -e ${_pidfile} && grep -q "${_child}" "${_pidfile}"; do sleep ${_small_delay}; done; \
