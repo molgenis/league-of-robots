@@ -205,7 +205,7 @@ lfs_quota:
       umcg-gdi: 1024
       umcg-gdio: 5120
       umcg-gonl: 3072
-      umcg-griac: 2048
+      umcg-griac: 20480
       umcg-grip: 1024
       umcg-gsad: 1024
       umcg-hematology: 3072
