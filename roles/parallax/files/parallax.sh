@@ -25,35 +25,56 @@ Overview
    is running on remote host
  - when command is executed, the timeout is running and waiting for limit to
    expire, if that happens, command is killed
- - command's output goes into stdout, parallax output goes into log file or logger
+ - output from commands are redirected into stdout, parallax's output goes into
+   log file or logger
 
-Arguments
-   --command=<string>     command to be executed - it can be also multiple commands separated by semicolon ;
-   --lock-dir=<path>      location of main lock directory, where it will store hostname directories and pid locks inside,
-                          must also be on shared filesystem, one that other host systems have access to
-   --logger-tag=<string>  for the 'logger' command - all logs are redirected to system logs - alternative of argument '-f'
-                          you can parse the log data by using 'journalctl -t <tag>' (if journal is/still stored)
-   --log-file=<path>      alternative of logger, store output into a file on this location - will fail if used together with --logger-tag
-   --hostname=<string>    for testing - it 'fakes' a remote hostname when run on the same host
-                          this will prevent checking if lock directory is located on mounted storage
- Runtime limits
-   --tdelay=<integer>   (d)elay time after lock directory is created, before command is executed (in seconds, default 10)
-   --truntime=<integer>  max run(t)time (in seconds) for command (in seconds, default 28800 = 8h)
-   --tremote=<integer>   how much extra time does a remote host get before this host removes pid file? (in seconds, default 21600 = 6h)
-                         note that pid file of remote host gets removed when: ( tdelay + truntime + tremote ) > now
- Restart limit
-   --restarts=<integer>  how many times can a script run (default 20), before
-                          - local pid will get killed
-                          - for processes that are running on remote the lock folder and pid file will be removed
-                         Note that has nothing to do with time limits - this is simply counter of script restarts.
-                         If many hosts are often running this script, then it should be set to higher number.
+Mandatory arguments
+ --command=<string>
+     command to be executed - it can be also multiple commands separated by
+     semicolon ; character
+ --lock-dir=<path>
+     location of main lock directory, where it will store hostname directories
+     and pid locks inside, must also be on shared filesystem, one that other
+     host systems have access to
+ --logger-tag=<string>
+     for the 'logger' command - all logs are redirected to system logs.
+     This is alternative of the argument '-f'. Elevated users can parse the log
+     data by using 'journalctl -t <tag>' (if journal is/still stored).
+ --log-file=<path>
+     alternative of logger, store output to a file on this location - fails when
+     used together with --logger-tag
+
+Extra arguments - time limits
+ --randomdelay=<integer>
+     maximum (d)elay time after lock dir is created and before command is
+     executed (in seconds, default 10). Actual delay is a random number between
+     5 seconds (minimum) and this number (maximim).
+ --runtime=<integer>
+     max run(t)time (in seconds) for command (in seconds, default 28800 = 8h)
+ --remoteextratime=<integer>
+     how much extra time does a remote host get before this host removes remotes
+     hosts pid file? (in seconds, default 21600 = 6h)
+     Note: that pid file of remote host gets removed only when:
+       now > ( randomdelay + runtime + remoteextratime )
+Other arguments
+ --restarts=<integer>
+     how many times can a script run (default 20), before
+       - process running on local system: pid gets killed
+       - process running on remote system: delete pid file and lock folder
+     Note that has nothing to do with time limits - this is simply counter of
+     script restarts.
+     If many hosts are often running this script, it must be set to high number.
+ --hostname=<string>
+     for testing - it 'fakes' a remote hostname when run on the same host
+     It will also not check if lock directory is located on mounted storage
+
 Examples
   1. Run one command, output logs to a system logs, leave default run limits
      ${0} --command="ls" --lock-dir=/groups/umcg-atd/tmp01/testing --logger-tag=myrun
   2. Run two commands, output logs to a log file on a system, leave default run limits, fake hostname
      ${0} --command=\"id; sleep 10; who\" --lock-dir=/groups/umcg-atd/tmp01/testing --log-file=/tmp/myrun.log --hostname=wh-chaperone
   3. Run one command, output logs to a log file on a system, set runtime limits
-     ${0} --command=\"uptime\" --lock-dir=/groups/umcg-atd/tmp01/testing --log-file=/tmp/myrun.log --tdelay=3 --truntime=600 --tremote=100
+     ${0} --command=\"uptime\" --lock-dir=/groups/umcg-atd/tmp01/testing --log-file=/tmp/myrun.log --randomdelay=3 --runtime=600 --remoteextratime=100
      - make a lock file and wait for 4 seconds before executing a command,
      - then it will run an 'uptime' command and limit its runtime to a 600s=10 min, when it will be automatically killed,
      - if another script is executed on the same host, but command is still running, and if lock folder is 10 min old, then it will kill process
@@ -75,8 +96,10 @@ _log_file=""
 _testing=false               # normally we don't test things, but setting a hostname changes that, and then
                              # we also don't check if remote storage is actually a mount point
 _hostname="$(/bin/hostname)" # for developing and testing - first argument overwrites hostname
-_small_delay="10"            # in seconds: how long should script wait (after the lock directory is created)
-                             # to actually start the command
+_small_random_delay="10"     # in seconds: how long should script wait (after the lock directory is created)
+                             # to actually start the command. Delay is a random number between 5 seconds and
+                             # this number. It changes at every run. It prevents misconfigured cron timings
+                             # for when all nodes are set up to start at the same time.
 _max_runtime=28800           # [= 6h] in seconds: how long can command run before is being killed?
 _extra_remote_time=21600     # [= 4h] in seconds: how much extra should local job ignore the remote host's job
                              # Script removes lock folder and files after
@@ -88,19 +111,29 @@ _restarts="20"               # how many times can script be restarted and remain
 while [[ "${#}" -gt 0 ]]; do
    _arg=${1//\~/${HOME}}
    case "${_arg//=*}" in
-      "--command")       _command="${_arg#--*=}" ;;
-      "--lock-dir")      _main_lock_dir="${_arg#--*=}" ;;
-      "--logger-tag")    _logger_tag="${_arg#--*=}" ;;
-      "--log-file")      _log_file="${_arg#--*=}" ;;
-      "--hostname")      _hostname="${_arg#--*=}"; _testing=true ;;
-      "--tdelay")        _small_delay="${_arg#--*=}" ;;
-      "--truntime")      _max_runtime="${_arg#--*=}" ;;
-      "--tremote")       _extra_remote_time="${_arg#--*=}" ;;
-      "--restarts")      _restarts="${_arg#--*=}" ;;
-      *)                 _print_help ;;
+      "--command")          _command="${_arg#--*=}" ;;
+      "--lock-dir")         _main_lock_dir="${_arg#--*=}" ;;
+      "--logger-tag")       _logger_tag="${_arg#--*=}" ;;
+      "--log-file")         _log_file="${_arg#--*=}" ;;
+      "--hostname")         _hostname="${_arg#--*=}"; _testing=true ;;
+      "--randomdelay")      _random_delay_arg="${_arg#--*=}" ;;
+      "--runtime")          _max_runtime="${_arg#--*=}" ;;
+      "--remoteextratime")  _extra_remote_time="${_arg#--*=}" ;;
+      "--restarts")         _restarts="${_arg#--*=}" ;;
+      *)                    _print_help ;;
    esac
    shift
 done
+
+# Prepare random delay in seconds: 5 seconds <= delay <= [ random delay number ]
+if [[ "${_random_delay_arg}" -gt "5" ]]; then
+  # make a number between 5 and argument number and with two decimal numbers
+  _tmp_rand1="$(( _random_delay_arg - 5))"
+  _tmp_rand2="$(( $(( RANDOM + 1 )) % _tmp_rand1 ))"
+  _small_random_delay="$(( _tmp_rand2 + 5)).$(( $(( RANDOM + 1 )) % 99 ))"
+  unset _tmp_rand1 _tmp_rand2
+else _small_random_delay=5
+fi
 
 # Check that --command and --lock-dir are configured
 if test -z "${_main_lock_dir:-}" || test -z "${_command:-}"; then
@@ -184,17 +217,17 @@ function check_time(){
    #     file `time` is missing or wrong perms              log
    [[ -n "${1:-}" ]] && _tmphost="${1}" || _tmphost="${_hostname}"
    local _time_created
-   _time_created=$(stat -c %Z ${_main_lock_dir}/${_tmphost})    # does NOT include _small_delay, tail, as last one is the most important
+   _time_created=$(stat -c %Z ${_main_lock_dir}/${_tmphost})    # does NOT include _small_random_delay, tail, as last one is the most important
    local _time_delay_start
-   _time_delay_start="$((_time_created + _small_delay))"    # add delay to the time of when the lock folder has been created
+   _time_delay_start="$(bc -l <<< "${_time_created} + ${_small_random_delay}")"    # add delay to the time of when the lock folder has been created
    if test -z "${_time_delay_start}"; then # the time is missing
       _logme "(${$} ${FUNCNAME}) Error _time_delay_start is empty"
       exit 200
    fi
    local _time_max_runtime
-   _time_max_runtime=$((_time_delay_start + _max_runtime))
+   _time_max_runtime=$(bc -l <<< "${_time_delay_start} + ${_max_runtime}")
    local _time_max_remotetime
-   _time_max_remotetime=$(( _time_delay_start + _max_runtime + _extra_remote_time))
+   _time_max_remotetime=$(bc -l <<< "${_time_delay_start} + ${_max_runtime} + ${_extra_remote_time}")
 
    # Collect time from server
    _timedir="${_main_lock_dir}/${_tmphost}/.testtimedir"
@@ -264,7 +297,8 @@ function start_flow(){
       _logme "($$ ${FUNCNAME})    making lock directory ${_lock_dir}"
       mkdir "${_lock_dir}" || { _logme "($$ ${FUNCNAME})      cannot create lock dir ${_lock_dir}" ; exit 255; }
       sync
-      sleep ${_small_delay} # don't rush things
+      _logme "($$ ${FUNCNAME})    now sleeping for ${_small_random_delay}"
+      sleep ${_small_random_delay} # don't rush things
       start_flow
    else # hosts are running things
       _logme "($$ ${FUNCNAME})    lock dirs exist"
@@ -286,7 +320,7 @@ function start_flow(){
                      timeout "${_max_runtime}" bash -c "cd ${_exec_dir} && ${_command%;}" & _child="${!}"
                      echo "${_child}" >> "${_pidfile}" # storing process ID inside the pid file
                      # Next line ensures that process is killed if lock pid file disappears
-                     {  (  while test -e ${_pidfile} && grep -q "${_child}" "${_pidfile}"; do sleep ${_small_delay}; done; \
+                     {  (  while test -e ${_pidfile} && grep -q "${_child}" "${_pidfile}"; do sleep ${_small_random_delay}; done; \
                            if pgrep -u ${UID} timeout 2>&1 | grep -q ${_child}; then
                               _logme "($$ ${FUNCNAME}) Killing PID ${_child} because the lock pid file disappeared!"; \
                               kill -9 "${_child}"; \
@@ -316,7 +350,7 @@ function start_flow(){
                case "${_time_result}" in
                   1)
                      _logme "($$ ${FUNCNAME})      too early, let's wait ... "
-                     sleep ${_small_delay} && start_flow         # go to start
+                     sleep ${_small_random_delay} && start_flow         # go to start
                      ;;
                   13|14)
                      _logme "($$ ${FUNCNAME})      we should kill: this process is running for too long"
