@@ -217,6 +217,7 @@ regular_groups:
   - "{{ envsync_group }}"
   - "{{ functional_admin_group }}"
   - 'umcg-atd'
+  - 'umcg-as'
   - 'umcg-biogen'
   - 'umcg-bionic-mdd-gwama'
   - 'umcg-bios'
@@ -250,6 +251,7 @@ regular_groups:
   - 'umcg-nawijn'
   - 'umcg-neonatology'
   - 'umcg-nephrology'
+  - 'umcg-pgx'
   - 'umcg-pmb'
   - 'umcg-radicon'
   - 'umcg-rehabilitation'
@@ -273,6 +275,10 @@ regular_users:
     groups: ['umcg-atd']
   - user: 'umcg-atd-dm'
     groups: ['umcg-atd']
+  - user: 'umcg-vipbot'
+    groups: ['umcg-as']
+  - user: 'umcg-as-dm'
+    groups: ['umcg-as']
   - user: 'umcg-biogen-dm'
     groups: ['umcg-biogen']
   - user: 'umcg-bionic-mdd-gwama-dm'
@@ -341,6 +347,8 @@ regular_users:
     groups: ['umcg-neonatology']
   - user: 'umcg-nephrology-dm'
     groups: ['umcg-nephrology']
+  - user: 'umcg-pgx-dm'
+    groups: ['umcg-pgx']
   - user: 'umcg-pmb-dm'
     groups: ['umcg-pmb']
   - user: 'umcg-radicon-dm'
@@ -378,6 +386,12 @@ sudoers:
     become: 'umcg-atd-ateambot'
   - who: ['%umcg-atd']
     become: 'umcg-atd-dm'
+  - who: ['%umcg-as']
+    become: 'umcg-capicebot'
+  - who: ['%umcg-as']
+    become: 'umcg-vipbot'
+  - who: ['%umcg-as']
+    become: 'umcg-as-dm'
   - who: ['%umcg-biogen-dms']
     become: 'umcg-biogen-dm'
   - who: ['%umcg-bionic-mdd-gwama-dms']
@@ -446,6 +460,8 @@ sudoers:
     become: 'umcg-neonatology-dm'
   - who: ['%umcg-nephrology-dms']
     become: 'umcg-nephrology-dm'
+  - who: ['%umcg-pgx-dms']
+    become: 'umcg-pgx-dm'
   - who: ['%umcg-pmb-dms']
     become: 'umcg-pmb-dm'
   - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
@@ -492,6 +508,7 @@ local_mount_subfolders:
         group: "{{ data_transfer_only_group }}"
       - rel_paths:
           - umcg-atd
+          - umcg-as
           - umcg-biogen
           - umcg-bionic-mdd-gwama
           - umcg-bios
@@ -581,6 +598,8 @@ lfs_mounts:
     groups:
       - name: umcg-atd
         mode: '2750'
+      - name: umcg-as
+        mode: '2750'
       - name: umcg-biogen
         mode: '2750'
       - name: umcg-bionic-mdd-gwama
@@ -647,6 +666,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-nephrology
         mode: '2750'
+      - name: umcg-pgx
+        mode: '2750'
       - name: umcg-pmb
         mode: '2750'
       - name: umcg-radicon
@@ -684,6 +705,7 @@ lfs_mounts:
     pfs: umcgst01
     groups:
       - name: umcg-atd
+      - name: umcg-as
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
@@ -736,6 +758,7 @@ lfs_mounts:
     pfs: umcgst02
     groups:
       - name: umcg-atd
+      - name: umcg-as
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
@@ -821,6 +844,7 @@ lfs_mounts:
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-nephrology
+      - name: umcg-pgx
       - name: umcg-pmb
       - name: umcg-radicon
       - name: umcg-rehabilitation

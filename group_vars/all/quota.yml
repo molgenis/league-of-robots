@@ -164,7 +164,7 @@ lfs_quota:
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
-      umcg-lifelines: 102400
+      umcg-lifelines: 87040
       umcg-lld: 8192
       umcg-llnext: 2048
       umcg-mic: 2048
@@ -205,14 +205,14 @@ lfs_quota:
       umcg-gdi: 1024
       umcg-gdio: 5120
       umcg-gonl: 3072
-      umcg-griac: 2048
+      umcg-griac: 20480
       umcg-grip: 1024
       umcg-gsad: 1024
       umcg-hematology: 3072
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
-      umcg-lifelines: 25600
+      umcg-lifelines: 40960
       umcg-lld: 1024
       umcg-llnext: 2048
       umcg-mic: 2048
