@@ -240,16 +240,16 @@ function check_time(){
    _logme "(${$} ${FUNCNAME})      _time_now=$_time_now"
    _logme "(${$} ${FUNCNAME})      _time_max_runtime=$_time_max_runtime"
    _logme "(${$} ${FUNCNAME})      _time_max_remotetime=$_time_max_remotetime"
-   if [[ "${_time_now}" -gt "${_time_max_remotetime}" ]]; then
+   if (( $(bc -l <<< "${_time_now} > ${_time_max_remotetime}") )); then
       _logme "(${$} ${FUNCNAME})    remote host runs for too long! (now returning 14 ... )"
       return 14   # clean remote host lock directory and files
-   elif [[ "${_time_now}" -gt "${_time_max_runtime}" ]]; then
+   elif (( $(bc -l <<< "${_time_now} > ${_time_max_runtime}") )); then
       _logme "(${$} ${FUNCNAME})    should kill! (now returning 13 ...)"
       return 13   # kill
-   elif [[ "${_time_now}" -lt "${_time_delay_start}" ]]; then
+   elif (( $(bc -l <<< "${_time_now} < ${_time_delay_start}") )); then
       _logme "(${$} ${FUNCNAME})    should wait (now returning 1 ...)"
       return 1    # wait
-   elif [[ "${_time_now}" -ge "${_time_delay_start}" ]]; then
+   elif (( $(bc -l <<< "${_time_now} >= ${_time_delay_start}") )); then
       _logme "(${$} ${FUNCNAME})    can run (now returning ok 0 ...)"
       return 0    # run
    else
