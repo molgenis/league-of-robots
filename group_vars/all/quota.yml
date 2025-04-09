@@ -34,6 +34,7 @@ lfs_quota:
       umcg-muhas: 1024
       umcg-nawijn: 2048
       umcg-pmb: 2048
+      umcg-rad: 1024
       umcg-rehabilitation: 1024
       umcg-reki: 1024
       umcg-solve-rd: 1024
@@ -225,6 +226,7 @@ lfs_quota:
       umcg-pgx: 1024
       umcg-pmb: 3072
       umcg-rehabilitation: 1024
+      umcg-rad: 1024
       umcg-radicon: 1024
       umcg-reki: 1024
       umcg-solve-rd: 1024
