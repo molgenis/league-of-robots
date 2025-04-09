@@ -4,8 +4,8 @@ Overview
 
  - for more information see script's header and help function
  - this script is intended to run as cron on multiple machines at the same time
- - the only way the machines can communicate is via is via shared filesystem
-   where a specific directory is located - used by machines to coordinate
+ - the only way the machines can communicate is via shared filesystem on which
+   dedicated lock directory is located - used by hosts to coordinate execution
  - script automatically checks if lock directory is located on mounted storage
  - the extra information about the machine that is running command is stored
    inside lock directory in the file called pid
