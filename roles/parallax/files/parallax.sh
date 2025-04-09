@@ -285,7 +285,7 @@ function killing_pid(){
 }
 
 function start_flow(){
-   _logme "($$ ${FUNCNAME}) Entering main loop]"
+   _logme "($$ ${FUNCNAME}) Entering main loop"
    sync
    if ! test -w "${_lock_dir}/"; then
       _logme "($$ ${FUNCNAME})    top level locking directory is missing [${_lock_dir}]"
