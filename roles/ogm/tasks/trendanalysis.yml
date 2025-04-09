@@ -11,7 +11,7 @@
 - name: Trendanalysis cronjob
   ansible.builtin.cron:
     name: "trendanalysis_{{ srvid }} # Unique ID required to update existing cronjob: do not modify."
-    weekday: '6' # on Fridays
+    weekday: '5' # on Fridays
     hour: "14"
     minute: "{{ 59 | random(seed=inventory_hostname) }}"
     user: 'umcg-ogm-dm'
