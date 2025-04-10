@@ -1,0 +1,42 @@
+---
+- name: Get unstable device name from perc cli utility.
+  ansible.builtin.shell:
+    cmd: |
+         set -o pipefail
+         /opt/MegaRAID/perccli/perccli64 \
+             /c{{ volume['perc_controller'] }} \
+             /v{{ volume['perc_virtual_drive'] | default('all') }} \
+             show all \
+         | grep -i 'OS Drive Name' \
+         | grep -o '/dev/.*'
+  changed_when: false
+  register: perc_os_device_name 
+  become: true
+
+- name: Update facts.
+  block:
+    - name: 'Set a fact, which will resolve references to other vars in the "local_mounts" variable.'
+      ansible.builtin.set_fact:
+        local_mounts_resolved_copy: "{{ local_mounts }}"
+    - name: 'Append unstable device name from perc cli utility to an updated copy of "local_mounts" with references resolved.'
+      ansible.utils.update_fact:
+        updates:
+          - path: "local_mounts_resolved_copy[{{ idx }}]['device']"
+            value: "{{ perc_os_device_name['stdout'] }}"
+      register: local_mounts_updated_copy
+    - name: 'Replace "local_mounts" with updated copy.'
+      ansible.builtin.set_fact:
+        local_mounts: "{{ local_mounts_updated_copy['local_mounts_resolved_copy'] }}"
+  when:
+    - perc_os_device_name['stdout'] != volume['device']
+
+- debug:
+    msg:
+      - "perc_controller: {{ volume['perc_controller'] | default('none') }}"
+      - "device: {{ volume['device'] }}"
+      - "idx: {{ idx }}"
+      - "local_mounts_updated_copy: {{ local_mounts_updated_copy }}"
+      - "local_mounts[idx]['device']: {{ local_mounts[idx]['device'] }}"
+      - "mount_point: {{ volume['mount_point'] }}"
+      - "label: {{ volume['label'] | default(volume['mount_point'] | regex_replace('.*/([^/]+)/*$', '\\1')) }}"
+...
