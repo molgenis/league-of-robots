@@ -1,4 +1,21 @@
 ---
+- name: Install tools to work with block devices and mount points.
+  ansible.builtin.package:
+    state: 'latest'
+    update_cache: true
+    name:
+      - util-linux  # Will also install util-linux-core
+  become: true
+
+- name: Get unstable device name from perc cli utility and update facts.
+  ansible.builtin.include_tasks:
+    file: perc.yml
+  loop: "{{ local_mounts }}"
+  loop_control:
+    loop_var: volume
+    index_var: idx
+  when: volume['perc_controller'] is defined
+
 - name: Check if file system source is a device.
   ansible.builtin.stat:
     path: "{{ item.device }}"
@@ -8,28 +25,25 @@
 - name: Create a file system on unformatted device.
   ansible.builtin.include_tasks:
     file: create_filesystem_on_device.yml
-  vars:
-    volume_mount_point: "{{ item.mount_point }}"
-    volume_device: "{{ item.device }}"
-    volume_type: "{{ item.type }}"
   when:
     - local_storage_device_stat['results']
-      | selectattr('item', 'equalto', item)
-      | map(attribute='stat')
-      | map(attribute='isblk')
-      | first is true
+        | selectattr('item', 'equalto', volume)
+        | map(attribute='stat')
+        | map(attribute='isblk')
+        | first is true
   loop: "{{ local_mounts }}"
+  loop_control:
+    loop_var: volume
 
 - name: Mount the local file system.
   ansible.builtin.include_tasks:
-    file: mount.yml
+    file: mount_filesystem.yml
   vars:
-    volume_path: "{{ item.mount_point }}"
-    volume_src: "{{ item.device }}"
-    volume_fstype: "{{ item.type }}"
-    volume_opts: "{{ item.mount_options }}"
-    volume_device: "{{ item.device }}"
+    volume_src: "{% if volume['label'] is defined %}LABEL={{ volume['label'] }}{% else %}{{ volume['device'] }}{% endif %}"
   loop: "{{ local_mounts }}"
+  loop_control:
+    loop_var: volume
+    label: "Mounting {{ volume['type'] }} file system from {{ volume_src }} on {{ volume['mount_point'] }} with opts: {{ volume['mount_options'] }}}"
 
 - name: Recheck the mount point.
   ansible.builtin.command: "mountpoint {{ item.mount_point }}"
