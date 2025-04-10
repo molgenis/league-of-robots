@@ -117,8 +117,8 @@
 - name: Verify services are enabled and running
   ansible.builtin.debug:
     msg:
-      - "services[{{ item }}.service].status={{ services[item+'.service'].status }}"
-      - "services[{{ item }}.service].state={{ services[item+'.service'].state }}"
+      - "services[{{ item }}.service].status={{ services[item + '.service'].status }}"
+      - "services[{{ item }}.service].state={{ services[item + '.service'].state }}"
   loop: "{{ beegfs_server_services }}"
   become: true
 
