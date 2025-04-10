@@ -110,7 +110,7 @@ all:
       hosts:
         copperfist:
           host_networks:
-            - name: vlan983
+            - name: vlan16
             - name: vlan990
           local_yum_repository: true # enable local yum repository
     deploy_admin_interface:
