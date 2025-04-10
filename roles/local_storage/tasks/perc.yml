@@ -29,4 +29,6 @@
     - name: 'Replace "local_mounts" with updated copy.'
       ansible.builtin.set_fact:
         local_mounts: "{{ local_mounts_updated_copy['local_mounts_resolved_copy'] }}"
+  when:
+    - perc_os_device_name['stdout'] != volume['device']
 ...
