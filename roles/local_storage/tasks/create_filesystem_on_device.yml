@@ -34,9 +34,11 @@
   become: true
 
 - name: Label existing, unmounted ext file system.
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: |
-         e2label {{ volume['device'] }} {{ volume['label'] }}
+         e2label {{ volume['device'] }} {{ volume['label'] }} && e2label {{ volume['device'] }}
+  register: e2label_result
+  changed_when: e2label_result.stdout != device_label['stdout']
   when:
     - mount_point_status['rc'] != 0
     - volume['label'] is defined
