@@ -10,10 +10,12 @@
          | grep -i 'OS Drive Name' \
          | grep -o '/dev/.*'
   changed_when: false
-  register: perc_os_device_name 
+  register: perc_os_device_name
   become: true
 
 - name: Update facts.
+  when:
+    - perc_os_device_name['stdout'] != volume['device']
   block:
     - name: 'Set a fact, which will resolve references to other vars in the "local_mounts" variable.'
       ansible.builtin.set_fact:
@@ -27,16 +29,4 @@
     - name: 'Replace "local_mounts" with updated copy.'
       ansible.builtin.set_fact:
         local_mounts: "{{ local_mounts_updated_copy['local_mounts_resolved_copy'] }}"
-  when:
-    - perc_os_device_name['stdout'] != volume['device']
-
-- debug:
-    msg:
-      - "perc_controller: {{ volume['perc_controller'] | default('none') }}"
-      - "device: {{ volume['device'] }}"
-      - "idx: {{ idx }}"
-      - "local_mounts_updated_copy: {{ local_mounts_updated_copy }}"
-      - "local_mounts[idx]['device']: {{ local_mounts[idx]['device'] }}"
-      - "mount_point: {{ volume['mount_point'] }}"
-      - "label: {{ volume['label'] | default(volume['mount_point'] | regex_replace('.*/([^/]+)/*$', '\\1')) }}"
 ...
