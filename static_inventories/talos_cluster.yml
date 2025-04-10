@@ -169,6 +169,31 @@ all:
               slurm_ethernet_interfaces:
                 - enp65s0np0
                 - enp65s0np0.1068
+        cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            tl-node-c01:
+              cloud_flavor: umcg.v1.vm.4-8
+              cloud_image: Rocky-9.5
+              cloud_user: rocky
+              host_networks:
+                - name: vlan1337
+                  security_group: "{{ stack_prefix }}_cluster"
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+              lustre_client_networks:
+                - name: tcp20
+                  interface: enp0s4
+              local_volume_size_extra: 1
+              slurm_sockets: 1
+              slurm_cores_per_socket: 8
+              slurm_real_memory: 257320
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
+              slurm_local_disk: 900
+              slurm_features: 'tmp08'
+              slurm_ethernet_interfaces:
+              - enp0s3
+              - enp0s4
     chaperone:
       hosts:
         tl-chaperone:
