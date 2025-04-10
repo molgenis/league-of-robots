@@ -498,8 +498,6 @@ lustre_client_networks_vm:
   - name: tcp15
     interface: ens5
 lustre_client_networks_baremetal:
-  - name: tcp14
-    interface: eno8303
   - name: tcp15
     interface: eno12399np0
 pfs_mounts:
