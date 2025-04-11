@@ -43,5 +43,6 @@
     - mount_point_status['rc'] != 0
     - volume['label'] is defined
     - device_label['stdout'] != volume['label']
+    - volume['type'] is regex_search('^ext[0-9]+')
   become: true
 ...
