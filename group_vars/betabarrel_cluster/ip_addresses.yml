@@ -29,9 +29,6 @@ ip_addresses:
       netmask: /32
       fqdn: 'bb-transfer.hpc.rug.nl'
   betabarrel:
-    vlan983:
-      address: 172.23.41.225
-      netmask: /32
     vlan16:
       address: 195.169.22.3
       netmask: /32
