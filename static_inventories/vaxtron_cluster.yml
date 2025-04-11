@@ -123,7 +123,7 @@ all:
                 - eno12409np1
                 - eno8303
                 - eno12399np0
-        R6625:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r6625:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             vt-node-b[01:06]:
               cloud_flavor: umcg.v1.bm.192-768-0
@@ -131,15 +131,18 @@ all:
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
-                - name: DH4 Lustre
-                  security_group: "{{ stack_prefix }}_storage"
                 - name: lustre
                   security_group: "{{ stack_prefix }}_storage"
-              lustre_client_networks: "{{ lustre_client_networks_baremetal }}"
+              lustre_client_networks:
+                - name: tcp15
+                  interface: eno12399
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
-                  device: '/dev/sdb'
+                  device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+                  label: local
+                  perc_controller: 0
+                  perc_virtual_drive: 239
                   mounted_owner: root
                   mounted_group: root
                   mounted_mode: '0755'
@@ -159,9 +162,8 @@ all:
               slurm_local_disk: 3420400
               slurm_features: 'rsc04,tmp04'
               slurm_ethernet_interfaces:
-                - eno12409np1
-                - eno8303
-                - eno12399np0
+                - eno12409
+                - eno12399
 administration:
   children:
     sys_admin_interface:
