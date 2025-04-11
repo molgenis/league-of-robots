@@ -83,7 +83,7 @@ all:
             - ens5
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r750:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             vt-node-a[01:04]:
               cloud_flavor: umcg_bigmem
