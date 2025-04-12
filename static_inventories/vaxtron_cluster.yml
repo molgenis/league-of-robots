@@ -155,11 +155,11 @@ all:
                   type: ext4
               local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
-              slurm_cores_per_socket: 92
+              slurm_cores_per_socket: 96
               slurm_real_memory: 768000
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
-              slurm_local_disk: 3420400
+              slurm_local_disk: 2850100
               slurm_features: 'rsc04,tmp04'
               slurm_ethernet_interfaces:
                 - eno12409
