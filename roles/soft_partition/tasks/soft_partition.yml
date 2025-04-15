@@ -34,7 +34,7 @@
     force: false        # prevent formatting the existing filesystem!
     fstype: "{{ item.fstype }}"
     dev: "{{ item.src }}"
-    opts: "{{ item.fsopts }}"
+    opts: "{{ item.fsopts | default('omit') }}"
   with_items: "{{ soft_partitions }}"
   when:
     - ansible_mounts | selectattr('mount', 'equalto', item.path) | list | length == 0
