@@ -30,9 +30,6 @@ ip_addresses:
       address: 10.10.1.46
       netmask: /32
   vt-node-a01:
-    DH4 Lustre:
-      address: 172.23.58.67
-      netmask: /32
     lustre:
       address: 172.23.13.16
       netmask: /32
@@ -40,9 +37,6 @@ ip_addresses:
       address: 10.10.1.182
       netmask: /32
   vt-node-a02:
-    DH4 Lustre:
-      address: 172.23.58.84
-      netmask: /32
     lustre:
       address: 172.23.13.91
       netmask: /32
@@ -50,9 +44,6 @@ ip_addresses:
       address: 10.10.1.112
       netmask: /32
   vt-node-a03:
-    DH4 Lustre:
-      address: 172.23.58.40
-      netmask: /32
     lustre:
       address: 172.23.12.50
       netmask: /32
@@ -60,14 +51,53 @@ ip_addresses:
       address: 10.10.1.142
       netmask: /32
   vt-node-a04:
-    DH4 Lustre:
-      address: 172.23.58.87
-      netmask: /32
     lustre:
       address: 172.23.12.51
       netmask: /32
     vt_internal_management:
       address: 10.10.1.79
+      netmask: /32
+  vt-node-b01:
+    lustre:
+      address: 172.23.12.45
+      netmask: /32
+    vt_internal_management:
+      address: 10.10.1.103
+      netmask: /32
+  vt-node-b02:
+    lustre:
+      address: 172.23.13.244
+      netmask: /32
+    vt_internal_management:
+      address: 10.10.1.60
+      netmask: /32
+  vt-node-b03:
+    lustre:
+      address: 172.23.12.157
+      netmask: /32
+    vt_internal_management:
+      address: 10.10.1.47
+      netmask: /32
+  vt-node-b04:
+    lustre:
+      address: 172.23.12.56
+      netmask: /32
+    vt_internal_management:
+      address: 10.10.1.196
+      netmask: /32
+  vt-node-b05:
+    lustre:
+      address: 172.23.13.224
+      netmask: /32
+    vt_internal_management:
+      address: 10.10.1.151
+      netmask: /32
+  vt-node-b06:
+    lustre:
+      address: 172.23.13.105
+      netmask: /32
+    vt_internal_management:
+      address: 10.10.1.198
       netmask: /32
   vt-repo:
     vt_internal_management:

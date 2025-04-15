@@ -141,8 +141,8 @@ stack_networks:
     router_network: external
     type: management
     external: false
-  - name: vlan983
-    cidr: '172.23.41.226/23'
+  - name: vlan16
+    cidr: '195.169.22.0/23'
     type: management
     external: true
   - name: vlan990
@@ -459,13 +459,12 @@ local_mount_subfolders:
 # Shared storage related variables
 #
 pfs_mounts:
-  - pfs: local_raid # must already be in /etc/fstab and mounted - f.e. /dev/sda > /mnt/local_raid (pfs somename must be same as /mnt/somename)
-    device: ''
+  - pfs: local_raid
     source: '/mnt'
     type: 'none'
-    rw_options: 'bind,rw'
-    ro_options: 'bind,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
+    rw_options: 'bind,nofail'
+    ro_options: 'bind,ro,nofail'
+    machines: []  # Complete PFS not mounted via shared_storage role. See local_storage role instead.
   - pfs: 'medgen_zincfinger$'
     source: '//storage5.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem
