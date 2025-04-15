@@ -42,6 +42,8 @@ regular_users:
     groups: ['vipt']
   - user: 'jkloosterman'
     groups: ['vipt']
+  - user: 'mbeukers'
+    groups: ['vipt']
 sudoers:
   - who: ['%vipt']
     become: 'ALL'
