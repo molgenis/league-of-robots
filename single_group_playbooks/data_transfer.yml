@@ -22,7 +22,8 @@
     - basic_security
     - rsyncd
     - regular_users
-    - local_storage
+    - role: local_storage
+      when: local_mounts is defined and local_mounts | length > 0
     - role: cleanup_gs_data
       when: '"umcg-genomescan" in regular_groups'
 ...

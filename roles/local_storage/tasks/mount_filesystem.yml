@@ -8,23 +8,23 @@
   block:
     - name: Try to mount the volume.
       ansible.posix.mount:
-        path: "{{ volume_path }}"
+        path: "{{ volume['mount_point'] }}"
         src: "{{ volume_src }}"
-        fstype: "{{ volume_fstype }}"
-        opts: "{{ volume_opts }}"
+        fstype: "{{ volume['type'] }}"
+        opts: "{{ volume['mount_options'] }}"
         state: mounted
       become: true
   rescue:
     - name: Try to remove metadata_csum feature, which might be too new.
       ansible.builtin.command:  # noqa no-changed-when
-        cmd: tune2fs -O ^metadata_csum "{{ volume_device }}"
+        cmd: tune2fs -O ^metadata_csum "{{ volume['device'] }}"
       become: true
     - name: Retry mounting the volume.
       ansible.posix.mount:
-        path: "{{ volume_path }}"
+        path: "{{ volume['mount_point'] }}"
         src: "{{ volume_src }}"
-        fstype: "{{ volume_fstype }}"
-        opts: "{{ volume_opts }}"
+        fstype: "{{ volume['type'] }}"
+        opts: "{{ volume['mount_options'] }}"
         state: mounted
       become: true
 ...

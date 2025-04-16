@@ -127,6 +127,24 @@
 # At the time this comment was written 2.15.6 was not yet released and we need to
 # * Fetch the source code for 2.15.6-RC1
 # * Use the same procedure as above to compile lustre-*2.15.6_RC1-1.el9.*.rpm RPMs.
+# Update: a newer kernel update in EL 9.5 broke the 2.15.6 GA release; we need to:
+# * Fetch the source code for the 2.15.x branch containing 2.15.6
+#   and then same additional patches back ported on top of that:
+#   For issue see: https://jira.whamcloud.com/browse/LU-18085
+#   For patch set description see: https://review.whamcloud.com/c/fs/lustre-release/+/57007
+#   Fetch the "snapshot" from https://git.whamcloud.com/?p=fs%2Flustre-release.git;a=commit;h=a71369eb9cb0aa89ede41cb01b2cd9cdcd8e9680
+# * Update build number 1 -> 2.
+#    * In lustre.spec.in change:
+#          Release: 1%{?dist}
+#      into:
+#          Release: 2%{?dist}
+#    * In lustre-dkms.spec.in change:
+#          %define buildid 1
+#      into:
+#          %define buildid 2
+# * Execute:
+#       autogen.sh
+# * Use the same procedure as above to compile lustre-*2.15.6-2.el9.*.rpm RPMs.
 #
 - name: Install the Lustre client
   ansible.builtin.package:
