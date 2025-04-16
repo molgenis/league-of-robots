@@ -57,8 +57,7 @@ cluster_common_packages:
     - git
     - git-core
     - gnutls
-    # iRODS not yet available for RedHat9
-    # - irods-icommands
+    - irods-icommands
     - libsodium
     - lsof
     - nano
