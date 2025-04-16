@@ -147,7 +147,7 @@ lfs_quota:
       umcg-dag3: 8192
       umcg-datateam: 2048
       umcg-ejp-rd: 1024
-      umcg-endocrinology: 5120
+      umcg-endocrinology: 2048
       umcg-fg: 7168
       umcg-franke-scrna: 18432
       umcg-fu: 2048
@@ -165,7 +165,7 @@ lfs_quota:
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
-      umcg-lifelines: 87040
+      umcg-lifelines: 76800
       umcg-lld: 8192
       umcg-llnext: 2048
       umcg-mic: 2048
@@ -195,7 +195,7 @@ lfs_quota:
       umcg-bios: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
-      umcg-endocrinology: 2048
+      umcg-endocrinology: 5120
       umcg-fg: 10240
       umcg-franke-scrna: 20480
       umcg-fu: 2048
@@ -213,7 +213,7 @@ lfs_quota:
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
-      umcg-lifelines: 40960
+      umcg-lifelines: 51200
       umcg-lld: 1024
       umcg-llnext: 2048
       umcg-mic: 2048

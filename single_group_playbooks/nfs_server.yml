@@ -10,8 +10,5 @@
   hosts:
     - nfs_server
   roles:
-    - role: perc_cli
-      when: perc_devices is defined and perc_devices
-    - local_storage
     - nfs_server
 ...

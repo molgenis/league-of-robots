@@ -11,8 +11,5 @@
   hosts:
     - compute_node
   roles:
-    - role: perc_cli
-      when: perc_devices is defined
-    - local_storage
     - slurm
 ...
