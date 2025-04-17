@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # First configure bash to correctly handle missing variables and errors
 set -eEuo pipefail
 
@@ -67,6 +66,8 @@ Other arguments
  --hostname=<string>
      for testing - it 'fakes' a remote hostname when run on the same host
      It will also not check if lock directory is located on mounted storage
+ --debug
+     Prints in stdout an extra debugging information
 
 Examples
   1. Run one command, output logs to a system logs, leave default run limits
@@ -87,12 +88,13 @@ EOF
    exit 1
 }
 
-_exec_dir=$(pwd)
+_exec_dir=${PWD}
 
 # default settings
 _script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 _logger_tag=""
 _log_file=""
+_debug=false
 _testing=false               # normally we don't test things, but setting a hostname changes that, and then
                              # we also don't check if remote storage is actually a mount point
 _hostname="$(/bin/hostname)" # for developing and testing - first argument overwrites hostname
@@ -107,6 +109,7 @@ _extra_remote_time=21600     # [= 4h] in seconds: how much extra should local jo
 _restarts="20"               # how many times can script be restarted and remain ignored, after then a local
                              # processes will be killed, where remote processes will have lock directory and
                              # pid file removed
+_try_again=2                 # if we wait in line, let's try again
 
 while [[ "${#}" -gt 0 ]]; do
    _arg=${1//\~/${HOME}}
@@ -116,21 +119,26 @@ while [[ "${#}" -gt 0 ]]; do
       "--logger-tag")       _logger_tag="${_arg#--*=}" ;;
       "--log-file")         _log_file="${_arg#--*=}" ;;
       "--hostname")         _hostname="${_arg#--*=}"; _testing=true ;;
-      "--randomdelay")      _random_delay_arg="${_arg#--*=}" ;;
+      "--randomdelay")      _small_random_delay_argument="${_arg#--*=}" ;;
       "--runtime")          _max_runtime="${_arg#--*=}" ;;
       "--remoteextratime")  _extra_remote_time="${_arg#--*=}" ;;
+      "--debug")            _debug=true ;;
       "--restarts")         _restarts="${_arg#--*=}" ;;
       *)                    _print_help ;;
    esac
    shift
 done
 
+if [[ "${_small_random_delay}" -ne "${_small_random_delay_argument}" ]]; then
+   _small_random_delay="${_small_random_delay_argument}"
+fi
+
 # Prepare random delay in seconds: 5 seconds <= delay <= [ random delay number ]
-if [[ "${_random_delay_arg}" -gt "5" ]]; then
+if [[ "${_small_random_delay}" -gt "5" ]]; then
   # make a number between 5 and argument number and with two decimal numbers
-  _tmp_rand1="$(( _random_delay_arg - 5))"
-  _tmp_rand2="$(( $(( RANDOM + 1 )) % _tmp_rand1 ))"
-  _small_random_delay="$(( _tmp_rand2 + 5)).$(( $(( RANDOM + 1 )) % 99 ))"
+  _tmp_size="$(( _small_random_delay - 5))"
+  _tmp_num="$(( RANDOM % _tmp_size ))"
+  _small_random_delay="$(( _tmp_num + 5)).$(( RANDOM % 99 ))"
   unset _tmp_rand1 _tmp_rand2
 else _small_random_delay=5
 fi
@@ -181,29 +189,33 @@ if ! test -d "${_main_lock_dir}"; then
     mkdir -p "${_main_lock_dir}"
     _logme "Created ${_main_lock_dir}"
 fi
-_lock_dir="${_main_lock_dir}/${_hostname}"
-_pidfile="${_lock_dir}/pid"
+_local_lock_dir="${_main_lock_dir}/${_hostname}"
+_pidfile="${_local_lock_dir}/pid"
 
 function clean_stale_pidfiles(){
-   local _stale_pidfile
-   _stale_pidfile="${_lock_dir}/pid"
-   if test -e "${_stale_pidfile}"; then
+   local _stale_local_pidfile
+   _stale_local_pidfile="${_local_lock_dir}/pid"
+   if test -e "${_stale_local_pidfile}"; then
       local _pid
-      # first clear all the pids that are not running
-      for _pid in $(cat "${_stale_pidfile}"); do
+      # clear all the pids that are not running
+      for _pid in $(cat "${_stale_local_pidfile}"); do
          if ! pgrep -u ${UID} "timeout" | grep -q "${_pid}"; then
-            sed -i "/${_pid}/d" "${_stale_pidfile}"
+            sed -i "/${_pid}/d" "${_stale_local_pidfile}"
             _logme "($$ ${FUNCNAME}) Removed ${_pid} from pid file"
          fi
       done
-      # if file is now empty, remove it whole file
-      if test -z "$(cat "${_stale_pidfile}")"; then
-         rm -f "${_stale_pidfile}" && _logme "(${$} ${FUNCNAME}) Removed stale pid file [${_lock_dir}/pid]"
+      # if file is now empty, clean directory
+      if ! test -s "${_stale_local_pidfile}"; then
+         rm -f "${_local_lock_dir}/pid"
+         rm -f "${_local_lock_dir}/remote"
+         [ -z "$(ls -A ${_local_lock_dir})" ] && rmdir "${_local_lock_dir}" && sync
+         _logme "(${$} ${FUNCNAME}) Removed local local files and directory [${_local_lock_dir}/{pid,remote}]!"
       fi
    fi
 }
 
 function check_time(){
+   #### Parameters explained
    # $1 must hostname (or else is assigned to this hostname)
    # 1. check's if time file exist, and
    # 2. check time
@@ -217,7 +229,8 @@ function check_time(){
    #     file `time` is missing or wrong perms              log
    [[ -n "${1:-}" ]] && _tmphost="${1}" || _tmphost="${_hostname}"
    local _time_created
-   _time_created=$(stat -c %Z ${_main_lock_dir}/${_tmphost})    # does NOT include _small_random_delay, tail, as last one is the most important
+   # does NOT include _small_random_delay, tail, as last one is the most important
+   sync && _time_created=$(stat -c %Z ${_main_lock_dir}/${_tmphost})
    local _time_delay_start
    _time_delay_start="$(bc -l <<< "${_time_created} + ${_small_random_delay}")"    # add delay to the time of when the lock folder has been created
    if test -z "${_time_delay_start}"; then # the time is missing
@@ -231,15 +244,16 @@ function check_time(){
 
    # Collect time from server
    _timedir="${_main_lock_dir}/${_tmphost}/.testtimedir"
-   test -d "${_timedir}" && rmdir "${_timedir}" # clean old directory
-   mkdir "${_timedir}"
-   _time_now="$(stat -c %Z ${_timedir})"        # get server's time
-   rmdir "${_timedir}"
-
+   # clean old directory
+   sync && test -d "${_timedir}" && rmdir "${_timedir}" && sync
+   mkdir "${_timedir}" && sync
+   # collect time on the server side
+   _time_now="$(stat -c %Z ${_timedir})"
+   rmdir "${_timedir}" && sync
    _logme "(${$} ${FUNCNAME})    collected _time_now epoch seconds from server [${_time_now}]"
-   _logme "(${$} ${FUNCNAME})      _time_now=$_time_now"
-   _logme "(${$} ${FUNCNAME})      _time_max_runtime=$_time_max_runtime"
-   _logme "(${$} ${FUNCNAME})      _time_max_remotetime=$_time_max_remotetime"
+   ${_debug} && _logme "(${$} ${FUNCNAME})      _time_now=$_time_now"
+   ${_debug} && _logme "(${$} ${FUNCNAME})      _time_max_runtime=$_time_max_runtime"
+   ${_debug} && _logme "(${$} ${FUNCNAME})      _time_max_remotetime=$_time_max_remotetime"
    if (( $(bc -l <<< "${_time_now} > ${_time_max_remotetime}") )); then
       _logme "(${$} ${FUNCNAME})    remote host runs for too long! (returning 14)"
       return 14   # clean remote host lock directory and files
@@ -258,25 +272,30 @@ function check_time(){
    fi
 }
 
-function remove_locks(){
-   # Cleaning up after run
-   if test -d "${_main_lock_dir}" && test -d "${_lock_dir}"; then
-      if test -z "$(cat "${_lock_dir}/pid")"; then   # check if pidfile contains our process or is empty
-         rm -f "${_lock_dir}/pid" # simply remove it
-         rmdir "${_lock_dir}" && _logme "(${$} ${FUNCNAME})   lock directory removed [$(pwd)/${_hostname}]"
+function end_remove_local_locks(){
+   # cleaning up after run
+   if test -d "${_main_lock_dir}" && test -d "${_local_lock_dir}"; then
+      # check that pidfile is not empty
+      if test -e "${_local_lock_dir}/pid"; then
+         # simply remove it
+         rm -f "${_local_lock_dir}/pid"
+         rm -f "${_local_lock_dir}/remote"
+         [ -z "$(ls -A ${_local_lock_dir})" ] && rmdir "${_local_lock_dir}/" && sync
+         _logme "(${$} ${FUNCNAME})   lock directory removed [$(pwd)/${_hostname}]"
       fi
    fi
 }
 
 function killing_pid(){
-   if test -e "${_lock_dir}/pid"; then
-      _pids="$(sort -u < "${_lock_dir}/pid")"
+   if test -e "${_local_lock_dir}/pid"; then
+      _pids="$(sort -u < "${_local_lock_dir}/pid")"
    else
       _logme "(${$} ${FUNCNAME}) Error, no pid provided to kill and pid file is missing. Exit 255!"
       exit 255
    fi
    for _each_pid in ${_pids}; do
-      if pgrep -u "${UID}" "timeout" 2>&1 | grep -q "${_each_pid}"; then # killing timeout processes
+      # killing timeout processes
+      if pgrep -u "${UID}" "timeout" 2>&1 | grep -q "${_each_pid}"; then
          _logme "(${$} ${FUNCNAME}) Killing process ${_each_pid}"
          kill -9 "${_each_pid}" && \
            _logme "(${$} ${FUNCNAME})  ${_each_pid} killed!"
@@ -284,54 +303,109 @@ function killing_pid(){
    done
 }
 
+function other_hosts_are_running(){
+   _try_again=$(( _try_again - 1 ))
+   _logme "($$ ${FUNCNAME})   there are other hosts running this script"
+   test -d "${_main_lock_dir}" && cd "${_main_lock_dir}"
+   for _each_host in */; do # loop through the hosts directories
+      _each_host="${_each_host%\/}"
+      {
+         [[ "${_each_host}" == "${_hostname}" ]] && continue
+         ${_debug} && _logme "(${$} ${FUNCNAME})      _each_host=$_each_host"
+         ${_debug} && _logme "(${$} ${FUNCNAME})      _hostname=$_hostname"
+         _remote_file="${_main_lock_dir}/${_each_host}/remote"
+	 _remote_file_lines=0
+	 test -e ${_remote_file} && _remote_file_lines="$(wc -l < "${_remote_file}")"
+         # first check time
+         _remote_time_result=$(check_time "${_each_host}")
+         # then update the remotepidfile inside, and not updating change time of ^ hosts directory
+#         # update remote only if pid file exists
+#         if test -e "${_main_lock_dir}/${_each_host}/pid"; then
+            ${_debug} && _logme "(${$} ${FUNCNAME})      Appending hostname into ${_remote_file}"
+            echo "${_hostname}" >> "${_remote_file}" # log attempt
+#         fi
+         _logme "($$ ${FUNCNAME}) 'file \'${_each_host//\/}/remote\' has \'${_remote_file_lines}\' lines inside!'"
+         # remove lock and pid, if time expired or script was restarted for too many times
+         if [[ "${_remote_time_result}" -eq "14" ]] || \
+            [[ "${_remote_file_lines}" -ge "${_restarts}" ]]; then
+            _logme "($$ ${FUNCNAME}) '${_each_host//\/}' runs for too long. Removig pid file and lock dir. Host will stop script on own side!"
+            # remove all files, also files like .nfsXXX .tmp or similar
+            rm -f "${_each_host}/"*
+            [ -z "$(ls -A ${_each_host})" ] &&  rmdir "${_each_host}/" && sync
+         fi
+       } 2>/dev/null || continue
+   done
+#   if [[ "${_try_again}" -eq "0" ]]; then
+   _logme "($$ ${FUNCNAME})   removing our host from the race and exit ... "
+   test -d "${_hostname}" && [ -z "$(ls -A ${_hostname})" ] && rmdir "${_hostname}" && sync
+   exit 250
+#   else
+#      sleep "${_small_random_delay}"
+#      start_flow
+#   fi
+}
+
+
 function start_flow(){
-   _logme "($$ ${FUNCNAME}) Entering main loop"
+   sleep ${_small_random_delay}
+   _logme "($$ ${FUNCNAME}) Entering main loop on on host ${_hostname}"
    sync
-   if ! test -w "${_lock_dir}/"; then
-      _logme "($$ ${FUNCNAME})    top level locking directory is missing [${_lock_dir}]"
+   if ! test -w "${_main_lock_dir}/"; then
+      _logme "($$ ${FUNCNAME})    top level locking directory is missing [${_main_lock_dir}]"
    fi
-   _all_host_count="$(ls -1 ${_main_lock_dir}| wc -l)"
-   _my_hostname_count="$(find "${_main_lock_dir}" -name "${_hostname}" | wc -l)"
-   if [[ "${_all_host_count}" -eq "0" ]]; then
+
+   _all_hosts_count="$(find "${_main_lock_dir}/" -mindepth 1 -maxdepth 1 -type d | wc -l)"
+   _all_hosts="$(find "${_main_lock_dir}/" -mindepth 1 -maxdepth 1 -type d)"
+   ${_debug} && _logme "($$ ${FUNCNAME})    content of _main_lock_dir [$(echo ${_all_hosts})]"
+   ${_debug} && _logme "($$ ${FUNCNAME})    _all_hosts_count=${_all_hosts_count}"
+   _this_hostname_count="$(sync && find "${_main_lock_dir}" -name "${_hostname}" | wc -l)"
+   ${_debug} && _logme "(${$} ${FUNCNAME})    _small_random_delay=${_small_random_delay}"
+   if [[ "${_all_hosts_count}" -eq "0" ]]; then
       _logme "($$ ${FUNCNAME})    no other host if running anything right now"
-      _logme "($$ ${FUNCNAME})    making lock directory ${_lock_dir}"
-      mkdir "${_lock_dir}" || { _logme "($$ ${FUNCNAME})      cannot create lock dir ${_lock_dir}" ; exit 255; }
+      _logme "($$ ${FUNCNAME})    making local lock directory ${_local_lock_dir}"
+      mkdir "${_local_lock_dir}" || { _logme "($$ ${FUNCNAME})      cannot create lock dir ${_local_lock_dir}" ; exit 255; }
       sync
       _logme "($$ ${FUNCNAME})    now sleeping for ${_small_random_delay}"
       sleep ${_small_random_delay} # don't rush things
       start_flow
    else # hosts are running things
       _logme "($$ ${FUNCNAME})    lock dirs exist"
-      if [[ "${_my_hostname_count}" -gt "0" ]]; then # my hostname is running script
-         _logme "($$ ${FUNCNAME})    this machine can run this script"
-         if [[ "${_my_hostname_count}" -eq "${_all_host_count}" ]]; then # it's ONLY my hostname
-            _logme "($$ ${FUNCNAME})    ONLY this machine can run this this script"
+      # this hostname is ALSO locking next to others
+      if [[ "${_this_hostname_count}" -gt "0" ]]; then
+         _logme "($$ ${FUNCNAME})    this machine can run a script"
+         # only our host is locking
+         if [[ "${_this_hostname_count}" -eq "${_all_hosts_count}" ]]; then
+            _logme "($$ ${FUNCNAME})    this hostname is ONLY one that can run this script"
             # Is pid file inside and it contains pid?
             _time_result=$(check_time)
             if [[ "${_time_result}" -eq "0" ]]; then
-               touch "${_lock_dir}/pid"
+               touch "${_local_lock_dir}/pid"
                if test -e "${_pidfile}"; then
                   if test -z "$(cat ${_pidfile})" ; then # pidfile exists and is empty
                      _logme "($$ ${FUNCNAME})    we already delayed the start so we can now proceed"
                      # the main command we would like to run inside cron
                      # _command="{ HOSTALIASES=/etc/hosts-LoR ${_command}; }"
-                     # _command_logger="_logme \"($$ ${FUNCNAME})    main command SUCCESSFULLY finished!\""
-                     _logme "($$ ${FUNCNAME})    RUNNING MAIN COMMAND"
+                     # first remove remote file
+                     test -e "${_main_lock_dir}/${_hostname}/remote" && rm -f "${_main_lock_dir}/${_hostname}/remote" && sync
+                     _logme "($$ ${FUNCNAME})    Submitting commands ..."
                      timeout "${_max_runtime}" bash -c "cd ${_exec_dir} && ${_command%;}" & _child="${!}"
-                     echo "${_child}" >> "${_pidfile}" # storing process ID inside the pid file
+                     echo "${_child}" >> "${_pidfile}"
                      # Next line ensures that process is killed if lock pid file disappears
                      {  (  while test -e ${_pidfile} && grep -q "${_child}" "${_pidfile}"; do sleep ${_small_random_delay}; done; \
                            if pgrep -u ${UID} timeout 2>&1 | grep -q ${_child}; then
                               _logme "($$ ${FUNCNAME}) Killing PID ${_child} because the lock pid file disappeared!"; \
                               kill -9 "${_child}"; \
-                              test -d "${_lock_dir}" && echo -n "" > "${_pidfile}"; \
+                              test -d "${_local_lock_dir}" && echo -n "" > "${_pidfile}"; \
                            fi \
                         ) & \
                      } 1>/dev/null 2>&1
                      _logme "($$ ${FUNCNAME}) Waiting for child response ..."
-                     wait ${_child} 2>/dev/null || true   #  true ensures that the cleanup is done
+                     if wait ${_child} 2>/dev/null; then
+                        _logme "($$ ${FUNCNAME})    succeeded!"
+                     else _logme "($$ ${FUNCNAME})    FAILED!"; fi
                      sync
-                     echo -n "" > "${_pidfile}" && sync   # empty pidfile if it is still exist by the end of process
+                     # empty pidfile if it is still exist by the end of process
+                     test -s "${_pidfile}" && echo -n "" > "${_pidfile}" && sync
                      _logme "($$ ${FUNCNAME}) Child process ended, syncing files finished"
                   else # the pid file is not empty
                      _running_pid="$(head -n1 < "${_pidfile}")"
@@ -366,34 +440,23 @@ function start_flow(){
                      ;;
                esac
             fi
+         # other hosts are locking as well as our host
+         else
+            _logme "($$ ${FUNCNAME})    other hosts can run as well"
+            other_hosts_are_running
          fi
-      else # other hosts are running this script
-         _logme "($$ ${FUNCNAME})   there are other hosts running this script"
-         for _each_host in */; do # loop through the hosts directories
-            _remote_pidfile="${_main_lock_dir}/${_each_host}/pid"
-            _remote_running_pid="$(head -n1 < "${_remote_pidfile}")"
-            _remote_pidfile_nr_lines="$(wc -l < "${_remote_pidfile}")"
-            echo "${_remote_running_pid}" >> "${_remote_pidfile}" # duplicating process ID inside pid file
-            _remote_time_result=$(check_time "${_each_host}")
-            # remove lock and pid, if time expired or script was restarted for too many times
-            if [[ "${_remote_time_result}" -eq "14" ]] || \
-               [[ "${_remote_pidfile_nr_lines}" -gt "${_restarts}" ]]; then
-               _logme "($$ ${FUNCNAME}) '${_each_host//\/}' runs script for too long. Removing the lock directory and files inside. Host will clean this processes on its own side!"
-               rm -f "${_each_host}/"*               # remove all files, the selection of just 'time' and 'pid' could make issues
-                                                     # if some other files would appear - like .nfsXXX .tmp or similar
-               rmdir "${_each_host}/"
-            fi
-         done
-         _logme "($$ ${FUNCNAME})   removing our host from the race and exit ... "
-         test -d ${_hostname} && rmdir ${_hostname}
-         exit 250
+      # our host is not locking, only others
+      else
+         _logme "($$ ${FUNCNAME})    other hosts can run as well"
+         other_hosts_are_running
       fi
    fi
 }
 
 _logme "($$ main) _______ Starting _______"
 cd "${_main_lock_dir}"
-clean_stale_pidfiles # first just clean old pids
+# first just clean old pids
+clean_stale_pidfiles
 _return_code="0"
 start_flow 2>&1 || _return_code=${?:-0}
 if [[  "${_return_code}" -ne "0" ]]; then
@@ -410,8 +473,11 @@ if [[  "${_return_code}" -ne "0" ]]; then
    exit 1
 fi
 
+# make sure you sleep for small random delay at the end, before cleaning the lock directores
+# so that they are not cleaned and another parallel process starts accidentaly
+sleep "${_small_random_delay_argument}"
+
 # Cleanning up
-remove_locks
+end_remove_local_locks
 
 _logme "($$ main) _______ Finished _______"
-
