@@ -83,7 +83,7 @@ all:
             - ens5
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r750:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             vt-node-a[01:04]:
               cloud_flavor: umcg_bigmem
@@ -119,33 +119,51 @@ all:
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 3420400
               slurm_features: 'rsc04,tmp04'
+              slurm_weight: 10
               slurm_ethernet_interfaces:
                 - eno12409np1
                 - eno12399np0
-#        virtual:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
-#          hosts:
-#            vt-node-b01:
-#              cloud_flavor: general.v1.large
-#              host_networks:
-#                - name: "{{ stack_prefix }}_internal_management"
-#                  security_group: "{{ stack_prefix }}_cluster"
-#                - name: DH4 Lustre
-#                  security_group: "{{ stack_prefix }}_storage"
-#                - name: lustre
-#                  security_group: "{{ stack_prefix }}_storage"
-#              lustre_client_networks: "{{ lustre_client_networks_vm }}"
-#              local_volume_size_extra: 1
-#              slurm_sockets: 15
-#              slurm_cores_per_socket: 1
-#              slurm_real_memory: 64000
-#              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-#              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
-#              slurm_local_disk: 975
-#              slurm_features: 'tmp04'
-#              slurm_ethernet_interfaces:
-#                - ens3
-#                - ens4
-#                - ens5
+        cpu_r6625:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            vt-node-b[01:06]:
+              cloud_flavor: umcg.v1.bm.192-768-0
+              host_type: baremetal
+              host_networks:
+                - name: "{{ stack_prefix }}_internal_management"
+                  security_group: "{{ stack_prefix }}_cluster"
+                - name: lustre
+                  security_group: "{{ stack_prefix }}_storage"
+              lustre_client_networks:
+                - name: tcp15
+                  interface: eno12399
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+                  label: local
+                  perc_controller: 0
+                  perc_virtual_drive: 239
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
+              slurm_sockets: 2
+              slurm_cores_per_socket: 96
+              slurm_real_memory: 768000
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
+              slurm_local_disk: 2850100
+              slurm_features: 'rsc04,tmp04'
+              slurm_ethernet_interfaces:
+                - eno12409
+                - eno12399
 administration:
   children:
     sys_admin_interface:
