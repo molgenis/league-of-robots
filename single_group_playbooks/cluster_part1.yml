@@ -41,4 +41,8 @@
     - gpu  # Needs to run after 'cluster' role.
     - resolver
     - coredumps
+    - role: perc_cli
+      when: perc_devices is defined and perc_devices
+    - role: local_storage
+      when: local_mounts is defined and local_mounts | length > 0
 ...
