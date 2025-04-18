@@ -98,7 +98,7 @@ _debug=false
 _testing=false               # normally we don't test things, but setting a hostname changes that, and then
                              # we also don't check if remote storage is actually a mount point
 _hostname="$(/bin/hostname)" # for developing and testing - first argument overwrites hostname
-_small_random_delay="10"     # in seconds: how long should script wait (after the lock directory is created)
+_random_delay_default="10"   # in seconds: how long should script wait (after the lock directory is created)
                              # to actually start the command. Delay is a random number between 5 seconds and
                              # this number. It changes at every run. It prevents misconfigured cron timings
                              # for when all nodes are set up to start at the same time.
@@ -111,6 +111,7 @@ _restarts="20"               # how many times can script be restarted and remain
                              # pid file removed
 _try_again=2                 # if we wait in line, let's try again
 
+_small_random_delay_argument="${_random_delay_default}"
 while [[ "${#}" -gt 0 ]]; do
    _arg=${1//\~/${HOME}}
    case "${_arg//=*}" in
@@ -119,7 +120,7 @@ while [[ "${#}" -gt 0 ]]; do
       "--logger-tag")       _logger_tag="${_arg#--*=}" ;;
       "--log-file")         _log_file="${_arg#--*=}" ;;
       "--hostname")         _hostname="${_arg#--*=}"; _testing=true ;;
-      "--randomdelay")      _small_random_delay_argument="${_arg#--*=}" ;;
+      "--randomdelay")      _small_random_delay_arg="${_arg#--*=}" ;;
       "--runtime")          _max_runtime="${_arg#--*=}" ;;
       "--remoteextratime")  _extra_remote_time="${_arg#--*=}" ;;
       "--debug")            _debug=true ;;
@@ -129,9 +130,7 @@ while [[ "${#}" -gt 0 ]]; do
    shift
 done
 
-if [[ "${_small_random_delay}" -ne "${_small_random_delay_argument}" ]]; then
-   _small_random_delay="${_small_random_delay_argument}"
-fi
+_small_random_delay="${_small_random_delay_arg:-${_random_delay_default}}"
 
 # Prepare random delay in seconds: 5 seconds <= delay <= [ random delay number ]
 if [[ "${_small_random_delay}" -gt "5" ]]; then
