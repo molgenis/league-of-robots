@@ -251,7 +251,9 @@ regular_groups:
   - 'umcg-nawijn'
   - 'umcg-neonatology'
   - 'umcg-nephrology'
+  - 'umcg-pgx'
   - 'umcg-pmb'
+  - 'umcg-rad'
   - 'umcg-radicon'
   - 'umcg-rehabilitation'
   - 'umcg-reki'
@@ -346,8 +348,12 @@ regular_users:
     groups: ['umcg-neonatology']
   - user: 'umcg-nephrology-dm'
     groups: ['umcg-nephrology']
+  - user: 'umcg-pgx-dm'
+    groups: ['umcg-pgx']
   - user: 'umcg-pmb-dm'
     groups: ['umcg-pmb']
+  - user: 'umcg-rad-dm'
+    groups: ['umcg-rad']
   - user: 'umcg-radicon-dm'
     groups: ['umcg-radicon']
   - user: 'umcg-rehabilitation-dm'
@@ -457,10 +463,14 @@ sudoers:
     become: 'umcg-neonatology-dm'
   - who: ['%umcg-nephrology-dms']
     become: 'umcg-nephrology-dm'
+  - who: ['%umcg-pgx-dms']
+    become: 'umcg-pgx-dm'
   - who: ['%umcg-pmb-dms']
     become: 'umcg-pmb-dm'
   - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
     become: 'umcg-radicon-dm'
+  - who: ['%umcg-rad-dms']
+    become: 'umcg-rad-dm'
   - who: ['%umcg-rehabilitation-dms']
     become: 'umcg-rehabilitation-dm'
   - who: ['%umcg-reki-dms']
@@ -531,6 +541,7 @@ local_mount_subfolders:
           - umcg-neonatology
           - umcg-nephrology
           - umcg-pmb
+          - umcg-rad
           - umcg-radicon
           - umcg-rehabilitation
           - umcg-reki
@@ -661,7 +672,11 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-nephrology
         mode: '2750'
+      - name: umcg-pgx
+        mode: '2750'
       - name: umcg-pmb
+        mode: '2750'
+      - name: umcg-rad
         mode: '2750'
       - name: umcg-radicon
         mode: '2750'
@@ -732,6 +747,7 @@ lfs_mounts:
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-pmb
+      - name: umcg-rad
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
@@ -837,6 +853,7 @@ lfs_mounts:
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-nephrology
+      - name: umcg-pgx
       - name: umcg-pmb
       - name: umcg-radicon
       - name: umcg-rehabilitation

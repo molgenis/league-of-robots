@@ -110,20 +110,27 @@ all:
       hosts:
         copperfist:
           host_networks:
-            - name: vlan983
+            - name: vlan16
             - name: vlan990
           local_yum_repository: true # enable local yum repository
+          local_mounts:
+            - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
+              device: 'LABEL=local_raid'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: 'defaults,nofail,x-systemd.device-timeout=10'
+              type: xfs
+            - mount_point: '/local'
+              device: '/mnt/local_raid/local'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '2755'
+              mount_options: 'bind,nofail'
+              type: none
     deploy_admin_interface:
       hosts:
         copperfist:
-          local_mounts:
-            - mount_point: '/apps'
-              device: '/mnt/env06/apps/'
-              mounted_owner: root
-              mounted_group: "{{ envsync_group }}"
-              mounted_mode: '2775'
-              mount_options: 'bind'
-              type: none
           main_backup_folder: '/mnt/local_raid/local_backups/'
           local_backups: # list of folders for cron to make daily backup
             - name: apps # Name == ID; don't modify after deployed!
@@ -146,14 +153,6 @@ all:
         regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             copperfist:
-              local_mounts:
-                - mount_point: '/local'
-                  device: '/mnt/local_raid/local'
-                  mounted_owner: root
-                  mounted_group: root
-                  mounted_mode: '2755'
-                  mount_options: 'bind,nofail'
-                  type: none
               slurm_sockets: 2
               slurm_cores_per_socket: 64
               slurm_real_memory: 515456
