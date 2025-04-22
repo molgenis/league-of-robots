@@ -490,8 +490,8 @@ pfs_mounts:
   - pfs: umcgst16
     source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
     type: nfs4    # checked with cat /proc/filesystem
-    rw_options: 'defaults,_netdev,noatime,nodiratime,local_lock=flock'
-    ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
+    rw_options: 'defaults,_netdev,noatime,nodiratime,nofail,local_lock=flock'
+    ro_options: 'defaults,_netdev,noatime,nodiratime,nofail,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -510,13 +510,24 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
-#      - name: umcg-pr
+      # - name: umcg-pr
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: tmp16
     pfs: 'umcgst16'
     groups:
       - name: umcg-atd
+      - name: umcg-gap
+      - name: umcg-gd
+      - name: umcg-genomescan
+      - name: umcg-gsad
+      - name: umcg-gst
+      - name: umcg-lab
+        mode: '2750'
+      - name: umcg-labgnkbh
+      - name: umcg-patho
+      # - name: umcg-pr
+      - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
