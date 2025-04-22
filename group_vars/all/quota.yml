@@ -83,7 +83,7 @@ lfs_quota:
       umcg-micompany: 512
       umcg-muhas: 1024
       umcg-nawijn: 2048
-      umcg-neonatology: 5120
+      umcg-neonatology: 6144
       umcg-nephrology: 3072
       umcg-pgx: 1024
       umcg-pmb: 5120
@@ -221,7 +221,7 @@ lfs_quota:
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 4096
-      umcg-neonatology: 2048
+      umcg-neonatology: 6144
       umcg-nephrology: 1024
       umcg-pgx: 1024
       umcg-pmb: 3072
