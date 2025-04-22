@@ -21,7 +21,7 @@
   community.general.filesystem:
     fstype: "{{ volume['type'] }}"
     dev: "{{ volume['device'] }}"
-    opts: "-L {{ volume['label'] }}"
+    opts: "{% if volume['label'] is defined %}-L {{ volume['label'] }}{% endif %}"
     force: false
     resizefs: true
   when:

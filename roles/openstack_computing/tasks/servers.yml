@@ -88,9 +88,10 @@
         - {{ public_key }}
         {% endif %}
       {% endfor %}
-      {% if local_mounts | default([]) is defined and local_mounts | default([]) | length > 0 %}
+      {% if local_mounts | default([]) is defined
+        and local_mounts | default([]) | rejectattr('device', 'equalto', 'dynamic') | list | length > 0 %}
       mounts:
-        {% for extra_mount in local_mounts | default([]) %}
+        {% for extra_mount in local_mounts | default([]) | rejectattr('device', 'equalto', 'dynamic') | list %}
         - - {{ extra_mount['device'] }}
           - {{ extra_mount['mount_point'] }}
           - {{ extra_mount['type'] }}

@@ -10,9 +10,6 @@
   hosts:
     - beegfs_server
   roles:
-    - role: perc_cli
-      when: perc_devices is defined and perc_devices
-    - local_storage
     - beegfs_server
     #
     # beegfs_client is preferred on server too and will be installed as part of cluster_part2.yml
