@@ -228,6 +228,27 @@ sudoers:
     become: 'umcg-sysops-dm'
   - who: ['%umcg-vipt']
     become: 'umcg-vipt-dm'
+sponsors:
+  umcg-research-it:
+    slurm_shares: 570
+    groups:
+      - 
+  umcg-cvandiemen:
+    slurm_shares: 112
+    groups:
+      - 
+  umcg-lfranke:
+    slurm_shares: 136
+    groups:
+      - 
+  umcg-mswertz:
+    slurm_shares: 570
+    groups:
+      - umcg-atd
+      - umcg-gcc
+      - umcg-gsad
+      - umcg-gst
+      - umcg-sysops
 #
 # Shared storage related variables
 #
