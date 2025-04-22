@@ -1,12 +1,18 @@
 #jinja2: trim_blocks:False
 # Data transfers - Push to or pull from {{ slurm_cluster_name | capitalize }} User Interface via Jumphost with GUI on macOS
 
-On macOS you can use
+On macOS you can use _**SSHFS**_ (SSH File System) to browse the file systems of the {{ slurm_cluster_name | capitalize }} cluster directly in the _**Finder**_
+With SSHFS you will use the _**S**ecure **F**ile **T**ransfer **P**rotocol_, which is basically _FTP_ tunneled over an _SSH_ connection.
 
- * either _**SSHFS**_ (SSH File System) to browse the file systems of the {{ slurm_cluster_name | capitalize }} cluster directly in the _**Finder**_ 
- * or a dedicated _SFTP_ client app like _**ForkLift2**_. 
-
-Both use the _**S**ecure **F**ile **T**ransfer **P**rotocol_, which is basically _FTP_ tunneled over an _SSH_ connection.
+**Important**: starting from _**macOS 15.x Sequoia**_ Apple has deprecated the use of kernel extensions (kexts),
+which will no longer work without overriding system security settings.
+For file systems developers are now supposed to use a new API instead,
+but this API is not finished yet nor properly documented yet, so cannot be used.
+Therefore we currently advise against the use of _**FUSE for macOS**_
+and suggest to use ```rsync``` on the command line instead to transfer data securely.
+For details: 
+ * [https://github.com/macfuse/macfuse/issues/987](https://github.com/macfuse/macfuse/issues/987)
+ * [https://github.com/macfuse/macfuse/issues/1025](https://github.com/macfuse/macfuse/issues/1025)
 
 ## SFTP with SSHFS in the Finder
 
@@ -84,36 +90,6 @@ sshfs -o "defer_permissions,follow_symlinks,noappledouble,noapplexattr,reconnect
 
 If you have access to multiple clusters, which were configured in a similar way, you may have multiple _SSHFS_ mounts,
 which are all mounted with the same ```mount-cluster-drives``` app.
-
-## SFTP with dedicated ForkLift2 client
-
-If you prefer a dedicated Graphical User Interface that is both free and supports multi-hop SSH via a jumphost using your OpenSSH config, we suggest you give _ForkLift 2_ a try.
-You can get _ForkLift 2_ from the [App store](https://apps.apple.com/app/forklift-file-manager-and-ftp-sftp-webdav-amazon-s3-client/id412448059).
-Please note that there is a newer version _ForkLift 3_, but this one is not available from the App store neither is it free.
-There are various other options, but those are either paid apps or they don't support multi-hop SSH using your OpenSSH config.
-
-To start a session with _ForkLift 2_:
-
- * Launch the app; You will see two file browser columns next to each other.  
-   Both will initially show the same contents of your local home dir.  
-   ![Allow access to the Terminal.app](img/ForkLift1.png)  
-   To configure one of the columns to show the contents of the cluster, click on the **star symbol** at the beginning of the path at the top of a column.
- * Click the **+** button to create a new _favorite_  
-   ![Allow access to the Terminal.app](img/ForkLift2.png)  
- * Provide the connection details:  
-   ![Allow access to the Terminal.app](img/ForkLift3b.png)  
-    * _Protocol:_ **SFTP**
-    * _Name_: **{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}**
-    * _Server_: **{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}**
-    * _Username_: your account name as you received it from the helpdesk
-    * Leave the _Password_ field empty.
-    * Optionally you can specify a default encoding and remote path to start browsing on the cluster.  
-   Click the **Save** button to store the new favorite.
- * Your favorite should now be listed under _Favorites_.  
-   ![Allow access to the Terminal.app](img/ForkLift4.png)
- * Click on your new favorite to connect to the server and start a session.
-   ![Allow access to the Terminal.app](img/ForkLift5.png)  
-   Note that if you did not specify an explicit _remote path_ you will start by default in your remote home dir on the cluster, which may be empty.
 
 -----
 
