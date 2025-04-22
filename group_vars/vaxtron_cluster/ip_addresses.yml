@@ -94,7 +94,7 @@ ip_addresses:
       netmask: /32
   vt-node-b06:
     lustre:
-      address: 172.23.13.105
+      address: 172.23.12.246
       netmask: /32
     vt_internal_management:
       address: 10.10.1.198
