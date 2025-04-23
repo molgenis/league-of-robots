@@ -24,6 +24,15 @@ slurm_partitions:
     local_disk: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.333G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-c[01-10]"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r630']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -147,16 +156,13 @@ cloud_image: RockyLinux-9.3_xfs
 cloud_user: cloud-user
 availability_zone: nova
 stack_networks:
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
+  - name: vlan1338  # Internal management for VMs and BMs
+    cidr: '172.23.69.0/24'
+    gateway: '172.23.69.1'
     router_network: vlan16
+    router_name: vlan1338
     type: management
-    external: false
-  - name: "{{ stack_prefix }}_internal_storage"
-    cidr: '10.10.2.0/24'
-    type: storage
-    external: false
+    external: true
   - name: vlan985  # DH4 Lustre
     cidr: '172.23.56.0/22'
     allow_ingress:
@@ -211,6 +217,7 @@ regular_groups:
   - "{{ envsync_group }}"
   - "{{ functional_admin_group }}"
   - 'umcg-atd'
+  - 'umcg-as'
   - 'umcg-biogen'
   - 'umcg-bionic-mdd-gwama'
   - 'umcg-bios'
@@ -244,7 +251,9 @@ regular_groups:
   - 'umcg-nawijn'
   - 'umcg-neonatology'
   - 'umcg-nephrology'
+  - 'umcg-pgx'
   - 'umcg-pmb'
+  - 'umcg-rad'
   - 'umcg-radicon'
   - 'umcg-rehabilitation'
   - 'umcg-reki'
@@ -267,6 +276,10 @@ regular_users:
     groups: ['umcg-atd']
   - user: 'umcg-atd-dm'
     groups: ['umcg-atd']
+  - user: 'umcg-vipbot'
+    groups: ['umcg-as']
+  - user: 'umcg-as-dm'
+    groups: ['umcg-as']
   - user: 'umcg-biogen-dm'
     groups: ['umcg-biogen']
   - user: 'umcg-bionic-mdd-gwama-dm'
@@ -335,8 +348,12 @@ regular_users:
     groups: ['umcg-neonatology']
   - user: 'umcg-nephrology-dm'
     groups: ['umcg-nephrology']
+  - user: 'umcg-pgx-dm'
+    groups: ['umcg-pgx']
   - user: 'umcg-pmb-dm'
     groups: ['umcg-pmb']
+  - user: 'umcg-rad-dm'
+    groups: ['umcg-rad']
   - user: 'umcg-radicon-dm'
     groups: ['umcg-radicon']
   - user: 'umcg-rehabilitation-dm'
@@ -372,6 +389,12 @@ sudoers:
     become: 'umcg-atd-ateambot'
   - who: ['%umcg-atd']
     become: 'umcg-atd-dm'
+  - who: ['%umcg-as']
+    become: 'umcg-capicebot'
+  - who: ['%umcg-as']
+    become: 'umcg-vipbot'
+  - who: ['%umcg-as']
+    become: 'umcg-as-dm'
   - who: ['%umcg-biogen-dms']
     become: 'umcg-biogen-dm'
   - who: ['%umcg-bionic-mdd-gwama-dms']
@@ -440,10 +463,14 @@ sudoers:
     become: 'umcg-neonatology-dm'
   - who: ['%umcg-nephrology-dms']
     become: 'umcg-nephrology-dm'
+  - who: ['%umcg-pgx-dms']
+    become: 'umcg-pgx-dm'
   - who: ['%umcg-pmb-dms']
     become: 'umcg-pmb-dm'
   - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
     become: 'umcg-radicon-dm'
+  - who: ['%umcg-rad-dms']
+    become: 'umcg-rad-dm'
   - who: ['%umcg-rehabilitation-dms']
     become: 'umcg-rehabilitation-dm'
   - who: ['%umcg-reki-dms']
@@ -486,6 +513,7 @@ local_mount_subfolders:
         group: "{{ data_transfer_only_group }}"
       - rel_paths:
           - umcg-atd
+          - umcg-as
           - umcg-biogen
           - umcg-bionic-mdd-gwama
           - umcg-bios
@@ -513,6 +541,7 @@ local_mount_subfolders:
           - umcg-neonatology
           - umcg-nephrology
           - umcg-pmb
+          - umcg-rad
           - umcg-radicon
           - umcg-rehabilitation
           - umcg-reki
@@ -531,11 +560,16 @@ local_mount_subfolders:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
+lustre_client_networks_vm:
   - name: tcp14
-    interface: ens5
+    interface: enp0s3
   - name: tcp20
-    interface: ens6
+    interface: enp0s4
+  - name: tcp15
+    interface: enp0s5
+#
+# lustre_client_networks for baremetal machines specified in static_inventory.
+#
 pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
@@ -569,6 +603,8 @@ lfs_mounts:
     pfs: umcgst04/slice2
     groups:
       - name: umcg-atd
+        mode: '2750'
+      - name: umcg-as
         mode: '2750'
       - name: umcg-biogen
         mode: '2750'
@@ -636,7 +672,11 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-nephrology
         mode: '2750'
+      - name: umcg-pgx
+        mode: '2750'
       - name: umcg-pmb
+        mode: '2750'
+      - name: umcg-rad
         mode: '2750'
       - name: umcg-radicon
         mode: '2750'
@@ -673,6 +713,7 @@ lfs_mounts:
     pfs: umcgst01
     groups:
       - name: umcg-atd
+      - name: umcg-as
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
@@ -706,6 +747,7 @@ lfs_mounts:
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-pmb
+      - name: umcg-rad
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
@@ -725,6 +767,7 @@ lfs_mounts:
     pfs: umcgst02
     groups:
       - name: umcg-atd
+      - name: umcg-as
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
@@ -810,6 +853,7 @@ lfs_mounts:
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-nephrology
+      - name: umcg-pgx
       - name: umcg-pmb
       - name: umcg-radicon
       - name: umcg-rehabilitation

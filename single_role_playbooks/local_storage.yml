@@ -6,5 +6,6 @@
      - data_transfer
      - chaperone
   roles:
-     - local_storage
+     - role: local_storage
+       when: local_mounts is defined and local_mounts | length > 0
 ...

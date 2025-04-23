@@ -34,6 +34,7 @@ lfs_quota:
       umcg-muhas: 1024
       umcg-nawijn: 2048
       umcg-pmb: 2048
+      umcg-rad: 1024
       umcg-rehabilitation: 1024
       umcg-reki: 1024
       umcg-solve-rd: 1024
@@ -65,14 +66,15 @@ lfs_quota:
       umcg-gap: 1024
       umcg-gastrocol: 5120
       umcg-gcc: 1024
-      umcg-gdi: 2048
+      umcg-gdi: 4096
       umcg-gdio: 12288
       umcg-gonl: 10240
-      umcg-griac: 11264
+      umcg-griac: 13312
       umcg-grip: 2048
       umcg-gsad: 1024
       umcg-hematology: 5120
       umcg-hlhs: 3072
+      umcg-immunogenetics: 2048
       umcg-impact: 3072
       umcg-lifelines: 17408
       umcg-lld: 3072
@@ -81,10 +83,10 @@ lfs_quota:
       umcg-micompany: 512
       umcg-muhas: 1024
       umcg-nawijn: 2048
-      umcg-neonatology: 5120
+      umcg-neonatology: 6144
       umcg-nephrology: 3072
       umcg-pgx: 1024
-      umcg-pmb: 1024
+      umcg-pmb: 5120
       umcg-radicon: 5120
       umcg-solve-rd: 8192
       umcg-sysops: 1024
@@ -145,7 +147,7 @@ lfs_quota:
       umcg-dag3: 8192
       umcg-datateam: 2048
       umcg-ejp-rd: 1024
-      umcg-endocrinology: 5120
+      umcg-endocrinology: 2048
       umcg-fg: 7168
       umcg-franke-scrna: 18432
       umcg-fu: 2048
@@ -163,7 +165,7 @@ lfs_quota:
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
-      umcg-lifelines: 102400
+      umcg-lifelines: 46080
       umcg-lld: 8192
       umcg-llnext: 2048
       umcg-mic: 2048
@@ -171,7 +173,7 @@ lfs_quota:
       umcg-nawijn: 4096
       umcg-neonatology: 3072
       umcg-pgx: 1024
-      umcg-pmb: 8192
+      umcg-pmb: 6144
       umcg-rehabilitation: 1024
       umcg-solve-rd: 18432
       umcg-sysops: 1024
@@ -193,28 +195,38 @@ lfs_quota:
       umcg-bios: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
-      umcg-endocrinology: 2048
+      umcg-endocrinology: 5120
       umcg-fg: 10240
       umcg-franke-scrna: 20480
       umcg-fu: 2048
+      umcg-gaf: 2048
       umcg-gap: 1024
+      umcg-gastrocol: 10240
       umcg-gcc: 8192
       umcg-gdi: 1024
       umcg-gdio: 5120
-      umcg-griac: 2048
+      umcg-gonl: 3072
+      umcg-griac: 20480
       umcg-grip: 1024
       umcg-gsad: 1024
+      umcg-hematology: 3072
       umcg-hlhs: 1024
-      umcg-lifelines: 25600
+      umcg-immunogenetics: 2048
+      umcg-impact: 1024
+      umcg-lifelines: 81920
       umcg-lld: 1024
+      umcg-llnext: 2048
       umcg-mic: 2048
       umcg-micompany: 512
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 4096
-      umcg-neonatology: 2048
+      umcg-neonatology: 6144
       umcg-nephrology: 1024
-      umcg-pmb: 1024
+      umcg-pgx: 1024
+      umcg-pmb: 3072
+      umcg-rehabilitation: 1024
+      umcg-rad: 1024
       umcg-radicon: 1024
       umcg-reki: 1024
       umcg-solve-rd: 1024
@@ -223,6 +235,7 @@ lfs_quota:
       umcg-sysops: 1024
       umcg-tifn: 2048
       umcg-ugli: 1024
+      umcg-ukb: 3072
       umcg-verbeek: 1024
       umcg-vdakker: 1024
       umcg-visclasataxia: 1024

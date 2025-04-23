@@ -141,8 +141,8 @@ stack_networks:
     router_network: external
     type: management
     external: false
-  - name: vlan983
-    cidr: '172.23.41.226/23'
+  - name: vlan16
+    cidr: '195.169.22.0/23'
     type: management
     external: true
   - name: vlan990
@@ -427,13 +427,12 @@ local_mount_subfolders:
 # Shared storage related variables
 #
 pfs_mounts:
-  - pfs: local_raid # must already be in /etc/fstab and mounted - f.e. /dev/sda > /mnt/local_raid (pfs somename must be same as /mnt/somename)
-    device: ''
+  - pfs: local_raid
     source: '/mnt'
     type: 'none'
-    rw_options: 'bind,rw'
-    ro_options: 'bind,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
+    rw_options: 'bind,nofail'
+    ro_options: 'bind,ro,nofail'
+    machines: []  # Complete PFS not mounted via shared_storage role. See local_storage role instead.
   - pfs: 'medgen_zincfinger$'
     source: '//storage5.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem
@@ -491,8 +490,8 @@ pfs_mounts:
   - pfs: umcgst16
     source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
     type: nfs4    # checked with cat /proc/filesystem
-    rw_options: 'defaults,_netdev,noatime,nodiratime,local_lock=flock'
-    ro_options: 'defaults,_netdev,noatime,nodiratime,ro'
+    rw_options: 'defaults,_netdev,noatime,nodiratime,nofail,local_lock=flock'
+    ro_options: 'defaults,_netdev,noatime,nodiratime,nofail,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -511,13 +510,24 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
-#      - name: umcg-pr
+      # - name: umcg-pr
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: tmp16
     pfs: 'umcgst16'
     groups:
       - name: umcg-atd
+      - name: umcg-gap
+      - name: umcg-gd
+      - name: umcg-genomescan
+      - name: umcg-gsad
+      - name: umcg-gst
+      - name: umcg-lab
+        mode: '2750'
+      - name: umcg-labgnkbh
+      - name: umcg-patho
+      # - name: umcg-pr
+      - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'

@@ -91,10 +91,12 @@ all:
             - enp5s0
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-a01:
-              cloud_flavor: umcg.v1.bm.28-256-0
+              cloud_flavor: umcg.v1.bm.28-256-0.vlan1337
+              cloud_image: Rocky-9.5
+              cloud_user: rocky
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -103,12 +105,18 @@ all:
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
               lustre_client_networks:
+                #- name: tcp20
+                #  interface: enp130s0f0.1068
                 - name: tcp20
-                  interface: enp130s0f0.1068
+                  interface: eth2.1068
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
-                  device: '/dev/sdb'
+                  #device: '/dev/sdb'
+                  device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+                  label: local
+                  perc_controller: 0
+                  perc_virtual_drive: 1
                   mounted_owner: root
                   mounted_group: root
                   mounted_mode: '0755'
@@ -128,9 +136,11 @@ all:
               slurm_local_disk: 3002000
               slurm_features: 'tmp08'
               slurm_ethernet_interfaces:
-                - enp130s0f0
-                - enp130s0f0.1068
-        cpu_b:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+                #- enp130s0f0
+                #- enp130s0f0.1068
+                - eth2
+                - eth2.1068
+        cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-b01:
               cloud_flavor: umcg.v1.bm.64-512-0
@@ -169,6 +179,31 @@ all:
               slurm_ethernet_interfaces:
                 - enp65s0np0
                 - enp65s0np0.1068
+        cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            tl-node-c01:
+              cloud_flavor: umcg.v1.vm.4-8
+              cloud_image: Rocky-9.5
+              cloud_user: rocky
+              host_networks:
+                - name: vlan1337
+                  security_group: "{{ stack_prefix }}_cluster"
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+              lustre_client_networks:
+                - name: tcp20
+                  interface: enp0s4
+              local_volume_size_extra: 1
+              slurm_sockets: 1
+              slurm_cores_per_socket: 8
+              slurm_real_memory: 257320
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
+              slurm_local_disk: 900
+              slurm_features: 'tmp08'
+              slurm_ethernet_interfaces:
+              - enp0s3
+              - enp0s4
     chaperone:
       hosts:
         tl-chaperone:

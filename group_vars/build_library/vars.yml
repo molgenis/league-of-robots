@@ -42,6 +42,8 @@ regular_users:
     groups: ['vipt']
   - user: 'jkloosterman'
     groups: ['vipt']
+  - user: 'mbeukers'
+    groups: ['vipt']
 sudoers:
   - who: ['%vipt']
     become: 'ALL'
@@ -75,6 +77,10 @@ external_jumphosts:
     hosts:
       - hostname: tunnel
         network: vlan16
+  - group: vaxtron_cluster
+    hosts:
+      - hostname: foyer
+        network: external
 cluster_common_packages:
   RedHat7:
     - apptainer
