@@ -4,15 +4,14 @@ set -ue
 #
 ## Preparing variables
 #
-{% for each_ogm_server in ogm_servers %}
-_PRM_MOUNT="{{ each_ogm_server['prm_location'] }}"
+_PRM_MOUNT="{{ item['prm_location'] }}"
 # check if mount point is set
 if ! mountpoint -q "${_PRM_MOUNT}"; then
    echo "$(date +%Y%m%d-%H%M%S) ${0}: ${_OGM_SERVER} backup folder '${_PRM_MOUNT}' is not mounted, exiting the backup script!"
    exit 1
 fi
-_OGM_SERVER="{{ each_ogm_server['server'] | default("error_remote_server")}}"
-_OGM_USER="{{ each_ogm_server['user'] | default("error_remote_user") }}"
+_OGM_SERVER="{{ item['server'] | default("error_remote_server")}}"
+_OGM_USER="{{ item['user'] | default("error_remote_user") }}"
 _PRM_SERVER_DIR="${_PRM_MOUNT}/${_OGM_SERVER}"
 
 if ! test -d "${_PRM_SERVER_DIR}"; then
@@ -20,11 +19,11 @@ if ! test -d "${_PRM_SERVER_DIR}"; then
    mkdir -m 0750 "${_PRM_SERVER_DIR}"
 fi
 
+{% if item['backup_commands'] is defined and item['backup_commands'] | length > 0 %}
 #
 ## Running commands on remote server
 #
-{% if each_ogm_server['backup_commands'] is defined and each_ogm_server['backup_commands'] | length > 0 %}
-{% for each_command in each_ogm_server['backup_commands'] %}
+{% for each_command in ogm_sever['backup_commands'] %}
 echo "$(date +%Y%m%d-%H%M%S) ${0}: ${_OGM_SERVER} started command {{ each_command['label'] }} ..."
 # Postgres dump of entire database, compressed and stored in the postgres location
 # Prevent timeout during long dump operation, max 4h
@@ -39,11 +38,11 @@ fi
 {% endfor %}
 {% endif %}
 
+{% if item['backup_source_dirs'] is defined and item['backup_source_dirs'] | length > 0 %}
 #
 ## Running rsync
 #
-{% if each_ogm_server['backup_source_dirs'] is defined and each_ogm_server['backup_source_dirs'] | length > 0 %}
-{% for each_directory in each_ogm_server['backup_source_dirs'] %}
+{% for each_directory in item['backup_source_dirs'] %}
 _SERVER_EACHDIR="{{ each_directory | default("wrong_server_dir")}}"
 _PRM_EACHDIR="/${_PRM_SERVER_DIR:-error_prm_dir}/${_SERVER_EACHDIR:-error_server_dir}"
 if ! test -d "${_PRM_EACHDIR}"; then
@@ -62,5 +61,3 @@ fi
 
 {% endfor %}
 {% endif %}
-
-{% endfor %}
