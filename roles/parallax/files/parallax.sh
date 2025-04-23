@@ -242,7 +242,7 @@ function check_time(){
    _time_max_remotetime=$(bc -l <<< "${_time_delay_start} + ${_max_runtime} + ${_extra_remote_time}")
 
    # Collect time from server
-   _timedir="${_main_lock_dir}/${_tmphost}/.testtimedir"
+   _timedir="${_main_lock_dir}/${_tmphost}/.testtimedir.$(date +%s.%N)"
    # clean old directory
    sync && test -d "${_timedir}" && rmdir "${_timedir}" && sync
    mkdir "${_timedir}" && sync
@@ -362,7 +362,7 @@ function start_flow(){
    if [[ "${_all_hosts_count}" -eq "0" ]]; then
       _logme "($$ ${FUNCNAME})    no other host if running anything right now"
       _logme "($$ ${FUNCNAME})    making local lock directory ${_local_lock_dir}"
-      mkdir "${_local_lock_dir}" || { _logme "($$ ${FUNCNAME})      cannot create lock dir ${_local_lock_dir}" ; exit 255; }
+      mkdir "${_local_lock_dir}" 2>/dev/null || { _logme "($$ ${FUNCNAME})      cannot create lock dir ${_local_lock_dir}" ; exit 255; }
       sync
       _logme "($$ ${FUNCNAME})    now sleeping for ${_small_random_delay}"
       sleep ${_small_random_delay} # don't rush things
@@ -387,7 +387,10 @@ function start_flow(){
                      # first remove remote file
                      test -e "${_main_lock_dir}/${_hostname}/remote" && rm -f "${_main_lock_dir}/${_hostname}/remote" && sync
                      _logme "($$ ${FUNCNAME})    Submitting commands ..."
-                     timeout "${_max_runtime}" bash -c "cd ${_exec_dir} && ${_command%;}" & _child="${!}"
+                     # Sleep at the end is important! It keeps the proccess with
+                     # registered PID number opened, and prevents other proccess
+                     # to run at the same time!
+                     timeout "${_max_runtime}" bash -c "cd ${_exec_dir} && ${_command%;}; sleep ${_small_random_delay}" & _child="${!}"
                      echo "${_child}" >> "${_pidfile}"
                      # Next line ensures that process is killed if lock pid file disappears
                      {  (  while test -e ${_pidfile} && grep -q "${_child}" "${_pidfile}"; do sleep ${_small_random_delay}; done; \
