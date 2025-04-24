@@ -114,7 +114,7 @@ The following types of shared storage are available on {{ slurm_cluster_name | c
   Designed for temporary storage of intermediate files and new results produced by jobs running on the compute nodes of the cluster.
 {% endif %}
 
-Note that your group(s) may have access to only a subset of shared storage types and not all types are available on all clusters.
+Note that your group(s) may have access to only a subset of shared storage types and not all types are available on all clusters. The minimal requirements for a main group can be found [here](../new_group/#minimal-requirements). 
 
 ## Quota
 
