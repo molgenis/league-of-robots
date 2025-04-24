@@ -201,8 +201,8 @@
   become: true
 
 - name: 'Install Slurm job_submit.lua script.'
-  ansible.builtin.copy:
-    src: "files/job_submit.lua.el{% if ansible_facts['distribution_major_version'] is version('8', '>=') %}8{% else %}7{% endif %}"
+  ansible.builtin.template:
+    src: "job_submit.lua.el{% if ansible_facts['distribution_major_version'] is version('8', '>=') %}8{% else %}7{% endif %}.j2"
     dest: '/etc/slurm/job_submit.lua'
     owner: 'root'
     group: 'root'

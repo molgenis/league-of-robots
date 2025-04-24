@@ -162,7 +162,15 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
-
+sponsors:
+  umcg-research-it:
+    slurm_shares: 570
+  umcg-cvandiemen:
+    slurm_shares: 112
+  umcg-lfranke:
+    slurm_shares: 136
+  umcg-mswertz:
+    slurm_shares: 570
 # Remote archive settings
 archive_groups:
   - name: arc01
@@ -185,6 +193,12 @@ regular_groups:
   - 'umcg-gsad'
   - 'umcg-gst'
   - 'umcg-sysops'
+group_sponsors:
+  umcg-atd: umcg-mswertz
+  umcg-gcc: umcg-mswertz
+  umcg-gsad: umcg-mswertz
+  umcg-gst: umcg-mswertz
+  umcg-sysops: umcg-research-it
 regular_users:
   # Note, for chaperone machines this is controlled in the static_inventories.
   - user: "{{ envsync_user }}"
@@ -228,27 +242,6 @@ sudoers:
     become: 'umcg-sysops-dm'
   - who: ['%umcg-vipt']
     become: 'umcg-vipt-dm'
-sponsors:
-  umcg-research-it:
-    slurm_shares: 570
-    groups:
-      - 
-  umcg-cvandiemen:
-    slurm_shares: 112
-    groups:
-      - 
-  umcg-lfranke:
-    slurm_shares: 136
-    groups:
-      - 
-  umcg-mswertz:
-    slurm_shares: 570
-    groups:
-      - umcg-atd
-      - umcg-gcc
-      - umcg-gsad
-      - umcg-gst
-      - umcg-sysops
 #
 # Shared storage related variables
 #

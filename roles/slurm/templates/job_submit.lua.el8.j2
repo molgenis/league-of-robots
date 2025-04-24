@@ -1,3 +1,4 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
 --[[
 
  This lua script:
@@ -23,6 +24,26 @@
     slurm-VERSION/src/plugins/job_submit/lua/
 
 --]]
+
+--
+-- List with sponsor for each group.
+-- Jobs are submitted to the sponsor's Slurm account,
+-- which determines the prio based on the sponsor's slurm shares and fair share usage of that share.
+--
+sponsor_shares = {
+  {% for sponsor in sponsors %}
+    {['{{ sponsor }}'], '{{ sponsors[sponsor]["slurm_shares"] }}'},
+  {% endfor %}
+}
+group_sponsors = {
+  {% for regular_group in regular_groups %}
+    {% if group_sponsors[regular_group] is defined %}
+    {['{{ regular_group }}'], '{{ group_sponsors[regular_group] }}'},
+    {% endif %}
+  {% endfor %}
+}
+
+{% raw %}
 
 --
 -- Only for debugging.
@@ -242,6 +263,20 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
             return slurm.ESLURM_NOT_SUPPORTED
         end
     end
+    if group ~= nil then
+        slurm.log_error(
+            "Failed to determine group for this job.\n" ..
+            "Rejecting job named %s from user %s (uid=%u).", tostring(job_metadata_value), tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
+        slurm.log_user(
+            "Failed to determine group for this job.\n" ..
+            "Contact the helpdesk.\n" ..
+            "Rejecting job named %s from user %s (uid=%u).", tostring(job_metadata_value), tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
+        return slurm.ESLURM_NOT_SUPPORTED
+    end
+    --
+    -- Lookup sponsor for group.
+    --
+    local sponsor = 
     slurm.log_debug("Job's feature list contains: %s.", tostring(job_desc.features))
     --
     -- Process final list of features:
@@ -273,7 +308,7 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
         slurm.log_error("Failed to create association in the Slurm accounting database for user %s in account/group %s", tostring(submit_user.name), tostring(group))
         slurm.log_error("Rejecting job named %s from user %s (uid=%u).", tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
         slurm.log_user("Failed to create association in the Slurm accounting database.")
-        slurm.log_user("Contact an admin if this is reproducible.")
+        slurm.log_user("Contact the helpdesk if this is reproducible.")
         slurm.log_user("Rejecting job named %s from user %s (uid=%u).", tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
         return slurm.ESLURM_INVALID_ACCOUNT
     end
@@ -389,3 +424,4 @@ end
 
 slurm.log_info("Initialized")
 return slurm.SUCCESS
+{% endraw %}
