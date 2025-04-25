@@ -97,6 +97,13 @@ ip_addresses:
     vlan1068:
       address: 172.23.60.13
       netmask: /32
+  nb-node-c03:
+    vlan1338:
+      address: 172.23.69.54
+      netmask: /32
+    vlan1068:
+      address: 172.23.60.25
+      netmask: /32
   nb-repo:
     vlan1338:
       address: 172.23.69.140
