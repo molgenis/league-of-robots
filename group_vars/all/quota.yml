@@ -182,7 +182,7 @@ lfs_quota:
       umcg-ukb: 3072
       umcg-vdakker: 1024
       umcg-verbeek: 1024
-      umcg-weersma: 20480
+      umcg-weersma: 10240
       umcg-wijmenga: 2048
   tmp02:
     quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
@@ -239,7 +239,7 @@ lfs_quota:
       umcg-verbeek: 1024
       umcg-vdakker: 1024
       umcg-visclasataxia: 1024
-      umcg-weersma: 1024
+      umcg-weersma: 11264
       umcg-wijmenga: 0
   tmp04:
     quota_pid_increment: 300000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
