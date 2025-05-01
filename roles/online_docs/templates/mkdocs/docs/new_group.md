@@ -10,7 +10,7 @@ The information needed to request a new group, includes:
     * Datamanager(s)
     * Group member(s)
 
-For each of the persons mentioned above, we need a confirmation from the secretary on the enddate of their contract with the UMCG.
+For each of the persons mentioned above, we need a confirmation of the enddate of their contract. If the person is employed by the UMCG, we need the confirmation from their secretary.
 
 ## Minimal requirements
 
@@ -29,7 +29,7 @@ available) storage systems and
 to use, etc.
     * Enforce the group's policy on what to store how and where by reviewing data sets produced by other group 
 members on ```tmp``` file systems before migrating/copying them to ```prm``` or ```arc``` (if available).
-    * Can put released versions of data sets on ```rsc``` storage, so it can be used as reference data by alle 
+    * Can put released versions of data sets on ```rsc``` storage, so it can be used as reference data by all 
 members of the group.
     * Have read-write access to all file systems including ```prm```, ```rsc``` (if available) and ```arc``` (if 
 available).
