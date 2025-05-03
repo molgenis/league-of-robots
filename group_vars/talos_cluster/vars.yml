@@ -163,13 +163,13 @@ functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
 sponsors:
-  umcg-research-it:
+  - name: umcg-research-it
     slurm_shares: 570
-  umcg-cvandiemen:
+  - name: umcg-cvandiemen
     slurm_shares: 112
-  umcg-lfranke:
+  - name: umcg-lfranke
     slurm_shares: 136
-  umcg-mswertz:
+  - name: umcg-mswertz
     slurm_shares: 570
 # Remote archive settings
 archive_groups:
@@ -193,12 +193,14 @@ regular_groups:
   - 'umcg-gsad'
   - 'umcg-gst'
   - 'umcg-sysops'
+  - 'umcg-vipt'
 group_sponsors:
   umcg-atd: umcg-mswertz
   umcg-gcc: umcg-mswertz
   umcg-gsad: umcg-mswertz
   umcg-gst: umcg-mswertz
   umcg-sysops: umcg-research-it
+  umcg-vipt: umcg-mswertz
 regular_users:
   # Note, for chaperone machines this is controlled in the static_inventories.
   - user: "{{ envsync_user }}"

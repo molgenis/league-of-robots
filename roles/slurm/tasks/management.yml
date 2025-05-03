@@ -207,6 +207,8 @@
     owner: 'root'
     group: 'root'
     mode: '0755'
+  tags:
+    - job_submit
   become: true
 
 - name: 'Create folders for systemd override files.'
@@ -250,7 +252,7 @@
     - 'slurmdbd.service'
   become: true
 
-- name: 'Copy Slurm DB initialization script to host running slurmdbd.'
+- name: 'Copy Slurm DB configuration script to host running slurmdbd.'
   ansible.builtin.template:
     src: 'templates/configure_slurm_accounting_db.bash'
     dest: '/etc/slurm/configure_slurm_accounting_db.bash'
@@ -266,20 +268,11 @@
 - name: 'Flush handlers.'
   ansible.builtin.meta: flush_handlers
 
-- name: 'Execute Slurm DB initialization script on host running slurmdbd.'  # noqa no-changed-when
+- name: 'Execute Slurm DB configuration script on host running slurmdbd.'  # noqa no-changed-when
   ansible.builtin.command:
     cmd: '/etc/slurm/configure_slurm_accounting_db.bash'
-  register: command_result
-  retries: 3
+  retries: 1
   delay: 5
-  until:
-    - command_result.stderr|length == 0
-    - command_result.stdout|length > 0
-  # NOTE: cannot use command_result.rc to check for the exit value of script in failed_when or changed_when
-  #       as the sacctmgr commands used in the script may return exit code 1 when trying to create/modify
-  #       something that already exists. This results in "Nothing new added." on STDOUT, but no message on STDERR.
-  #       In case something is really wrong there will be messags printed to STDERR.
-  failed_when: command_result.stderr|length > 0
   tags: 'create_database'
   become: true
 
@@ -335,20 +328,15 @@
   when: functional_admin_group is defined and functional_admin_group | length >= 1
   become: true
 
-- name: 'Deploy cron script for creating missing slurm group accounts in the database.'
-  ansible.builtin.copy:
-    src: 'files/cron_add_missing_slurm_accounts.sh'
-    dest: '/root/cron_add_missing_slurm_accounts.sh'
-    owner: 'root'
-    group: 'root'
-    mode: '0750'
-  become: true
-
-- name: 'Deploy cron job to create missing slurm group accounts in the slurm database, run every half an hour.'
+- name: 'Remove cron job to create missing slurm group accounts in the slurm database: accounts must be created/updated by playbook.'
   ansible.builtin.cron:
     name: 'Add missing slurm group accounts'
-    minute: '24,54'
-    hour: '*'
-    job: '/root/cron_add_missing_slurm_accounts.sh'
+    state: absent
+  become: true
+
+- name: 'Remove script for creating missing slurm group accounts in the database: accounts must be created/updated by playbook.'
+  ansible.builtin.file:
+    path: '/root/cron_add_missing_slurm_accounts.sh'
+    state: absent
   become: true
 ...
