@@ -286,7 +286,7 @@ regular_users:
     groups: ['umcg-ejp-rd']
   - user: 'umcg-endocrinology-dm'
     groups: ['umcg-endocrinology']
-  - user: '%umcg-erdera-dms'
+  - user: 'umcg-erdera-dm'
     groups: ['umcg-erdera']
   - user: 'umcg-fg-dm'
     groups: ['umcg-fg']
@@ -393,6 +393,8 @@ sudoers:
     become: 'umcg-ejp-rd-dm'
   - who: ['%umcg-endocrinology-dms']
     become: 'umcg-endocrinology-dm'
+  - who: ['%umcg-erdera-dms']   
+    become: 'umcg-erdera-dm'
   - who: ['%umcg-gcc']
     become: 'umcg-gcc-dm'
   - who: ['%umcg-fg-dms']
