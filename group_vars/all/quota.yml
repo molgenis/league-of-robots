@@ -9,6 +9,7 @@ lfs_quota:
       umcg-bios: 12288
       umcg-dag3: 1024
       umcg-datateam: 1024
+      umcg-erdera: 1024
       umcg-fg: 11264
       umcg-franke-scrna: 1024
       umcg-fu: 2048
@@ -59,6 +60,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-ejp-rd: 1024
       umcg-endocrinology: 1024
+      umcg-erdera: 1024
       umcg-fg: 3072
       umcg-franke-scrna: 1024
       umcg-fu: 2048
@@ -249,6 +251,7 @@ lfs_quota:
       umcg-biogen: 56320
       umcg-bios: 1024
       umcg-dag3: 1024
+      umcg-erdera: 1024
       umcg-fg: 4096
       umcg-franke-scrna: 14336
       umcg-gcc: 9216
