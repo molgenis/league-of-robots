@@ -273,8 +273,13 @@ for sponsor in "${!sponsors[@]}"; do
 	else
 		printf 'Account for sponsor "%s" already exists.\n' "${sponsor}"
 	fi
-	sacctmgr -i modify account "${sponsor}" set FairShare="${sponsors[${sponsor}]}" \
-		Descr=sponsor Org=various Parent=users
+	account_found="$(sacctmgr --parsable2 --noheader show account "${sponsor}" withassoc format=ParentName,Account,Share,Desc,Org)"
+	if [[ "${account_found}" != "users|${sponsor}|${sponsors[${sponsor}]}|sponsor|various" ]]; then
+		sacctmgr -i modify account "${sponsor}" set FairShare="${sponsors[${sponsor}]}" \
+			Descr=sponsor Org=various Parent=users
+	else
+		printf 'Account for sponsor "%s" already up-to-date: nothing modified.\n' "${sponsor}"
+	fi
 done
 #
 # Create/update group accounts.
@@ -292,8 +297,13 @@ for group in "${!groups[@]}"; do
 	else
 		printf 'Account for group "%s" already exists.\n' "${group}"
 	fi
-	sacctmgr -i modify account "${group}" set Parent="${groups[${group}]}" \
-		Descr=group Org=various FairShare=parent
+	account_found="$(sacctmgr --parsable2 --noheader show account "${group}" withassoc format=ParentName,Account,Share,Desc,Org)"
+	if [[ "${account_found}" != "${groups[${group}]}|${group}|parent|group|various" ]]; then
+		sacctmgr -i modify account "${group}" set Parent="${groups[${group}]}" \
+			Descr=group Org=various FairShare=parent
+	else
+		printf 'Account for group "%s" already up-to-date: nothing modified.\n' "${sponsor}"
+	fi
 done
 #
 ##
