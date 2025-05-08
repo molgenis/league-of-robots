@@ -5,7 +5,7 @@
   register: fw_reg
   changed_when: fw_reg.rc == 0
   delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-  loop: "{{ logs_class_servers }}"
+  loop: "{{ cluster_class_servers }}"
   become: true
   notify: client_restart_rsyslog
   listen: restart_server_firewall
@@ -17,7 +17,7 @@
     name: rsyslog.service
     state: restarted
   delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-  loop: "{{ logs_class_servers }}"
+  loop: "{{ cluster_class_servers }}"
   become: true
   listen: restart_server_rsyslog
   vars:

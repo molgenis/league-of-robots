@@ -38,9 +38,9 @@ additional_etc_hosts:
       - name: ladap
         network: donbot_external_network
 #
-# Remote logging settings - for diagnostics servers
+# Cluster classification (used by `logs` and `login` roles)
 #
-logs_class: 'development'
+cluster_class: 'development'
 #
 # Ldap settings
 #
