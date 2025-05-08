@@ -12,6 +12,8 @@
   with_items: "{{ main_groups }}"
   loop_control:
     loop_var: main_group
+  tags:
+    - groups
   changed_when: false
   register: getent_versioned_subgroups
 
@@ -34,6 +36,8 @@
   with_items: "{{ main_groups }}"
   loop_control:
     loop_var: main_group
+  tags:
+    - groups
   changed_when: false
   register: getent_unversioned_subgroups
 

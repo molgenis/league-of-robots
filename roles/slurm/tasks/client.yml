@@ -192,6 +192,7 @@
         (inventory_hostname in groups['compute_node'])
   tags:
     - nhc
+    - groups
   become: true
 
 - name: 'Install logrotate config file for slurmd.'
