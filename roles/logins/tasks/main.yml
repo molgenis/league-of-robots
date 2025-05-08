@@ -157,4 +157,11 @@
   when:
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= "8"
+
+- name: Extend pam.d/sshd to limit limit user ssh resources
+  ansible.builtin.include_tasks:
+    file: limitedusers.yml
+  when:
+   - inventory_hostname not in groups['deploy_admin_interface'] | default([])
+   - cluster_class | default('') != 'diagnostics'
 ...
