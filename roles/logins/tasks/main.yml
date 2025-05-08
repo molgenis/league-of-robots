@@ -162,6 +162,6 @@
   ansible.builtin.include_tasks:
     file: limitedusers.yml
   when:
-   - inventory_hostname not in groups['deploy_admin_interface'] | default([])
-   - cluster_class | default('') != 'diagnostics'
+    - inventory_hostname not in groups['deploy_admin_interface'] | default([])
+    - cluster_class | default('') != 'diagnostics'
 ...
