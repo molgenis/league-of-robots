@@ -9,6 +9,7 @@ lfs_quota:
       umcg-bios: 12288
       umcg-dag3: 1024
       umcg-datateam: 1024
+      umcg-erdera: 1024
       umcg-fg: 11264
       umcg-franke-scrna: 1024
       umcg-fu: 2048
@@ -59,6 +60,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-ejp-rd: 1024
       umcg-endocrinology: 1024
+      umcg-erdera: 1024
       umcg-fg: 3072
       umcg-franke-scrna: 1024
       umcg-fu: 2048
@@ -173,7 +175,7 @@ lfs_quota:
       umcg-nawijn: 4096
       umcg-neonatology: 3072
       umcg-pgx: 1024
-      umcg-pmb: 6144
+      umcg-pmb: 1024
       umcg-rehabilitation: 1024
       umcg-solve-rd: 18432
       umcg-sysops: 1024
@@ -182,7 +184,7 @@ lfs_quota:
       umcg-ukb: 3072
       umcg-vdakker: 1024
       umcg-verbeek: 1024
-      umcg-weersma: 20480
+      umcg-weersma: 10240
       umcg-wijmenga: 2048
   tmp02:
     quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
@@ -224,7 +226,7 @@ lfs_quota:
       umcg-neonatology: 6144
       umcg-nephrology: 1024
       umcg-pgx: 1024
-      umcg-pmb: 3072
+      umcg-pmb: 8192
       umcg-rehabilitation: 1024
       umcg-rad: 1024
       umcg-radicon: 1024
@@ -239,7 +241,7 @@ lfs_quota:
       umcg-verbeek: 1024
       umcg-vdakker: 1024
       umcg-visclasataxia: 1024
-      umcg-weersma: 1024
+      umcg-weersma: 11264
       umcg-wijmenga: 0
   tmp04:
     quota_pid_increment: 300000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
@@ -249,6 +251,7 @@ lfs_quota:
       umcg-biogen: 56320
       umcg-bios: 1024
       umcg-dag3: 1024
+      umcg-erdera: 1024
       umcg-fg: 4096
       umcg-franke-scrna: 14336
       umcg-gcc: 9216

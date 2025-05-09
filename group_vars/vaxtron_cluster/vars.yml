@@ -217,6 +217,7 @@ regular_groups:
   - 'umcg-dag3'
   - 'umcg-datateam'
   - 'umcg-ejp-rd'
+  - 'umcg-erdera'
   - 'umcg-endocrinology'
   - 'umcg-fg'
   - 'umcg-franke-scrna'
@@ -285,6 +286,8 @@ regular_users:
     groups: ['umcg-ejp-rd']
   - user: 'umcg-endocrinology-dm'
     groups: ['umcg-endocrinology']
+  - user: 'umcg-erdera-dm'
+    groups: ['umcg-erdera']
   - user: 'umcg-fg-dm'
     groups: ['umcg-fg']
   - user: 'umcg-franke-scrna-dm'
@@ -390,6 +393,8 @@ sudoers:
     become: 'umcg-ejp-rd-dm'
   - who: ['%umcg-endocrinology-dms']
     become: 'umcg-endocrinology-dm'
+  - who: ['%umcg-erdera-dms']   
+    become: 'umcg-erdera-dm'
   - who: ['%umcg-gcc']
     become: 'umcg-gcc-dm'
   - who: ['%umcg-fg-dms']
@@ -542,6 +547,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-dag3
         mode: '2750'
+      - name: umcg-erdera
+        mode: '2750'
       - name: umcg-fg
         mode: '2750'
       - name: umcg-franke-scrna
@@ -576,6 +583,7 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-ejp-rd
       - name: umcg-endocrinology
+      - name: umcg-erdera
       - name: umcg-fg
       - name: umcg-franke-scrna
       - name: umcg-fu
@@ -627,6 +635,7 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-ejp-rd
       - name: umcg-endocrinology
+      - name: umcg-erdera
       - name: umcg-fg
       - name: umcg-franke-scrna
       - name: umcg-fu
