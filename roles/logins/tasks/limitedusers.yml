@@ -1,5 +1,5 @@
 ---
-- name: 'Install limitedusers.sh script into /etc/security/'
+- name: 'Install limitedusers.sh script into /etc/pam-script.d/'
   ansible.builtin.template:
     src: limitedusers.sh
     dest: /etc/pam-script.d/limitedusers.sh
