@@ -102,7 +102,7 @@ The steps are:
    file, and in the `group_vars/logs_library/ip_addresses.yml`
  - initialize the apropriate client LOR stack environment and on them deploy the same `single_group_playbooks/logs.yml`
  - in order for jumphost jump to work (explained in VI.
-   - the invididual stack have to have the logs servers added in the `additional_etc_hosts` in the file `group_vars/[stack]/vars.yml`
+   - the individual stacks need the logs servers added to the `additional_etc_hosts` variable in the file `group_vars/[stack]/vars.yml`
    - `single_role_playbooks/static_hostname_lookup.yml` needs to be run on the jumphosts of that individual stack
    - the variable `iptables_allow_ssh_inbound` in the `group_vars/logs.yml` must contain correct jumphost's value and iptables redeployed
 
