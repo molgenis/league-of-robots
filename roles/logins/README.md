@@ -23,8 +23,7 @@ the login stil gets processed.
 
 ## Script
 
-The script uses systemd's command line to modify user slice. `systemctl` limit
-CPU and RAM of the users .slice. 
+The script uses systemd's command line tool `systemctl` to modify the CPU and RAM limit of the user's slice. 
 
 Script controls users that
 
