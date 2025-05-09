@@ -18,7 +18,7 @@ This is done with the following line in the `/etc/pam.d/sshd` file
      session    optional     pam_exec.so /etc/pam-script.d/limitedusers.sh
 ```
 
-A script `/etc/security/limitedusers.sh` is called at the login, but upon error
+A script `/etc/pam-script.d/limitedusers.sh` is called at the login, but upon error
 the login stil gets processed.
 
 ## Script
