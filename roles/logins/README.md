@@ -3,8 +3,8 @@
 ## PAM
 
 Systemd manages all users slices. These slices are located under main `user.slice`.
-Cgroups v2 can be managed separately, but users still cannot be moved into those
-because systemd already exclusively manage user slice.
+Cgroups v2 can be managed separately, but users cannot be moved into another slice hierarchy,
+because `systemd` already exclusively manages user slices.
 
 Therefore we manage user's resource availability, with help of systemd slice
 modification. Limitation on the slice is per individual user.
