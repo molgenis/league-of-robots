@@ -15,7 +15,7 @@ new user logs into the system via ssh.
 This is done with the following line in the `/etc/pam.d/sshd` file
 
 ```
-     session    optional     pam_exec.so /etc/security/limitedusers.sh
+     session    optional     pam_exec.so /etc/pam-script.d/limitedusers.sh
 ```
 
 A script `/etc/security/limitedusers.sh` is called at the login, but upon error
