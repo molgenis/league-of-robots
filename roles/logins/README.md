@@ -30,8 +30,7 @@ Script controls users that
  - have UID > 1000
  - are not part of the admin group
 
-Users that get elevated permissions, are still on the SAME slice limitation as
-user that executed su or sudo command.
+Users that gain elevated permissions by switching to another account using `su` or `sudo` are still on the *same* slice and hence cannot escape the limits from their original login account.
 
 ## systemd control groups vs slurm
 
