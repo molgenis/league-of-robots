@@ -1,0 +1,19 @@
+---
+- name: 'Install limitedusers.sh script into /etc/pam-script.d/'
+  ansible.builtin.template:
+    src: limitedusers.sh
+    dest: /etc/pam-script.d/limitedusers.sh
+    owner: root
+    group: root
+    mode: '0750'
+  become: true
+- name: Add limitedusers.sh in pam.d/sshd to limit user ssh resources
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/sshd
+    search_string: '^.*/limitedusers.sh$'
+    line: 'session    optional     pam_exec.so /etc/pam-script.d/limitedusers.sh'
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+...

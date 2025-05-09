@@ -71,9 +71,9 @@
 #
 # Log servers.
 #
-  {% for logs_class in logs_server_public_networks %}
-      {% for item in logs_server_public_networks[logs_class] %}
-{{ "%-15s" | format(all_ip_addresses[item['name']][item['network']].address) }}    {{ item['name'] }}       # {{ logs_class }}
+  {% for cluster_class in logs_server_public_networks %}
+      {% for item in logs_server_public_networks[cluster_class] %}
+{{ "%-15s" | format(all_ip_addresses[item['name']][item['network']].address) }}    {{ item['name'] }}       # {{ cluster_class }}
       {% endfor %}
   {% endfor %}
 {% endif %}

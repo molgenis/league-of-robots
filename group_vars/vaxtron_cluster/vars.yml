@@ -50,7 +50,10 @@ slurm_qos_limit_fractions:
     user: 0.2
   interactive-short:
     user: 0.5
-logs_class: 'research'
+#
+# Remote logging settings - for diagnostics servers
+#
+cluster_class: 'research'
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
 figlet_font: 'ogre'

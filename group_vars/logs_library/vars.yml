@@ -48,8 +48,10 @@ regular_groups:
 regular_users:
   - user: "logstoprm"
     groups: "umcg-logstoprm"
-# Logs CA key name: 'development' (default), 'research' or 'diagnostics'
-logs_class: 'development'
+#
+# Cluster classification (used by `logs` and `login` roles)
+#
+cluster_class: 'development'
 # logs collecting variables for rsyncd modules and logs_servers cron scripts
 logstoprm_rsyncd_module:
   username: 'logstoprm'          # must be defined in users.yml and ^ in regular_users

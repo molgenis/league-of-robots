@@ -86,26 +86,26 @@ and on the repository at the
 ! Note: CA and client certificates are generated with `gnutls`, while the communication has
 been later switched to `openssl`.
 
-## V. Deploying a new type of logs server f.e. 'diagnostics'
+## V. Deploying a new type of logs server f.e. 'development'
 
-Every logs type, needs it's own server, to which the clients can connect.
+Every logs type needs it's own server to which the clients can connect.
 
 The steps are:
- - in the `static_inventory/logs_library.yml` define a new instance
- - assign the correct `logs_class` variable for individual instance- example 'diagnostics':
-     `logs_class: 'development'`
- - deploy the new server and run the `single_group_playbooks/logs.yml` on top of it
- - define the client's environment to use the same type of logs servers - example Hyperchicken:
-   (edit the `group_vars/hyperchicken_cluster/vars.yml` and configure the lines)
-   `logs_class: 'development'` or `logs_class: 'diagnostics'`
-   Where the stack's logs servers values are already defined in the `static_inventory/logs_library.yml`
-   file, and in the `group_vars/logs_library/ip_addresses.yml`
- - initialize the apropriate client LOR stack environment and then deploy the same `single_group_playbooks/logs.yml`
- - in order for jumphost jump to work (explained in VI.
+- Define a new logs server instance in `static_inventory/logs_library.yml`.
+- Assign the correct `cluster_class` to the new instance. E.g. for 'development':
+    `cluster_class: 'development'`
+- Create the new logs server and run `single_group_playbooks/logs.yml` to configure it.
+- Define the client's environment to use the same `cluster_class`.
+  E.g. for _Hyperchicken_ edit `group_vars/hyperchicken_cluster/vars.yml` and configure:
+  `cluster_class: 'development'`
+  This will allow the client to lookup info for the logs server from
+     `static_inventory/logs_library.yml`
+     `group_vars/logs_library/ip_addresses.yml`
+- Initialize the apropriate client LOR stack environment and then deploy the same `single_group_playbooks/logs.yml`
+- In order for jumphost jump to work (explained in VI.
    - the individual stacks need the logs servers added to the `additional_etc_hosts` variable in the file `group_vars/[stack]/vars.yml`
    - `single_role_playbooks/static_hostname_lookup.yml` needs to be run on the jumphosts of that individual stack
    - the variable `iptables_allow_ssh_inbound` in the `group_vars/logs.yml` must contain correct jumphost's value and the `iptables` role must be redeployed.
-
 
 ## VI. Client connections to the logs server
 
@@ -172,7 +172,7 @@ For example you want to add `earl5` for `research`
 1. Define `earl5` in the `static_inventories/logs_library.yml`
     ```
         earl5:
-          logs_class: 'research'
+          cluster_class: 'research'
           cloud_flavor: m1.small
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
