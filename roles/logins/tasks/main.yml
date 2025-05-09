@@ -158,7 +158,7 @@
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= "8"
 
-- name: Extend pam.d/sshd to limit limit user ssh resources
+- name: Extend PAM stack to limit resources for users that login via SSH.
   ansible.builtin.include_tasks:
     file: limitedusers.yml
   when:
