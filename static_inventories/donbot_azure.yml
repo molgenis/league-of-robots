@@ -18,6 +18,7 @@ all:
           create_ldap: true
           ldap_domains:
             stack:
+              # ladap.westeurope.cloudapp.azure.com"
               uri: "ldaps://ladap"
               base: "dc={{ stack_name }},dc=local"
               schema: rfc2307bis
