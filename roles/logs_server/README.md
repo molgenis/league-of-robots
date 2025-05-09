@@ -98,7 +98,7 @@ The steps are:
  - define the client's environment to use the same type of logs servers - example Hyperchicken:
    (edit the `group_vars/hyperchicken_cluster/vars.yml` and configure the lines)
    `logs_class: 'development'` or `logs_class: 'diagnostics'`
-   Where the stacks logs servers values are already defined in the `static_inventory/logs_library.yml`
+   Where the stack's logs servers values are already defined in the `static_inventory/logs_library.yml`
    file, and in the `group_vars/logs_library/ip_addresses.yml`
  - initialize the apropriate client LOR stack environment and then deploy the same `single_group_playbooks/logs.yml`
  - in order for jumphost jump to work (explained in VI.
