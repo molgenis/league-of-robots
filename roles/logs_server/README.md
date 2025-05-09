@@ -104,7 +104,7 @@ The steps are:
  - in order for jumphost jump to work (explained in VI.
    - the individual stacks need the logs servers added to the `additional_etc_hosts` variable in the file `group_vars/[stack]/vars.yml`
    - `single_role_playbooks/static_hostname_lookup.yml` needs to be run on the jumphosts of that individual stack
-   - the variable `iptables_allow_ssh_inbound` in the `group_vars/logs.yml` must contain correct jumphost's value and iptables redeployed
+   - the variable `iptables_allow_ssh_inbound` in the `group_vars/logs.yml` must contain correct jumphost's value and the `iptables` role must be redeployed.
 
 
 ## VI. Client connections to the logs server
