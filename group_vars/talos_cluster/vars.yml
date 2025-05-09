@@ -33,7 +33,10 @@ slurm_partitions:
     local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
-logs_class: 'development'
+#
+# Remote logging settings - for diagnostics servers
+#
+cluster_class: 'development'
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
 figlet_font: 'ogre'

@@ -3,8 +3,8 @@
 # since both playbooks 'rsyslog_server' and 'rsyslog_client' are both using it
 rsyslog_remote_path_key_dir: "/etc/pki/tls/private/"
 rsyslog_remote_path_cert_dir: "/etc/pki/tls/certs/"
-rsyslog_ca_key_file: "logs_{{ logs_class }}.key"
-rsyslog_ca_cert_file: "logs_{{ logs_class }}.pem"
+rsyslog_ca_key_file: "logs_{{ cluster_class }}.key"
+rsyslog_ca_cert_file: "logs_{{ cluster_class }}.pem"
 rsyslog_repository_dir: "{{ playbook_dir }}/files/logs_library/"
 
 # Iptables additional configurations

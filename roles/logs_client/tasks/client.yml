@@ -107,7 +107,7 @@
         force: true
       become: true
       delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-      loop: "{{ logs_class_servers }}"
+      loop: "{{ cluster_class_servers }}"
       vars:
         ansible_python_interpreter: /usr/bin/python3
 
@@ -119,7 +119,7 @@
         force: true
       become: true
       delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-      loop: "{{ logs_class_servers }}"
+      loop: "{{ cluster_class_servers }}"
       vars:
         ansible_python_interpreter: /usr/bin/python3
 
@@ -136,7 +136,7 @@
       failed_when: client_certificates_generate_results.rc != 0
       become: true
       delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-      loop: "{{ logs_class_servers }}"
+      loop: "{{ cluster_class_servers }}"
       notify: restart_server_rsyslog
       vars:
         ansible_python_interpreter: /usr/bin/python3
@@ -150,7 +150,7 @@
         validate_checksum: true
       become: true
       delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
-      loop: "{{ logs_class_servers }}"
+      loop: "{{ cluster_class_servers }}"
       notify: restart_server_rsyslog
       vars:
         ansible_python_interpreter: /usr/bin/python3

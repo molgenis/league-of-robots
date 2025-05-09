@@ -15,7 +15,10 @@ slurm_partitions:
     local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
-logs_class: 'development'
+#
+# Cluster classification (used by `logs` and `login` roles)
+#
+cluster_class: 'development'
 repo_manager: 'none'
 os_distribution: 'centos7'
 figlet_font: 'speed'
