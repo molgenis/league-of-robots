@@ -63,6 +63,16 @@ with the `slurm` jobs.
 
 This can be nicely observed with `systemd-cgls`.
 
+## Memory control
+
+Memory of the cgroups is limited to whatever is set as the `memory.max` value. But
+note that this field is limiting only resident set size of the memory, therefore
+it will not (!) limit memory consumption of the additional swapped space.
+
+Simply put: if there is limit of `memory.max=100MB`, user can still use 1G of
+total memory, where 100M is placed in memory and the rest of the 900M will be
+placed in swap.
+
 ## More information
 
  - https://systemd.io/CONTROL_GROUP_INTERFACE/
