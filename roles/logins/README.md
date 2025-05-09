@@ -63,4 +63,13 @@ with the `slurm` jobs.
 
 This can be nicely observed with `systemd-cgls`.
 
+## More information
+
+ - https://systemd.io/CONTROL_GROUP_INTERFACE/
+ - https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html
+ - https://www.freedesktop.org/software/systemd/man/latest/pam_systemd.html
+ - https://man.archlinux.org/man/pam_exec.8.en
+ - https://man7.org/linux/man-pages/man8/pam_systemd.8.html
+ - https://docs.kernel.org/admin-guide/cgroup-v2.html
+
 
