@@ -1,27 +1,47 @@
 # Cgroups limitation
 
-Systemd manages all the users slices. They are in located under `user.slice`.
-Cgroups v2 can be managed separately, but users cannot be moved into those after
-systemd already manages user (and breaking this functionality would not be a
-smart approach).
+## PAM
 
-Therefore we manage total user resource limitation on the individual uses slice.
+Systemd manages all users slices. These slices are located under main `user.slice`.
+Cgroups v2 can be managed separately, but users still cannot be moved into those
+because systemd already exclusively manage user slice.
 
-This is done automatically after user is loged into the system via ssh.
+Therefore we manage user's resource availability, with help of systemd slice
+modification. Limitation on the slice is per individual user.
 
-A line of
+This is done with helper script, that gets automatically executed every time a
+new user logs into the system via ssh.
+
+This is done with the following line in the `/etc/pam.d/sshd` file
 
 ```
      session    optional     pam_exec.so /etc/security/limitedusers.sh
 ```
 
-is added to `/etc/pam.d/sshd`. A file `/etc/security/limitedusers.sh` calls the
+A script `/etc/security/limitedusers.sh` is called at the login, but upon error
+the login stil gets processed.
 
-`systemctl` and sets the user's .slice to limit CPU and RAM limits.
+## Script
 
-In this way users get limited resources ONLY when login via ssh.
+The script uses systemd's command line to modify user slice. `systemctl` limit
+CPU and RAM of the users .slice. 
 
-Slurm is not managed under `user.slice`, but has jobs placed under `system.slice`, like
+Script controls users that
+
+ - have UID > 1000
+ - are not part of the admin group
+
+Users that get elevated permissions, are still on the SAME slice limitation as
+user that executed su or sudo command.
+
+## systemd control groups vs slurm
+
+TLDR: Users slice limits are NOT same as slurm slice limits.
+
+Slurm has job placed under `system.slice`, and the resources are managed there.
+It is not managed under `user.slice`. Therefore `pam.d/sshd` is not conflicting
+with the `slurm` jobs.
+
 ```
 └─system.slice (#55)
   ...
@@ -43,7 +63,4 @@ Slurm is not managed under `user.slice`, but has jobs placed under `system.slice
 
 This can be nicely observed with `systemd-cgls`.
 
-TLDR: Users slice limits are NOT same as slurm slice limits.
 
-Users that get elevated permissions, are still on the SAME slice limitation as
-user that executed su or sudo command.
