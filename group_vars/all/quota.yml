@@ -31,6 +31,7 @@ lfs_quota:
       umcg-llnext: 10240
       umcg-mic: 2048
       umcg-micompany: 512
+      umcg-mmbimg: 1024
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 2048
@@ -220,6 +221,7 @@ lfs_quota:
       umcg-llnext: 2048
       umcg-mic: 2048
       umcg-micompany: 512
+      umcg-mmbimg: 1024
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 4096
