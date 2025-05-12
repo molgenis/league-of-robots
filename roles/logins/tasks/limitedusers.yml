@@ -10,8 +10,10 @@
 - name: Add limitedusers.sh in pam.d/sshd to limit user ssh resources
   ansible.builtin.lineinfile:
     path: /etc/pam.d/sshd
-    search_string: '^.*/limitedusers.sh$'
+    search_string: '/limitedusers.sh'
     line: 'session    optional     pam_exec.so /etc/pam-script.d/limitedusers.sh'
+    state: present
+    insertafter: EOF
     owner: root
     group: root
     mode: '0644'
