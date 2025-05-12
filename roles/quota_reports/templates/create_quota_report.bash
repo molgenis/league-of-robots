@@ -15,4 +15,7 @@ mkdir -p -m 0750 "${output_folder}"
 
 # run quota script and dismiss home folders
 /root/quota -a -p | { head -4; sed -n -e '/\/groups\//,/[-]+/p'; } > "${output_folder}/${output_file}"
+
+# Add results of total file system size to output file
+df -h >> "${output_folder}/${output_file}"
 {% endraw %}
