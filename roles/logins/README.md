@@ -71,6 +71,36 @@ Simply put: if there is limit of `memory.max=100MB`, user can still use 1G of
 total memory, where 100M is placed in memory and the rest of the 900M will be
 placed in swap.
 
+## Local Disk Bandwidth control
+
+If control groups is set to
+
+    `IOAccounting=true IOReadBandwidthMax="/ 10M" IOWriteBandwidthMax="/ 10M"`
+
+then a test file write
+
+```
+    dd if=/dev/zero of=/tmp/test bs=1M count=100 conv=fdatasync status=progress
+    100+0 records in
+    100+0 records out
+    104857600 bytes (105 MB, 100 MiB) copied, 11.5569 s, 9.1 MB/s
+```
+
+can produce following output
+
+```
+   [root@portal ~]# systemd-cgtop -i
+   Control Group                      Tasks   %CPU   Memory  Input/s Output/s
+   user.slice                            15    1.5   160.7M       0B     9.8M
+   user.slice/user-1088.slice             6      -   113.0M       0B     9.8M
+   /                                    158    1.0   381.8M       0B     4.9M
+   dev-hugepages.mount                    -      -    20.0K        -        -
+   dev-mqueue.mount                       -      -    36.0K        -        -
+   init.scope                             1      -    48.7M        -        -
+   sys-fs-fuse-connections.mount          -      -     4.0K        -        -
+   sys-kernel-config.mount                -      -     4.0K        -        -
+```
+
 ## More information
 
  - https://systemd.io/CONTROL_GROUP_INTERFACE/
