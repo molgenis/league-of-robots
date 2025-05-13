@@ -11,12 +11,13 @@
   become: true
   notify: client_restart_rsyslog
 
-- name: Install rsyslog and gnutls with all plugins
+- name: Install rsyslog and additional packages provided by rsyslog
   ansible.builtin.package:
     name:
       - librelp
       - rsyslog
       - rsyslog-relp
+      - rsyslog-openssl
     state: latest
     update_cache: true
     disablerepo: '*'
@@ -35,7 +36,7 @@
 
 - name: Create client keys and certificates, if managed rsyslog servers are present
   ansible.builtin.include_tasks: client.yml
-  when: logs_class_servers | length > 0
+  when: cluster_class_servers | length > 0
 
 # Must be deployed first due to the order of checking the scripts in next step
 # and faulty script in rsyslog.d can break deploying rsyslog.conf

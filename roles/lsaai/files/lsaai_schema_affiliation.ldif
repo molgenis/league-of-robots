@@ -1,0 +1,10 @@
+dn: cn={8}lsaai,cn=schema,cn=config
+changetype: modify
+replace: olcObjectClasses
+olcObjectClasses: ( 1.3.6.1.4.1.4203.77777.100
+  NAME 'lsaaiPerson'
+  DESC 'lsaai object class'
+  SUP top
+  AUXILIARY
+  MAY ( lsaaiUid $ voPersonExternalAffiliation ) )
+

@@ -54,6 +54,8 @@
     name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
     allocation_method: static
     domain_name_label: "{{ stack_prefix }}-{{ inventory_hostname }}-{{ (item.name | ansible.builtin.hash('sha1'))[:4] }}"
+    # idle_timeout is in minutes, default is set to 4, (currently) maximum is set to 30
+    idle_timeout: 30
   with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
   when:
     - item.assign_floating_ip is defined

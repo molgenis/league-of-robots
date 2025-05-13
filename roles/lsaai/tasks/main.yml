@@ -178,16 +178,25 @@
   become: true
   become_user: lsaai
 
-- name: Install LDIF schema file for LSAAI extra fields
+- name: Install LDIF file for schema add lsaaiUID attribute
   ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "/usr/local/openldap/etc/openldap/custom/{{ item }}"
+    src: "lsaai_schema.ldif"
+    dest: "/usr/local/openldap/etc/openldap/custom/"
     owner: root
     group: root
     mode: '0640'
-  with_items:
-    - lsaai_schema.ldif
-  register: lsaii_schema_deploy
+  register: lsaii_schema_extend_reg
   notify: lsaai_schema_extend
+  become: true
+
+- name: Install LDIF file for schema modify voPersonExternalAffiliation attribute
+  ansible.builtin.copy:
+    src: "lsaai_schema_affiliation.ldif"
+    dest: "/usr/local/openldap/etc/openldap/custom/"
+    owner: root
+    group: root
+    mode: '0640'
+  register: lsaai_schema_modify_reg
+  notify: lsaai_schema_modify
   become: true
 ...

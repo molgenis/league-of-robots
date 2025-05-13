@@ -82,9 +82,9 @@ ssh_client_configs:
   - betabarrel_cluster
   - copperfist_cluster
 #
-# Remote logging settings - for diagnostics servers
+# Cluster classification (used by `logs` and `login` roles)
 #
-logs_class: 'diagnostics'
+cluster_class: 'diagnostics'
 #
 # Ldap settings
 #

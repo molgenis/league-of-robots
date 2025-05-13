@@ -28,7 +28,7 @@
           - support_expiration_date
           - os_distribution
           - repo_manager
-          - logs_class
+          - cluster_class
       when:
         - hostvars[inventory_hostname][search_attr_name] is defined
         - hostvars[inventory_hostname][search_attr_name] | regex_search("(?i)" + search_attr_value)

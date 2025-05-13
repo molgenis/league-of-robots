@@ -22,6 +22,12 @@ else
     #
     TMPDIR="${LOCAL_SCRATCH_DIR}/${SLURM_JOB_ID}/"
     #logger -s "DEBUG: local scratch disk (${LOCAL_SCRATCH_DIR}) is mounted. Trying to create ${TMPDIR} ..."
-    mkdir -m 700 -p "${TMPDIR}" || logger -s "FATAL: failed to create ${TMPDIR}."
-    chown "${SLURM_JOB_USER}" "${TMPDIR}" || logger -s "FATAL: failed to chown ${TMPDIR}."
+    mkdir -m 700 -p "${TMPDIR}" || {
+        logger -s "FATAL: failed to create ${TMPDIR}."
+        exit 1
+      }
+    chown "${SLURM_JOB_USER}" "${TMPDIR}" || {
+        logger -s "FATAL: failed to chown ${TMPDIR}."
+        exit 1
+      }
 fi
