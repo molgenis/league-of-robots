@@ -79,7 +79,7 @@ PreemptMode=REQUEUE
 #   8 = debug4
 #   9 = debug5
 #
-SlurmctldDebug=5
+SlurmctldDebug=3
 SlurmctldLogFile=/var/log/slurm/slurmctld.log
 SlurmdDebug=3
 SlurmdLogFile=/var/log/slurm/slurmd.log
