@@ -20,10 +20,10 @@ Test/development clusters were named after other robots.
 The main ingredients for (deploying) these clusters:
 
  * [Ansible playbooks](https://github.com/ansible/ansible) for system configuration management.
- * [OpenStack](https://www.openstack.org/) for virtualization. (Note that deploying the OpenStack itself is not part of the configs/code in this repo.)
+ * [OpenStack](https://www.openstack.org/) for the private clouds on which the clusters run. (Note that deploying the OpenStack itself is not part of the configs/code in this repo.)
  * [Pulp](https://pulpproject.org/) to create freezes of Linux distros.
- * [CentOS 7](https://www.centos.org/) as OS for the virtual machines.
- * [Slurm](https://slurm.schedmd.com/) as workload/resource manager to orchestrate jobs.
+ * [Rocky Linux](https://rockylinux.org/) as OS for the cluster machines.
+ * [Slurm](https://slurm.schedmd.com/) as Workload/resource manager to orchestrate jobs.
 
 #### Branches and Releases
 The master and develop branches of this repo are protected; updates can only be merged into these branches using reviewed pull requests.
@@ -547,9 +547,13 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
   unset JUMPHOST_USER
   ansible-playbook -u "${lor_admin_user}" -l '!jumphost' cluster.yml
   ```
-* (Re-)deploying only a specific role - e.g. *rsyslog_client* - on the previously deployed test cluster *Talos*
+* (Re-)deploying only a specific role - e.g. *rsyslog_client* - on a previously deployed stack
   ```bash
   ansible-playbook -u "${lor_admin_user}" single_role_playbooks/rsyslog_client.yml
+  ```
+* (Re-)deploying only specific tasks with a certain tag from multiple roles - e.g. those with the tag *groups* to rerun relevant tasks when a group was added or its config was changed - on a previously deployed stack
+  ```bash
+  ansible-playbook -u "${lor_admin_user}" single_tag_playbooks/groups.yml -t groups
   ```
 
 #### 11. Verify operation.
