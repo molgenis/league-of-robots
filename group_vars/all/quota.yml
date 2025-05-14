@@ -159,7 +159,7 @@ lfs_quota:
       umcg-gastrocol: 10240
       umcg-gcc: 3072
       umcg-gdi: 2048
-      umcg-gdio: 11264
+      umcg-gdio: 2048
       umcg-gonl: 3072
       umcg-griac: 2048
       umcg-grip: 1024
@@ -207,7 +207,7 @@ lfs_quota:
       umcg-gastrocol: 10240
       umcg-gcc: 8192
       umcg-gdi: 1024
-      umcg-gdio: 5120
+      umcg-gdio: 14336
       umcg-gonl: 3072
       umcg-griac: 20480
       umcg-grip: 1024
