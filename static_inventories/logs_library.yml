@@ -8,7 +8,7 @@ all:
     logs:
       hosts:
         earl1:
-          logs_class: 'development'
+          cluster_class: 'development'
           cloud_flavor: m1.small
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
@@ -16,21 +16,21 @@ all:
               assign_floating_ip: true
           local_volume_size_extra: 100
         earl2:
-          logs_class: 'development'
+          cluster_class: 'development'
           azure_flavor: "Standard_DS1_v2"
           host_networks:
             - name: "{{ stack_prefix }}_external"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
         earl3:
-          logs_class: 'diagnostics'
+          cluster_class: 'diagnostics'
           azure_flavor: "Standard_DS1_v2"
           host_networks:
             - name: "{{ stack_prefix }}_external"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
         earl4:
-          logs_class: 'diagnostics'
+          cluster_class: 'diagnostics'
           cloud_flavor: m1.small
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
@@ -38,7 +38,7 @@ all:
               assign_floating_ip: true
           local_volume_size_extra: 100
         earl5:
-          logs_class: 'research'
+          cluster_class: 'research'
           cloud_flavor: m1.small
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
@@ -46,7 +46,7 @@ all:
               assign_floating_ip: true
           local_volume_size_extra: 100
         earl6:
-          logs_class: 'research'
+          cluster_class: 'research'
           azure_flavor: "Standard_DS1_v2"
           host_networks:
             - name: "{{ stack_prefix }}_external"

@@ -59,7 +59,10 @@ slurm_qos_limit_fractions:
     user: 0.2
   interactive-short:
     user: 0.5
-logs_class: 'research'
+#
+# Cluster classification (used by `logs` and `login` roles)
+#
+cluster_class: 'research'
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
 figlet_font: 'ogre'
@@ -246,6 +249,7 @@ regular_groups:
   - 'umcg-llnext'
   - 'umcg-mic'
   - 'umcg-micompany'
+  - 'umcg-mmbimg'
   - 'umcg-msb'
   - 'umcg-muhas'
   - 'umcg-nawijn'
@@ -338,6 +342,8 @@ regular_users:
     groups: ['umcg-mic']
   - user: 'umcg-micompany-dm'
     groups: ['umcg-micompany']
+  - user: 'umcg-mmbimg-dm'
+    groups: ['umcg-mmbimg']
   - user: 'umcg-msb-dm'
     groups: ['umcg-msb']
   - user: 'umcg-muhas-dm'
@@ -453,6 +459,8 @@ sudoers:
     become: 'umcg-mic-dm'
   - who: ['%umcg-micompany-dms']
     become: 'umcg-micompany-dm'
+  - who: ['%umcg-mmbimg-dms']
+    become: 'umcg-mmbimg-dm'
   - who: ['%umcg-msb']
     become: 'umcg-msb-dm'
   - who: ['%umcg-muhas-dms']
@@ -536,6 +544,7 @@ local_mount_subfolders:
           - umcg-lld
           - umcg-llnext
           - umcg-micompany
+          - umcg-mmbimg
           - umcg-msb
           - umcg-nawijn
           - umcg-neonatology
@@ -662,6 +671,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-micompany
         mode: '2750'
+      - name: umcg-mmbimg
+        mode: '2750'
       - name: umcg-msb
         mode: '2750'
       - name: umcg-muhas
@@ -742,6 +753,7 @@ lfs_mounts:
       - name: umcg-llnext
       - name: umcg-mic
       - name: umcg-micompany
+      - name: umcg-mmbimg
       - name: umcg-msb
       - name: umcg-muhas
       - name: umcg-nawijn

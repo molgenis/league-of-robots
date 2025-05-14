@@ -3,7 +3,7 @@ objectClass: olcSchemaConfig
 cn: lsaai
 olcAttributeTypes: {0}( 1.3.6.1.4.1.4203.77777.1
   NAME 'lsaaiUid'
-  DESC 'LSAAI unique User IDntifier'
+  DESC 'LSAAI unique User IDentifier'
   EQUALITY caseIgnoreIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
   SINGLE-VALUE )
@@ -13,3 +13,4 @@ olcObjectClasses: {0}( 1.3.6.1.4.1.4203.77777.100
   SUP top
   AUXILIARY
   MAY ( lsaaiUid ) )
+
