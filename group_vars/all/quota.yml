@@ -250,7 +250,7 @@ lfs_quota:
     quota_limits:  # All values in GB.
       umcg-as: 1024
       umcg-atd: 1024
-      umcg-biogen: 56320
+      umcg-biogen: 66560
       umcg-bios: 1024
       umcg-dag3: 1024
       umcg-erdera: 1024
