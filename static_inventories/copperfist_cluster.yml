@@ -239,7 +239,6 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_baremetal }}"
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
           local_mounts:
