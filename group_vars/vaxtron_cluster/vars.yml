@@ -245,6 +245,7 @@ regular_groups:
   - 'umcg-micompany'
   - 'umcg-msb'
   - 'umcg-nawijn'
+  - 'umcg-nephrology'
   - 'umcg-pmb'
   - 'umcg-radicon'
   - 'umcg-rehabilitation'
@@ -339,6 +340,8 @@ regular_users:
     groups: ['umcg-msb']
   - user: 'umcg-nawijn-dm'
     groups: ['umcg-nawijn']
+  - user: 'umcg-nephrology-dm'
+    groups: ['umcg-nephrology']
   - user: 'umcg-pmb-dm'
     groups: ['umcg-pmb']
   - user: 'umcg-radicon-dm'
@@ -448,6 +451,8 @@ sudoers:
     become: 'umcg-msb-dm'
   - who: ['%umcg-nawijn-dms']
     become: 'umcg-nawijn-dm'
+  - who: ['%umcg-nephrology-dms']
+    become: 'umcg-nephrology-dm'
   - who: ['%umcg-pmb-dms']
     become: 'umcg-pmb-dm'
   - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
@@ -568,6 +573,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-llnext
         mode: '2750'
+      - name: umcg-nephrology
+        mode: '2750'
       - name: umcg-tifn
         mode: '2750'
       - name: umcg-ugli
@@ -662,6 +669,7 @@ lfs_mounts:
       - name: umcg-micompany
       - name: umcg-msb
       - name: umcg-nawijn
+      - name: umcg-nephrology
       - name: umcg-pgx
       - name: umcg-pmb
       - name: umcg-radicon
