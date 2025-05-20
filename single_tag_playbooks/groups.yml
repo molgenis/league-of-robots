@@ -8,6 +8,9 @@
 - name: Import regular_users single role playbook.
   ansible.builtin.import_playbook: ../single_role_playbooks/regular_users.yml
 
+- name: Import sudoers single role playbook.
+  ansible.builtin.import_playbook: ../single_role_playbooks/sudoers.yml
+
 - name: Import shared_storage single role playbook.
   ansible.builtin.import_playbook: ../single_role_playbooks/shared_storage.yml
 
