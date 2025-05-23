@@ -11,14 +11,14 @@ _delay=0.5
 function _print_help(){
    cat << EOF
    Provide one of the following arguments
-    --dmfind-reg <path>      print regular files / files that reside only on disk
-    --dmfind-mig <path>      print files that are being copied from disk to tape
-    --dmfind-dul <path>      print files that reside both online and offline
-    --dmfind-ofl <path>      print data that is no longer on disk (is on tape)
-    --dmfind-unm <path>      print files which are being copied from tape to disk
-    --dmget      <path>      recall / stage online FROM TAPE
-    --dmls       <path>      list state
-    --dmput      <path>      send to offline / stage TO TAPE
+    --dafind-reg <path>      print regular files / files that reside only on disk
+    --dafind-que <path>      print files that are being copied from disk TO TAPE
+    --dafind-dul <path>      print files that reside both online and offline
+    --dafind-ofl <path>      print data that is no longer on disk (is on tape)
+    --dafind-stg <path>      print files which are being copied FROM TAPE to disk
+    --daget      <path>      recall / stage online FROM TAPE
+    --dals       <path>      list state
+    --darelease  <path>      send to offline / stage TO TAPE
     --sha256sum  <path>      compute the sha256sum of the file
 EOF
 }

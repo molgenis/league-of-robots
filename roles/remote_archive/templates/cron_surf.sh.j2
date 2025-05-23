@@ -6,6 +6,7 @@ set -euo pipefail
 _arc="{{ item.name }}"
 _user="{{ item.archive_user }}"
 _system="{{ item.archive_system }}"
+_archive_remote_top_dir="{{ item.archive_remote_top_dir }}"
 _arcq_dir="/var/cache/arcq/"
 _lock="${_arcq_dir}/${_arc}-lock"
 _queue_dir="${_arcq_dir}/queue/${_arc}"
@@ -94,16 +95,16 @@ for _file in ${_queue_files}; do
    # Check and format command
    _argument=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    case "${_argument:2}" in
-      dmfind-reg) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state reg" ;;
-      dmfind-mig) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state mig" ;;
-      dmfind-dul) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state dul" ;;
-      dmfind-ofl) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state ofl" ;;
-      dmfind-unm) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state unm" ;;
-      dmget)      _command="dmget -nq ${_arc}/${_group}/${_subdir}" ;;
-      dmls)       _command="dmls -l ${_arc}/${_group}/${_subdir}" ;;
-      dmput)      _command="dmput -n -r ${_arc}/${_group}/${_subdir}" ;;
+      dafind-reg) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state REG" ;;
+      dafind-que) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state QUE" ;;
+      dafind-dul) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state DUL" ;;
+      dafind-ofl) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state OFL" ;;
+      dmfind-stg) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state STG" ;;
+      daget)      _command="daget ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
+      dals)       _command="dals -l ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
+      darelease)  _command="darelease ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       sha256sum)  _afile="$(basename ${_subdir})"; _adir="$(dirname ${_subdir})"
-                  _command="dmfind ${_arc}/${_group}/${_adir} -name ${_afile} \( -state DUL -or -state REG \) -exec sha256sum {} \; ; dmfind ${_arc}/${_group}/${_adir} -name ${_afile} \( ! -state DUL ! -state REG \) -exec echo 'sha256sum unavailable - file is offline' \;" ;;
+                  _command="dmfind ${_archive_remote_top_dir}/${_arc}/${_group}/${_adir} -name ${_afile} \( -state DUL -or -state REG \) -exec sha256sum {} \; ; dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_adir} -name ${_afile} \( ! -state DUL ! -state REG \) -exec echo 'sha256sum unavailable - file is offline' \;" ;;
       *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
                   date >> "${_stdout}.done"
                   rm -f "${_file:-error_path}" && continue ;;
