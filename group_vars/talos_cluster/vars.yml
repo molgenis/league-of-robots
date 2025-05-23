@@ -130,6 +130,13 @@ stack_networks:
     router_name: vlan1337
     type: management
     external: true
+  - name: "{{ stack_prefix }}_internal_management"
+    cidr: '10.10.1.0/24'
+    gateway: '10.10.1.1'
+    router_network: vlan16
+    type: management
+    external: false
+    mtu_size: '1450'
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
     allow_ingress:
@@ -165,7 +172,6 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
-
 # Remote archive settings
 archive_groups:
   - name: arc01

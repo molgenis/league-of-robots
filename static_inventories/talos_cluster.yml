@@ -78,6 +78,8 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
           lustre_client_networks: "{{ lustre_client_networks_vm }}"
