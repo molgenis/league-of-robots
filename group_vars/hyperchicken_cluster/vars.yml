@@ -61,19 +61,21 @@ ldap_domains:
     create_ldap: true
     ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
   ladap:
+    # must be FQDN or certificate authentication with LDAP server fails
     uri: ldaps://ladap.westeurope.cloudapp.azure.com
     base: dc=donbot_azure,dc=local
-    schema: rfc2307
+    # rfc2307bis for LADAP, because group members are stored in each group and
+    # not in the user profile
+    schema: rfc2307bis
     min_id: 37800000
-    max_id: 37899999
+    max_id: 37999999
     user_object_class: posixAccount
-    #user_name: uid
     user_name: mail
     user_ssh_public_key: sshPublicKey
-    user_member_of: groupMembership
-    user_expiration_date: loginExpirationTime
-    group_member: memberUid
+    user_member_of: member
     group_object_class: groupofnames
+    group_member: member
+    override_homedir: '/home/%U'
 cloud_image: RockyLinux-9.3_xfs
 local_volume_size_root: 22
 availability_zone: nova

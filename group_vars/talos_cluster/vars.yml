@@ -79,7 +79,7 @@ ldap_domains:
   idvault:
     uri: ldaps://svrs.id.rug.nl
     base: ou=umcg,o=asds
-    schema: rfc2307
+    schema: rfc2307bis
     min_id: 50100000
     max_id: 55999999
     user_object_class: posixAccount
