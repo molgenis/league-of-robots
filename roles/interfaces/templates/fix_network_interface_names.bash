@@ -1,5 +1,8 @@
 #!/bin/bash
 {% raw %}
+set -u
+set -e
+set -o pipefail
 #
 # Our custom NamePolicy in /etc/systemd/network/99-default.link
 # (to prevent problematic slot-based network interface names)
@@ -31,8 +34,8 @@ readarray -t network_interfaces_unsorted < <(find '/sys/class/net/' -maxdepth 1 
 declare -a network_interfaces_sorted
 for network_interface in "${network_interfaces_unsorted[@]}"; do
     if_index="$(udevadm info -q property --property=IFINDEX --value "${network_interface}")"
-    network_interfaces_sorted[${if_index}]="${network_interface}"
-    printf 'INFO: Found network interface %s at index %d ...\n' "${network_interface}" ${if_index}
+    network_interfaces_sorted["${if_index}"]="${network_interface}"
+    printf 'INFO: Found network interface %s at index %d ...\n' "${network_interface}" "${if_index}"
 done
 #
 # Apply udev rules to network interfaces sorted by index.
