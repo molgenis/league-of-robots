@@ -27,3 +27,4 @@ ssh-host-ca/*production*
 #
 debug.yml
 roles/custom_debug
+.ansible

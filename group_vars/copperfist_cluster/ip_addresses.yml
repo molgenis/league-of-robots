@@ -19,6 +19,13 @@ ip_addresses:
       address: 195.169.23.116
       netmask: /32
       fqdn: 'NXDOMAIN'
+  cf-storage:
+    cf_internal_management:
+      address: 10.10.1.72
+      netmask: /32
+    vlan990:
+      address: 192.168.1.145
+      netmask: /32
   cf-transfer:
     cf_internal_management:
       address: 10.10.1.42
@@ -29,9 +36,6 @@ ip_addresses:
       netmask: /32
       fqdn: 'cf-transfer.hpc.rug.nl'
   copperfist:
-    vlan983:
-      address: 172.23.41.226
-      netmask: /32
     vlan16:
       address: 195.169.22.4
       netmask: /32

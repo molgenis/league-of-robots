@@ -21,7 +21,7 @@
     - basic_security
     - figlet_motd
     - role: logs_client
-      when: logs_class is defined
+      when: cluster_class is defined
     - resolver
     - coredumps
 
@@ -33,7 +33,8 @@
     - cluster
     - regular_users
     - sudoers
-    - local_storage
+    - role: local_storage
+      when: local_mounts is defined and local_mounts | length > 0
     - shared_storage
     - build_environment
     - envsync

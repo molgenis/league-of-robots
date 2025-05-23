@@ -1,27 +1,27 @@
 ---
-- name: Install tools to work with block devices and mount points.
-  ansible.builtin.package:
-    state: 'latest'
-    update_cache: true
-    name:
-      - util-linux  # Will also install util-linux-core
-  become: true
-
 - name: Check the file system type of the device.
-  ansible.builtin.command: "lsblk -n -o FSTYPE {{ volume_device }}"
+  ansible.builtin.command: "lsblk -n -o FSTYPE {{ volume['device'] }}"
   register: device_status
   changed_when: false
 
+- name: Check the file system label of the device.
+  ansible.builtin.command: "lsblk -n -o LABEL {{ volume['device'] }}"
+  register: device_label
+  changed_when: false
+  when:
+    - volume['label'] is defined
+
 - name: Check the mount point.
-  ansible.builtin.command: "mountpoint {{ volume_mount_point }}"
+  ansible.builtin.command: "mountpoint {{ volume['mount_point'] }}"
   register: mount_point_status
   failed_when: mount_point_status.rc not in [0, 1, 32]
   changed_when: false
 
 - name: Create a filesystem on the device.
   community.general.filesystem:
-    fstype: "{{ volume_type }}"
-    dev: "{{ volume_device }}"
+    fstype: "{{ volume['type'] }}"
+    dev: "{{ volume['device'] }}"
+    opts: "{% if volume['label'] is defined %}-L {{ volume['label'] }}{% endif %}"
     force: false
     resizefs: true
   when:
@@ -30,6 +30,19 @@
     # and when the device is unformatted.
     #
     - mount_point_status['rc'] != 0
-    - device_status['stdout'] != volume_type
+    - device_status['stdout'] != volume['type']
+  become: true
+
+- name: Label existing, unmounted ext file system.
+  ansible.builtin.shell:
+    cmd: |
+         e2label {{ volume['device'] }} {{ volume['label'] }} && e2label {{ volume['device'] }}
+  register: e2label_result
+  changed_when: e2label_result.stdout != device_label['stdout']
+  when:
+    - mount_point_status['rc'] != 0
+    - volume['label'] is defined
+    - device_label['stdout'] != volume['label']
+    - volume['type'] | ansible.builtin.regex_search('^ext[0-9]+')
   become: true
 ...

@@ -1,0 +1,43 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  listen: 'archive_systemd_reload'
+  become: true
+
+- name: Stop mounts
+  ansible.builtin.systemd_service:
+    name: "{{ item + '.mount' }}"
+    state: stopped
+  listen: 'archive_mount_stop'
+  with_items: "{{ desired_auto_mounts }}"
+  become: true
+
+- name: Enable and start automounts
+  ansible.builtin.systemd_service:
+    name: "{{ item + '.automount' }}"
+    state: started
+    enabled: true
+  listen: 'archive_automount_enable'
+  with_items: "{{ desired_auto_mounts }}"
+  become: true
+
+- name: Enable path service monitoring
+  ansible.builtin.systemd_service:
+    name: "arcq_{{ item.name }}.service"
+    enabled: true
+  listen: 'archive_service_monitor_enable'
+  with_items:
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+  become: true
+
+- name: Enable and start path monitoring
+  ansible.builtin.systemd_service:
+    name: "arcq_{{ item.name }}.path"
+    state: started
+    enabled: true
+  listen: 'archive_path_monitor_enable'
+  with_items:
+    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+  become: true
+...

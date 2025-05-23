@@ -3,6 +3,7 @@
     - jumphost
   roles:
     - logrotate
+
 - hosts:
     - repo
     - cluster

@@ -1,0 +1,82 @@
+---
+- name: Install Beegfs utils.
+  ansible.builtin.package:
+    name: "{{ beegfs_client_install }}"
+  become: true
+
+- name: Make /etc/beegfs/connAuthFile
+  ansible.builtin.copy:
+    content: "{{ beegfs_connAuthFile_content }}"
+    dest: /etc/beegfs/connauthfile
+    owner: root
+    group: root
+    mode: '0400'
+  notify:
+    - systemd_reload
+    - restart-beegfs-helperd
+    - restart-beegfs-client
+  become: true
+
+- name: Configure all the services to use the connAuthFile
+  ansible.builtin.lineinfile:
+    path: "/etc/beegfs/{{ item }}"
+    regexp: '^connAuthFile(\s+)='
+    line: "connAuthFile = /etc/beegfs/connauthfile"
+  with_items:
+    - beegfs-helperd.conf
+    - beegfs-client.conf
+  notify:
+    - systemd_reload
+    - restart-beegfs-helperd
+    - restart-beegfs-client
+  become: true
+
+- name: Configure BeeGFS client
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-client.conf
+    regexp: '^sysMgmtdHost(\s+)='
+    line: "sysMgmtdHost = {{ groups['beegfs_server'] | default([]) | first }}"
+  notify:
+    - systemd_reload
+    - restart-beegfs-helperd
+    - restart-beegfs-client
+  become: true
+
+- name: Configure BeeGFS mounts
+  ansible.builtin.template:
+    src: templates/beegfs-mounts.conf.j2
+    dest: /etc/beegfs/beegfs-mounts.conf
+    force: true
+    mode: '0644'
+  notify:
+    - systemd_reload
+    - restart-beegfs-helperd
+    - restart-beegfs-client
+  become: true
+
+- name: Check if services are enabled and running
+  ansible.builtin.service_facts:
+  become: true
+
+- name: Checking if helperd is enabled and running
+  ansible.builtin.debug:
+    msg:
+      - "services[{{ item }}.service].status = {{ services[item + '.service'].status }}"
+      - "services[{{ item }}.service].state = {{ services[item + '.service'].state }}"
+  with_items:
+    - "beegfs-helperd"
+  become: true
+
+- name: Make sure helperd is enabled and running
+  ansible.builtin.debug:
+    msg: "The service '{{ item }}' is not enabled and running, starting it now ..."
+  changed_when: services[item+'.service'].status != 'enabled' or services[item+'.service'].state != 'running'
+  when: services[item+'.service'].status != 'enabled' or services[item+'.service'].state != 'running'
+  notify: "restart-{{ item }}"
+  with_items:
+    - "beegfs-helperd"
+  become: true
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+...

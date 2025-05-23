@@ -1,9 +1,12 @@
 ---
-- hosts:
+- name: Deploy login role on jumphosts.
+  hosts:
     - jumphost
   roles:
     - logins
-- hosts:
+
+- name: Deploy login role on machines behind jumphosts.
+  hosts:
     - repo
     - cluster
     - chaperone,!mit_chaperone

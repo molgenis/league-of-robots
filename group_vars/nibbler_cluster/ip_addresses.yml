@@ -1,135 +1,157 @@
 ---
 ip_addresses:
   nb-dai:
-    nb_internal_management:
-      address: 10.10.1.78
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.27
-      netmask: /32
     vlan1068:
       address: 172.23.60.31
       netmask: /32
     vlan1073:
       address: 172.23.14.112
       netmask: /32
+    vlan1338:
+      address: 172.23.69.157
+      netmask: /32
     vlan985:
       address: 172.23.59.250
       netmask: /32
   nb-node-a01:
-    nb_internal_management:
-      address: 10.10.1.172
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.190
-      netmask: /32
     vlan1068:
       address: 172.23.60.6
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.106
       netmask: /32
     vlan985:
       address: 172.23.59.95
       netmask: /32
   nb-node-a02:
-    nb_internal_management:
-      address: 10.10.1.246
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.152
-      netmask: /32
     vlan1068:
       address: 172.23.60.29
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.111
       netmask: /32
     vlan985:
       address: 172.23.59.90
       netmask: /32
   nb-node-a03:
-    nb_internal_management:
-      address: 10.10.1.32
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.220
-      netmask: /32
     vlan1068:
       address: 172.23.60.15
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.163
       netmask: /32
     vlan985:
       address: 172.23.59.213
       netmask: /32
   nb-node-a04:
-    nb_internal_management:
-      address: 10.10.1.26
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.131
-      netmask: /32
     vlan1068:
       address: 172.23.60.16
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.123
       netmask: /32
     vlan985:
       address: 172.23.59.225
       netmask: /32
   nb-node-a05:
-    nb_internal_management:
-      address: 10.10.1.28
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.217
-      netmask: /32
     vlan1068:
       address: 172.23.60.3
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.210
       netmask: /32
     vlan985:
       address: 172.23.59.86
       netmask: /32
   nb-node-b01:
-    nb_internal_management:
-      address: 10.10.1.197
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.129
-      netmask: /32
     vlan1068:
       address: 172.23.60.22
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.35
       netmask: /32
     vlan985:
       address: 172.23.59.247
       netmask: /32
   nb-node-b02:
-    nb_internal_management:
-      address: 10.10.1.229
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.39
-      netmask: /32
     vlan1068:
       address: 172.23.60.14
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.86
       netmask: /32
     vlan985:
       address: 172.23.59.177
       netmask: /32
+  nb-node-c01:
+    vlan1068:
+      address: 172.23.60.26
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.138
+      netmask: /32
+  nb-node-c02:
+    vlan1068:
+      address: 172.23.60.13
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.51
+      netmask: /32
+  nb-node-c03:
+    vlan1068:
+      address: 172.23.60.25
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.54
+      netmask: /32
+  nb-node-c04:
+    vlan1068:
+      address: 172.23.60.18
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.185
+      netmask: /32
+  nb-node-c05:
+    vlan1068:
+      address: 172.23.60.12
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.24
+      netmask: /32
+  nb-node-c06:
+    vlan1068:
+      address: 172.23.60.20
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.193
+      netmask: /32
+  nb-node-c07:
+    vlan1068:
+      address: 172.23.60.10
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.62
+      netmask: /32
   nb-repo:
-    nb_internal_management:
-      address: 10.10.1.137
+    vlan1338:
+      address: 172.23.69.140
       netmask: /32
   nb-sai:
-    nb_internal_management:
-      address: 10.10.1.106
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.68
-      netmask: /32
     vlan1068:
       address: 172.23.60.7
       netmask: /32
     vlan1073:
       address: 172.23.14.213
       netmask: /32
+    vlan1338:
+      address: 172.23.69.155
+      netmask: /32
     vlan985:
       address: 172.23.59.171
       netmask: /32
   nb-transfer:
-    nb_internal_management:
-      address: 10.10.1.12
+    vlan1338:
+      address: 172.23.69.27
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     vlan16:
@@ -137,36 +159,33 @@ ip_addresses:
       netmask: /32
       fqdn: 'nb-transfer.hpc.rug.nl'
   nibbler:
-    nb_internal_management:
-      address: 10.10.1.112
-      netmask: /32
-    nb_internal_storage:
-      address: 10.10.2.87
-      netmask: /32
     vlan1068:
       address: 172.23.60.4
       netmask: /32
     vlan1073:
       address: 172.23.14.232
       netmask: /32
+    vlan1338:
+      address: 172.23.69.136
+      netmask: /32
     vlan985:
       address: 172.23.59.144
       netmask: /32
   tunnel:
-    nb_internal_management:
-      address: 10.10.1.188
+    vlan1338:
+      address: 172.23.69.43
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     vlan16:
       address: 195.169.22.136
       netmask: /32
       fqdn: 'tunnel.hpc.rug.nl'
-  nb_internal_management-vlan16-router:
-    nb_internal_management:
-      address: 10.10.1.1
+  vlan1338-vlan16-router:
+    vlan1338:
+      address: 172.23.69.1
       netmask: /32
     vlan16:
-      address: 195.169.22.49
+      address: 195.169.22.58
       netmask: /32
       fqdn: 'NXDOMAIN'
 ...

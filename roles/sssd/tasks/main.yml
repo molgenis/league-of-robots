@@ -15,14 +15,43 @@
     - restart_sshd
   become: true
 
-- name: Copy LDAP server certificate to LDAP clients.
-  ansible.builtin.copy:
-    src: "{{ stack_name }}/ldap.crt"
-    dest: /etc/pki/ca-trust/source/anchors/
+- name: Find all stacks ldap.crt files
+  ansible.builtin.find:
+    path: "files/"
+    patterns: "ldap.crt"
+    recurse: true
+  register: all_certificates
+  delegate_to: localhost
+  connection: local
+
+- name: Print extra certificate paths that should be included
+  ansible.builtin.debug:
+    msg: "{{ item.path }}"
+  with_items: "{{ all_certificates.files }}"
+  when: all_certificates.files | length > 0
+
+- name: Collect content of each ldap certificate file
+  ansible.builtin.set_fact:
+    certificates_content: "{{ certificates_content | default('') + lookup('file', item.path) + '\n' }}"
+  loop: "{{ all_certificates.files }}"
+  when: all_certificates.files | length > 0
+
+- name: Print collected certificate content
+  ansible.builtin.debug:
+    msg: "{{ certificates_content }}"
+  when: certificates_content | length > 0
+  loop_control:
+    label: " "
+
+- name: Update server to allow all LDAP certificates.
+  ansible.builtin.blockinfile:
+    path: "/etc/pki/ca-trust/source/anchors/lor_all_ldap_certificates.crt"
+    marker: "#<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    block: "{{ certificates_content }}"
     owner: root
     group: root
     mode: '0600'
-  when: (playbook_dir, '/files/', stack_name, '/', 'ldap.crt') | join('') is exists
+    create: true
   become: true
   notify:
     - update-ca-trust
@@ -88,7 +117,7 @@
     enabled: false
     daemon_reload: true
   register: nslcd_status
-  when: "'nslcd.service' in services"
+  when: "'nslcd' in services"
   become: true
 
 - name: Deploy custom script to fetch public keys from LDAP servers.

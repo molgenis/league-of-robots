@@ -22,13 +22,29 @@
       /usr/local/openldap/bin/ldapadd
       -Y EXTERNAL
       -H 'ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi'
-      -f /usr/local/openldap/etc/openldap/custom/lsaai.ldif
+      -f /usr/local/openldap/etc/openldap/custom/lsaai_schema.ldif
   register: lsaai_schema_extend_result
-  failed_when: lsaai_ldapadd_result.rc != 0
+  failed_when: lsaai_schema_extend_result.rc != 0
   changed_when:
     - lsaai_schema_extend_result.rc == 0
     - "'adding new entry' in lsaai_schema_extend_result.stdout"
     - "'cn=lsaai,cn=schema,cn=config' in lsaai_schema_extend_result.stdout"
   become: true
   listen: lsaai_schema_extend
+
+- name: Modify LDAP and add voPersonExternalAffiliation attribute to lsaaiPerson 
+  ansible.builtin.command:
+    cmd: >
+      /usr/local/openldap/bin/ldapmodify
+      -Y EXTERNAL
+      -H 'ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi'
+      -f /usr/local/openldap/etc/openldap/custom/lsaai_schema_affiliation.ldif
+  register: lsaai_schema_modify_result
+  failed_when: lsaai_schema_modify_result.rc != 0
+  changed_when:
+    - lsaai_schema_modify_result.rc == 0
+    - "'modifying entry' in lsaai_schema_modify_result.stdout"
+    - "'cn=lsaai,cn=schema,cn=config' in lsaai_schema_modify_result.stdout"
+  become: true
+  listen: lsaai_schema_modify
 ...

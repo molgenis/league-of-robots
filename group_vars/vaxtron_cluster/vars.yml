@@ -6,24 +6,24 @@ stack_prefix: 'vt'
 stack_dtap_state: production
 slurm_version: '23.02.7-2.el9.umcg'
 slurm_partitions:
-  - name: regular  # Must be in sync with group listed in Ansible inventory.
-    default: yes
+  - name: cpu_r750  # Must be in sync with group listed in Ansible inventory.
+    default: no
     nodes: "{{ stack_prefix }}-node-a[01-04]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['regular']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r750']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
-#  - name: virtual  # Must be in sync with group listed in Ansible inventory.
-#    default: yes
-#    nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
-#    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['regular']|list|length }}{% else %}1{% endif %}"
-#    max_cores_per_node: "{{ groups['virtual'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-#    max_mem_per_node: "{{ groups['virtual'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-#    local_disk: "{{ groups['virtual'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-#    features: "{{ groups['virtual'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
-#    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_r6625  # Must be in sync with group listed in Ansible inventory.
+    default: yes
+    nodes: "{{ stack_prefix }}-node-b[01-06]"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r6625']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -50,7 +50,10 @@ slurm_qos_limit_fractions:
     user: 0.2
   interactive-short:
     user: 0.5
-logs_class: 'research'
+#
+# Remote logging settings - for diagnostics servers
+#
+cluster_class: 'research'
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
 figlet_font: 'ogre'
@@ -189,6 +192,21 @@ envsync_user: 'umcg-envsync'
 envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 hpc_env_prefix: '/apps'
+
+# Remote archive settings
+archive_groups:
+  - name: arc01
+    groups:
+      - 'umcg-atd'
+      - 'umcg-gcc'
+      - 'umcg-fg'
+    archive_user: 'umcg-atd-dm'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+
 regular_groups:
   - "{{ data_transfer_only_group }}"
   - "{{ envsync_group }}"
@@ -202,6 +220,7 @@ regular_groups:
   - 'umcg-dag3'
   - 'umcg-datateam'
   - 'umcg-ejp-rd'
+  - 'umcg-erdera'
   - 'umcg-endocrinology'
   - 'umcg-fg'
   - 'umcg-franke-scrna'
@@ -226,6 +245,7 @@ regular_groups:
   - 'umcg-micompany'
   - 'umcg-msb'
   - 'umcg-nawijn'
+  - 'umcg-nephrology'
   - 'umcg-pmb'
   - 'umcg-radicon'
   - 'umcg-rehabilitation'
@@ -270,6 +290,8 @@ regular_users:
     groups: ['umcg-ejp-rd']
   - user: 'umcg-endocrinology-dm'
     groups: ['umcg-endocrinology']
+  - user: 'umcg-erdera-dm'
+    groups: ['umcg-erdera']
   - user: 'umcg-fg-dm'
     groups: ['umcg-fg']
   - user: 'umcg-franke-scrna-dm'
@@ -318,6 +340,8 @@ regular_users:
     groups: ['umcg-msb']
   - user: 'umcg-nawijn-dm'
     groups: ['umcg-nawijn']
+  - user: 'umcg-nephrology-dm'
+    groups: ['umcg-nephrology']
   - user: 'umcg-pmb-dm'
     groups: ['umcg-pmb']
   - user: 'umcg-radicon-dm'
@@ -375,6 +399,8 @@ sudoers:
     become: 'umcg-ejp-rd-dm'
   - who: ['%umcg-endocrinology-dms']
     become: 'umcg-endocrinology-dm'
+  - who: ['%umcg-erdera-dms']   
+    become: 'umcg-erdera-dm'
   - who: ['%umcg-gcc']
     become: 'umcg-gcc-dm'
   - who: ['%umcg-fg-dms']
@@ -425,6 +451,8 @@ sudoers:
     become: 'umcg-msb-dm'
   - who: ['%umcg-nawijn-dms']
     become: 'umcg-nawijn-dm'
+  - who: ['%umcg-nephrology-dms']
+    become: 'umcg-nephrology-dm'
   - who: ['%umcg-pmb-dms']
     become: 'umcg-pmb-dm'
   - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
@@ -483,8 +511,6 @@ lustre_client_networks_vm:
   - name: tcp15
     interface: ens5
 lustre_client_networks_baremetal:
-  - name: tcp14
-    interface: eno8303
   - name: tcp15
     interface: eno12399np0
 pfs_mounts:
@@ -529,6 +555,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-dag3
         mode: '2750'
+      - name: umcg-erdera
+        mode: '2750'
       - name: umcg-fg
         mode: '2750'
       - name: umcg-franke-scrna
@@ -544,6 +572,8 @@ lfs_mounts:
       - name: umcg-lld
         mode: '2750'
       - name: umcg-llnext
+        mode: '2750'
+      - name: umcg-nephrology
         mode: '2750'
       - name: umcg-tifn
         mode: '2750'
@@ -563,6 +593,7 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-ejp-rd
       - name: umcg-endocrinology
+      - name: umcg-erdera
       - name: umcg-fg
       - name: umcg-franke-scrna
       - name: umcg-fu
@@ -614,6 +645,7 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-ejp-rd
       - name: umcg-endocrinology
+      - name: umcg-erdera
       - name: umcg-fg
       - name: umcg-franke-scrna
       - name: umcg-fu
@@ -637,6 +669,7 @@ lfs_mounts:
       - name: umcg-micompany
       - name: umcg-msb
       - name: umcg-nawijn
+      - name: umcg-nephrology
       - name: umcg-pgx
       - name: umcg-pmb
       - name: umcg-radicon

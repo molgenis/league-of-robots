@@ -15,15 +15,19 @@ iptables_allow_icmp_inbound:
   - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
+  - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
 iptables_allow_ssh_inbound:
   - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
   - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
+  - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
 iptables_allow_ssh_outbound:
+  - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
   - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
+  - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
 ...

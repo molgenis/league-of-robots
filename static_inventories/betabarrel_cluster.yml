@@ -124,36 +124,33 @@ all:
       hosts:
         betabarrel:
           host_networks:
-            - name: vlan983
+            - name: vlan16
             - name: vlan990
           local_yum_repository: true # enable local yum repository
-          ldap_domains:
-            idvault:  # Required to override LDAP uri to use internal connection via VLAN 983.
-              uri: ldaps://172.23.40.249
-              base: ou=gd,o=asds
-              schema: rfc2307
-              min_id: 50100000
-              max_id: 55999999
-              user_object_class: posixAccount
-              user_name: uid
-              user_ssh_public_key: sshPublicKey
-              user_member_of: groupMembership
-              group_member: memberUid
-              group_object_class: groupofnames
-              group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-              group_quota_hard_limit_template: ruggroupumcgquotaLFS
-              create_ldap: false
+          local_mounts:
+            - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
+              device: 'LABEL=local_raid'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: 'defaults,nofail,x-systemd.device-timeout=10'
+              type: xfs
+            - mount_point: '/local'
+              device: '/mnt/local_raid/local'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '2755'
+              mount_options: 'bind,nofail'
+              type: none
     deploy_admin_interface:
       hosts:
         betabarrel:
-          local_mounts:
-            - mount_point: '/apps'
-              device: '/mnt/env05/apps/'
-              mounted_owner: root
-              mounted_group: "{{ envsync_group }}"
-              mounted_mode: '2775'
-              mount_options: 'bind'
-              type: none
+          main_backup_folder: '/mnt/local_raid/local_backups/'
+          local_backups: # list of folders for cron to make daily backup
+            - name: apps # Name == ID; don't modify after deployed!
+              src_path: '/apps'
+              frequency:
+               - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
         betabarrel:
@@ -170,14 +167,6 @@ all:
         regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             betabarrel:
-              local_mounts:
-                - mount_point: '/local'
-                  device: '/mnt/local_raid/local'
-                  mounted_owner: root
-                  mounted_group: root
-                  mounted_mode: '2755'
-                  mount_options: 'bind,nofail'
-                  type: none
               slurm_sockets: 2
               slurm_cores_per_socket: 64
               slurm_real_memory: 515456

@@ -10,6 +10,5 @@
   hosts:
     - nfs_server
   roles:
-    - local_storage
     - nfs_server
 ...

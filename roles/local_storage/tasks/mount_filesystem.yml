@@ -1,0 +1,30 @@
+#
+# This Mount with "rescue" block, will retry when the first attempt to mount the file system fails.
+# When the first mount attempt fails we assume it is because of the new metadata_csum: hard to tell though.
+# So we try to remove that feature and then mount again....
+#
+---
+- name: Mount the volume.
+  block:
+    - name: Try to mount the volume.
+      ansible.posix.mount:
+        path: "{{ volume['mount_point'] }}"
+        src: "{{ volume_src }}"
+        fstype: "{{ volume['type'] }}"
+        opts: "{{ volume['mount_options'] }}"
+        state: mounted
+      become: true
+  rescue:
+    - name: Try to remove metadata_csum feature, which might be too new.
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: tune2fs -O ^metadata_csum "{{ volume['device'] }}"
+      become: true
+    - name: Retry mounting the volume.
+      ansible.posix.mount:
+        path: "{{ volume['mount_point'] }}"
+        src: "{{ volume_src }}"
+        fstype: "{{ volume['type'] }}"
+        opts: "{{ volume['mount_options'] }}"
+        state: mounted
+      become: true
+...

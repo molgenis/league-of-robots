@@ -85,9 +85,9 @@ ssh_client_configs:
   - copperfist_cluster
   - wingedhelix_cluster
 #
-# Remote logging settings - for diagnostics servers
+# Cluster classification (used by `logs` and `login` roles)
 #
-logs_class: 'diagnostics'
+cluster_class: 'diagnostics'
 #
 # Ldap settings
 #
@@ -130,8 +130,8 @@ stack_networks:
     router_network: vlan16
     type: management
     external: false
-  - name: vlan983
-    cidr: '172.23.41.225/23'
+  - name: vlan16
+    cidr: '195.169.22.0/23'
     type: management
     external: true
   - name: vlan990
@@ -173,12 +173,6 @@ iptables_allow_ssh_outbound:
   - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
-main_backup_folder: '/mnt/local_raid/local_backups/'
-local_backups: # list of folders for cron to make daily backup
-  - name: apps # don't modify after once deployed!
-    src_path: '/apps'
-    frequency:
-     - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
 local_admin_groups:
   - 'admin'
   - 'docker'
@@ -422,13 +416,12 @@ local_mount_subfolders:
 # Shared storage related variables
 #
 pfs_mounts:
-  - pfs: local_raid # must already be in /etc/fstab and mounted - f.e. /dev/sda > /mnt/local_raid (pfs somename must be same as /mnt/somename)
-    device: ''
+  - pfs: local_raid
     source: '/mnt'
     type: 'none'
-    rw_options: 'bind,rw'
-    ro_options: 'bind,ro'
-    machines: "{{ groups['sys_admin_interface'] }}"
+    rw_options: 'bind,nofail'
+    ro_options: 'bind,ro,nofail'
+    machines: []  # Complete PFS not mounted via shared_storage role. See local_storage role instead.
   - pfs: 'medgen_zincfinger$'
     source: '//storage5.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem

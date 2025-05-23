@@ -11,9 +11,9 @@
   hosts:
     - deploy_admin_interface
   roles:
-    - local_storage
     - build_environment
     - envsync
+    - backup_local
     - nhc_standalone
     - module_usage_tracking
 ...
