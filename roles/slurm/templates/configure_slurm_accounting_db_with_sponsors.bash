@@ -305,9 +305,8 @@ done
 # See: https://bugs.schedmd.com/show_bug.cgi?id=3491
 #
 # When using nested accounts sacctmgr will always report "nothing has changed" as long as
-# the parent for the account is unchanged. Hence when we check whether something needs an update,
-# detect some values need to be changed and issue an "sacctmgr modify ..." command,
-# it will fail with
+# the parent for the account is unchanged. Hence when we detected some values need to be changed 
+# and issue an "sacctmgr modify ..." command, then it will fail with
 #     sacctmgr: error: Request didn't affect anything
 #     Error with request: Data has not changed since time specified
 # and return exit code 1
