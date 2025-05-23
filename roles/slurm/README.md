@@ -21,7 +21,7 @@ Slurm uses _accounts_ to manage shares of resources.
 The _shares_ in Slurm are a virtual currency that is used to determine a job's priority;
 When a Slurm _account_ recently used less than its share,
 then jobs submitted by that account will get a higher prio
-and when a Slurm _account_ recently used more resources then what it is entitled to based on its shares,
+and when a Slurm _account_ recently used more resources than what it is entitled to based on its shares,
 then jobs submitted by that account will get a lower priority.
 Note that _fair share_ based on slurm _shares_ and recent resource usage is not the only factor in determining job prio,
 which is also influenced by accrued queue time and Quality of Service (QoS) level.
