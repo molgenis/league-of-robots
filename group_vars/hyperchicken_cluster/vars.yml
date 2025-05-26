@@ -75,6 +75,9 @@ ldap_domains:
     user_member_of: member
     group_object_class: groupofnames
     group_member: member
+    # Path of the home directory should not be depending on the username (as it
+    # can change). Instead we use %U to make it stable, unique (/home/[uid])
+    # and persistent across systems
     override_homedir: '/home/%U'
 cloud_image: RockyLinux-9.3_xfs
 local_volume_size_root: 22
