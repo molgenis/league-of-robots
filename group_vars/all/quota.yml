@@ -262,6 +262,7 @@ lfs_quota:
       umcg-lifelines: 1024
       umcg-lld: 1024
       umcg-llnext: 1024
+      umcg-nephrology: 1024
       umcg-tifn: 1024
       umcg-ugli: 1024
   tmp08:
