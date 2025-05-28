@@ -43,7 +43,6 @@ The data migrates on remote server from disk to tape and during this it has diff
 | State | Code | Online (data on disks) | Offline (data on tape) | Explanation |
 | ----- | ---- |-------------- | ------------ | ----------- |
 | Regular | `REG` | Yes | No | Files are only on disk. File content can be accessed and changed. |
-| ~~Migrating~~ | ~~`MIG`~~ | ~~Yes~~ | ~~**No**t yet~~ | ~~File content is copied from disks to tape. Content is still available.~~ |
 | Dual-state | `DUL` | Yes | Yes | Content is both on disk and on tape. |
 | Offline | `OFL` | No | Yes | Content is no longer online (on disks). It is only on tape. Can be recalled back to disks. |
 | Unmigrating | `QUE` | **No** | Yes | File queued for staging from tape. Not yet copied from tape. Next state is STG (see next line). |
