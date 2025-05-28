@@ -72,4 +72,12 @@ ip_addresses:
       address: 195.169.22.56
       netmask: /32
       fqdn: 'NXDOMAIN'
+  tl_internal_management-vlan16-router:
+    tl_internal_management:
+      address: 10.10.1.1
+      netmask: /32
+    vlan16:
+      address: 195.169.22.49
+      netmask: /32
+      fqdn: 'NXDOMAIN'
 ...

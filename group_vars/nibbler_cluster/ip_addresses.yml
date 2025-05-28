@@ -188,4 +188,12 @@ ip_addresses:
       address: 195.169.22.58
       netmask: /32
       fqdn: 'NXDOMAIN'
+  nb_internal_management-vlan16-router:
+    nb_internal_management:
+      address: 10.10.1.1
+      netmask: /32
+    vlan16:
+      address: 195.169.22.148
+      netmask: /32
+      fqdn: 'NXDOMAIN'
 ...
