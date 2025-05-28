@@ -551,10 +551,17 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
   ```bash
   ansible-playbook -u "${lor_admin_user}" single_role_playbooks/rsyslog_client.yml
   ```
-* (Re-)deploying only specific tasks with a certain tag from multiple roles - e.g. those with the tag *groups* to rerun relevant tasks when a group was added or its config was changed - on a previously deployed stack
-  ```bash
-  ansible-playbook -u "${lor_admin_user}" single_tag_playbooks/groups.yml -t groups
-  ```
+* (Re-)deploying only specific tasks with a certain tag from multiple roles
+  * When a new group needs to be added, an old one needs to be removed or a config for a groups needs to be updated,
+    then you can re-deploy only the relevant tasks in the correct order using the `groups` tag:
+    ```bash
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/cgroups.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/regular_users.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/sudoers.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/shared_storage.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/slurm.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/subgroup_directories.yml
+    ```
 
 #### 11. Verify operation.
 
