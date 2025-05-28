@@ -40,13 +40,13 @@ Therefore the correct procedure is to **first stage (recall from the tape) the f
 
 The data migrates on remote server from disk to tape and during this it has different states. **As long as the data is online (on disks), it is available to the user. It can be read or modified.**.
 
-| State | Code | Online (data on disks) | Offline (data on tape) | Explanation |
+| State | Code | Online (on disks) | Offline (on tape) | Explanation |
 | ----- | ---- |-------------- | ------------ | ----------- |
 | Regular | `REG` | Yes | No | Files are only on disk. File content can be accessed and changed. |
 | Dual-state | `DUL` | Yes | Yes | Content is both on disk and on tape. |
-| Offline | `OFL` | No | Yes | Content is no longer online (on disks). It is only on tape. Can be recalled back to disks. |
-| Unmigrating | `QUE` | **No** | Yes | File queued for staging from tape. Not yet copied from tape. Next state is STG (see next line). |
-| Unmigrating | `STG` | **No**t yet / Partially | Yes | File being staged from tape. Content is copied from tape and is not available until copy is finised. |
+| Offline | `OFL` | No | Yes | Content is no longer online/on disks, but only on tape. |
+| Unmigrating | `QUE` | **No** | Yes | File queued for staging from tape. Not yet copied from tape. |
+| Unmigrating | `STG` | **No**t yet / Partially | Yes | File being staged from tape to disk. Content is is unavailable until copy is finised. |
 
 Note that the folders are always online (in state `REG`) and as such you can always browse folders and check file permissions and their metadata information.
 
