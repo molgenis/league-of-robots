@@ -96,10 +96,10 @@ for _file in ${_queue_files}; do
    _argument=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    case "${_argument:2}" in
       dafind-reg) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state REG" ;;
-      dafind-que) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state QUE" ;;
       dafind-dul) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state DUL" ;;
       dafind-ofl) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state OFL" ;;
-      dmfind-stg) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state STG" ;;
+      dafind-que) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state QUE" ;;
+      dafind-stg) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state STG" ;;
       daget)      _command="daget ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       dals)       _command="dals -l ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       darelease)  _command="darelease ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;

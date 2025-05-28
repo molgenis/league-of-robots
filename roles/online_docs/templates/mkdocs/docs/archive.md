@@ -43,10 +43,11 @@ The data migrates on remote server from disk to tape and during this it has diff
 | State | Code | Online (data on disks) | Offline (data on tape) | Explanation |
 | ----- | ---- |-------------- | ------------ | ----------- |
 | Regular | `REG` | Yes | No | Files are only on disk. File content can be accessed and changed. |
-| Migrating | `MIG` | Yes | **No**t yet | File content is copied from disks to tape. Content is still available. |
+| ~~Migrating~~ | ~~`MIG`~~ | ~~Yes~~ | ~~**No**t yet~~ | ~~File content is copied from disks to tape. Content is still available.~~ |
 | Dual-state | `DUL` | Yes | Yes | Content is both on disk and on tape. |
 | Offline | `OFL` | No | Yes | Content is no longer online (on disks). It is only on tape. Can be recalled back to disks. |
-| Unmigrating | `UNM` | **No**t yet | Yes | Files content is copied from tape and is not available until copy is finised. |
+| Unmigrating | `QUE` | **No** | Yes | File queued for staging from tape. Not yet copied from tape. Next state is STG (see next line). |
+| Unmigrating | `STG` | **No**t yet / Partially | Yes | File being staged from tape. Content is copied from tape and is not available until copy is finised. |
 
 Note that the folders are always online (in state `REG`) and as such you can always browse folders and check file permissions and their metadata information.
 
@@ -87,7 +88,7 @@ Upload file(s) to the archive
 
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
 ```
-   dm-user $ arc_surf --dmput /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --darelease /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
@@ -96,7 +97,7 @@ Upload file(s) to the archive
 
 Check the file status
 ```
-   dm-user $ arc_surf --dmls /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --dals /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
@@ -105,13 +106,13 @@ Check the file status
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
-   dm-user $ arc_surf --dmget /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --daget /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
 ```
 Check the status again
 ```
-   dm-user $ arc_surf --dmls /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --dals /groups/[group]/arc01/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (UNM) project-x.tar
@@ -126,14 +127,14 @@ Use `--help` argument to get more information
 ```
    dm-user $ $ arc_surf --help
    Provide one of the following arguments
-    --dmfind-reg <path>      print regular files / files that reside only on disk
-    --dmfind-mig <path>      print files that are being copied from disk to tape
-    --dmfind-dul <path>      print files that reside both online and offline
-    --dmfind-ofl <path>      print data that is no longer on disk (is on tape)
-    --dmfind-unm <path>      print files which are being copied from tape to disk
-    --dmget      <path>      recall / stage online FROM TAPE
-    --dmls       <path>      list state
-    --dmput      <path>      send to offline / stage TO TAPE
+    --dafind-reg <path>      print regular files / files that reside only on disk
+    --dafind-que <path>      print files that are being copied from disk to tape
+    --dafind-dul <path>      print files that reside both online and offline
+    --dafind-ofl <path>      print data that is no longer on disk (is on tape)
+    --dafind-stg <path>      print files which are being copied from tape to disk
+    --daget      <path>      recall / stage online FROM TAPE
+    --dals       <path>      list state
+    --darelease  <path>      send to offline / stage TO TAPE
     --sha256sum  <path>      compute the sha256sum of the file
 
 ```
