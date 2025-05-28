@@ -46,7 +46,7 @@ The data migrates on remote server from disk to tape and during this it has diff
 | Dual-state | `DUL` | Yes | Yes | Content is both on disk and on tape. |
 | Offline | `OFL` | No | Yes | Content is no longer online/on disks, but only on tape. |
 | Unmigrating | `QUE` | **No** | Yes | File queued for staging from tape. Not yet copied from tape. |
-| Unmigrating | `STG` | **No**t yet / Partially | Yes | File being staged from tape to disk. Content is is unavailable until copy is finised. |
+| Unmigrating | `STG` | **No**t yet / Partially | Yes | File being staged from tape to disk. Content is is unavailable until copy is finished. |
 
 Note that the folders are always online (in state `REG`) and as such you can always browse folders and check file permissions and their metadata information.
 
