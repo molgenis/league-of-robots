@@ -1,0 +1,15 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
+---
+interfaces:
+- name: {{ network['nmstate_interface']['name'] }}
+  profile-name: {{ network['name'] }}
+  state: {{ network['nmstate_interface']['state'] | default('up') }}
+  ipv4:
+    enabled: {{ network['nmstate_interface']['ipv4']['enabled'] | default('true') }}
+    dhcp: {{ network['nmstate_interface']['ipv4']['dhcp'] | default('true') }}
+    {%if network['nmstate_interface']['ipv4']['auto-route-metric'] is defined %}
+    auto-route-metric: {{ network['nmstate_interface']['ipv4']['auto-route-metric'] }}
+    {% endif %}
+  ipv6:
+    enabled: {{ network['nmstate_interface']['ipv6']['enabled'] | default('false') }}
+...

@@ -1,0 +1,83 @@
+---
+- name: Install NetworkManager and nmstate.
+  ansible.builtin.package:
+    name:
+      - NetworkManager
+      - nmstate
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Deploy override file to customize NetworkManager configuration.
+  ansible.builtin.template:
+    src: 99-custom.conf
+    dest: /etc/NetworkManager/conf.d/99-custom.conf
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+
+- name: Deploy nmstate configuration file.
+  ansible.builtin.template:
+    src: nmstate.conf
+    dest: /etc/nmstate/nmstate.conf
+    mode: '0644'
+  become: true
+
+- name: Deploy network device configuration file for nmstate based on template.
+  ansible.builtin.template:
+    src: interface_template_nmstate.j2
+    dest: "/etc/nmstate/{{ network['name'] }}.yml"
+    mode: '0644'
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
+  loop_control:
+    loop_var: network
+  register: interfaces_changed_nmstate_files
+  notify: restart_nmstate_service
+  become: true
+
+- name: Remove /etc/nmstate/*.applied when corresponding /etc/nmstate/*.yml got updated.
+  ansible.builtin.file:
+    path: "/etc/nmstate/{{ item }}.applied"
+    state: absent
+  loop: "{{ interfaces_changed_nmstate_files['results'] | selectattr('changed') | map(attribute='network') | map(attribute='name') }}"
+  loop_control:
+    label: "/etc/nmstate/{{ item }}.applied"
+  become: true
+
+- name: Make sure nmstate.service enabled at boot and started.
+  ansible.builtin.systemd:
+    name: nmstate.service
+    enabled: true
+    state: started
+  become: true
+
+- name: Find old network interface configs in ifcfg script format.
+  ansible.builtin.find:
+    paths: /etc/sysconfig/network-scripts/
+    patterns: 'ifcfg-.*'
+    use_regex: true
+  register: interfaces_found_ifcfg_scripts
+
+- name: Delete any old network interface configs in ifcfg script format.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ interfaces_found_ifcfg_scripts.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  become: true
+
+#
+# Prevent cloud-init from ignoring our network setup and
+# from recreating potentially conflicting interface configs in ifcfg script format.
+#
+- name: Prevent cloud-init from messing up the netowrk config on reboot.
+  ansible.builtin.template:
+    src: 99-custom-networking.cfg
+    dest: /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+...
