@@ -112,9 +112,22 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  nmstate_interface:
+                    name: eth2
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: eth2.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: eth2
+                    ipv4:
+                      address:
+                        - ip: 172.23.60.11
+                          prefix-length: 24
+                      dhcp: false
               lustre_client_networks:
                 #- name: tcp20
                 #  interface: enp130s0f0.1068
@@ -169,9 +182,10 @@ all:
                     type: vlan
                     vlan:
                       id: 1068
+                      base-iface: enp65s0np0
                     ipv4:
                       address:
-                        - ip: 192.168.122.250
+                        - ip: 172.23.60.24
                           prefix-length: 24
                       dhcp: false
               lustre_client_networks:
@@ -217,8 +231,8 @@ all:
                 - name: tcp20
                   interface: enp0s4
               local_volume_size_extra: 1
-              slurm_sockets: 1
-              slurm_cores_per_socket: 8
+              slurm_sockets: 4
+              slurm_cores_per_socket: 1
               slurm_real_memory: 257320
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
