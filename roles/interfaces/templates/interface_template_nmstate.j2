@@ -4,11 +4,26 @@ interfaces:
 - name: {{ network['nmstate_interface']['name'] }}
   profile-name: {{ network['name'] }}
   state: {{ network['nmstate_interface']['state'] | default('up') }}
+  {%if network['nmstate_interface']['type'] is defined %}
+  type: {{ network['nmstate_interface']['type'] }}
+  {% endif %}
+  {%if network['nmstate_interface']['vlan'] is defined %}
+  vlan:
+    id: {{ network['nmstate_interface']['vlan']['id'] }}
+    base-iface: {{ network['nmstate_interface']['vlan']['base-iface'] }}
+  {% endif %}
   ipv4:
     enabled: {{ network['nmstate_interface']['ipv4']['enabled'] | default('true') }}
     dhcp: {{ network['nmstate_interface']['ipv4']['dhcp'] | default('true') }}
     {%if network['nmstate_interface']['ipv4']['auto-route-metric'] is defined %}
     auto-route-metric: {{ network['nmstate_interface']['ipv4']['auto-route-metric'] }}
+    {% endif %}
+    {%if network['nmstate_interface']['ipv4']['address'] is defined %}
+    address:
+      {% for address in network['nmstate_interface']['ipv4']['address'] %}
+      - ip: {{ address['ip'] }}
+        prefix-length: {{ address['prefix-length'] }}
+      {% endfor %}
     {% endif %}
   ipv6:
     enabled: {{ network['nmstate_interface']['ipv6']['enabled'] | default('false') }}
