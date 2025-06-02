@@ -49,18 +49,21 @@
   become: true
 
 - name: Apply changed network device configuration file using nmstatectl.
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: |
-         nmstatectl apply "/etc/nmstate/{{ item }}.yml"
+         set -o pipefail
+         before=$(nmstatectl show {{ network['nmstate_interface']['name'] }} | grep -v life-time)
+         nmstatectl apply "/etc/nmstate/{{ network['name'] }}.yml"
+         after=$(nmstatectl show {{ network['nmstate_interface']['name'] }} | grep -v life-time)
+         if [[ "${before}" != "${after}" ]]; then
+           echo 'nmstate changed'
+         fi
     creates: "/etc/nmstate/{{ item }}.applied"
-  loop: "{{ interfaces_changed_nmstate_files['results']
-            | selectattr('changed')
-            | map(attribute='network')
-            | map(attribute='name') }}"
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
   loop_control:
-    label: "/etc/nmstate/{{ item }}.yml"
-  #register: interfaces_apply_nmstate
-  changed_when:
+    loop_var: network
+  register: interfaces_apply_nmstate
+  changed_when: "'nmstate changed' in interfaces_apply_nmstate.stdout"
   become: true
 
 - name: Make sure nmstate.service enabled at boot and started.
