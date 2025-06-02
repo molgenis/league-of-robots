@@ -4,7 +4,7 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'tl'
 stack_dtap_state: development
-slurm_version: '23.02.7-2.el9.umcg'
+slurm_version: '24.11.4-1.el9.umcg'
 slurm_partitions:
   - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
     default: yes
@@ -23,6 +23,15 @@ slurm_partitions:
     max_mem_per_node: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
     local_disk: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_vm  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-c01"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_vm']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
@@ -172,6 +181,15 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
+sponsors:
+  - name: umcg-research-it
+    slurm_shares: 570
+  - name: umcg-cvandiemen
+    slurm_shares: 112
+  - name: umcg-lfranke
+    slurm_shares: 136
+  - name: umcg-mswertz
+    slurm_shares: 570
 # Remote archive settings
 archive_groups:
   - name: arc01
@@ -194,6 +212,14 @@ regular_groups:
   - 'umcg-gsad'
   - 'umcg-gst'
   - 'umcg-sysops'
+  - 'umcg-vipt'
+group_sponsors:
+  umcg-atd: umcg-mswertz
+  umcg-gcc: umcg-mswertz
+  umcg-gsad: umcg-mswertz
+  umcg-gst: umcg-mswertz
+  umcg-sysops: umcg-research-it
+  umcg-vipt: umcg-mswertz
 regular_users:
   # Note, for chaperone machines this is controlled in the static_inventories.
   - user: "{{ envsync_user }}"

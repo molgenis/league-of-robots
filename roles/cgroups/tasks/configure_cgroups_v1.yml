@@ -70,6 +70,8 @@
     owner: root
     group: root
     mode: '0644'
+  tags:
+    - groups
   notify: restart_cgred
   become: true
 
