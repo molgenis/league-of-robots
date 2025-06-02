@@ -58,7 +58,7 @@
          if [[ "${before}" != "${after}" ]]; then
            echo 'nmstate changed'
          fi
-    creates: "/etc/nmstate/{{ item }}.applied"
+    creates: "/etc/nmstate/{{ network['name'] }}.applied"
   loop: "{{ host_networks | selectattr('nmstate_interface') }}"
   loop_control:
     loop_var: network
