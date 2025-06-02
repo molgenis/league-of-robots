@@ -51,6 +51,8 @@
 - name: Apply changed network device configuration file using nmstatectl.
   ansible.builtin.shell:
     cmd: |
+         set -u
+         set -e
          set -o pipefail
          before=$(nmstatectl show {{ network['nmstate_interface']['name'] }} | grep -v life-time)
          nmstatectl apply "/etc/nmstate/{{ network['name'] }}.yml"

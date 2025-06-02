@@ -124,9 +124,6 @@ all:
                       id: 1068
                       base-iface: eth2
                     ipv4:
-                      address:
-                        - ip: 172.23.60.11
-                          prefix-length: 24
                       dhcp: false
               lustre_client_networks:
                 #- name: tcp20
@@ -184,9 +181,6 @@ all:
                       id: 1068
                       base-iface: enp65s0np0
                     ipv4:
-                      address:
-                        - ip: 172.23.60.24
-                          prefix-length: 24
                       dhcp: false
               lustre_client_networks:
                 - name: tcp20
