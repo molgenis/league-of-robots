@@ -1,5 +1,35 @@
 # Network interfaces
 
+## On EL >= 8.x - Network Manager, nmstate, cloud-init, udev and systemd
+
+On Enterprise Linux these tools all try to fiddle with network settings and it can become a complicated mess.
+
+### Network Manager & nmstate
+
+Network Manager kind of works, but do not try to use the `nmtui` text based User Interface nor any GUI.
+Use the `nmcli` command line interface instead.
+By default NetworkManager creates _connections_ for network _devices_ using problematic names.
+E.g. `System wired 1`: such names are confusing and handling in code is problematic due to the spaces in the names. 
+Network Manager also has a habit of creating yet another _connection_ instead of modifying the existing one
+when you try to change/update something.
+
+Therefore we use `nmstate` and its command line tool `nmstatectl` to configure Network Manager. 
+The network interface config files used by `nmstate` are stored in
+```
+/etc/nmstate/*.yml
+```
+When such a `*.yml` is deployed successfully with
+```
+nmstatectl apply /etc/nmstate/natwork_name.yml
+```
+it will result in a corresponding
+```
+nmstatectl apply /etc/nmstate/natwork_name.applied
+```
+and `nmstatectl` will refuse to apply the `*.yml` again unless the corresponding `*.applied` is removed first.
+
+
+
 ### Commands for debugging and config files used.
 
 ```
