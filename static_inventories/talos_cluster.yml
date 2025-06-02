@@ -195,8 +195,8 @@ all:
                   interface: enp0s4
               local_volume_size_extra: 1
               slurm_sockets: 1
-              slurm_cores_per_socket: 8
-              slurm_real_memory: 257320
+              slurm_cores_per_socket: 4
+              slurm_real_memory: 7684
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 900
