@@ -95,8 +95,11 @@
   ansible.builtin.debug:
     msg:
       - 'FATAL: network device specified for network has an IP from another subnet:'
-      - "       {{ network['nmstate_interface']['name'] }} should have IP {{ ip_addresses[inventory_hostname][network['name']]['address'] }} for network {{ network['name'] }}, but"
-      - "       {{ network['nmstate_interface']['name'] }} currently has IP {{ interfaces_active_nmstate_ip }} from another network."
+      - "       {{ network['nmstate_interface']['name'] }} should have IP
+                {{ ip_addresses[inventory_hostname][network['name']]['address'] }}
+                for network {{ network['name'] }}, but"
+      - "       {{ network['nmstate_interface']['name'] }} currently has IP
+                {{ interfaces_active_nmstate_ip }} from another network."
   vars:
     interfaces_active_nmstate_query: "results[?network.name=='{{ network['name'] }}'].stdout"
     interfaces_active_nmstate_yaml: "{{ interfaces_active_nmstate
