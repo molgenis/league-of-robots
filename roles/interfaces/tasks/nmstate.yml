@@ -2,19 +2,9 @@
 - name: Install NetworkManager and nmstate.
   ansible.builtin.package:
     name:
-      - NetworkManager
       - nmstate
     state: latest
     update_cache: true
-  become: true
-
-- name: Deploy override file to customize NetworkManager configuration.
-  ansible.builtin.template:
-    src: 99-custom.conf
-    dest: /etc/NetworkManager/conf.d/99-custom.conf
-    owner: 'root'
-    group: 'root'
-    mode: '0644'
   become: true
 
 - name: Deploy nmstate configuration file.
@@ -75,22 +65,6 @@
     state: started
   become: true
 
-- name: Find old network interface configs in ifcfg script format.
-  ansible.builtin.find:
-    paths: /etc/sysconfig/network-scripts/
-    patterns: 'ifcfg-.*'
-    use_regex: true
-  register: interfaces_found_ifcfg_scripts
-
-- name: Delete any old network interface configs in ifcfg script format.
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    state: absent
-  loop: "{{ interfaces_found_ifcfg_scripts.files }}"
-  loop_control:
-    label: "{{ item.path }}"
-  become: true
-
 #
 # Prevent cloud-init from ignoring our network setup and
 # from recreating potentially conflicting interface configs in ifcfg script format.
@@ -103,4 +77,42 @@
     group: 'root'
     mode: '0644'
   become: true
+
+#
+# Sanity check: get active IP for interface and verify if it matches the expected IP address of the network specified for that interface.
+#
+- name: Get active network config for device using nmstatectl.
+  ansible.builtin.command:
+    cmd: |
+         nmstatectl show {{ network['nmstate_interface']['name'] }}
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
+  loop_control:
+    loop_var: network
+  register: interfaces_active_nmstate
+  changed_when: true
+
+- name: Fail if device specified for network has a wrong IP from another network.
+  ansible.builtin.debug:
+    msg:
+      - 'FATAL: network device specified for network has an IP from another subnet:'
+      - "       {{ network['nmstate_interface']['name'] }} should have IP {{ ip_addresses[inventory_hostname][network['name']]['address'] }} for network {{ network['name'] }}, but"
+      - "       {{ network['nmstate_interface']['name'] }} currently has IP {{ interfaces_active_nmstate_ip }} from another network."
+  vars:
+    interfaces_active_nmstate_query: "results[?network.name=='{{ network['name'] }}'].stdout"
+    interfaces_active_nmstate_yaml: "{{ interfaces_active_nmstate
+        | json_query(interfaces_active_nmstate_query)
+        | first
+        | from_yaml }}"
+    interfaces_active_nmstate_ip: "{{ interfaces_active_nmstate_yaml['interfaces']
+        | map(attribute='ipv4')
+        | map(attribute='address')
+        | first
+        | map(attribute='ip')
+        | first }}"
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
+  loop_control:
+    loop_var: network
+  when: interfaces_active_nmstate_ip != ip_addresses[inventory_hostname][network['name']]['address']
+  changed_when: interfaces_active_nmstate_ip != ip_addresses[inventory_hostname][network['name']]['address']
+  failed_when: interfaces_active_nmstate_ip != ip_addresses[inventory_hostname][network['name']]['address']
 ...
