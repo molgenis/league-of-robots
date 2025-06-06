@@ -1,3 +1,4 @@
+{% raw %}
 --[[
 
  This lua script:
@@ -242,6 +243,16 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
             return slurm.ESLURM_NOT_SUPPORTED
         end
     end
+    if group == nil then
+        slurm.log_error(
+            "Failed to determine group for this job.\n" ..
+            "Rejecting job named %s from user %s (uid=%u).", tostring(job_metadata_value), tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
+        slurm.log_user(
+            "Failed to determine group for this job.\n" ..
+            "Contact the helpdesk.\n" ..
+            "Rejecting job named %s from user %s (uid=%u).", tostring(job_metadata_value), tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
+        return slurm.ESLURM_NOT_SUPPORTED
+    end
     slurm.log_debug("Job's feature list contains: %s.", tostring(job_desc.features))
     --
     -- Process final list of features:
@@ -389,3 +400,4 @@ end
 
 slurm.log_info("Initialized")
 return slurm.SUCCESS
+{% endraw %}
