@@ -103,8 +103,7 @@ for _file in ${_queue_files}; do
       daget)      _command="daget ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       dals)       _command="dals -l ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       darelease)  _command="darelease ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
-      sha256sum)  _afile="$(basename ${_subdir})"; _adir="$(dirname ${_subdir})"
-                  _command="dmfind ${_archive_remote_top_dir}/${_arc}/${_group}/${_adir} -name ${_afile} \( -state DUL -or -state REG \) -exec sha256sum {} \; ; dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_adir} -name ${_afile} \( ! -state DUL ! -state REG \) -exec echo 'sha256sum unavailable - file is offline' \;" ;;
+      sha256sum)  _command="sha256sum ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
                   date >> "${_stdout}.done"
                   rm -f "${_file:-error_path}" && continue ;;
