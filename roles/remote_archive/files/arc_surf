@@ -11,6 +11,7 @@ _delay=0.5
 function _print_help(){
    cat << EOF
    Provide one of the following arguments
+    --quiet                  don't print the start message - supress the extra output
     --dafind-reg <path>      search for regular files / files that reside only on disk
                              (there is no copy on tape) Directories are always REG.
     --dafind-dul <path>      search for files that reside both online (on disk) and offline (on tape)
@@ -30,29 +31,46 @@ if [[ "${#}" -lt 2 ]] || [[ "${1}" == "-h" ]] || [[ "${1}" == "--help" ]]; then
    _print_help
 fi
 
-_arg="${1:-default}"
-_path="${2:-/error_path}"
-if ! test -e "${_path}"; then
-   echo "Error, path must exist!"
-   exit 1
-fi
+# set variable initial values
+_quiet=false
+_arg="default"
+_path="/errorpath"
+
+# parse command arguments
+for _eacharg in "$@"; do
+   # if starts with '--'
+   if [[ "${_eacharg:0:2}" == "--" ]]; then
+      if [[ "${_eacharg}" == "--quiet" ]]; then
+         _quiet=true
+      else # if not quiet, it is --dafind, --dals ...
+         _arg="${_eacharg}"
+      fi
+   else
+      # else it is probably path (if it does not start with '--'
+      _path="${_eacharg}"
+      if ! test -e "${_path}"; then
+         echo "Error: path must exist!"
+         exit 1
+      fi
+   fi
+done
 
 _first="$(echo "${_path}" | cut -s -d'/' -f2)"
 if [[ "${_first}" != "groups" ]]; then
-   echo "Failed: directory must be from the /groups!"
+   echo "Error: directory must be from the /groups!"
    exit 1
 fi
 _second="$(echo "${_path}" | cut -s -d'/' -f3)"
 _third="$(echo "${_path}" | cut -s -d'/' -f4)"
 if [[ ! "${_third}" =~ ^"arc"[0-9][0-9]$ ]]; then
-   echo "Failed: directory must be in the arc filesystem!"
+   echo "Error: directory must be in the arc filesystem!"
    exit 1
 fi
 
 echo "${_arg} ${_path}" >> "${_queue_dir}/${_third}/${_tmp_basename}"
 
-echo "Submitted to remote host, waiting for reply ..."
-echo "( You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_basename} )"
+${_quiet} || echo "Submitted to remote host, waiting for reply ..."
+${_quiet} || echo "( You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_basename} )"
 sleep ${_delay} && sync
 while ! test -s "${_stdout_dir}/${_tmp_basename}.done"; do
    sleep ${_delay}

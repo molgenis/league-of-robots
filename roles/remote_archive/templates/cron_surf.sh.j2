@@ -95,11 +95,11 @@ for _file in ${_queue_files}; do
    # Check and format command
    _argument=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    case "${_argument:2}" in
-      dafind-reg) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state REG" ;;
-      dafind-dul) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state DUL" ;;
-      dafind-ofl) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state OFL" ;;
-      dafind-que) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state QUE" ;;
-      dafind-stg) _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state STG" ;;
+      dafind-reg) _state="REG" ;;
+      dafind-dul) _state="DUL" ;;
+      dafind-ofl) _state="OFL" ;;
+      dafind-que) _state="QUE" ;;
+      dafind-stg) _state="STG" ;;
       daget)      _command="daget ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       dals)       _command="dals -l ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
       darelease)  _command="darelease ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
@@ -108,8 +108,13 @@ for _file in ${_queue_files}; do
                   date >> "${_stdout}.done"
                   rm -f "${_file:-error_path}" && continue ;;
    esac
+   # if dafind, restructure output to correctly show folder paths
+   if [[ "${_argument:2:6}" == "dafind" ]]; then
+       _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state ${_state}"
+   fi
+   _command_sed="${_command} | sed 's|${_archive_remote_top_dir}/${_arc}/${_group}/|/groups/${_group}/${_arc}/|g'"
    rm -f "${_file:-error_path}"
-   echo "${0} info: running command '${_command}'"
-   timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command}" >> "${_stdout}" 2>&1
+   echo "${0} info: running command '${_command_sed}'"
+   timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command_sed}" >> "${_stdout}" 2>&1
    date >> "${_stdout}.done" && chown "${_submitter_uid}":"${_group}" "${_stdout}.done"
 done

@@ -117,7 +117,7 @@
     - 'archive_systemd_reload'
   become: true
 
-- name: Create archive directory mountpoint for each group
+- name: Create archive directory mountpoint for each group (dir must be unmounted first)
   ansible.builtin.file:
     path: "/groups/{{ item.1 }}/{{ item.0.name }}"
     owner: "{{ item.1 }}-dm"
