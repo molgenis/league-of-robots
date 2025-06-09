@@ -93,7 +93,8 @@ NamePolicy=kernel database onboard path slot
 
 ### cloud-init
 
-_Cloud-init_ is required to configure at least a first network interface when the machine is provisioned.
+[Network config via _cloud-init_](https://cloudinit.readthedocs.io/en/latest/reference/network-config.html)
+is required to configure at least a first network interface when the machine is provisioned.
 Once we can login via SSH and deploy Ansible playbooks, we can change the network configuration for that interface
 or add/remove additional interfaces. _Cloud-init_ configures _Network Manager_,
 but uses the old _ifcfg scripts_ file format with files located in `/etc/sysconfig/network-scripts/`
@@ -104,16 +105,158 @@ and once we can deploy this role we use it to disable network configuration by _
 
 ## Configuring network settings using this interfaces role
 
-In `group_vars/[stack-name]/vars.yml`:
-
+Configure all networks used by the stack in `group_vars/[stack-name]/vars.yml`;
+Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here.
 ```yaml
-
+stack_networks:
+  - name: string
+    cidr: 'ip/mask'
+    gateway: ip
+    router_network: string
+    router_name: string
+    type: [management|storage]  # Effects security group applied to network by openstack_networking role.
+    external: [true|false]      # Default is false when omitted and means network is created by code from this repo.
+                                # True means network is created by cloud admin before running any code from this repo.
+    mtu_size: integer
+    allow_ingress:
+      - ip/mask  # External machines not part of this stack that need to communicate with machines in this stack
+                 # and which need to be added to the OpenStack security group rules for this network to allow network traffic.
+```
+Example for the Talos test cluster:
+```yaml
+stack_networks:
+  - name: vlan1337  # Internal management for VMs and BMs
+    cidr: '172.23.68.0/24'
+    gateway: '172.23.68.1'
+    router_network: vlan16
+    router_name: vlan1337
+    type: management
+    external: true
+  - name: "{{ stack_prefix }}_internal_management"
+    cidr: '10.10.1.0/24'
+    gateway: '10.10.1.1'
+    router_network: vlan16
+    type: management
+    external: false
+    mtu_size: '1450'
+  - name: vlan1068  # Private Lustre
+    cidr: '172.23.60.0/24'
+    allow_ingress:
+      - 172.23.60.161/32  # Lustre server
+      - 172.23.60.162/32  # Lustre server
+      - 172.23.60.163/32  # Lustre server
+      - 172.23.60.164/32  # Lustre server
+    type: storage
+    external: true
 ```
 
-In `static_inventory/[stack-name].yml`:
-
+Configure which network to use and on which interface per machine in `static_inventory/[stack-name].yml`.
 ```yaml
+---
+all:
+  children:
+    [inventory_group]:
+      hosts:
+        [inventory_hostname]:
+          host_networks:
+            - name: string
+              security_group: string
+              assign_floating_ip: [true|false]  # Default is false when omitted.
+              #
+              # Details for nmstate in the same YAML syntax/structure as for a single item from the
+              # "interfaces" key in the YAML output from nmstatectl or as listed in nmstate config files; See
+              #     https://nmstate.io/
+              # for details. Note that
+              #     * Not all nmstate interface configuration options have been implemented (yet):
+              #       See roles/interfaces/templates/interface_template_nmstate.j2 for supported options.
+              #     * Not all options must be specified; omitted options will use defaults.
+              #       The minimal config specifies only the interface "name" and will use DHCP.
+              #
+              nmstate_interface:
+                name: string  # E.g. enp3s0
+            - name: string
+              security_group: string
+              #
+              # Example for configuring the metric of the newtwork route for this interface manually
+              # to enforce a certain order of precedence when multiple routes are possible.
+              #
+              nmstate_interface:
+                name: string  # E.g. enp4s0
+                ipv4:
+                  auto-route-metric: integer  # Integer below 100 to increae priority for this route.
+            - name: string
+              security_group: string
+              #
+              # Example for configuring a tagged VLAN interface on a base interface,
+              # which may use an untagged VLAN, after initial provisioing of the machine.
+              # In this case DHCP is disabled and a specific IP is configured: this IP
+              # must not be specified here as it will get looked up automagically from:
+              #     group_vars/[stack-name]/ip_addresses.yml.
+              #
+              attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+              nmstate_interface:
+                name: base_interface_name.vlan_ID  # Must use this format. E.g. enp4s0.1068
+                type: vlan
+                vlan:
+                  id: integer
+                  base-iface: string  # E.g. enp4s0
+                ipv4:
+                  dhcp: false
+```
 
+Example with subset of machines for the Talos test cluster:
+```yaml
+---
+all:
+  children:
+    jumphost:
+      hosts:
+        reception:
+          host_networks:
+            - name: vlan1337
+              security_group: "{{ stack_prefix }}_jumphosts"
+              assign_floating_ip: true
+              nmstate_interface:
+                name: enp3s0
+    user_interface:
+      hosts:
+        talos:
+          host_networks:
+            - name: vlan1337
+              security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                name: enp4s0
+            - name: vlan1068
+              security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                name: enp5s0
+                ipv4:
+                  auto-route-metric: 80
+    compute_node:
+      children:
+        cpu_r6515:
+          hosts:
+            tl-node-b01:
+              host_networks:
+                - name: vlan1337
+                  security_group: "{{ stack_prefix }}_cluster"
+                  nmstate_interface:
+                    name: enp65s0np0
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: enp65s0np0.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: enp65s0np0
+                    ipv4:
+                      dhcp: false
 ```
 
 ### Commands for debugging and config files used.
