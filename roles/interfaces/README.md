@@ -9,11 +9,11 @@ On Enterprise Linux these tools all try to fiddle with network settings and it c
 Network Manager kind of works, but do not try to use the `nmtui` text based User Interface nor any GUI.
 Use the `nmcli` command line interface instead.
 By default NetworkManager creates _connections_ for network _devices_ using problematic names.
-E.g. `System wired 1`: such names are confusing and handling in code is problematic due to the spaces in the names. 
+E.g. `System wired 1`: such _connection_ names are confusing and handling in code is problematic due to the spaces in the names. 
 Network Manager also has a habit of creating yet another _connection_ instead of modifying the existing one
 when you try to change/update something.
 
-Therefore we use `nmstate` and its command line tool `nmstatectl` to configure Network Manager. 
+Therefore we use [nmstate](https://nmstate.io/) and its command line tool `nmstatectl` to control Network Manager. 
 The network interface config files used by `nmstate` are stored in
 ```
 /etc/nmstate/*.yml
@@ -28,13 +28,103 @@ nmstatectl apply /etc/nmstate/natwork_name.applied
 ```
 and `nmstatectl` will refuse to apply the `*.yml` again unless the corresponding `*.applied` is removed first.
 
+To check the current state of the network connections and devices:
+```
+#
+# List all network connections using Network Manager.
+#
+nmcli connection show
+#
+# List all network devices using Network Manager.
+#
+nmcli device status
+#
+# List the state of a network device using nmstate;
+# nmstate does not differentiate between connections and devices:
+# it always operates directly on a network device and
+# changes to the state of a network interface are automagically reflected
+# in the corresponsing Network Manager connection.
+#
+nmstatectl show [device]
+```
 
+### udev & systemd
+
+> systemd/udev will automatically assign predictable, stable network interface names for all local Ethernet, WLAN and WWAN interfaces.
+
+For additional details see [systemd - Predictable Network Interface Names](https://systemd.io/PREDICTABLE_INTERFACE_NAMES/)
+
+The exec summary:
+ * Old interface naming resulted in names like `eth0`, `eth1`, `eth2`, etc. for ethernet devices
+   and depends on the order in which the kernel discoveres network interfaces.
+ * This is problematic when an interface was added or removed, because it could result in a new order
+   and hence result in changed names of network devices after a reboot.
+ * The new interface naming depends on _udev rules_.
+   By default these are applied in the following order of precedence
+    1. `keep`: previously assigned names are kept.
+    1. `kernel`: the kernel claims that the name it has set for a device is predictable (example: `lo` for loopback device).
+    1. `database`: name based on entry in udev's Hardware Database.
+    1. `onboard`: name based on Firmware/BIOS provided index numbers for on-board devices (example: eno1).
+    1. `slot`: name based on Firmware/BIOS provided PCI Express hotplug slot index numbers (example: ens1).
+    1. `path`: name based on physical/geographical path to the connector of the hardware (example: enp3s0).
+    1. `mac`: name based the MAC address of the interfaces (example: enx2317d1ca25ab)
+    1. `classic`: last resort if all of the above failed, then use "unpredictable" old style naming by the kernel (example: eth0)
+   In theory this should result in stable network interface names when interfaces are added or removed
+   **as long as the _udev rules_ are stable**.
+ * In practice however the latter is a problem:
+    * Updates for `udev` in minor updates for Enterprise Linux have result in changed rules.
+    * Firmware updates may result in presenting the hardware differently to BIOS/EFI,
+      resulting in different names even when the rules have not changed.
+ * Therefore every minor bugfix update can now result in changed network interface names after reboot
+   even when no interfaces were added nor removed: network interface names are now even less predictable then before.
+
+We use a patched list (of precedence) of `udev` _rules_:
+```
+NamePolicy=kernel database onboard path slot
+```
+* `slot` based naming rules changed several times and are less stable than `path` based rules.
+  Therefore we prefer `path` based naming over `slot` based naming.
+* `keep` was removed, because it is problematic when trying to enforce a custom set of naming rules.
+  Moreover it is problematic when a machine is re-deployed later and the rules changed:
+  The redeployed one will follow the new rules, but the exact same generation of hardware that was previously deployed,
+  will continue to use the old rules. This may result for example in for compute nodes of the same type.
+* `mac` is not used because it the most unpredictable making it impossible to predict the name of interfaces
+  for machines of the same generation of hardware when the config for the first machine is known.
+
+### cloud-init
+
+_Cloud-init_ is required to configure at least a first network interface when the machine is provisioned.
+Once we can login via SSH and deploy Ansible playbooks, we can change the network configuration for that interface
+or add/remove additional interfaces. _Cloud-init_ configures _Network Manager_,
+but uses the old _ifcfg scripts_ file format with files located in `/etc/sysconfig/network-scripts/`
+instead of the new _keyfile_ file format with files located in `/etc/NetworkManager/system-connections/`.
+
+Therefore we first let _cloud-init_ configure network when the machine is provisioned
+and once we can deploy this role we use it to disable network configuration by _cloud-init_.
+
+## Configuring network settings using this interfaces role
+
+In `group_vars/[stack-name]/vars.yml`:
+
+```yaml
+
+```
+
+In `static_inventory/[stack-name].yml`:
+
+```yaml
+
+```
 
 ### Commands for debugging and config files used.
 
 ```
 #
-# Track what udev does
+# Track what udev does; this command will also rename the network interface according to udev rules when possible
+# Possible means:
+#   * When the new interface name as determined by the udev rules is not already used by another interface
+#   * When there are no other config files that already enforce some other name;
+#     E.g. previously named interfaces listed in /etc/udev/rules.d/70-persistent-net.rules will not get renamed.
 #
 sudo udevadm test /sys/class/net/[current_interface_name]
 
