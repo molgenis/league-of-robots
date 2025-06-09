@@ -106,7 +106,7 @@ and once we can deploy this role we use it to disable network configuration by _
 ## Configuring network settings using this interfaces role
 
 Configure all networks used by the stack in `group_vars/[stack-name]/vars.yml`;
-Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here.
+Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here:
 ```yaml
 stack_networks:
   - name: string
@@ -150,7 +150,7 @@ stack_networks:
     external: true
 ```
 
-Configure which network to use and on which interface per machine in `static_inventory/[stack-name].yml`.
+Configure which network to use and on which interface per machine in `static_inventory/[stack-name].yml`:
 ```yaml
 ---
 all:
@@ -169,8 +169,13 @@ all:
               # for details. Note that
               #     * Not all nmstate interface configuration options have been implemented (yet):
               #       See roles/interfaces/templates/interface_template_nmstate.j2 for supported options.
-              #     * Not all options must be specified; omitted options will use defaults.
+              #     * Not all options need to be specified; omitted options will use defaults.
               #       The minimal config specifies only the interface "name" and will use DHCP.
+              #     * When you privision a machine from a new generation of hardware or a new OS version,
+              #       which may use changed udev rules, you may not know the names of the interfaces.
+              #       In that case leave the nmstate_interface key out or disable it with a comment
+              #       for the first deployment, check the interface names once you can login via SSH,
+              #       then append nmstate_interface details and re-deploy the interfaces role.
               #
               nmstate_interface:
                 name: string  # E.g. enp3s0
