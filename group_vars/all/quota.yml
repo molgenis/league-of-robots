@@ -16,7 +16,7 @@ lfs_quota:
       umcg-gaf: 22528
       umcg-gap: 1024
       umcg-gastrocol: 5120
-      umcg-gcc: 26624
+      umcg-gcc: 27648
       umcg-gdi: 1024
       umcg-gdio: 11264
       umcg-gonl: 5120
@@ -79,6 +79,7 @@ lfs_quota:
       umcg-hlhs: 3072
       umcg-immunogenetics: 2048
       umcg-impact: 3072
+      umcg-intercept: 2048
       umcg-lifelines: 17408
       umcg-lld: 3072
       umcg-llnext: 10240
@@ -216,6 +217,7 @@ lfs_quota:
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
+      umcg-intercept: 2048
       umcg-lifelines: 81920
       umcg-lld: 1024
       umcg-llnext: 2048
