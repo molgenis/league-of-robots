@@ -201,12 +201,24 @@
   become: true
 
 - name: 'Install Slurm job_submit.lua script.'
-  ansible.builtin.copy:
-    src: "files/job_submit.lua.el{% if ansible_facts['distribution_major_version'] is version('8', '>=') %}8{% else %}7{% endif %}"
+  ansible.builtin.template:
+    src: "job_submit.lua.el
+         {%- if ansible_facts['distribution_major_version'] is version('8', '>=') -%}
+           8
+           {%- if slurm_version is version('24.11', '>=') -%}
+             .with_sponsors
+           {%- endif -%}
+         {%- else -%}
+           7
+         {%- endif -%}
+         .j2"
     dest: '/etc/slurm/job_submit.lua'
     owner: 'root'
     group: 'root'
     mode: '0755'
+  tags:
+    - job_submit
+    - groups
   become: true
 
 - name: 'Create folders for systemd override files.'
@@ -250,14 +262,16 @@
     - 'slurmdbd.service'
   become: true
 
-- name: 'Copy Slurm DB initialization script to host running slurmdbd.'
+- name: 'Copy Slurm DB configuration script to host running slurmdbd.'
   ansible.builtin.template:
-    src: 'templates/configure_slurm_accounting_db.bash'
+    src: "templates/configure_slurm_accounting_db{% if slurm_version is version('24.11', '>=') %}_with_sponsors{% endif %}.bash"
     dest: '/etc/slurm/configure_slurm_accounting_db.bash'
     owner: 'root'
     group: 'root'
     mode: '0700'
-  tags: 'create_database'
+  tags:
+    - configure_slurm_database
+    - groups
   become: true
 
 #
@@ -266,31 +280,6 @@
 - name: 'Flush handlers.'
   ansible.builtin.meta: flush_handlers
 
-- name: 'Execute Slurm DB initialization script on host running slurmdbd.'  # noqa no-changed-when
-  ansible.builtin.command:
-    cmd: '/etc/slurm/configure_slurm_accounting_db.bash'
-  register: command_result
-  retries: 3
-  delay: 5
-  until:
-    - command_result.stderr|length == 0
-    - command_result.stdout|length > 0
-  # NOTE: cannot use command_result.rc to check for the exit value of script in failed_when or changed_when
-  #       as the sacctmgr commands used in the script may return exit code 1 when trying to create/modify
-  #       something that already exists. This results in "Nothing new added." on STDOUT, but no message on STDERR.
-  #       In case something is really wrong there will be messags printed to STDERR.
-  failed_when: command_result.stderr|length > 0
-  tags: 'create_database'
-  become: true
-
-- name: 'Make sure slurmctld service is enabled and started now that the cluster DB is present.'
-  ansible.builtin.systemd:
-    name: 'slurmctld.service'
-    state: 'started'
-    enabled: true
-    daemon_reload: true
-  become: true
-
 - name: 'Make backup dir.'
   ansible.builtin.file:
     path: '/root/slurm/backup'
@@ -298,7 +287,9 @@
     owner: 'root'
     group: 'root'
     mode: '0700'
-  tags: 'backup'
+  tags:
+    - backup
+    - groups
   become: true
 
 - name: 'Create Slurm accounting DB backup now.'  # noqa no-changed-when
@@ -307,7 +298,9 @@
              -uroot -p{{ MYSQL_ROOT_PASSWORD | quote }} \
              -h localhost --protocol=socket \
              | gzip > /root/slurm/backup/slurm.sql.gz
-  tags: 'backup'
+  tags:
+    - backup
+    - groups
   no_log: true
   become: true
 
@@ -321,8 +314,27 @@
       && mysqldump --all-databases -uroot -p{{ MYSQL_ROOT_PASSWORD | quote }} -h localhost --protocol=socket
       | gzip > /root/slurm/backup/slurm.sql.gz
       && /bin/find /root/slurm/backup/slurm_bak.sql.gz* -mtime +3 -delete
-  tags: 'backup'
+  tags:
+    - backup
   no_log: true
+  become: true
+
+- name: 'Execute Slurm DB configuration script on host running slurmdbd.'  # noqa no-changed-when
+  ansible.builtin.command:
+    cmd: '/etc/slurm/configure_slurm_accounting_db.bash'
+  retries: 1
+  delay: 5
+  tags:
+    - configure_slurm_database
+    - groups
+  become: true
+
+- name: 'Make sure slurmctld service is enabled and started now that the cluster DB is present.'
+  ansible.builtin.systemd:
+    name: 'slurmctld.service'
+    state: 'started'
+    enabled: true
+    daemon_reload: true
   become: true
 
 - name: 'Allow passwordless sudo to slurm user for users in the functional_admins_group.'
@@ -342,6 +354,7 @@
     owner: 'root'
     group: 'root'
     mode: '0750'
+  when: slurm_version is version('24.11', '<')
   become: true
 
 - name: 'Deploy cron job to create missing slurm group accounts in the slurm database, run every half an hour.'
@@ -350,5 +363,20 @@
     minute: '24,54'
     hour: '*'
     job: '/root/cron_add_missing_slurm_accounts.sh'
+  when: slurm_version is version('24.11', '<')
+  become: true
+
+- name: 'Remove cron job to create missing slurm group accounts in the slurm database: accounts must be created/updated by playbook.'
+  ansible.builtin.cron:
+    name: 'Add missing slurm group accounts'
+    state: absent
+  when: slurm_version is version('24.11', '>=')
+  become: true
+
+- name: 'Remove script for creating missing slurm group accounts in the database: accounts must be created/updated by playbook.'
+  ansible.builtin.file:
+    path: '/root/cron_add_missing_slurm_accounts.sh'
+    state: absent
+  when: slurm_version is version('24.11', '>=')
   become: true
 ...

@@ -44,7 +44,7 @@ BatchStartTimeout=30
 InactiveLimit=0
 MinJobAge=300
 KillWait=30
-UnkillableStepTimeout=180
+UnkillableStepTimeout=300
 Waittime=15
 #
 # Scheduling
