@@ -9,7 +9,9 @@
   run_once: true  # noqa run-once
   delegate_to: localhost
   connection: local
-  tags: help
+  tags:
+    - help
+    - never
 
 - name: stop the playbook
   ansible.builtin.meta: end_play
