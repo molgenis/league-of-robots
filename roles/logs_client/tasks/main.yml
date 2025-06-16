@@ -1,5 +1,5 @@
 ---
-- name: print help options
+- name: Print help options
   ansible.builtin.debug:
     msg: >
       this role supports following tags:
@@ -9,11 +9,15 @@
   run_once: true  # noqa run-once
   delegate_to: localhost
   connection: local
-  tags: help
+  tags:
+    - help
+    - never
 
-- name: stop the playbook
+- name: Stop the playbook
   ansible.builtin.meta: end_play
-  tags: help
+  tags:
+    - help
+    - never
 
 - name: Compile the list of logs server names
   ansible.builtin.set_fact:
