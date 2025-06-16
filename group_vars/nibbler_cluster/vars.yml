@@ -251,6 +251,7 @@ regular_groups:
   - 'umcg-hlhs'
   - 'umcg-immunogenetics'
   - 'umcg-impact'
+  - 'umcg-intercept'
   - 'umcg-lifelines'
   - 'umcg-lld'
   - 'umcg-llnext'
@@ -339,6 +340,8 @@ regular_users:
     groups: ['umcg-immunogenetics']
   - user: 'umcg-impact-dm'
     groups: ['umcg-impact']
+  - user: 'umcg-intercept-dm'   
+    groups: ['umcg-intercept']
   - user: 'umcg-lifelines-dm'
     groups: ['umcg-lifelines']
   - user: 'umcg-lld-dm'
@@ -456,6 +459,8 @@ sudoers:
     become: 'umcg-immunogenetics-dm'
   - who: ['%umcg-impact']
     become: 'umcg-impact-dm'
+  - who: ['%umcg-intercept']
+    become: 'umcg-intercept-dm'
   - who: ['%umcg-lifelines-dms']
     become: 'umcg-lifelines-dm'
   - who: ['%umcg-lld-dms']
@@ -547,6 +552,7 @@ local_mount_subfolders:
           - umcg-gsad
           - umcg-hematology
           - umcg-impact
+          - umcg-intercept
           - umcg-lifelines
           - umcg-lld
           - umcg-llnext
@@ -668,6 +674,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-impact
         mode: '2750'
+      - name: umcg-intercept
+        mode: '2750'
       - name: umcg-lifelines
         mode: '2750'
       - name: umcg-lld
@@ -755,6 +763,7 @@ lfs_mounts:
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
+      - name: umcg-intercept
       - name: umcg-lifelines
       - name: umcg-lld
       - name: umcg-llnext
@@ -810,6 +819,7 @@ lfs_mounts:
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
+      - name: umcg-intercept
       - name: umcg-lifelines
       - name: umcg-lld
       - name: umcg-llnext
@@ -863,6 +873,7 @@ lfs_mounts:
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
+      - name: umcg-intercept
       - name: umcg-lifelines
       - name: umcg-lld
       - name: umcg-llnext
