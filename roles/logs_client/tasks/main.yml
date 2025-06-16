@@ -1,5 +1,5 @@
 ---
-- name: print help options
+- name: Print help options
   ansible.builtin.debug:
     msg: >
       this role supports following tags:
@@ -13,9 +13,11 @@
     - help
     - never
 
-- name: stop the playbook
+- name: Stop the playbook
   ansible.builtin.meta: end_play
-  tags: help
+  tags:
+    - help
+    - never
 
 - name: Compile the list of logs server names
   ansible.builtin.set_fact:
