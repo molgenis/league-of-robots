@@ -192,13 +192,18 @@ all:
             - name: string
               security_group: string
               #
+              # On Merlin cloud only network interfaces from a dedicated management network for bare metal deployment
+              # can be attached automatically to machines upon initial instance launch.
+              # Network interfaces for all additional networks must be configured after boot.
+              #
+              attach_port_on_instance_launch: false
+              #
               # Example for configuring a tagged VLAN interface on a base interface,
-              # which may use an untagged VLAN, after initial provisioing of the machine.
+              # which may use an untagged VLAN, after initial provisioning of the machine.
               # In this case DHCP is disabled and a specific IP is configured: this IP
               # must not be specified here as it will get looked up automagically from:
               #     group_vars/[stack-name]/ip_addresses.yml.
               #
-              attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
               nmstate_interface:
                 name: base_interface_name.vlan_ID  # Must use this format. E.g. enp4s0.1068
                 type: vlan

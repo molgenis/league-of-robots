@@ -69,7 +69,7 @@
 # Prevent cloud-init from ignoring our network setup and
 # from recreating potentially conflicting interface configs in ifcfg script format.
 #
-- name: Prevent cloud-init from messing up the netowrk config on reboot.
+- name: Prevent cloud-init from messing up the network config on reboot.
   ansible.builtin.template:
     src: 99-custom-networking.cfg
     dest: /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
