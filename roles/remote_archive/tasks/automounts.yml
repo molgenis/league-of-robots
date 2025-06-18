@@ -117,14 +117,22 @@
     - 'archive_systemd_reload'
   become: true
 
-- name: Create archive directory mountpoint for each group (dir must be unmounted first)
+# We don't assign the user and group permissions for two reasons:
+#  - this task should create folder only if is missing
+#  - it should not assign user or group ownership
+#  - the user and group ownership change at mount time, and assinging them
+#    would make this task fail - which is not needed
+#  - we only assign mode 2750 which reflects the permissions of the mounted 
+#    folders - so this is fine
+#  - from security point of view, as mentioned before, user and group change
+#    at mount time, so that only -dm users can view and edit archive content
+- name: Create archive directory mountpoint for each group
   ansible.builtin.file:
     path: "/groups/{{ item.1 }}/{{ item.0.name }}"
-    owner: "{{ item.1 }}-dm"
-    group: "{{ item.1 }}"
     mode: "2750"
     state: "directory"
   when: archive_groups | default([]) | length >= 1
+  register: created_mount_point
   with_subelements:
     - "{{ archive_groups | list }}"
     - 'groups'
