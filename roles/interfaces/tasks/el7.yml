@@ -1,7 +1,7 @@
 ---
 - name: Create network device configuration file based on template.
   ansible.builtin.template:
-    src: interface_template.j2
+    src: interface_template_ifcfg.j2
     dest: "/etc/sysconfig/network-scripts/{{ network_device_file_prefix }}{{ item.device }}"
     mode: '0644'
   become: true

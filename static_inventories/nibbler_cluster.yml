@@ -139,12 +139,27 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                name: enp0s6
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp0s3
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp0s4
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp0s5
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                #name: enp0s7
+                name: enp0s11  # Will most likely change to enp0s7 after reboot.
+                ipv4:
+                  auto-route-metric: 80
           lustre_client_networks: "{{ lustre_client_networks_vm }}"
           slurm_sockets: 16
           slurm_cores_per_socket: 1
@@ -243,9 +258,19 @@ all:
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
+                  nmstate_interface:
+                    name: enp130s0f0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: enp130s0f0.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: enp130s0f0
+                    ipv4:
+                      dhcp: false
               lustre_client_networks:
                 - name: tcp20
                   interface: enp130s0f0.1068

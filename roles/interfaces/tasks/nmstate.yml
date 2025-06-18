@@ -1,0 +1,121 @@
+---
+- name: Install NetworkManager and nmstate.
+  ansible.builtin.package:
+    name:
+      - nmstate
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Deploy nmstate configuration file.
+  ansible.builtin.template:
+    src: nmstate.conf
+    dest: /etc/nmstate/nmstate.conf
+    mode: '0644'
+  become: true
+
+- name: Deploy network device configuration file for nmstate based on template.
+  ansible.builtin.template:
+    src: interface_template_nmstate.j2
+    dest: "/etc/nmstate/{{ network['name'] }}.yml"
+    mode: '0644'
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
+  loop_control:
+    loop_var: network
+  register: interfaces_changed_nmstate_files
+  notify: restart_nmstate_service
+  become: true
+
+- name: Remove /etc/nmstate/*.applied when corresponding /etc/nmstate/*.yml got updated.
+  ansible.builtin.file:
+    path: "/etc/nmstate/{{ item }}.applied"
+    state: absent
+  loop: "{{ interfaces_changed_nmstate_files['results']
+            | selectattr('changed')
+            | map(attribute='network')
+            | map(attribute='name') }}"
+  loop_control:
+    label: "/etc/nmstate/{{ item }}.applied"
+  become: true
+
+- name: Apply changed network device configuration file using nmstatectl.
+  ansible.builtin.shell:
+    cmd: |
+         set -u
+         set -e
+         set -o pipefail
+         before=$(nmstatectl show {{ network['nmstate_interface']['name'] }} | grep -v life-time)
+         nmstatectl apply "/etc/nmstate/{{ network['name'] }}.yml"
+         after=$(nmstatectl show {{ network['nmstate_interface']['name'] }} | grep -v life-time)
+         if [[ "${before}" != "${after}" ]]; then
+           echo 'nmstate changed'
+         fi
+    creates: "/etc/nmstate/{{ network['name'] }}.applied"
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
+  loop_control:
+    loop_var: network
+  register: interfaces_apply_nmstate
+  changed_when: "'nmstate changed' in interfaces_apply_nmstate.stdout"
+  become: true
+
+- name: Make sure nmstate.service enabled at boot and started.
+  ansible.builtin.systemd:
+    name: nmstate.service
+    enabled: true
+    state: started
+  become: true
+
+#
+# Prevent cloud-init from ignoring our network setup and
+# from recreating potentially conflicting interface configs in ifcfg script format.
+#
+- name: Prevent cloud-init from messing up the network config on reboot.
+  ansible.builtin.template:
+    src: 99-custom-networking.cfg
+    dest: /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+
+#
+# Sanity check: get active IP for interface and verify if it matches the expected IP address of the network specified for that interface.
+#
+- name: Get active network config for device using nmstatectl.
+  ansible.builtin.command:
+    cmd: |
+         nmstatectl show {{ network['nmstate_interface']['name'] }}
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
+  loop_control:
+    loop_var: network
+  register: interfaces_active_nmstate
+  changed_when: true
+
+- name: Fail if device specified for network has a wrong IP from another network.
+  ansible.builtin.debug:
+    msg:
+      - 'FATAL: network device specified for network has an IP from another subnet:'
+      - "       {{ network['nmstate_interface']['name'] }} should have IP
+                {{ ip_addresses[inventory_hostname][network['name']]['address'] }}
+                for network {{ network['name'] }}, but"
+      - "       {{ network['nmstate_interface']['name'] }} currently has IP
+                {{ interfaces_active_nmstate_ip }} from another network."
+  vars:
+    interfaces_active_nmstate_query: "results[?network.name=='{{ network['name'] }}'].stdout"
+    interfaces_active_nmstate_yaml: "{{ interfaces_active_nmstate
+        | json_query(interfaces_active_nmstate_query)
+        | first
+        | from_yaml }}"
+    interfaces_active_nmstate_ip: "{{ interfaces_active_nmstate_yaml['interfaces']
+        | map(attribute='ipv4')
+        | map(attribute='address')
+        | first
+        | map(attribute='ip')
+        | first }}"
+  loop: "{{ host_networks | selectattr('nmstate_interface') }}"
+  loop_control:
+    loop_var: network
+  when: interfaces_active_nmstate_ip != ip_addresses[inventory_hostname][network['name']]['address']
+  changed_when: interfaces_active_nmstate_ip != ip_addresses[inventory_hostname][network['name']]['address']
+  failed_when: interfaces_active_nmstate_ip != ip_addresses[inventory_hostname][network['name']]['address']
+...
