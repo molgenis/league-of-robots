@@ -30,9 +30,9 @@ Data-manager account of the specific group is the **only** account that has **re
 
 ## 2. Managing data
 
-After some time, all the files on remote archive server get automatically migrated to the tape. When this happens, entire tree with all the (sub)folders and files can be normally accessed and browsed. `ls` and `cd` commands work just as they work on *regular* filesystem. File names, permissions and metadata (age, size, ownerhip) can be listed.
+After some time, all the files on remote archive server get automatically migrated to the tape. **metadata** and **data structure** remain remote disks, while **data** content exist only on tape. When this happens, the meta-data (like file names, permissions, timestamps, size, ownerhip, etc.) can be normally accessed and the structure can be normally browsed. `ls` and `cd` commands work just like on *regular* filesystem.
 
-The difference is that the file content is not directly available anymore - until it is recalled. If anything is done on the file content (attempt to compress it or modify with vim/nano) or simply read it (with `less`, `cat` or `grep`), will result in the command line **appear stuck**. Actually it is waiting for data to be retrieved. This takes a long time, since the data is copied from tapes to disks.
+The difference is that the file content is not directly available anymore - until it is recalled. Any command that attempts to read the file content (like `less`, `cat` or `grep`) or edit the content (like `vim` or `nano`) may **appear stuck**. Actually it is waiting for data to be retrieved, which can take a very long time since the data needs to be copied back from tape to disk.
 
 Therefore the correct procedure is to **first stage (recall from the tape) the file, and access the content when it is available again**.
 
@@ -169,7 +169,7 @@ Which means that archiving and restoring of the large datasets can take (dependi
 
 So far most of the bugs have been resolved, but it could happen that
 
- - archive folder is not available - please inform helpdesk, this should not happen, but it can be that remote system is temporarily down,
+ - the archive folder is not available - please inform the helpdesk unless maintenance was announced,
  - download/upload perfomance occasionally drops - this most probably depends on the Login node usage (and data copy by other users) - notify helpdesk if it persists for a longer period,
  - submitting the commands did not provide the results - has happened in first implemenentation of the archive solution, but should be fixed now.
 
