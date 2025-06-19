@@ -62,11 +62,11 @@ fi
 _queue_files="$(find /var/cache/arcq/queue/${_arc} -type f)"
 for _file in ${_queue_files}; do
    # Prepare variables
-   #  the file structure: from queue file. All send in one line = [command] [subdirectory]
-   _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
+   #  the file structure: from queue file. All send in one line = [command] [path]
    _command=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
+   _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
    _group="$(echo "${_path}" | cut -s -d'/' -f3)"
-   _fs="$(echo "${_path}" | cut -s -d'/' -f4)"
+   _arc_name="$(echo "${_path}" | cut -s -d'/' -f4)"
    _subdir="$(echo "${_path}" | cut -s -d'/' -f5-)"
    #  the output: based on basename of queued file
    _basename="$(basename ${_file})"
@@ -86,8 +86,8 @@ for _file in ${_queue_files}; do
       continue
    fi
    # Check that it is running on a correct filesystem
-   if [[ ! "${_fs}" =~ ^"arc"[0-9][0-9]$ ]]; then
-      echo "error: (${_fs}) path not pointing to the arc filesystem!" > "${_stdout}"
+   if [[ ! "${_arc_name}" =~ ^"arc"[0-9][0-9]$ ]]; then
+      echo "error: (${_arc_name}) path not pointing to the arc filesystem!" > "${_stdout}"
       date >> "${_stdout}.done" && chmod 644 "${_stdout}.done"
       rm -f "${_file}"
       continue
@@ -100,19 +100,24 @@ for _file in ${_queue_files}; do
       dafind-ofl) _state="OFL" ;;
       dafind-que) _state="QUE" ;;
       dafind-stg) _state="STG" ;;
-      daget)      _command="daget ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
-      dals)       _command="dals -l ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
-      darelease)  _command="darelease ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
-      sha256sum)  _command="sha256sum ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir}" ;;
+      daget)      _command="daget ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
+      dals)       _command="dals -lq ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
+      darelease)  _command="darelease ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
+      sha256sum)  _command="sha256sum ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
       *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
                   date >> "${_stdout}.done"
                   rm -f "${_file:-error_path}" && continue ;;
    esac
    # if dafind, restructure output to correctly show folder paths
    if [[ "${_argument:2:6}" == "dafind" ]]; then
-       _command="dafind ${_archive_remote_top_dir}/${_arc}/${_group}/${_subdir} -type f -state ${_state}"
+       _command="dafind ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir} -type f -state ${_state}"
    fi
-   _command_sed="${_command} | sed 's|${_archive_remote_top_dir}/${_arc}/${_group}/|/groups/${_group}/${_arc}/|g'"
+   # Reformat the output from remote server, so that it does not confuse the local user
+   # Changing output of
+   #   /archive/username/groupname/arc0X/path
+   # to reflect local filesystem's path
+   #   /groups/groupname/arc0X/path
+   _command_sed="${_command} | sed 's|${_archive_remote_top_dir}/|/groups/|g'"
    rm -f "${_file:-error_path}"
    echo "${0} info: running command '${_command_sed}'"
    timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command_sed}" >> "${_stdout}" 2>&1

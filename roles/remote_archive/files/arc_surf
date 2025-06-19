@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-_tmp_basename="$(basename $(mktemp -u))"
+_tmp_queue="$(basename $(mktemp -u))"
 _tag="surf_archive"
 _main_dir="/var/cache/arcq/"
 _queue_dir="${_main_dir}/queue"
@@ -21,7 +21,7 @@ function _print_help(){
     --dafind-stg <path>      search for files which are currently being copied FROM TAPE to disk
                              (files that are currently copying, but data is not yet available)
     --daget      <path>      recall / request data to be staged online FROM TAPE to disk
-    --dals       <path>      list file state
+    --dals       <path>      list file state in long format (including queue state)
     --darelease  <path>      send to offline / stage TO TAPE
     --sha256sum  <path>      compute the sha256sum of the file
 EOF
@@ -33,7 +33,7 @@ fi
 
 # set variable initial values
 _quiet=false
-_arg="default"
+_command="default"
 _path="/errorpath"
 
 # parse command arguments
@@ -43,10 +43,10 @@ for _eacharg in "$@"; do
       if [[ "${_eacharg}" == "--quiet" ]]; then
          _quiet=true
       else # if not quiet, it is --dafind, --dals ...
-         _arg="${_eacharg}"
+         _command="${_eacharg}"
       fi
    else
-      # else it is probably path (if it does not start with '--'
+      # probably a path since it does not start with '--'
       _path="${_eacharg}"
       if ! test -e "${_path}"; then
          echo "Error: path must exist!"
@@ -55,26 +55,26 @@ for _eacharg in "$@"; do
    fi
 done
 
-_first="$(echo "${_path}" | cut -s -d'/' -f2)"
-if [[ "${_first}" != "groups" ]]; then
+_groups="$(echo "${_path}" | cut -s -d'/' -f2)"
+if [[ "${_groups}" != "groups" ]]; then
    echo "Error: directory must be from the /groups!"
    exit 1
 fi
-_second="$(echo "${_path}" | cut -s -d'/' -f3)"
-_third="$(echo "${_path}" | cut -s -d'/' -f4)"
-if [[ ! "${_third}" =~ ^"arc"[0-9][0-9]$ ]]; then
+_group_name="$(echo "${_path}" | cut -s -d'/' -f3)"
+_arc_name="$(echo "${_path}" | cut -s -d'/' -f4)"
+if [[ ! "${_arc_name}" =~ ^"arc"[0-9][0-9]$ ]]; then
    echo "Error: directory must be in the arc filesystem!"
    exit 1
 fi
 
-echo "${_arg} ${_path}" >> "${_queue_dir}/${_third}/${_tmp_basename}"
+echo "${_command} ${_path}" >> "${_queue_dir}/${_arc_name}/${_tmp_queue}"
 
 ${_quiet} || echo "Submitted to remote host, waiting for reply ..."
-${_quiet} || echo "( You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_basename} )"
+${_quiet} || echo "( You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_queue} )"
 sleep ${_delay} && sync
-while ! test -s "${_stdout_dir}/${_tmp_basename}.done"; do
+while ! test -s "${_stdout_dir}/${_tmp_queue}.done"; do
    sleep ${_delay}
 done
 
 sync
-cat "${_stdout_dir}/${_tmp_basename}"
+cat "${_stdout_dir}/${_tmp_queue}"

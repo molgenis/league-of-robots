@@ -6,7 +6,7 @@
 Description=Mount for {{ item.1 }}
 
 [Mount]
-What={{ item.0.archive_user }}@{{ item.0.archive_system }}:{{ item.0.archive_remote_top_dir }}/{{ item.0.name }}/{{ item.1 }}
+What={{ item.0.archive_user }}@{{ item.0.archive_system }}:{{ item.0.archive_remote_top_dir }}/{{ item.1 }}/{{ item.0.name }}
 Where=/groups/{{ item.1 }}/{{ item.0.name }}
 Type=fuse.sshfs
 # ServerAliveInterval - ssh sends every X seconds a message to the server requesting a response
