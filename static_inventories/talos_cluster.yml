@@ -13,6 +13,8 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              nmstate_interface:
+                name: enp3s0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
@@ -22,6 +24,8 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_repo"
+              nmstate_interface:
+                name: enp3s0
           swap_file_size: 2
     data_transfer:
       hosts:
@@ -31,6 +35,8 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: false
+              nmstate_interface:
+                name: enp3s0
           local_volume_size_extra: 100
           local_mount_subfolders:
             - mount_point: '/groups'
@@ -57,8 +63,12 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
           lustre_client_networks: "{{ lustre_client_networks_vm }}"
     deploy_admin_interface:
       hosts:
@@ -67,8 +77,12 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
           lustre_client_networks: "{{ lustre_client_networks_vm }}"
           local_volume_size_extra: 300
     user_interface:
@@ -78,8 +92,18 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+              nmstate_interface:
+                name: enp5s0
+                ipv4:
+                  auto-route-metric: 80
           lustre_client_networks: "{{ lustre_client_networks_vm }}"
           slurm_sockets: 4
           slurm_cores_per_socket: 1
@@ -87,6 +111,7 @@ all:
           slurm_local_disk: 0
           slurm_features: 'prm08,tmp08'
           slurm_ethernet_interfaces:
+            - enp3s0
             - enp4s0
             - enp5s0
     compute_node:
@@ -101,9 +126,19 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  nmstate_interface:
+                    name: eth2
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: eth2.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: eth2
+                    ipv4:
+                      dhcp: false
               lustre_client_networks:
                 #- name: tcp20
                 #  interface: enp130s0f0.1068
@@ -148,9 +183,19 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  nmstate_interface:
+                    name: enp65s0np0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: enp65s0np0.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: enp65s0np0
+                    ipv4:
+                      dhcp: false
               lustre_client_networks:
                 - name: tcp20
                   interface: enp65s0np0.1068
@@ -188,22 +233,26 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  nmstate_interface:
+                    name: eth0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
+                  nmstate_interface:
+                    name: eth1
               lustre_client_networks:
                 - name: tcp20
-                  interface: enp0s4
+                  interface: eth1
               local_volume_size_extra: 1
-              slurm_sockets: 1
-              slurm_cores_per_socket: 8
+              slurm_sockets: 4
+              slurm_cores_per_socket: 1
               slurm_real_memory: 257320
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 900
               slurm_features: 'tmp08'
               slurm_ethernet_interfaces:
-              - enp0s3
-              - enp0s4
+              - eth0
+              - eth1
     chaperone:
       hosts:
         tl-chaperone:

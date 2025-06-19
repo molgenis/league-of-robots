@@ -16,7 +16,7 @@ lfs_quota:
       umcg-gaf: 22528
       umcg-gap: 1024
       umcg-gastrocol: 5120
-      umcg-gcc: 26624
+      umcg-gcc: 27648
       umcg-gdi: 1024
       umcg-gdio: 11264
       umcg-gonl: 5120
@@ -44,6 +44,7 @@ lfs_quota:
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 6144
+      umcg-ucu: 1024
       umcg-ugli: 2048
       umcg-verbeek: 1024
       umcg-vdakker: 1024
@@ -79,6 +80,7 @@ lfs_quota:
       umcg-hlhs: 3072
       umcg-immunogenetics: 2048
       umcg-impact: 3072
+      umcg-intercept: 2048
       umcg-lifelines: 17408
       umcg-lld: 3072
       umcg-llnext: 10240
@@ -94,8 +96,9 @@ lfs_quota:
       umcg-solve-rd: 8192
       umcg-sysops: 1024
       umcg-tifn: 5120
-      umcg-ukb: 3072
+      umcg-ucu: 1024
       umcg-ugli: 6144
+      umcg-ukb: 3072
       umcg-vdakker: 1024
       umcg-weersma: 8192
       umcg-wijmenga: 3072
@@ -159,7 +162,7 @@ lfs_quota:
       umcg-gastrocol: 10240
       umcg-gcc: 3072
       umcg-gdi: 2048
-      umcg-gdio: 11264
+      umcg-gdio: 2048
       umcg-gonl: 3072
       umcg-griac: 2048
       umcg-grip: 1024
@@ -207,7 +210,7 @@ lfs_quota:
       umcg-gastrocol: 10240
       umcg-gcc: 8192
       umcg-gdi: 1024
-      umcg-gdio: 5120
+      umcg-gdio: 14336
       umcg-gonl: 3072
       umcg-griac: 20480
       umcg-grip: 1024
@@ -216,6 +219,7 @@ lfs_quota:
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
+      umcg-intercept: 2048
       umcg-lifelines: 81920
       umcg-lld: 1024
       umcg-llnext: 2048
@@ -238,6 +242,7 @@ lfs_quota:
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
+      umcg-ucu: 1024
       umcg-ugli: 1024
       umcg-ukb: 3072
       umcg-verbeek: 1024
@@ -250,7 +255,7 @@ lfs_quota:
     quota_limits:  # All values in GB.
       umcg-as: 1024
       umcg-atd: 1024
-      umcg-biogen: 56320
+      umcg-biogen: 66560
       umcg-bios: 1024
       umcg-dag3: 1024
       umcg-erdera: 1024
@@ -262,7 +267,9 @@ lfs_quota:
       umcg-lifelines: 1024
       umcg-lld: 1024
       umcg-llnext: 1024
+      umcg-nephrology: 1024
       umcg-tifn: 1024
+      umcg-ucu: 1024
       umcg-ugli: 1024
   tmp08:
     quota_limits:  # All values in GB.

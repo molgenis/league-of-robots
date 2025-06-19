@@ -23,6 +23,21 @@
   become: true
 
 #
+# Remove /etc/udev/rules.d/70-persistent-net.rules to make our new rules apply
+# and interfaces are stuck on an old name based on a broken rule.
+# File content example with bad slot-based interface names linked tp specific MAC addresses:
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:1d:d9:9a", NAME="ens3"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:34:33:d7", NAME="ens4"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:81:c0:bf", NAME="ens5"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:43:01:be", NAME="ens6"
+#
+- name: Delete /etc/udev/rules.d/70-persistent-net.rules.
+  ansible.builtin.file:
+    path: /etc/udev/rules.d/70-persistent-net.rules
+    state: absent
+  become: true
+
+#
 # To ensure the custom /etc/systemd/network/99-default.link config is included in the initramfs,
 # so it will also be applied during early boot, and that it will be included in future kernel updates,
 # we would have to
@@ -37,6 +52,40 @@
 # later in the boot sequence, but before we using things like shared file systems or NHC,
 # that rely on specific network interface names.
 #
+
+- name: Install NetworkManager.
+  ansible.builtin.package:
+    name:
+      - NetworkManager
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Deploy override file to customize NetworkManager configuration.
+  ansible.builtin.template:
+    src: 99-custom.conf
+    dest: /etc/NetworkManager/conf.d/99-custom.conf
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+
+- name: Find old network interface configs in ifcfg script format.
+  ansible.builtin.find:
+    paths: /etc/sysconfig/network-scripts/
+    patterns: 'ifcfg-.*'
+    use_regex: true
+  register: interfaces_found_ifcfg_scripts
+
+- name: Delete any old network interface configs in ifcfg script format.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ interfaces_found_ifcfg_scripts.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  become: true
+
 - name: Deploy /usr/local/sbin/fix_network_interface_names to apply customised udev network device renaming.
   ansible.builtin.template:
     src: fix_network_interface_names.bash
@@ -55,7 +104,7 @@
     mode: '0644'
   become: true
 
-- name: Start fix_network_interface_names.service
+- name: Start fix_network_interface_names.service.
   ansible.builtin.systemd:
     name: fix_network_interface_names.service
     enabled: true
@@ -64,17 +113,12 @@
   become: true
 
 #
-# Network Manager is a mess and not idempotent in most cases creating yet another config.
+# Network Manager and its nmcli is a mess and not idempotent in most cases creating yet another config.
+# Therefore we use nmstatectl to manage profiles for NetworkManager.
 #
-# - name: Create network connection with nmcli.
-#   community.general.nmcli:
-#     conn_name: "{{ item['device'] }}"
-#     ifname: "{{ item['device'] }}"
-#     type: ethernet
-#     method4: "{{ item['method4'] }}"
-#     method6: disabled
-#     state: present
-#     autoconnect: true
-#   loop: "{{ interfaces }}"
-#   become: true
+- name: Configure network with nmstatectl.
+  ansible.builtin.import_tasks:
+    file: nmstate.yml
+  when:
+    - host_networks | default([]) | selectattr('nmstate_interface', 'defined') | length() >= 1
 ...

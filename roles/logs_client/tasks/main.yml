@@ -1,4 +1,24 @@
 ---
+- name: Print help options
+  ansible.builtin.debug:
+    msg: >
+      this role supports following tags:
+       - test    # for testing / validating that the connection with remote log
+                 # server is working and that logs get correctly transferred
+       - always
+  run_once: true  # noqa run-once
+  delegate_to: localhost
+  connection: local
+  tags:
+    - help
+    - never
+
+- name: Stop the playbook
+  ansible.builtin.meta: end_play
+  tags:
+    - help
+    - never
+
 - name: Compile the list of logs server names
   ansible.builtin.set_fact:
     cluster_class_servers: "{{ cluster_class_servers | default([]) + [item.name] }}"
