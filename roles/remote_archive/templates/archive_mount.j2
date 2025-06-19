@@ -10,7 +10,7 @@ What={{ item.0.archive_user }}@{{ item.0.archive_system }}:{{ item.0.archive_rem
 Where=/groups/{{ item.1 }}/{{ item.0.name }}
 Type=fuse.sshfs
 # ServerAliveInterval - ssh sends every X seconds a message to the server requesting a response
-# ServerAliveCountMax - and max this times if responding
+# ServerAliveCountMax - and max this number of times if the server did not respond.
 # max_conns - each sshfs mount allows up to this number of connections
 # ControlPersist - automount disconnects after 3 minutes, this ssh connection stays for 5 min
 # ControlPath - even tho every connection to server should and *does* use ssh settings from ~/.ssh/conf.d
