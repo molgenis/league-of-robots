@@ -171,7 +171,6 @@ So far most of the bugs have been resolved, but it could happen that
 
  - the archive folder is not available - please inform the helpdesk unless maintenance was announced,
  - download/upload perfomance occasionally drops - this most probably depends on the Login node usage (and data copy by other users) - notify helpdesk if it persists for a longer period,
- - submitting the commands did not provide the results - has happened in first implemenentation of the archive solution, but should be fixed now.
 
 If you expirence any issues with the archive solution, please notify helpdesk.
 

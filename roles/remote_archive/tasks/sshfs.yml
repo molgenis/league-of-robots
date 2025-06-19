@@ -79,7 +79,7 @@
 - name: Check connection and ensure that group folder on remote archive system exists
   ansible.builtin.command: >
     ssh -i {{ archive_ssh_key_location }} {{ item.0.archive_user }}@{{ item.0.archive_system }}
-    "mkdir -p {{ item.0.archive_remote_top_dir }}/{{ item.0.name }}/{{ item.1 }}"
+    "mkdir -p {{ item.0.archive_remote_top_dir }}/{{ item.1 }}/{{ item.0.name }}"
   register: archive_dir_test
   changed_when: false
   with_subelements:
