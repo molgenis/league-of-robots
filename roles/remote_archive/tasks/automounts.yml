@@ -122,7 +122,7 @@
 #  - it should not assign user or group ownership
 #  - the user and group ownership change at mount time, and assinging them
 #    would make this task fail - which is not needed
-#  - we only assign mode 2750 which reflects the permissions of the mounted 
+#  - we only assign mode 2750 which reflects the permissions of the mounted
 #    folders - so this is fine
 #  - from security point of view, as mentioned before, user and group change
 #    at mount time, so that only -dm users can view and edit archive content
