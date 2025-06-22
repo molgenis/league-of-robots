@@ -17,85 +17,93 @@
 
 - name: 'Add regular groups to parent entry for groups.'
   community.general.ldap_entry:
-    dn: "cn={{ item }},ou=groups,{{ regular_users_ldap_base }}"
+    dn: "cn={{ group['name'] }},ou=groups,{{ regular_users_ldap_base }}"
     objectClass:
       - 'groupOfMembers'
       - 'posixGroup'
     state: present
     attributes:
-      gidNumber: "{{ auth_groups[item].gid }}"
+      gidNumber: "{{ auth_groups[group['name']]['gid'] }}"
     server_uri: "{{ regular_users_ldap_server_uri }}"
     bind_dn: "{{ regular_users_ldap_bind_dn }}"
     bind_pw: "{{ regular_users_ldap_bind_pw }}"
-  with_items: "{{ regular_groups }}"
+  loop: "{{ regular_groups }}"
+  loop_control:
+    loop_var: group
 
 - name: 'Add private groups for each regular user to parent entry for groups.'
   community.general.ldap_entry:
-    dn: "cn={{ item.user }},ou=groups,{{ regular_users_ldap_base }}"  # Use same name as user's account name for user's private group.
+    dn: "cn={{ user['name'] }},ou=groups,{{ regular_users_ldap_base }}"  # Use same name as user's account name for user's private group.
     objectClass:
       - 'groupOfMembers'
       - 'posixGroup'
     state: present
     attributes:
-      gidNumber: "{{ auth_users[item.user].uid }}"  # Use same GID as user's UID for user's private group.
+      gidNumber: "{{ auth_users[user['name']]['uid'] }}"  # Use same GID as user's UID for user's private group.
     server_uri: "{{ regular_users_ldap_server_uri }}"
     bind_dn: "{{ regular_users_ldap_bind_dn }}"
     bind_pw: "{{ regular_users_ldap_bind_pw }}"
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
 
 - name: 'Add users to parent entry for users.'
   community.general.ldap_entry:
-    dn: "cn={{ item.user }},ou=users,{{ regular_users_ldap_base }}"
+    dn: "cn={{ user['name'] }},ou=users,{{ regular_users_ldap_base }}"
     state: present
     objectClass:
       - 'inetOrgPerson'
       - 'posixAccount'
       - 'ldapPublicKey'
     attributes:
-      sn: "{{ item.user }}"
-      givenName: "{{ auth_users[item.user].comment }}"
-      cn: "{{ item.user }}"
-      uid: "{{ item.user }}"
-      uidNumber: "{{ auth_users[item.user].uid }}"
-      gidNumber: "{{ auth_users[item.user].uid }}"  # primary group == private group for user.
-      homeDirectory: "/home/{{ item.user }}"
+      sn: "{{ user['name'] }}"
+      givenName: "{{ auth_users[user['name']]['comment'] }}"
+      cn: "{{ user['name'] }}"
+      uid: "{{ user['name'] }}"
+      uidNumber: "{{ auth_users[user['name']]['uid'] }}"
+      gidNumber: "{{ auth_users[user['name']]['uid'] }}"  # primary group == private group for user.
+      homeDirectory: "/home/{{ user['name'] }}"
       loginShell: '/bin/bash'
-      sshPublicKey: "{{ auth_users[item.user].pub_keys }}"
-      mail: "{{ auth_users[item.user].email }}"
+      sshPublicKey: "{{ auth_users[user['name']]['pub_keys'] }}"
+      mail: "{{ auth_users[user['name']]['email'] }}"
     server_uri: "{{ regular_users_ldap_server_uri }}"
     bind_dn: "{{ regular_users_ldap_bind_dn }}"
     bind_pw: "{{ regular_users_ldap_bind_pw }}"
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
 
 - name: 'Update user attributes.'
   community.general.ldap_attrs:
-    dn: "cn={{ item.user }},ou=users,{{ regular_users_ldap_base }}"
+    dn: "cn={{ user['name'] }},ou=users,{{ regular_users_ldap_base }}"
     state: exact
     attributes:
-      sshPublicKey: "{{ auth_users[item.user].pub_keys }}"
-      mail: "{{ auth_users[item.user].email }}"
+      sshPublicKey: "{{ auth_users[user['name']]['pub_keys'] }}"
+      mail: "{{ auth_users[user['name']]['email'] }}"
       #
       # The to_json(ensure_ascii=True) filter is a temporary hack to remove non ASCII characters,
       # which are not supported in the gecos attribute from the RFC2307 schema.
       # We can use all characters in the gecos field once we switch to the RFC2307bis schema, which uses UTF-8.
       #
-      gecos: "{{ auth_users[item.user].comment | to_json(ensure_ascii=True) }}\
-              {% if auth_users[item.user].email is defined and auth_users[item.user].email | length %} <{{ auth_users[item.user].email }}>{% endif %}"
+      gecos: "{{ auth_users[user['name']]['comment'] | to_json(ensure_ascii=True) }}\
+              {% if auth_users[user['name']]['email'] is defined and auth_users[user['name']]['email'] | length %} <{{ auth_users[user['name']]['email'] }}>{% endif %}"
     server_uri: "{{ regular_users_ldap_server_uri }}"
     bind_dn: "{{ regular_users_ldap_bind_dn }}"
     bind_pw: "{{ regular_users_ldap_bind_pw }}"
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
 
 - name: 'Add users to groups.'
   community.general.ldap_attrs:
-    dn: "cn={{ item.1 }},ou=groups,{{ regular_users_ldap_base }}"
+    dn: "cn={{ user[1] }},ou=groups,{{ regular_users_ldap_base }}"
     state: present
     attributes:
-      member: "cn={{ item.0.user }},ou=users,{{ regular_users_ldap_base }}"
+      member: "cn={{ user[0]['name'] }},ou=users,{{ regular_users_ldap_base }}"
     server_uri: "{{ regular_users_ldap_server_uri }}"
     bind_dn: "{{ regular_users_ldap_bind_dn }}"
     bind_pw: "{{ regular_users_ldap_bind_pw }}"
-  with_subelements:
-    - "{{ regular_users }}"
-    - 'groups'
+  loop: "{{ regular_users | subelements('groups') }}"
+  loop_control:
+    loop_var: user
 ...

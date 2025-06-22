@@ -266,47 +266,47 @@ all:
           use_ldap: false
           use_sssd: false
           regular_groups:
-            - "{{ envsync_group }}"
-            - "{{ functional_admin_group }}"
-            - "{{ functional_users_group }}"
-            - 'umcg-atd'
-            - 'umcg-gsad'
-            - 'umcg-gst'
-            - 'umcg-vipt'
+            - name: "{{ envsync_group }}"
+            - name: "{{ functional_admin_group }}"
+            - name: "{{ functional_users_group }}"
+            - name: 'umcg-atd'
+            - name: 'umcg-gsad'
+            - name: 'umcg-gst'
+            - name: 'umcg-vipt'
           regular_users:
-            - user: "{{ envsync_user }}"
+            - name: "{{ envsync_user }}"
               groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
-            - user: 'umcg-molgenis'
+            - name: 'umcg-molgenis'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', "{{ functional_users_group }}"]
-            - user: 'umcg-atd-ateambot'
+            - name: 'umcg-atd-ateambot'
               groups: ['umcg-atd', "{{ functional_users_group }}"]
-            - user: 'umcg-atd-dm'
+            - name: 'umcg-atd-dm'
               groups: ['umcg-atd', "{{ functional_users_group }}"]
-            - user: 'umcg-gsad-ateambot'
+            - name: 'umcg-gsad-ateambot'
               groups: ['umcg-gsad', "{{ functional_users_group }}"]
-            - user: 'umcg-gsad-dm'
+            - name: 'umcg-gsad-dm'
               groups: ['umcg-gsad', "{{ functional_users_group }}"]
-            - user: 'umcg-gst-dm'
+            - name: 'umcg-gst-dm'
               groups: ['umcg-gst', "{{ functional_users_group }}"]
-            - user: 'umcg-vipt-dm'
+            - name: 'umcg-vipt-dm'
               groups: ['umcg-vipt', "{{ functional_users_group }}"]
-            - user: 'mbenjamins'
+            - name: 'mbenjamins'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
-            - user: 'mbijlsma'
+            - name: 'mbijlsma'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
-            - user: 'bcharbon'
+            - name: 'bcharbon'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
-            - user: 'scimerman'
+            - name: 'scimerman'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
-            - user: 'dhendriksen'
+            - name: 'dhendriksen'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
-            - user: 'kdelange'
+            - name: 'kdelange'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
-            - user: 'rkanninga'
+            - name: 'rkanninga'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
-            - user: 'pneerincx'
+            - name: 'pneerincx'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
-            - user: 'gvdvries'
+            - name: 'gvdvries'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
           sudoers:
             - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']

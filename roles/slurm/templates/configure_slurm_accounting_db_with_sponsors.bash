@@ -18,9 +18,9 @@ declare -A sponsors=(
 {% endfor %}
 )
 declare -A groups=(
-{% for group in regular_groups %}
-	{% if group_sponsors[group] is defined %}
-	['{{ group }}']='{{ group_sponsors[group] }}'
+{% for regular_group in regular_groups %}
+	{% if regular_group['sponsor'] is defined %}
+	['{{ regular_group["name"] }}']='{{ regular_group["sponsor"] }}'
 	{% endif %}
 {% endfor %}
 )
