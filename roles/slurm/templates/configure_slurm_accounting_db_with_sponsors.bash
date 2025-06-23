@@ -320,7 +320,7 @@ for group in "${!groups[@]}"; do
 	else
 		printf 'Account for group "%s" already exists.\n' "${group}"
 	fi
-	account_found="$(sacctmgr --parsable2 --noheader show account "${group}" withassoc format=ParentName,Account)"
+	account_found="$(sacctmgr --parsable2 --noheader show account "${group}" where user='' withassoc format=ParentName,Account)"
 	if [[ "${account_found}" != "${groups[${group}]}|${group}" ]]; then
 		sacctmgr -i modify account "${group}" set Parent="${groups[${group}]}"
 	else
