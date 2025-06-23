@@ -194,13 +194,13 @@ functional_admin_group: 'umcg-funad'
 hpc_env_prefix: '/apps'
 sponsors:
   - name: umcg-research-it
-    slurm_shares: 570
+    slurm_shares: 260
   - name: umcg-cvandiemen
-    slurm_shares: 112
+    slurm_shares: 214
   - name: umcg-lfranke
-    slurm_shares: 136
+    slurm_shares: 253
   - name: umcg-mswertz
-    slurm_shares: 570
+    slurm_shares: 260
 # Remote archive settings
 archive_groups:
   - name: arc01
@@ -227,6 +227,7 @@ regular_groups:
   - name: 'umcg-biogen'
     sponsor: umcg-lfranke
   - name: 'umcg-bionic-mdd-gwama'
+    sponsor: umcg-research-it
   - name: 'umcg-bios'
     sponsor: umcg-lfranke
   - name: 'umcg-dag3'
@@ -238,56 +239,87 @@ regular_groups:
   - name: 'umcg-erdera'
     sponsor: umcg-mswertz
   - name: 'umcg-endocrinology'
+    sponsor: umcg-research-it
   - name: 'umcg-fg'
     sponsor: umcg-lfranke
   - name: 'umcg-franke-scrna'
     sponsor: umcg-lfranke
   - name: 'umcg-fu'
+    sponsor: umcg-research-it
   - name: 'umcg-gap'
+    sponsor: umcg-mswertz
   - name: 'umcg-gastrocol'
+    sponsor: umcg-research-it
   - name: 'umcg-gcc'
     sponsor: umcg-mswertz
   - name: 'umcg-gdi'
+    sponsor: umcg-research-it
   - name: 'umcg-gdio'
     sponsor: umcg-cvandiemen
   - name: 'umcg-gonl'
+    sponsor: umcg-mswertz
   - name: 'umcg-griac'
+    sponsor: umcg-research-it
   - name: 'umcg-grip'
+    sponsor: umcg-research-it
   - name: 'umcg-gsad'
+    sponsor: umcg-mswertz
   - name: 'umcg-hematology'
+    sponsor: umcg-research-it
   - name: 'umcg-hlhs'
+    sponsor: umcg-research-it
   - name: 'umcg-immunogenetics'
+    sponsor: umcg-research-it
   - name: 'umcg-impact'
+    sponsor: umcg-research-it
   - name: 'umcg-lifelines'
+    sponsor: umcg-research-it
   - name: 'umcg-lld'
     sponsor: umcg-lfranke
   - name: 'umcg-llnext'
     sponsor: umcg-lfranke
   - name: 'umcg-mic'
+    sponsor: umcg-research-it
   - name: 'umcg-micompany'
+    sponsor: umcg-research-it
   - name: 'umcg-msb'
+    sponsor: umcg-research-it
   - name: 'umcg-nawijn'
+    sponsor: umcg-research-it
   - name: 'umcg-nephrology'
+    sponsor: umcg-research-it
   - name: 'umcg-pmb'
+    sponsor: umcg-research-it
   - name: 'umcg-radicon'
+    sponsor: umcg-research-it
   - name: 'umcg-rehabilitation'
+    sponsor: umcg-research-it
   - name: 'umcg-reki'
+    sponsor: umcg-research-it
   - name: 'umcg-solve-rd'
     sponsor: umcg-mswertz
   - name: 'umcg-sommer'
+    sponsor: umcg-research-it
   - name: 'umcg-sysops'
     sponsor: umcg-research-it
   - name: 'umcg-tifn'
     sponsor: umcg-lfranke
   - name: 'umcg-ucu'
+    sponsor: umcg-cvandiemen
   - name: 'umcg-ukb'
+    sponsor: umcg-research-it
   - name: 'umcg-ugli'
     sponsor: umcg-lfranke
   - name: 'umcg-verbeek'
+    sponsor: umcg-research-it
   - name: 'umcg-vdakker'
+    sponsor: umcg-research-it
   - name: 'umcg-visclasataxia'
+    sponsor: umcg-research-it
   - name: 'umcg-weersma'
+    sponsor: umcg-research-it
   - name: 'umcg-wijmenga'
+    sponsor: umcg-research-it
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
