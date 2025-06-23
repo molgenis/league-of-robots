@@ -193,14 +193,16 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 hpc_env_prefix: '/apps'
 sponsors:
-  - name: umcg-research-it
-    slurm_shares: 260
   - name: umcg-cvandiemen
-    slurm_shares: 214
+    slurm_shares: 754
   - name: umcg-lfranke
-    slurm_shares: 253
+    slurm_shares: 772
+  - name: umcg-mmvanderklauw
+    slurm_shares: 660
   - name: umcg-mswertz
-    slurm_shares: 260
+    slurm_shares: 775
+  - name: umcg-research-it
+    slurm_shares: 654
 # Remote archive settings
 archive_groups:
   - name: arc01
@@ -227,11 +229,11 @@ regular_groups:
   - name: 'umcg-biogen'
     sponsor: umcg-lfranke
   - name: 'umcg-bionic-mdd-gwama'
-    sponsor: umcg-research-it
+    sponsor: umcg-mswertz
   - name: 'umcg-bios'
     sponsor: umcg-lfranke
   - name: 'umcg-dag3'
-    sponsor: umcg-lfranke
+    sponsor: umcg-research-it
   - name: 'umcg-datateam'
     sponsor: umcg-mswertz
   - name: 'umcg-ejp-rd'
@@ -239,7 +241,7 @@ regular_groups:
   - name: 'umcg-erdera'
     sponsor: umcg-mswertz
   - name: 'umcg-endocrinology'
-    sponsor: umcg-research-it
+    sponsor: umcg-mmvanderklauw
   - name: 'umcg-fg'
     sponsor: umcg-lfranke
   - name: 'umcg-franke-scrna'
@@ -253,7 +255,7 @@ regular_groups:
   - name: 'umcg-gcc'
     sponsor: umcg-mswertz
   - name: 'umcg-gdi'
-    sponsor: umcg-research-it
+    sponsor: umcg-mswertz
   - name: 'umcg-gdio'
     sponsor: umcg-cvandiemen
   - name: 'umcg-gonl'
@@ -261,13 +263,13 @@ regular_groups:
   - name: 'umcg-griac'
     sponsor: umcg-research-it
   - name: 'umcg-grip'
-    sponsor: umcg-research-it
+    sponsor: umcg-mswertz
   - name: 'umcg-gsad'
     sponsor: umcg-mswertz
   - name: 'umcg-hematology'
     sponsor: umcg-research-it
   - name: 'umcg-hlhs'
-    sponsor: umcg-research-it
+    sponsor: umcg-cvandiemen
   - name: 'umcg-immunogenetics'
     sponsor: umcg-research-it
   - name: 'umcg-impact'
@@ -277,7 +279,7 @@ regular_groups:
   - name: 'umcg-lld'
     sponsor: umcg-lfranke
   - name: 'umcg-llnext'
-    sponsor: umcg-lfranke
+    sponsor: umcg-research-it
   - name: 'umcg-mic'
     sponsor: umcg-research-it
   - name: 'umcg-micompany'
@@ -291,7 +293,7 @@ regular_groups:
   - name: 'umcg-pmb'
     sponsor: umcg-research-it
   - name: 'umcg-radicon'
-    sponsor: umcg-research-it
+    sponsor: umcg-cvandiemen
   - name: 'umcg-rehabilitation'
     sponsor: umcg-research-it
   - name: 'umcg-reki'
@@ -303,13 +305,13 @@ regular_groups:
   - name: 'umcg-sysops'
     sponsor: umcg-research-it
   - name: 'umcg-tifn'
-    sponsor: umcg-lfranke
+    sponsor: umcg-research-it
   - name: 'umcg-ucu'
     sponsor: umcg-cvandiemen
   - name: 'umcg-ukb'
     sponsor: umcg-research-it
   - name: 'umcg-ugli'
-    sponsor: umcg-lfranke
+    sponsor: umcg-mswertz
   - name: 'umcg-verbeek'
     sponsor: umcg-research-it
   - name: 'umcg-vdakker'
