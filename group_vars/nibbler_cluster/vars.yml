@@ -341,7 +341,7 @@ regular_users:
     groups: ['umcg-immunogenetics']
   - user: 'umcg-impact-dm'
     groups: ['umcg-impact']
-  - user: 'umcg-intercept-dm'   
+  - user: 'umcg-intercept-dm'
     groups: ['umcg-intercept']
   - user: 'umcg-lifelines-dm'
     groups: ['umcg-lifelines']
