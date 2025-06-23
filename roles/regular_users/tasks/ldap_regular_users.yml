@@ -87,7 +87,7 @@
       #
       gecos: >-2
         {{ auth_users[user['name']]['comment'] | to_json(ensure_ascii=True) }}
-        {%- if auth_users[user['name']]['email'] is defined 
+        {%- if auth_users[user['name']]['email'] is defined
             and auth_users[user['name']]['email'] | length %}
          <{{ auth_users[user['name']]['email'] }}>
         {%- endif -%}
