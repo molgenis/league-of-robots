@@ -1,6 +1,15 @@
+---
 - name: Restart network.service
   ansible.builtin.systemd:
-    name: 'network.service'
+    name: network.service
     state: restarted
   become: true
   listen: restart_network
+
+- name: Restart nmstate.service
+  ansible.builtin.systemd:
+    name: nmstate.service
+    state: restarted
+  become: true
+  listen: restart_nmstate_service
+...
