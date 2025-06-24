@@ -1,0 +1,36 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
+---
+interfaces:
+- name: {{ network['nmstate_interface']['name'] }}
+  profile-name: {{ network['name'] }}
+  state: {{ network['nmstate_interface']['state'] | default('up') }}
+  {% if network['nmstate_interface']['type'] is defined %}
+  type: {{ network['nmstate_interface']['type'] }}
+  {% endif %}
+  {% if network['nmstate_interface']['vlan'] is defined %}
+  vlan:
+    id: {{ network['nmstate_interface']['vlan']['id'] }}
+    base-iface: {{ network['nmstate_interface']['vlan']['base-iface'] }}
+  {% endif %}
+  ipv4:
+    enabled: {{ network['nmstate_interface']['ipv4']['enabled'] | default('true') }}
+    {% if network['nmstate_interface']['ipv4']['dhcp'] | default(true) %}
+    dhcp: true
+    {% else %}
+    dhcp: false
+    {% endif %}
+    {% if network['nmstate_interface']['ipv4']['auto-route-metric'] is defined %}
+    auto-route-metric: {{ network['nmstate_interface']['ipv4']['auto-route-metric'] }}
+    {% endif %}
+    {% if network['nmstate_interface']['ipv4']['dhcp'] | default(true) is false %}
+    address:
+      - ip: {{ ip_addresses[inventory_hostname][network['name']]['address'] }}
+        prefix-length: {{ stack_networks
+                          | selectattr('name', 'equalto', network['name'])
+                          | map(attribute='cidr')
+                          | first
+                          | regex_replace('^[^/]+/([0-9]+)$', '\\1') }}
+    {% endif %}
+  ipv6:
+    enabled: {{ network['nmstate_interface']['ipv6']['enabled'] | default('false') }}
+...

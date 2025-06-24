@@ -166,6 +166,13 @@ stack_networks:
     router_name: vlan1338
     type: management
     external: true
+  - name: "{{ stack_prefix }}_internal_management"
+    cidr: '10.10.1.0/24'
+    gateway: '10.10.1.1'
+    router_network: vlan16
+    type: management
+    external: false
+    mtu_size: '1450'
   - name: vlan985  # DH4 Lustre
     cidr: '172.23.56.0/22'
     allow_ingress:
@@ -267,6 +274,7 @@ regular_groups:
   - 'umcg-surg'
   - 'umcg-sysops'
   - 'umcg-tifn'
+  - 'umcg-ucu'
   - 'umcg-ukb'
   - 'umcg-ugli'
   - 'umcg-verbeek'
@@ -379,6 +387,8 @@ regular_users:
     groups: ['umcg-sysops']
   - user: 'umcg-tifn-dm'
     groups: ['umcg-tifn']
+  - user: 'umcg-ucu-dm'
+    groups: ['umcg-ucu']
   - user: 'umcg-ukb-dm'
     groups: ['umcg-ukb']
   - user: 'umcg-ugli-dm'
@@ -498,6 +508,8 @@ sudoers:
     become: 'umcg-sysops-dm'
   - who: ['%umcg-tifn-dms']
     become: 'umcg-tifn-dm'
+  - who: ['%umcg-ucu-dms']
+    become: 'umcg-ucu-dm'
   - who: ['%umcg-ukb-dms']
     become: 'umcg-ukb-dm'
   - who: ['%umcg-ugli-dms']
@@ -563,6 +575,7 @@ local_mount_subfolders:
           - umcg-solve-rd
           - umcg-sommer
           - umcg-tifn
+          - umcg-ucu
           - umcg-ukb
           - umcg-ugli
           - umcg-verbeek
@@ -713,6 +726,8 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-tifn
         mode: '2750'
+      - name: umcg-ucu
+        mode: '2750'
       - name: umcg-ukb
         mode: '2750'
       - name: umcg-ugli
@@ -777,6 +792,7 @@ lfs_mounts:
       - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
+      - name: umcg-ucu
       - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
@@ -832,6 +848,7 @@ lfs_mounts:
       - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
+      - name: umcg-ucu
       - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
