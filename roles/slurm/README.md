@@ -87,14 +87,13 @@ sponsors:
     slurm_shares: 12
 regular_groups:
   # Note, for chaperone machines this is controlled in the static_inventories.
-  - "{{ data_transfer_only_group }}"  # Not used for Slurm config
-  - "{{ envsync_group }}"             # Not used for Slurm config
-  - "{{ functional_admin_group }}"    # Not used for Slurm config
-  - 'groupA'
-  - 'groupB'
-  - 'groupC'
-group_sponsors:
-  groupA: sponsor1
-  groupB: sponsor1
-  groupC: sponsor2
+  - name: "{{ data_transfer_only_group }}"  # Not used for Slurm config
+  - name: "{{ envsync_group }}"             # Not used for Slurm config
+  - name: "{{ functional_admin_group }}"    # Not used for Slurm config
+  - name: 'groupA'
+    sponsor: sponsor1
+  - name: 'groupB'
+    sponsor: sponsor1
+  - name: 'groupC'
+    sponsor: sponsor2
 ```
