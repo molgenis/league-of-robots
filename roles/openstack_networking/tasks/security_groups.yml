@@ -355,10 +355,11 @@
 #
 # Webservers security group.
 #
-- name: "Create security groups for webservers in 'docs' or 'jenkins' or 'build_server' inventory group."
+- name: "Create security groups for webservers in 'docs' or 'jenkins' or 'build_server' or 'silo_server' inventory group."
   when: ('docs' in inventory_groups_with_hosts_created_in_openstack) or
         ('jenkins' in inventory_groups_with_hosts_created_in_openstack) or
-        ('build_server' in inventory_groups_with_hosts_created_in_openstack)
+        ('build_server' in inventory_groups_with_hosts_created_in_openstack) or
+        ('silo_server' in inventory_groups_with_hosts_created_in_openstack)
   block:
     - name: "Create security group for webservers."
       openstack.cloud.security_group:
@@ -372,6 +373,22 @@
                      Allows all outbound traffic.
         wait: true
         timeout: "{{ openstack_api_timeout }}"
+    - name: "Add rules to {{ stack_prefix }}_webservers security group: allow inbound traffic from {{ stack_prefix }}_jumphosts security group."
+      openstack.cloud.security_group_rule:
+        security_group: "{{ stack_prefix }}_webservers"
+        direction: ingress
+        protocol: "{{ item.protocol }}"
+        port_range_min: "{{ item.port }}"
+        port_range_max: "{{ item.port }}"
+        remote_group: "{{ stack_prefix }}_jumphosts"
+        wait: true
+        timeout: "{{ openstack_api_timeout }}"
+      with_items:
+        - protocol: tcp
+          port: 22  # SSH
+        - protocol: icmp
+          port: -1  # ICMP protocol does not have any ports.
+      when: groups['jumphost'] | default([]) | length >= 1
     - name: "Add rules to {{ stack_prefix }}_webservers security group: allow inbound SSH from external jumphosts."
       openstack.cloud.security_group_rule:
         security_group: "{{ stack_prefix }}_webservers"
