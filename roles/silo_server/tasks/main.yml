@@ -4,8 +4,8 @@
 ---
 - name: 'Check OS version of target host.'
   ansible.builtin.fail:
-    msg: 'This role requires RedHat/CentOS version >= 7.x'
-  when: ansible_facts['os_family'] != "RedHat" or ansible_facts['distribution_major_version'] <= "6"
+    msg: 'This role requires RedHat/CentOS version >= 9.x'
+  when: ansible_facts['os_family'] != "RedHat" or ansible_facts['distribution_major_version'] < "9"
 
 - name: 'Set selinux in permissive mode.'
   ansible.posix.selinux:
@@ -27,14 +27,13 @@
   ansible.builtin.get_url:
     url: "{{ cvmfs_repo_url }}"
     dest: /etc/yum.repos.d/cernvm.repo
-  when: cvmfs_repo_url | default(false)
   become: true
 
 - name: 'Add CVMFS repo GPG key.'
   ansible.builtin.rpm_key:
     state: present
     key: "{{ cvmfs_repo_key_url }}"
-  when: cvmfs_repo_url | default(false)
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
   become: true
 
 - name: 'Install CVMFS.'
