@@ -46,7 +46,7 @@ local_admin_users:
 regular_groups:
   - 'umcg-logstoprm'
 regular_users:
-  - user: "logstoprm"
+  - name: "logstoprm"
     groups: "umcg-logstoprm"
 #
 # Cluster classification (used by `logs` and `login` roles)

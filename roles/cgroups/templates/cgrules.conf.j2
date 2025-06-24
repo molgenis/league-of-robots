@@ -6,5 +6,5 @@
 root		cpuset,cpu,memory	/
 @admin		cpuset,cpu,memory	/
 {% for regular_group in regular_groups | default([]) | sort %}
-@{{ regular_group }}		cpuset,cpu,memory		regular_users/
+@{{ regular_group['name'] }}		cpuset,cpu,memory		regular_users/
 {% endfor %}

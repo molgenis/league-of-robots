@@ -1,38 +1,46 @@
 ---
 - name: 'Check if required groups are present.'
   ansible.builtin.group:
-    name: "{{ item }}"
-    gid: "{{ auth_groups[item].gid }}"
+    name: "{{ group['name'] }}"
+    gid: "{{ auth_groups[group['name']]['gid'] }}"
     state: present
-  with_items: "{{ regular_groups }}"
+  loop: "{{ regular_groups }}"
+  loop_control:
+    loop_var: group
   become: true
 
 - name: "Check if required private groups for user's home dir are present."
   ansible.builtin.group:
-    name: "{{ item.user }}"                 # Use same name as user's account name for user's private group.
-    gid: "{{ auth_users[item.user].uid }}"  # Use same GID as user's UID for user's private group.
+    name: "{{ user['name'] }}"                 # Use same name as user's account name for user's private group.
+    gid: "{{ auth_users[user['name']]['uid'] }}"  # Use same GID as user's UID for user's private group.
     state: present
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
   become: true
 
 - name: 'Create local regular users and append them to relevant groups.'
   ansible.builtin.user:
-    name: "{{ item.user }}"
-    uid: "{{ auth_users[item.user].uid }}"
-    comment: "{{ auth_users[item.user].comment }}"
-    group: "{{ item.user }}"
-    groups: "{{ item.groups }}"
-    home: "/home/{{ item.user }}"
+    name: "{{ user['name'] }}"
+    uid: "{{ auth_users[user['name']]['uid'] }}"
+    comment: "{{ auth_users[user['name']]['comment'] }}"
+    group: "{{ user['name'] }}"
+    groups: "{{ user['groups'] }}"
+    home: "/home/{{ user['name'] }}"
     append: false
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
   become: true
 
 - name: 'Deploy authorized keys for local regular users.'
   ansible.posix.authorized_key:
-    user: "{{ item.user }}"
-    key: "{{ auth_users[item.user].pub_keys }}"
+    user: "{{ user['name'] }}"
+    key: "{{ auth_users[user['name']]['pub_keys'] }}"
     state: present
     exclusive: true
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
   become: true
 ...
