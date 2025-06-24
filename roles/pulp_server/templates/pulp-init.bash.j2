@@ -90,7 +90,7 @@ function pulp-sync-publish-distribute() {
 					--href "${_rpm_pulp_href}" \
 					| jq -r '.sha256')
 			if [[ "${_rpm_sha256:-}" != "$(sha256sum "${_rpm_path}" | cut -d ' ' -f 1)" ]]; then
-				echo "ERROR: sha256 checksum for ${_rpm_path} on disk does match with the checksum for the previously uploaded RPM."
+				echo "ERROR: sha256 checksum for ${_rpm_path} on disk does not match with the checksum for the previously uploaded RPM."
 				echo 'ERROR: This code will not replace an RPM with a newer one.'
 				echo 'ERROR: If you really need to replace the existing RPM, you must delete the old one manually first.'
 				return 1

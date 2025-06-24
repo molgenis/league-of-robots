@@ -36,8 +36,8 @@
 --
 group_sponsors = {
   {% for regular_group in regular_groups %}
-    {% if group_sponsors[regular_group] is defined %}
-    ['{{ regular_group }}'] = '{{ group_sponsors[regular_group] }}',
+    {% if regular_group['sponsor'] is defined %}
+    ['{{ regular_group["name"] }}'] = '{{ regular_group["sponsor"] }}',
     {% endif %}
   {% endfor %}
 }
