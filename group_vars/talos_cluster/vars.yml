@@ -205,43 +205,42 @@ archive_groups:
     recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
 regular_groups:
   # Note, for chaperone machines this is controlled in the static_inventories.
-  - "{{ data_transfer_only_group }}"
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - 'umcg-atd'
-  - 'umcg-gcc'
-  - 'umcg-gsad'
-  - 'umcg-gst'
-  - 'umcg-sysops'
-  - 'umcg-vipt'
-group_sponsors:
-  umcg-atd: umcg-mswertz
-  umcg-gcc: umcg-mswertz
-  umcg-gsad: umcg-mswertz
-  umcg-gst: umcg-mswertz
-  umcg-sysops: umcg-research-it
-  umcg-vipt: umcg-mswertz
+  - name: "{{ data_transfer_only_group }}"
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: 'umcg-atd'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gcc'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gsad'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gst'
+    sponsor: umcg-mswertz
+  - name: 'umcg-sysops'
+    sponsor: umcg-research-it
+  - name: 'umcg-vipt'
+    sponsor: umcg-mswertz
 regular_users:
   # Note, for chaperone machines this is controlled in the static_inventories.
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
-  - user: 'umcg-atd-ateambot'
+  - name: 'umcg-atd-ateambot'
     groups: ['umcg-atd', "{{ functional_users_group }}"]
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd', "{{ functional_users_group }}"]
-  - user: 'umcg-gcc-dm'
+  - name: 'umcg-gcc-dm'
     groups: ['umcg-gcc', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-ateambot'
+  - name: 'umcg-gsad-ateambot'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-dm'
+  - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-ateambot'
+  - name: 'umcg-gst-ateambot'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-dm'
+  - name: 'umcg-gst-dm'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-sysops-dm'
+  - name: 'umcg-sysops-dm'
     groups: ['umcg-sysops', "{{ functional_users_group }}"]
-  - user: 'umcg-vipt-dm'
+  - name: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']

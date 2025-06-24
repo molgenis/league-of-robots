@@ -29,20 +29,20 @@ local_admin_users:
   - 'wim'
 functional_admin_group: 'funad'
 regular_groups:
-  - "{{ functional_admin_group }}"
-  - 'vipt'
+  - name: "{{ functional_admin_group }}"
+  - name: 'vipt'
 regular_users:
-  - user: 'dhendriksen'
+  - name: 'dhendriksen'
     groups: ['vipt']
-  - user: 'bcharbon'
+  - name: 'bcharbon'
     groups: ['vipt']
-  - user: 'svandenhoek'
+  - name: 'svandenhoek'
     groups: ['vipt']
-  - user: 'mbijlsma'
+  - name: 'mbijlsma'
     groups: ['vipt']
-  - user: 'jkloosterman'
+  - name: 'jkloosterman'
     groups: ['vipt']
-  - user: 'mbeukers'
+  - name: 'mbeukers'
     groups: ['vipt']
 sudoers:
   - who: ['%vipt']
