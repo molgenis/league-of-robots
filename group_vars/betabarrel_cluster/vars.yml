@@ -197,71 +197,71 @@ functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /et
 hpc_env_prefix: '/apps'
 regular_groups:
   # Note, for chaperone machines this is controlled in the static_inventories.
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - "{{ functional_users_group }}"
-  - 'umcg-atd'
-  - 'umcg-gap'
-  - 'umcg-gd'
-  - 'umcg-genomescan'
-  - 'umcg-gsad'
-  - 'umcg-gst'
-  - 'umcg-lab'
-  - 'umcg-labgnkbh'
-  - 'umcg-logstoprm'
-  - 'umcg-ogm'
-  - 'umcg-patho'
-  - 'umcg-pr'
-  - 'umcg-vipt'
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: "{{ functional_users_group }}"
+  - name: 'umcg-atd'
+  - name: 'umcg-gap'
+  - name: 'umcg-gd'
+  - name: 'umcg-genomescan'
+  - name: 'umcg-gsad'
+  - name: 'umcg-gst'
+  - name: 'umcg-lab'
+  - name: 'umcg-labgnkbh'
+  - name: 'umcg-logstoprm'
+  - name: 'umcg-ogm'
+  - name: 'umcg-patho'
+  - name: 'umcg-pr'
+  - name: 'umcg-vipt'
 regular_users:
   # Note, for chaperone machines this is controlled in the static_inventories.
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
-  - user: 'umcg-atd-ateambot'
+  - name: 'umcg-atd-ateambot'
     groups: ['umcg-atd', 'umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd', "{{ functional_users_group }}"]
-  - user: 'umcg-gap-ateambot'
+  - name: 'umcg-gap-ateambot'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gap-dm'
+  - name: 'umcg-gap-dm'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gd-ateambot'
+  - name: 'umcg-gd-ateambot'
     groups: ['umcg-gd', 'umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gd-dm'
+  - name: 'umcg-gd-dm'
     groups: ['umcg-gd', "{{ functional_users_group }}"]
-  - user: 'umcg-genomescan-ateambot'
+  - name: 'umcg-genomescan-ateambot'
     groups: ['umcg-genomescan', "{{ functional_users_group }}"]
-  - user: 'umcg-genomescan-dm'
+  - name: 'umcg-genomescan-dm'
     groups: ['umcg-genomescan', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-ateambot'
+  - name: 'umcg-gsad-ateambot'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-dm'
+  - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-ateambot'
+  - name: 'umcg-gst-ateambot'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-dm'
+  - name: 'umcg-gst-dm'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-lab-ateambot'
+  - name: 'umcg-lab-ateambot'
     groups: ['umcg-lab', "{{ functional_users_group }}"]
-  - user: 'umcg-lab-dm'
+  - name: 'umcg-lab-dm'
     groups: ['umcg-lab', "{{ functional_users_group }}"]
-  - user: 'umcg-labgnkbh-ateambot'
+  - name: 'umcg-labgnkbh-ateambot'
     groups: ['umcg-labgnkbh', "{{ functional_users_group }}"]
-  - user: 'umcg-labgnkbh-dm'
+  - name: 'umcg-labgnkbh-dm'
     groups: ['umcg-labgnkbh', "{{ functional_users_group }}"]
-  - user: 'umcg-logstoprm-dm'
+  - name: 'umcg-logstoprm-dm'
     groups: ['umcg-logstoprm', "{{ functional_users_group }}"]
-  - user: 'umcg-ogm-dm'
+  - name: 'umcg-ogm-dm'
     groups: ['umcg-ogm', "{{ functional_users_group }}"]
-  - user: 'umcg-patho-ateambot'
+  - name: 'umcg-patho-ateambot'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
-  - user: 'umcg-patho-dm'
+  - name: 'umcg-patho-dm'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
-  - user: 'umcg-pr-ateambot'
+  - name: 'umcg-pr-ateambot'
     groups: ['umcg-pr', "{{ functional_users_group }}"]
-  - user: 'umcg-pr-dm'
+  - name: 'umcg-pr-dm'
     groups: ['umcg-pr', "{{ functional_users_group }}"]
-  - user: 'umcg-vipt-dm'
+  - name: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd']
