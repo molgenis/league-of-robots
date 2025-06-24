@@ -1,0 +1,13 @@
+---
+ssh_client_jumphosts:
+  - alias: lobby
+    hostname: 195.169.22.185
+
+ssh_client_known_hosts: "\
+  @cert-authority \
+  lobby*,\
+  195.169.22.185,\
+  *silo-*,\
+  195.169.22.69 \
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPpMwXUlFLk4qpsewXvC+qDGlnQ79PNki4JDNESs37TH CA key for silo_server"
+...

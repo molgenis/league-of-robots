@@ -275,6 +275,7 @@ Are you sure you want to continue connecting (yes/no)?
 * Example to create a new CA key pair with the ```ed25519``` algorithm and encryption after that:
   ```bash
   ssh-keygen -t ed25519 -a 101 -f ssh-host-ca/[stack_name]-ca -C "CA key for [stack_name]"
+  # NOTE: You will be asked for the password that is located in [stack_name]/secrets.yml.
   ansible-vault encrypt --encrypt-vault-id [stack_name] ssh-host-ca/[stack_name]-ca
   ```
 
