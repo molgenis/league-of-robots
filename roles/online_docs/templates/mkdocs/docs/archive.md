@@ -32,7 +32,7 @@ Data-manager account of the specific group is the **only** account that has **re
 
 After some time, all the files on remote archive server get automatically migrated to the tape. **metadata** and **data structure** remain remote disks, while **data** content exist only on tape. When this happens, the meta-data (like file names, permissions, timestamps, size, ownerhip, etc.) can be normally accessed and the structure can be normally browsed. `ls` and `cd` commands work just like on *regular* filesystem.
 
-The difference is that the file content is not directly available anymore - until it is recalled. Any command that attempts to read the file content (like `less`, `cat` or `grep`) or edit the content (like `vim` or `nano`) may **appear stuck**. Actually it is waiting for data to be retrieved, which can take a very long time since the data needs to be copied back from tape to disk.
+The difference is that the file content is not directly available anymore until it is recalled. Any command that attempts to read the file content (like `less`, `cat` or `grep`) or to edit the content (like `vim` or `nano`) may **appear stuck**. Actually the machine is waiting for data to be retrieved, which can take a very long time since the data needs to be copied back from tape to disk.
 
 Therefore the correct procedure is to **first stage (recall from the tape) the file, and access the content when it is available again**.
 
