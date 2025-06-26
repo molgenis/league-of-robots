@@ -30,7 +30,7 @@ Data-manager account of the specific group is the **only** account that has **re
 
 ## 2. Managing data
 
-After some time, all the files on remote archive server get automatically migrated to the tape. **metadata** and **data structure** remain remote disks, while **data** content exist only on tape. When this happens, the meta-data (like file names, permissions, timestamps, size, ownerhip, etc.) can be normally accessed and the structure can be normally browsed. `ls` and `cd` commands work just like on *regular* filesystem.
+After some time, all the files on remote archive server get automatically migrated to the tape. The **metadata** and **tree structure** remain on remote disks, while the **data content** exist only on tape. When this happens, the metadata (like file names, permissions, timestamps, size, ownership, etc.) can be normally accessed and the structure can be normally browsed. `cd`, `ls` and `find` commands work just like they do on a *regular* filesystem.
 
 The difference is that the file content is not directly available anymore until it is recalled. Any command that attempts to read the file content (like `less`, `cat` or `grep`) or to edit the content (like `vim` or `nano`) may **appear stuck**. Actually the machine is waiting for data to be retrieved, which can take a very long time since the data needs to be copied back from tape to disk.
 
@@ -65,14 +65,14 @@ Become the data manager
 
 (optional, but highly recommended) Preperate the data by merging multiple files/folders into one compressed **tar** file
 ```
-   dm-user $ tar -czvf /groups/[group]/[tmp0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
+   dm-user $ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
 ```
 
 ### Uploading
 
 Upload file(s) to the archive
 ```
-   dm-user $ cp /groups/[group]/[prm0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
+   dm-user $ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
 
 ```
 
