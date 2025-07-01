@@ -6,16 +6,18 @@
 Description=Mount for {{ item.1 }}
 
 [Mount]
-What={{ item.0.archive_user }}@{{ item.0.archive_system }}:/home/{{ item.0.archive_user }}/{{ item.0.name }}/{{ item.1 }}
-Where=/groups/{{ item.1 }}/{{ item.0.name }}
+What={{ item.0.archive_user }}@{{ item.0.archive_system }}:{{ item.0.archive_remote_top_dir }}/{{ item.0.local_top_level_mount }}/{{ item.1 }}/{{ item.0.name }}
+Where=/{{ item.0.local_top_level_mount | regex_replace('/', '') }}/{{ item.1 }}/{{ item.0.name }}
 Type=fuse.sshfs
-# ServerAliveInterval - ssh sends every 2 seconds a message to the server requesting a response
-# ServerAliveCountMax - and max 2 times if responding
+# ServerAliveInterval - ssh sends every X seconds a message to the server requesting a response
+# ServerAliveCountMax - and max this number of times if the server did not respond.
 # max_conns - each sshfs mount allows up to this number of connections
 # ControlPersist - automount disconnects after 3 minutes, this ssh connection stays for 5 min
 # ControlPath - even tho every connection to server should and *does* use ssh settings from ~/.ssh/conf.d
 #               the sshfs somehow ignores global settings and creates new connections - this prevents it
-Options=ServerAliveCountMax=2,ServerAliveInterval=2,max_conns=2,ControlPersist=300,ControlPath=/root/.ssh/tmp/%%C,users,idmap=user,IdentityFile="{{ archive_ssh_key_location }}",reconnect,default_permissions,allow_other,uid={{ item.1 }}-dm,gid={{ item.1 | trim() }}-dm,_netdev
+# compression=no  - we don't need compression, as we already use it at .ssh/conf.d configuration
+# cache=yes       - use data and metadata caching
+Options=default_permissions,ServerAliveCountMax=2,ServerAliveInterval=2,max_conns=5,ControlPersist=300,ControlPath=/root/.ssh/tmp/%%C,users,idmap=none,IdentityFile="{{ archive_ssh_key_location }}",reconnect,allow_other,uid={{ item.1 }}-dm,gid={{ item.1 | trim() }}-dm,compression=no,cache=yes,attr_timeout=2,_netdev
 # This prevents: when redeploying the role, systemd must restart .mount service, which fails when users are using mount point
 LazyUnmount=true
 
