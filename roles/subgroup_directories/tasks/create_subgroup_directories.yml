@@ -1,5 +1,7 @@
 ---
 - name: "Create directory structure for releases with version number."
+  tags:
+    - groups
   when: versioned_sub_groups | length > 0
   become: true
   become_user: "{{ main_group }}-dm"
@@ -33,6 +35,8 @@
       ignore_errors: true  # noqa ignore-errors
 
 - name: "Create directory structure for projects."
+  tags:
+    - groups
   when: unversioned_sub_groups | length > 0
   become: true
   become_user: "{{ main_group }}-dm"

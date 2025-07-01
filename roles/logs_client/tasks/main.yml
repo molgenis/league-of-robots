@@ -1,9 +1,29 @@
 ---
+- name: Print help options
+  ansible.builtin.debug:
+    msg: >
+      this role supports following tags:
+       - test    # for testing / validating that the connection with remote log
+                 # server is working and that logs get correctly transferred
+       - always
+  run_once: true  # noqa run-once
+  delegate_to: localhost
+  connection: local
+  tags:
+    - help
+    - never
+
+- name: Stop the playbook
+  ansible.builtin.meta: end_play
+  tags:
+    - help
+    - never
+
 - name: Compile the list of logs server names
   ansible.builtin.set_fact:
-    logs_class_servers: "{{ logs_class_servers | default([]) + [item.name] }}"
-  loop: "{{ logs_server_public_networks[logs_class] }}"
-  when: logs_class is defined and logs_class|length>0
+    cluster_class_servers: "{{ cluster_class_servers | default([]) + [item.name] }}"
+  loop: "{{ logs_server_public_networks[cluster_class] }}"
+  when: cluster_class is defined and cluster_class|length>0
   register: rsys_ext_ips
   delegate_to: localhost
   connection: local
@@ -15,19 +35,19 @@
 - name: Open logs server firewall for each client
   ansible.builtin.include_tasks:
     file: firewall.yml
-  when: ( logs_class is defined and ( logs_class|length>0 ) ) or
+  when: ( cluster_class is defined and ( cluster_class|length>0 ) ) or
         ( rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 ))
 
 - name: Deploy rsyslog client
   ansible.builtin.include_tasks:
     file: deploy.yml
-  when: ( logs_class is defined and ( logs_class|length>0 ) ) or
+  when: ( cluster_class is defined and ( cluster_class|length>0 ) ) or
         ( rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 ))
 
 - name: Test rsyslog client
   ansible.builtin.include_tasks:
     file: test.yml
-  when: ( logs_class is defined and ( logs_class|length>0 ) ) or
+  when: ( cluster_class is defined and ( cluster_class|length>0 ) ) or
         ( rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 ))
   tags:
     - always

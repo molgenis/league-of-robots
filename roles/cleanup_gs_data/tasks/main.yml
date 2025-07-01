@@ -2,5 +2,9 @@
 - name: Configure automatic cleanup of old data.
   ansible.builtin.include_tasks:
     file: configure_cleanup.yml
-  when: '"umcg-genomescan" in regular_groups'
+  when: regular_groups
+        | default([])
+        | selectattr('name', 'equalto', 'umcg-genomescan')
+        | list
+        | length > 0
 ...

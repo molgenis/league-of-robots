@@ -7,10 +7,10 @@
 #
 - name: Create ~/.ssh dir and subdirs.
   ansible.builtin.file:
-    path: "/home/{{ item.0.user }}/{{ item.1 }}"
+    path: "/home/{{ user[0]['name'] }}/{{ user[1] }}"
     state: 'directory'
-    owner: "{{ item.0.user }}"
-    group: "{{ item.0.user }}"
+    owner: "{{ user[0]['name'] }}"
+    group: "{{ user[0]['name'] }}"
     mode: '0700'
   vars:
     ssh_client_dirs:
@@ -18,24 +18,28 @@
       - '.ssh/tmp'
       - '.ssh/conf.d'
   loop: "{{ regular_users | product(ssh_client_dirs) | list }}"
+  loop_control:
+    loop_var: user
   become: true
 
 - name: 'Configure ssh client config file ~/.ssh/config to include ~/.ssh/conf.d dir.'
   ansible.builtin.lineinfile:
-    path: "/home/{{ item.user }}/.ssh/config"
-    owner: "{{ item.user }}"
-    group: "{{ item.user }}"
+    path: "/home/{{ user['name'] }}/.ssh/config"
+    owner: "{{ user['name'] }}"
+    group: "{{ user['name'] }}"
     mode: '0600'
     create: true
     insertbefore: BOF
     regexp: '(?i)^#?Include'
     line: 'Include conf.d/*'
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
   become: true
 
 - name: 'Insert/update block into ~/.bashrc to ensure we can load modules.'
   ansible.builtin.blockinfile:
-    path: "/home/{{ item.user }}/.bashrc"
+    path: "/home/{{ user['name'] }}/.bashrc"
     block: |
       if [ -f "/apps/modules//modules.bashrc" ]; then
         source "/apps/modules//modules.bashrc"
@@ -43,9 +47,11 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK - Setup environment for Lua, Lmod & EasyBuild."
     insertbefore: '# User specific aliases and functions'
     create: false
-    owner: "{{ item.user }}"
-    group: "{{ item.user }}"
+    owner: "{{ user['name'] }}"
+    group: "{{ user['name'] }}"
     mode: '0600'
-  with_items: "{{ regular_users }}"
+  loop: "{{ regular_users }}"
+  loop_control:
+    loop_var: user
   become: true
 ...

@@ -1,0 +1,25 @@
+---
+- name: Import pre deploy checks.
+  ansible.builtin.import_playbook: pre_deploy_checks.yml
+
+- name: Import initialization playbook for all hosts.
+  ansible.builtin.import_playbook: init.yml
+
+- name: '###==-> Roles for CVMFS servers. <-==###'
+  hosts:
+    - silo-01
+  roles:
+    - {role: yum_local, when: local_yum_repository is defined}
+    - epel
+    - iptables
+    - grub
+    - locale
+    - logrotate
+    - remove
+    - update
+    - sshd
+    - basic_security
+    - silo_server
+   #- cluster # for installing software?
+   #- sudoers
+...

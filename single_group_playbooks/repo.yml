@@ -20,7 +20,7 @@
     - remove
     - update
     - role: logs_client
-      when: logs_class is defined
+      when: cluster_class is defined
 
 - name: '###==-> Roles for repo management servers. <-==###'
   hosts: repo

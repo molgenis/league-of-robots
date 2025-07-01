@@ -18,6 +18,7 @@ all:
           create_ldap: true
           ldap_domains:
             stack:
+              # ladap.westeurope.cloudapp.azure.com"
               uri: "ldaps://ladap"
               base: "dc={{ stack_name }},dc=local"
               schema: rfc2307bis
@@ -31,9 +32,9 @@ all:
               create_ldap: true
               ldap_db_index: 2  # Indices up to 1 are already used by default for the "config" and "monitor" databases. (Example database on "2" was removed.)
           regular_groups:
-            - 'lsaai'
+            - name: 'lsaai'
           regular_users:
-            - user: "lsaai"
+            - name: "lsaai"
               groups:
                 - "lsaai"
           iptables_allow_ssh_inbound:

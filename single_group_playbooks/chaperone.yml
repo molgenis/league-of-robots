@@ -21,7 +21,7 @@
     - basic_security
     - figlet_motd
     - role: logs_client
-      when: logs_class is defined
+      when: cluster_class is defined
     - resolver
     - coredumps
 

@@ -6,6 +6,8 @@ set -euo pipefail
 _arc="{{ item.name }}"
 _user="{{ item.archive_user }}"
 _system="{{ item.archive_system }}"
+_local_top_level_mount="{{ item.local_top_level_mount }}"
+_archive_remote_top_dir="{{ item.archive_remote_top_dir }}"
 _arcq_dir="/var/cache/arcq/"
 _lock="${_arcq_dir}/${_arc}-lock"
 _queue_dir="${_arcq_dir}/queue/${_arc}"
@@ -61,11 +63,11 @@ fi
 _queue_files="$(find /var/cache/arcq/queue/${_arc} -type f)"
 for _file in ${_queue_files}; do
    # Prepare variables
-   #  the file structure: from queue file. All send in one line = [command] [subdirectory]
-   _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
+   #  the file structure: from queue file. All send in one line = [command] [path]
    _command=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
+   _path=$(head -n 1 < "${_file}" | cut -s -d' ' -f2)
    _group="$(echo "${_path}" | cut -s -d'/' -f3)"
-   _fs="$(echo "${_path}" | cut -s -d'/' -f4)"
+   _arc_name="$(echo "${_path}" | cut -s -d'/' -f4)"
    _subdir="$(echo "${_path}" | cut -s -d'/' -f5-)"
    #  the output: based on basename of queued file
    _basename="$(basename ${_file})"
@@ -85,8 +87,8 @@ for _file in ${_queue_files}; do
       continue
    fi
    # Check that it is running on a correct filesystem
-   if [[ ! "${_fs}" =~ ^"arc"[0-9][0-9]$ ]]; then
-      echo "error: (${_fs}) path not pointing to the arc filesystem!" > "${_stdout}"
+   if [[ ! "${_arc_name}" =~ ^"arc"[0-9][0-9]$ ]]; then
+      echo "error: (${_arc_name}) path not pointing to the arc filesystem!" > "${_stdout}"
       date >> "${_stdout}.done" && chmod 644 "${_stdout}.done"
       rm -f "${_file}"
       continue
@@ -94,22 +96,31 @@ for _file in ${_queue_files}; do
    # Check and format command
    _argument=$(head -n 1 < "${_file}" | cut -s -d' ' -f1)
    case "${_argument:2}" in
-      dmfind-reg) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state reg" ;;
-      dmfind-mig) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state mig" ;;
-      dmfind-dul) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state dul" ;;
-      dmfind-ofl) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state ofl" ;;
-      dmfind-unm) _command="dmfind ${_arc}/${_group}/${_subdir} -type f -state unm" ;;
-      dmget)      _command="dmget -nq ${_arc}/${_group}/${_subdir}" ;;
-      dmls)       _command="dmls -l ${_arc}/${_group}/${_subdir}" ;;
-      dmput)      _command="dmput -n -r ${_arc}/${_group}/${_subdir}" ;;
-      sha256sum)  _afile="$(basename ${_subdir})"; _adir="$(dirname ${_subdir})"
-                  _command="dmfind ${_arc}/${_group}/${_adir} -name ${_afile} \( -state DUL -or -state REG \) -exec sha256sum {} \; ; dmfind ${_arc}/${_group}/${_adir} -name ${_afile} \( ! -state DUL ! -state REG \) -exec echo 'sha256sum unavailable - file is offline' \;" ;;
+      dafind-reg) _state="REG" ;;
+      dafind-dul) _state="DUL" ;;
+      dafind-ofl) _state="OFL" ;;
+      dafind-que) _state="QUE" ;;
+      dafind-stg) _state="STG" ;;
+      daget)      _command="daget ${_archive_remote_top_dir}/${_path}" ;;
+      dals)       _command="dals -lq ${_archive_remote_top_dir}/${_path}" ;;
+      darelease)  _command="darelease ${_archive_remote_top_dir}/${_path}" ;;
+      sha256sum)  _command="sha256sum ${_archive_remote_top_dir}/${_path}" ;;
       *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
                   date >> "${_stdout}.done"
                   rm -f "${_file:-error_path}" && continue ;;
    esac
+   # if dafind, restructure output to correctly show folder paths
+   if [[ "${_argument:2:6}" == "dafind" ]]; then
+       _command="dafind ${_archive_remote_top_dir}/${_path} -type f -state ${_state}"
+   fi
+   # Reformat the output from remote server, so that it does not confuse the local user
+   # Changing output of
+   #   /archive/username/complete/path
+   # to reflect local filesystem's path
+   #   /complete/path
+   _command_sed="${_command} | sed 's|${_archive_remote_top_dir}||g'"
    rm -f "${_file:-error_path}"
-   echo "${0} info: running command '${_command}'"
-   timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command}" >> "${_stdout}" 2>&1
+   echo "${0} info: running command '${_command_sed}'"
+   timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command_sed}" >> "${_stdout}" 2>&1
    date >> "${_stdout}.done" && chown "${_submitter_uid}":"${_group}" "${_stdout}.done"
 done

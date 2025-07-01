@@ -33,7 +33,7 @@
     name:
       - curl
       - git
-      - java-17-openjdk
+      - java-21-openjdk
       - nano
       - rsync
       - "{{ 'libselinux-python' if ansible_python['version']['major'] < 3 else 'python3-libselinux' }}"

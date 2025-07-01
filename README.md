@@ -20,10 +20,10 @@ Test/development clusters were named after other robots.
 The main ingredients for (deploying) these clusters:
 
  * [Ansible playbooks](https://github.com/ansible/ansible) for system configuration management.
- * [OpenStack](https://www.openstack.org/) for virtualization. (Note that deploying the OpenStack itself is not part of the configs/code in this repo.)
+ * [OpenStack](https://www.openstack.org/) for the private clouds on which the clusters run. (Note that deploying the OpenStack itself is not part of the configs/code in this repo.)
  * [Pulp](https://pulpproject.org/) to create freezes of Linux distros.
- * [CentOS 7](https://www.centos.org/) as OS for the virtual machines.
- * [Slurm](https://slurm.schedmd.com/) as workload/resource manager to orchestrate jobs.
+ * [Rocky Linux](https://rockylinux.org/) as OS for the cluster machines.
+ * [Slurm](https://slurm.schedmd.com/) as Workload/resource manager to orchestrate jobs.
 
 #### Branches and Releases
 The master and develop branches of this repo are protected; updates can only be merged into these branches using reviewed pull requests.
@@ -275,6 +275,7 @@ Are you sure you want to continue connecting (yes/no)?
 * Example to create a new CA key pair with the ```ed25519``` algorithm and encryption after that:
   ```bash
   ssh-keygen -t ed25519 -a 101 -f ssh-host-ca/[stack_name]-ca -C "CA key for [stack_name]"
+  # NOTE: You will be asked for the password that is located in [stack_name]/secrets.yml.
   ansible-vault encrypt --encrypt-vault-id [stack_name] ssh-host-ca/[stack_name]-ca
   ```
 
@@ -547,10 +548,21 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
   unset JUMPHOST_USER
   ansible-playbook -u "${lor_admin_user}" -l '!jumphost' cluster.yml
   ```
-* (Re-)deploying only a specific role - e.g. *rsyslog_client* - on the previously deployed test cluster *Talos*
+* (Re-)deploying only a specific role - e.g. *rsyslog_client* - on a previously deployed stack
   ```bash
   ansible-playbook -u "${lor_admin_user}" single_role_playbooks/rsyslog_client.yml
   ```
+* (Re-)deploying only specific tasks with a certain tag from multiple roles
+  * When a new group needs to be added, an old one needs to be removed or a config for a groups needs to be updated,
+    then you can re-deploy only the relevant tasks in the correct order using the `groups` tag:
+    ```bash
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/cgroups.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/regular_users.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/sudoers.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/shared_storage.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/slurm.yml
+    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/subgroup_directories.yml
+    ```
 
 #### 11. Verify operation.
 

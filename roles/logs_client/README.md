@@ -20,12 +20,12 @@ See also
 
 List of interesting variables
 
- - `logs_class_servers` - a list of servers for current `logs_class` (like 'development', 'research', 'diagnostic' ... )
+ - `cluster_class_servers` - a list of servers for current `cluster_class` (like 'development', 'research', 'diagnostic' ... )
  - `random_tag` - a string that gets created at the testing, the tag that gets injected into log and after that
                   searched on the server
  - `rsyslog_remote_path_cert_dir` - folder on server's side where certificate will be stored
  - `rsyslog_remote_path_key_dir` - folder on server's side where private key will be stored
- - `rsyslog_repository_dir` - location withing the LoR where public and private keys of each `logs_class` are stored
+ - `rsyslog_repository_dir` - location withing the LoR where public and private keys of each `cluster_class` are stored
  - `iptables_extras_dir` - folder on each of the logs servers, where the files that define firewall exceptions
                            of an individual stack are stored
 
@@ -62,9 +62,9 @@ This role is the second role of the ansible roles for logs. It relies on predefi
  - (optional) a list of external rsyslog servers (unmanaged by our roles)
  - (optional) defined in `group_vars/{{ stack_name }}/vars.yml`
    ```
-    logs_class: 'development'
+    cluster_class: 'development'
    ```
-   The `logs_class` defines the group of rsyslog server to be used. The group must be already
+   The `cluster_class` defines the group of rsyslog server to be used. The group must be already
    created and CA key and certificate exist in the `files/logs_library/` folder.
    Currently there are following groups planned: `development`, `research` and `diagnostics`.
  - The `additional_etc_hosts` variable must include the apropriate logs servers. This is defined
@@ -105,7 +105,7 @@ This role is the second role of the ansible roles for logs. It relies on predefi
       - `development` (default) for testing purposes
       - `research`, for the research clusters, and
       - `diagnostics` for the production machines
-    - type can be defined by assigning an appropriate value to the `logs_class` variable (f.e.
+    - type can be defined by assigning an appropriate value to the `cluster_class` variable (f.e.
       `research`) in a `groups_vars/[stack]/vars.yml` (for group of computers) or
       `static_inventory/[stack].yml` (to the individual instance).`
 

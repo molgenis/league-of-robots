@@ -15,7 +15,10 @@ slurm_partitions:
     local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
-logs_class: 'development'
+#
+# Cluster classification (used by `logs` and `login` roles)
+#
+cluster_class: 'development'
 repo_manager: 'none'
 os_distribution: 'centos7'
 figlet_font: 'speed'
@@ -82,33 +85,33 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 regular_groups:
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - 'users'
-  - 'umcg-atd'
-  - 'umcg-gsad'
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: 'users'
+  - name: 'umcg-atd'
+  - name: 'umcg-gsad'
 regular_users:
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd']
-  - user: 'umcg-gsad-dm'
+  - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad']
-  - user: 'gvdvries'
+  - name: 'gvdvries'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
-  - user: 'kdelange'
+  - name: 'kdelange'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
-  - user: 'mbenjamins'
+  - name: 'mbenjamins'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
-  - user: 'mbijlsma'
+  - name: 'mbijlsma'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
-  - user: 'mswertz'
+  - name: 'mswertz'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
-  - user: 'pneerincx'
+  - name: 'pneerincx'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
-  - user: 'rkanninga'
+  - name: 'rkanninga'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
-  - user: 'scimerman'
+  - name: 'scimerman'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
 sudoers:
   - who: ['%umcg-atd']

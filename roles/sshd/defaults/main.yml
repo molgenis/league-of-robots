@@ -73,7 +73,7 @@ sshd_max_sessions: "\
     {% if inventory_hostname in groups['jumphost'] | default([]) %}\
         {{ [10,
             (lookup('config', 'DEFAULT_FORKS') * 2),
-            ([groups['cluster'] | length, 50] | min)]
+            ([groups['cluster'] | default([]) | length, 50] | min)]
            | max }}\
     {% else %}\
         10 # default\
