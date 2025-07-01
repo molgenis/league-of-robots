@@ -206,6 +206,7 @@ sponsors:
 # Remote archive settings
 archive_groups:
   - name: arc01
+    local_top_level_mount: '/groups'
     groups:
       - 'umcg-atd'
       - 'umcg-gcc'
@@ -217,6 +218,7 @@ archive_groups:
     archive_remote_top_dir: '/archive/umcg-atd-dm/groups'
     recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
   - name: arc02
+    local_top_level_mount: '/groups'
     groups:
       - 'umcg-fg'
       - 'umcg-biogen'

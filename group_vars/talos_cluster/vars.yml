@@ -193,6 +193,7 @@ sponsors:
 # Remote archive settings
 archive_groups:
   - name: arc01
+    local_top_level_mount: '/groups'
     groups:
       - 'umcg-atd'
       - 'umcg-gcc'

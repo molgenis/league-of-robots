@@ -111,18 +111,18 @@ functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 # Remote archive settings
 archive_groups:
-- name: arc01
-  local_top_level_mount: '/groups'
-  groups:
-    - 'umcg-atd'
-    - 'solve-rd'
-  archive_user: 'umcg-atd-dm'
-  archive_system: 'archive.surfsara.nl'
-  archive_system_fingerprints:
-    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
-    - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
-  archive_remote_top_dir: '/archive/umcg-atd-dm'
-  recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+  - name: arc01
+    local_top_level_mount: '/groups'
+    groups:
+      - 'umcg-atd'
+      - 'solve-rd'
+    archive_user: 'umcg-atd-dm'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-atd-dm'
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
 regular_groups:
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
