@@ -6,6 +6,7 @@ set -euo pipefail
 _arc="{{ item.name }}"
 _user="{{ item.archive_user }}"
 _system="{{ item.archive_system }}"
+_local_top_level_mount="{{ item.local_top_level_mount }}"
 _archive_remote_top_dir="{{ item.archive_remote_top_dir }}"
 _arcq_dir="/var/cache/arcq/"
 _lock="${_arcq_dir}/${_arc}-lock"
@@ -100,24 +101,24 @@ for _file in ${_queue_files}; do
       dafind-ofl) _state="OFL" ;;
       dafind-que) _state="QUE" ;;
       dafind-stg) _state="STG" ;;
-      daget)      _command="daget ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
-      dals)       _command="dals -lq ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
-      darelease)  _command="darelease ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
-      sha256sum)  _command="sha256sum ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir}" ;;
+      daget)      _command="daget ${_archive_remote_top_dir}/${_path}" ;;
+      dals)       _command="dals -lq ${_archive_remote_top_dir}/${_path}" ;;
+      darelease)  _command="darelease ${_archive_remote_top_dir}/${_path}" ;;
+      sha256sum)  _command="sha256sum ${_archive_remote_top_dir}/${_path}" ;;
       *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
                   date >> "${_stdout}.done"
                   rm -f "${_file:-error_path}" && continue ;;
    esac
    # if dafind, restructure output to correctly show folder paths
    if [[ "${_argument:2:6}" == "dafind" ]]; then
-       _command="dafind ${_archive_remote_top_dir}/${_group}/${_arc}/${_subdir} -type f -state ${_state}"
+       _command="dafind ${_archive_remote_top_dir}/${_path} -type f -state ${_state}"
    fi
    # Reformat the output from remote server, so that it does not confuse the local user
    # Changing output of
-   #   /archive/username/groupname/arc0X/path
+   #   /archive/username/complete/path
    # to reflect local filesystem's path
-   #   /groups/groupname/arc0X/path
-   _command_sed="${_command} | sed 's|${_archive_remote_top_dir}/|/groups/|g'"
+   #   /complete/path
+   _command_sed="${_command} | sed 's|${_archive_remote_top_dir}||g'"
    rm -f "${_file:-error_path}"
    echo "${0} info: running command '${_command_sed}'"
    timeout -s 9 ${_ssh_timeout} ssh "${_user}@${_system}" "${_command_sed}" >> "${_stdout}" 2>&1

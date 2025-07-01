@@ -20,12 +20,15 @@
   become: true
 
 - name: Install recall script
-  ansible.builtin.copy:
-    src: "arc_surf"
+  ansible.builtin.template:
+    src: "arc_surf.j2"
     dest: /usr/local/bin/arc_surf
     mode: "0755"
     owner: root
     group: root
+  when:
+    - archive_groups is defined
+    - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
 - name: Deploy archive_queue service for each group

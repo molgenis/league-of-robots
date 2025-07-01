@@ -27,7 +27,7 @@ function _print_help(){
 EOF
 }
 
-if [[ "${#}" -lt 2 ]] || [[ "${1}" == "-h" ]] || [[ "${1}" == "--help" ]]; then
+if [[ "$#" -lt 2 ]] || [[ "${1}" == "-h" ]] || [[ "${1}" == "--help" ]]; then
    _print_help
 fi
 
@@ -56,12 +56,18 @@ for _eacharg in "$@"; do
 done
 
 _groups="$(echo "${_path}" | cut -s -d'/' -f2)"
-if [[ "${_groups}" != "groups" ]]; then
-   echo "Error: directory must be from the /groups!"
+_correct_path=false
+_top_mounts=({% for archive in archive_groups %} "{{ archive.local_top_level_mount }}" {% endfor %})
+for _each_group in "${_top_mounts[@]}"; do
+   [[ "/${_groups}" == "${_each_group}" ]] && _correct_path=true && break
+done
+if ! ${_correct_path}; then
+   echo "Error: directory must be from either of '${_top_mounts[@]}'!"
    exit 1
 fi
 _group_name="$(echo "${_path}" | cut -s -d'/' -f3)"
 _arc_name="$(echo "${_path}" | cut -s -d'/' -f4)"
+
 if [[ ! "${_arc_name}" =~ ^"arc"[0-9][0-9]$ ]]; then
    echo "Error: directory must be in the arc filesystem!"
    exit 1
