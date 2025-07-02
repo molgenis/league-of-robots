@@ -4,7 +4,7 @@
 
 ### Adding arcXX to a group
 
-vi group_vars/hyperchicken_cluster/vars.yml
+`vi group_vars/hyperchicken_cluster/vars.yml`
 
 define variable `archive_groups`:
 
@@ -71,6 +71,15 @@ When mount point is accessed
  - permissions
    - even though that the files are owned in the backed by the remote archive user
    - local user can access only the files from the group that he is a member of
+
+## Mount path assumption
+
+Right now the implementation works for `/groups` folders only.
+
+This is hard-coded in the `group_vars/[cluster]/vars.yml` with the variable `archive_remote_top_dir` (which ends with `.../groups`) and in the
+`roles/remote_archive/templates/archive_mount.j2`, with `Where` starting with `/groups`.
+
+If you wish to change it, so that remote archive folders would be mounted on the local subfolder of `/mnt` or similar, the playbook should be extended.
 
 ## Prerequisites
 

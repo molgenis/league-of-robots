@@ -33,10 +33,10 @@
 
 - name: Make a list of desired mount and automount files
   ansible.builtin.set_fact:
-    desired_auto_mounts: "{{ desired_auto_mounts | default([])  + ['groups-' + item.1 | regex_replace('-', '\\\\x2d') +
-                         '-' + item.0.name | regex_replace('-', '\\\\x2d')] }}"
+    desired_auto_mounts: "{{ desired_auto_mounts | default([])  + [ item.0.local_top_level_mount | regex_replace('\/', '') + '-'
+        + item.1 | regex_replace('-', '\\\\x2d') + '-' + item.0.name | regex_replace('-', '\\\\x2d')] }}"
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ archive_groups | default([], true) | list }}"
     - 'groups'
 
 - name: Set disable_auto_mounts
@@ -117,16 +117,46 @@
     - 'archive_systemd_reload'
   become: true
 
-- name: Create archive directory mountpoint for each group
+- name: "Check if top level mount folders exist and is executable by others"
+  ansible.builtin.shell: |
+    test -d "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}" \
+      && test -x "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}"
+  with_subelements:
+    - "{{ archive_groups | default([], true) }}"
+    - groups
+  register: folder_test
+  failed_when: folder_test.rc != 0
+  changed_when: false
+
+- name: "Check if group folder inside exist and is executable by others"
+  ansible.builtin.shell: |
+    test -d "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}/{{ item.1 }}" \
+      && test -x "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}/{{ item.1 }}"
+  with_subelements:
+    - "{{ archive_groups | default([], true) }}"
+    - groups
+  register: subfolder_test
+  failed_when: subfolder_test.rc != 0
+  changed_when: false
+
+# We don't assign the user and group permissions for two reasons:
+#  - this task should create folder only if is missing
+#  - it should not assign user or group ownership
+#  - the user and group ownership change at mount time, and assinging them
+#    would make this task fail - which is not needed
+#  - we only assign mode 2750 which reflects the permissions of the mounted
+#    folders - so this is fine
+#  - from security point of view, as mentioned before, user and group change
+#    at mount time, so that only -dm users can view and edit archive content
+- name: Create archive folder mountpoint for each group
   ansible.builtin.file:
-    path: "/groups/{{ item.1 }}/{{ item.0.name }}"
-    owner: "{{ item.1 }}-dm"
-    group: "{{ item.1 }}"
+    path: "/{{ item.0.local_top_level_mount | regex_replace('\/', '') }}/{{ item.1 }}/{{ item.0.name }}"
     mode: "2750"
     state: "directory"
-  when: archive_groups | default([]) | length >= 1
+  when: archive_groups | default([], true) | length >= 1
+  register: created_mount_point
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ archive_groups | default([], true) | list }}"
     - 'groups'
   become: true
 ...
