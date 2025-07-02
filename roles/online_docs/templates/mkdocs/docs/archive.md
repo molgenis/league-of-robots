@@ -26,13 +26,13 @@ The following guidelines apply to this archive storage
 
 Archive is automatically mounted when user navigates to the `/groups/[GROUP]/arc[XX]` folder. At that moment storage from remote server gets mounted on the folder. It remains accessible until some specific idle time is reached.
 
-Data-manager account of the specific group is the **only** account that has **read** or **write** access to the archive folder of the group. This is to prevent the potential problems of accidentally recalling files online when not needed. Also to make sure that all the files are stored in correct format (see 'Best practices' below).
+Data-manager account of the specific group is the **only** account that has **read** and **write** access to the archive folder of the group. This is to prevent users accidentally recalling files online when not needed. Also to make sure that all the files are stored in correct format (see 'Best practices' below).
 
 ## 2. Managing data
 
-After some time, all the files on remote archive server get automatically migrated to the tape. When this happens, all the folders and files can be still normally seen in the structure. The access to any (sub)directory is possible and `ls` should list the files. All the filenames and their permissions and metadata (age, size, ownerhip) can be seen.
+After some time, all the files on remote archive server get automatically migrated to the tape. The **metadata** and **tree structure** remain on remote disks, while the **data content** exist only on tape. When this happens, the metadata (like file names, permissions, timestamps, size, ownership, etc.) can be normally accessed and the structure can be normally browsed. `cd`, `ls` and `find` commands work just like they do on a *regular* filesystem.
 
-The difference is that the file content is not directly available anymore - that is, not without calling it back first. If anything is done on the file content, like edit (like compressing, edit with vim/nano) or read (with `less`, `cat` or `grep`) then the command will get stuck in order to retrieve the file from the tapes - which take a lot of time. During this time the command line will be **stuck** unusable.
+The difference is that the file content is not directly available anymore until it is recalled. Any command that attempts to read the file content (like `less`, `cat` or `grep`) or to edit the content (like `vim` or `nano`) may **appear stuck**. Actually the machine is waiting for data to be retrieved, which can take a very long time since the data needs to be copied back from tape to disk.
 
 Therefore the correct procedure is to **first stage (recall from the tape) the file, and access the content when it is available again**.
 
@@ -40,13 +40,13 @@ Therefore the correct procedure is to **first stage (recall from the tape) the f
 
 The data migrates on remote server from disk to tape and during this it has different states. **As long as the data is online (on disks), it is available to the user. It can be read or modified.**.
 
-| State | Code | Online (data on disks) | Offline (data on tape) | Explanation |
+| State | Code | Online (on disks) | Offline (on tape) | Explanation |
 | ----- | ---- |-------------- | ------------ | ----------- |
 | Regular | `REG` | Yes | No | Files are only on disk. File content can be accessed and changed. |
-| Migrating | `MIG` | Yes | **No**t yet | File content is copied from disks to tape. Content is still available. |
 | Dual-state | `DUL` | Yes | Yes | Content is both on disk and on tape. |
-| Offline | `OFL` | No | Yes | Content is no longer online (on disks). It is only on tape. Can be recalled back to disks. |
-| Unmigrating | `UNM` | **No**t yet | Yes | Files content is copied from tape and is not available until copy is finised. |
+| Offline | `OFL` | No | Yes | Content is no longer online/on disks, but only on tape. |
+| Unmigrating | `QUE` | **No** | Yes | File queued for staging from tape. Not yet copied from tape. |
+| Unmigrating | `STG` | **No**t yet / Partially | Yes | File being staged from tape to disk. Content is is unavailable until copy is finished. |
 
 Note that the folders are always online (in state `REG`) and as such you can always browse folders and check file permissions and their metadata information.
 
@@ -65,14 +65,14 @@ Become the data manager
 
 (optional, but highly recommended) Preperate the data by merging multiple files/folders into one compressed **tar** file
 ```
-   dm-user $ tar -czvf /groups/[group]/arc01/projects/project-x.tar.gz /groups/[group]/prmxx/projects/x/*
+   dm-user $ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
 ```
 
 ### Uploading
 
 Upload file(s) to the archive
 ```
-   dm-user $ cp /groups/[group]/prmXX/project-x.tar /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
 
 ```
 
@@ -87,7 +87,7 @@ Upload file(s) to the archive
 
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
 ```
-   dm-user $ arc_surf --dmput /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --darelease /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
@@ -96,7 +96,7 @@ Upload file(s) to the archive
 
 Check the file status
 ```
-   dm-user $ arc_surf --dmls /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
@@ -105,19 +105,24 @@ Check the file status
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
-   dm-user $ arc_surf --dmget /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --daget /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
 ```
-Check the status again
+
+**Note**: when you request a file to be staged, for some time it will remain `OFL`, until it starts to be copied from tape to disks.
+
+After some time we check the status again.
+
 ```
-   dm-user $ arc_surf --dmls /groups/[group]/arc01/projects/project-x.tar
+   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
-   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (UNM) project-x.tar
-   dm-user $ # note that the file is unmigrating now
+   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar
 ```
-Now wait until status of `UNM` (unmigrating) is changed to `DUL` (Dual-state) or `REG` (Regular state).
+
+In this example, the file has status `QUE` (queued), but it can also have `STG` (staged).
+We must wait until it is changed to `DUL` (Dual-state).
 
 ## 4. Other command line options
 
@@ -126,14 +131,14 @@ Use `--help` argument to get more information
 ```
    dm-user $ $ arc_surf --help
    Provide one of the following arguments
-    --dmfind-reg <path>      print regular files / files that reside only on disk
-    --dmfind-mig <path>      print files that are being copied from disk to tape
-    --dmfind-dul <path>      print files that reside both online and offline
-    --dmfind-ofl <path>      print data that is no longer on disk (is on tape)
-    --dmfind-unm <path>      print files which are being copied from tape to disk
-    --dmget      <path>      recall / stage online FROM TAPE
-    --dmls       <path>      list state
-    --dmput      <path>      send to offline / stage TO TAPE
+    --dafind-reg <path>      print regular files / files that reside only on disk
+    --dafind-que <path>      print files that are being copied from disk to tape
+    --dafind-dul <path>      print files that reside both online and offline
+    --dafind-ofl <path>      print data that is no longer on disk (is on tape)
+    --dafind-stg <path>      print files which are being copied from tape to disk
+    --daget      <path>      recall / stage online FROM TAPE
+    --dals       <path>      list state
+    --darelease  <path>      send to offline / stage TO TAPE
     --sha256sum  <path>      compute the sha256sum of the file
 
 ```
@@ -143,9 +148,9 @@ Use `--help` argument to get more information
 File sizes are extremely important for archive. Tape storage performance and management is better when the files are larger size.
 
 Therefore
-- files should be in range 1 and 100GB (checksums are exception)
-- average file size should not be lower than a **1GB**
-- the archive filesystem was build around the idea of occasional (as in *once or twice a year at most*) accessing the data content
+ - files should be in range 1 and 100GB (checksums are exception)
+ - average file size should not be lower than a **1GB**
+ - the archive filesystem was build around the idea of occasional (as in *once or twice a year at most*) accessing the data content
 
 The average size is monitored and the groups with average size lower than this will have **locked accounts**.
 
@@ -162,19 +167,12 @@ Which means that archiving and restoring of the large datasets can take (dependi
 
 ## 7. Issues
 
-So far the bugs have been resolved, but it could happen that
+So far most of the bugs have been resolved, but it could happen that
 
- - archive folder is not available - please inform helpdesk, this should not happen, but it can be that remote system is temporarily down,
+ - the archive folder is not available - please inform the helpdesk unless maintenance was announced,
  - download/upload perfomance occasionally drops - this most probably depends on the Login node usage (and data copy by other users) - notify helpdesk if it persists for a longer period,
- - submitting the commands did not provide the results - has happened in first implemenentation of the archive solution, should be fixed now.
 
 If you expirence any issues with the archive solution, please notify helpdesk.
-
-## 8. Additional information
-
-https://servicedesk.surf.nl/jira/servicedesk/customer/kb/view/1474651?applicationId=1ce5558f-6f9a-3c77-9454-661953e955cb&spaceKey=WIKI&portalId=13&title=Data%20Archive
-
-(from Feb. 2025)
 
 ```
 Where is my data stored?

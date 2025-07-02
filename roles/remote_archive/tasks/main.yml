@@ -16,12 +16,14 @@
 - name: Create mount files from templates
   ansible.builtin.template:
     src: archive_mount.j2
-    dest: "/etc/systemd/system/groups-{{ item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.mount"
+    dest: >
+      /etc/systemd/system/{{ item.0.local_top_level_mount | regex_replace('\/', '') | regex_replace('-', '\\\\x2d') }}-{{
+      item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.mount
     owner: root
     group: root
     mode: "0644"
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ archive_groups | default([], true) | list }}"
     - 'groups'
   notify:
     - 'archive_systemd_reload'
@@ -35,12 +37,14 @@
 - name: Create automount files from templates
   ansible.builtin.template:
     src: archive_automount.j2
-    dest: "/etc/systemd/system/groups-{{ item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.automount"
+    dest: >
+      /etc/systemd/system/{{ item.0.local_top_level_mount | regex_replace('\/', '') | regex_replace('-', '\\\\x2d') }}-{{
+      item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.automount
     owner: root
     group: root
     mode: "0644"
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ archive_groups | default([], true) | list }}"
     - 'groups'
   notify:
     - 'archive_systemd_reload'
