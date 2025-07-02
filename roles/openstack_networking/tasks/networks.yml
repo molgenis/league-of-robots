@@ -42,15 +42,15 @@
     name: "Router bridging {{ network['router_wan_name'] }} and {{ network['name'] }}"
     network: "{{ network['router_wan_name'] }}"
     interfaces:
-      #- "{{ network['name'] }}"
+      # - "{{ network['name'] }}"
       #
       # Specifying only the network_name will fail when the default gateway IP
       # from that subnet is already in use. In that case we must specify an IP,
       # but there is no easy, safe way to determine which one we should use....
       #
-       - net: "{{ network['name'] }}"
-         subnet: "{{ network['name'] }}"
-         portip: "{{ network['gateway'] }}"
+      - net: "{{ network['name'] }}"
+        subnet: "{{ network['name'] }}"
+        portip: "{{ network['gateway'] }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
   when: network['gateway'] is defined

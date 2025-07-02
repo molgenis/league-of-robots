@@ -7,7 +7,7 @@
     file: networks.yml
   loop: "{{ stack_networks
             | rejectattr('create', 'undefined')
-            | selectattr('create', 'equalto', true)}}"
+            | selectattr('create', 'equalto', true) }}"
   loop_control:
     loop_var: network
 

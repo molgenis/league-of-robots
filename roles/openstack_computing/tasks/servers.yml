@@ -104,8 +104,6 @@
   when: hostvars[inventory_hostname]['host_type'] | default('vm') != 'baremetal'
   register: create_instance_result
 
-- meta: end_play
-
 - name: Create baremetal servers.
   openstack.cloud.server:
     state: present
