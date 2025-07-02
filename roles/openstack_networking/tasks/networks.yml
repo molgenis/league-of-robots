@@ -1,0 +1,57 @@
+---
+- name: "Create {{ network['name'] }} network."
+  openstack.cloud.network:
+    state: present
+    name: "{{ network['name'] }}"
+    external: false  # This means we create the network ourselves here and it was not pre-defined outside OpenStack.
+    mtu_size: "{{ network['mtu_size'] | default(omit) }}"
+    wait: true
+    timeout: "{{ openstack_api_timeout }}"
+
+- name: "Assign subnet without gateway to closed {{ network['name'] }} network."
+  openstack.cloud.subnet:
+    # 'name' must be the same as 'network_name' or else creating routers for this subnet will fail due to known bug.
+    name: "{{ network['name'] }}"
+    network_name: "{{ network['name'] }}"
+    state: present
+    cidr: "{{ network['cidr'] }}"
+    no_gateway_ip: true
+    enable_dhcp: true
+    dns_nameservers: "{{ nameservers }}"
+    wait: true
+    timeout: "{{ openstack_api_timeout }}"
+  when: network['gateway'] is not defined
+
+- name: "Assign subnet with gateway to {{ network['name'] }} network."
+  openstack.cloud.subnet:
+    # 'name' must be the same as 'network_name' or else creating routers for this subnet will fail due to known bug.
+    name: "{{ network['name'] }}"
+    network_name: "{{ network['name'] }}"
+    state: present
+    cidr: "{{ network['cidr'] }}"
+    gateway_ip: "{{ network['gateway'] }}"
+    enable_dhcp: true
+    dns_nameservers: "{{ nameservers }}"
+    wait: true
+    timeout: "{{ openstack_api_timeout }}"
+  when: network['gateway'] is defined
+
+- name: "Create router to bridge {{ network['router_wan_name'] | default('---') }} and {{ network['name'] }} networks."
+  openstack.cloud.router:
+    state: present
+    name: "Router bridging {{ network['router_wan_name'] }} and {{ network['name'] }}"
+    network: "{{ network['router_wan_name'] }}"
+    interfaces:
+      #- "{{ network['name'] }}"
+      #
+      # Specifying only the network_name will fail when the default gateway IP
+      # from that subnet is already in use. In that case we must specify an IP,
+      # but there is no easy, safe way to determine which one we should use....
+      #
+       - net: "{{ network['name'] }}"
+         subnet: "{{ network['name'] }}"
+         portip: "{{ network['gateway'] }}"
+    wait: true
+    timeout: "{{ openstack_api_timeout }}"
+  when: network['gateway'] is defined
+...

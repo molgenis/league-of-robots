@@ -2,15 +2,15 @@
 ---
 ip_addresses:
 {% for server_info in relevant_servers_info | sort(attribute='name') %}
-  {{ server_info.name }}:
+  {{ server_info['name'] }}:
   {% for network_id in server_info.addresses | default([]) | sort %}
     {%if server_info.addresses[network_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'fixed') | map(attribute='addr') | first is defined %}
     {{ network_id }}:
-      address: {{ server_info.addresses[network_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'fixed') | map(attribute='addr') | first }}
+      address: {{ server_info['addresses'][network_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'fixed') | map(attribute='addr') | first }}
       netmask: /32
-      {% if server_info.addresses[network_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'floating') | map(attribute='addr') | first is defined %}
+      {% if server_info['addresses'][network_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'floating') | map(attribute='addr') | first is defined %}
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-        {% set floating_ip = server_info.addresses[network_id]
+        {% set floating_ip = server_info['addresses'][network_id]
                              | selectattr('OS-EXT-IPS:type', 'equalto', 'floating')
                              | map(attribute='addr')
                              | first %}
@@ -27,8 +27,8 @@ ip_addresses:
         {% else %}
           {% set fqdn = 'WARNING: Check manually for DNS CNAME records a.k.a. aliases: we cannot reverse lookup an alias automagically.' %}
         {% endif %}
-    {{ api_network_info.networks | selectattr('id', 'equalto', floating_network_id) | map(attribute='name') | first }}:
-      address: {{ server_info.addresses[network_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'floating') | map(attribute='addr') | first }}
+    {{ api_network_info['networks'] | selectattr('id', 'equalto', floating_network_id) | map(attribute='name') | first }}:
+      address: {{ server_info['addresses'][network_id] | selectattr('OS-EXT-IPS:type', 'equalto', 'floating') | map(attribute='addr') | first }}
       netmask: /32
       fqdn: '{{ fqdn }}'
       {% endif %}
@@ -36,7 +36,7 @@ ip_addresses:
   {% endfor %}
 {% endfor %}
 {% for stack_network in stack_networks
-   | selectattr('router_network', 'defined')
+   | selectattr('router_wan_name', 'defined')
    | sort(attribute='name') %}
   {#
    # Unfortunately, we can only use the router name to lookup the info for the router.
@@ -44,15 +44,15 @@ ip_addresses:
    # and the IP used in that internal VLAN may not be unique as it can be used in multiple VLANs
    # used in the same or even in other stacks.
    # Therefore we default to using
-   #    'Router bridging ' + stack_network.router_network + ' and ' + stack_network.name
+   #    'Router bridging ' + stack_network.router_wan_name + ' and ' + stack_network.name
    # which is used by the openstack_networking role when we create routers ourselves.
    # If the router was created by an external cloud admin instead,
    # then the stack_network must have a router_name attribute with the correct name.
    #}
-  {% set router_name = stack_network.router_name | default('Router bridging ' + stack_network.router_network + ' and ' + stack_network.name) %}
-  {{ stack_network.name }}-{{ stack_network.router_network }}-router:
-    {{ stack_network.name }}:
-      address: {{ stack_network.gateway }}
+  {% set router_name = stack_network['router_name'] | default('Router bridging ' + stack_network['router_wan_name'] + ' and ' + stack_network['name']) %}
+  {{ stack_network['name'] }}-{{ stack_network['router_wan_name'] }}-router:
+    {{ stack_network['name'] }}:
+      address: {{ stack_network['gateway'] }}
       netmask: /32
     {% if api_router_info['routers']
           | selectattr('name', 'equalto', router_name)
@@ -60,7 +60,7 @@ ip_addresses:
           | map(attribute='external_fixed_ips')
           | first
        is defined %}
-    {{ stack_network.router_network }}:
+    {{ stack_network['router_wan_name'] }}:
       address: {{ api_router_info['routers']
                   | selectattr('name', 'equalto', router_name)
                   | map(attribute='external_gateway_info')

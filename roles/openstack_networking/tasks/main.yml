@@ -2,40 +2,14 @@
 # Create vxlans, routers and security groups.
 #
 ---
-- name: Get info on routers from OpenStack API.
-  openstack.cloud.routers_info:
-  register: api_router_info
-
-- name: Rename old var name to new var name for backwards compatibility.
-  ansible.builtin.set_fact:
-    api_router_info: "{{ api_router_info | combine({'routers': api_router_info['openstack_routers']}) }}"
-  when: api_router_info['openstack_routers'] is defined
-
-- name: Create management networks.
+- name: Create network.
   ansible.builtin.include_tasks:
-    file: management_networks.yml
-  vars:
-    network_name: "{{ item }}"
-    network_cidr: "{{ stack_networks | selectattr('name', 'equalto', item) | map(attribute='cidr') | first }}"
-    network_gateway: "{{ stack_networks | selectattr('name', 'equalto', item) | map(attribute='gateway') | first }}"
-    network_mtu_size: "{{ stack_networks | selectattr('name', 'equalto', item) | map(attribute='mtu_size') | first | default(omit) }}"
-    router_network: "{{ stack_networks | selectattr('name', 'equalto', item) | map(attribute='router_network') | first }}"
-  with_items: "{{ stack_networks
-                  | selectattr('type', 'equalto', 'management')
-                  | selectattr('external', 'equalto', false)
-                  | map(attribute='name') }}"
-
-- name: Create storage networks.
-  ansible.builtin.include_tasks:
-    file: storage_networks.yml
-  vars:
-    network_name: "{{ item }}"
-    network_cidr: "{{ stack_networks | selectattr('name', 'equalto', item) | map(attribute='cidr') | first }}"
-    network_mtu_size: "{{ stack_networks | selectattr('name', 'equalto', item) | map(attribute='mtu_size') | first | default(omit) }}"
-  with_items: "{{ stack_networks
-                  | selectattr('type', 'equalto', 'storage')
-                  | selectattr('external', 'equalto', false)
-                  | map(attribute='name') }}"
+    file: networks.yml
+  loop: "{{ stack_networks
+            | rejectattr('create', 'undefined')
+            | selectattr('create', 'equalto', true)}}"
+  loop_control:
+    loop_var: network
 
 - name: Create security groups.
   ansible.builtin.include_tasks:

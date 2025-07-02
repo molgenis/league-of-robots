@@ -162,40 +162,31 @@ stack_networks:
   - name: vlan1338  # Internal management for VMs and BMs
     cidr: '172.23.69.0/24'
     gateway: '172.23.69.1'
-    router_network: vlan16
+    router_wan_name: vlan16
     router_name: vlan1338
-    type: management
-    external: true
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
     gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router_wan_name: vlan16
+    create: true
     mtu_size: '1450'
   - name: vlan985  # DH4 Lustre
     cidr: '172.23.56.0/22'
+  - name: vlan1068  # Private Lustre
+    cidr: '172.23.60.0/24'
+  - name: vlan1073  # DH5 Lustre
+    cidr: '172.23.12.0/22'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.57.213/32  # Lustre server
       - 172.23.57.214/32  # Lustre server
-    type: storage
-    external: true
-  - name: vlan1068  # Private Lustre
-    cidr: '172.23.60.0/24'
-    allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
-  - name: vlan1073  # DH5 Lustre
-    cidr: '172.23.12.0/22'
-    allow_ingress:
       - 172.23.15.186/32  # Lustre server
       - 172.23.15.187/32  # Lustre server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.

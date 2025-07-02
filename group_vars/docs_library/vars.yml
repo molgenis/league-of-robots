@@ -9,9 +9,8 @@ stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
     gateway: '10.10.1.1'
-    router_network: external
-    type: management
-    external: false
+    router_wan_name: external
+    create: true
     mtu_size: '1500'
 nameservers: [
   '8.8.4.4',  # Google DNS.

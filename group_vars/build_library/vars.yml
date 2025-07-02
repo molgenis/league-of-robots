@@ -8,9 +8,8 @@ stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
     gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router_wan_name: vlan16
+    create: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.

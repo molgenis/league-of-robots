@@ -4,10 +4,10 @@
     - name: "Use pre-defined address from group_vars/{{ stack_name }}/ip_addresses.yml."
       openstack.cloud.port:
         state: present
-        name: "{{ inventory_hostname }}-{{ item.name }}"
-        network: "{{ item.name }}"
-        security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ item.vnic_type
+        name: "{{ inventory_hostname }}-{{ item['name'] }}"
+        network: "{{ item['name'] }}"
+        security_groups: "{{ item['security_group'] }}"
+        binding_vnic_type: "{{ item['vnic_type']
             | default(hostvars[inventory_hostname]['host_type'])
             | default('normal') }}"
         fixed_ips:
@@ -18,8 +18,8 @@
           # Theoretically a network can have multiple subnets in OpenStack,
           # but we do not have/use any networks with multiple subnets yet and simply use the first subnet for the required network.
           #
-          - ip_address: "{{ ip_addresses[inventory_hostname][item.name]['address'] }}"
-            subnet_id: "{{ api_network_info['networks'] | selectattr('name', 'equalto', item.name) | map(attribute='subnet_ids') | first | first }}"
+          - ip_address: "{{ ip_addresses[inventory_hostname][item['name']]['address'] }}"
+            subnet_id: "{{ api_network_info['networks'] | selectattr('name', 'equalto', item['name']) | map(attribute='subnet_ids') | first | first }}"
         wait: true
         timeout: "{{ openstack_api_timeout }}"
       with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
@@ -27,10 +27,10 @@
     - name: "Use new random address from defined subnet."
       openstack.cloud.port:
         state: present
-        name: "{{ inventory_hostname }}-{{ item.name }}"
-        network: "{{ item.name }}"
-        security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ item.vnic_type
+        name: "{{ inventory_hostname }}-{{ item['name'] }}"
+        network: "{{ item['name'] }}"
+        security_groups: "{{ item['security_group'] }}"
+        binding_vnic_type: "{{ item['vnic_type']
             | default(hostvars[inventory_hostname]['host_type'])
             | default('normal') }}"
         wait: true
@@ -103,6 +103,9 @@
     timeout: "{{ openstack_api_timeout }}"
   when: hostvars[inventory_hostname]['host_type'] | default('vm') != 'baremetal'
   register: create_instance_result
+
+- meta: end_play
+
 - name: Create baremetal servers.
   openstack.cloud.server:
     state: present
@@ -143,8 +146,8 @@
     server: "{{ inventory_hostname }}"
     state: present
     reuse: true
-    network: "{{ stack_networks | selectattr('name', 'equalto', item.name) | map(attribute='router_network') | first }}"
-    nat_destination: "{{ item.name }}"
+    network: "{{ stack_networks | selectattr('name', 'equalto', item['name']) | map(attribute='router_wan_name') | first }}"
+    nat_destination: "{{ item['name'] }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
   #
@@ -157,9 +160,11 @@
   # Note: this check currently works for VMs and will fail for baremetal servers.
   #
   when:
-    - item.assign_floating_ip is defined
-    - item.assign_floating_ip is true
-    - item.name not in (create_instance_result.server.addresses | dict2items(key_name='vlan', value_name='specs') | json_query(floating_ip_vlan_query))
+    - item['assign_floating_ip'] is defined
+    - item['assign_floating_ip'] is true
+    - item['name'] not in (create_instance_result['server']['addresses']
+      | dict2items(key_name='vlan', value_name='specs')
+      | json_query(floating_ip_vlan_query))
   vars:
     floating_ip_vlan_query: '[?specs[?"OS-EXT-IPS:type"==`floating`]].vlan'
   with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"

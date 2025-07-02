@@ -85,12 +85,9 @@ ldap_domains:
     listserv_mailinglist: UMCG-HPC
 stack_networks:
   - name: vlan983
-    router_network: vlan16
-    type: management
-    external: true
+    router_wan_name: vlan16
   - name: vlan985
     type: storage
-    external: true
 nameservers: [
   '172.23.40.244', # Order is important: local DNS for Isilon storage first!
   '8.8.4.4',       # Google DNS.

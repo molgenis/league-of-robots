@@ -42,9 +42,8 @@ for example
 ```
 azure_networks:
   - name: "{{ stack_prefix }}_internal_management"
-    external: false
     cidr: '10.10.1.0/24'
-    type: management
+    create: true
 azure_image:
   rocky9:
     offer: 'rockylinux-x86_64'

@@ -112,12 +112,13 @@ stack_networks:
   - name: string
     cidr: 'ip/mask'
     gateway: ip
-    router_network: string
+    router_wan_name: string
     router_name: string
-    type: [management|storage]  # Effects security group applied to network by openstack_networking role.
-    external: [true|false]      # Default is false when omitted and means network is created by code from this repo.
-                                # True means network is created by cloud admin before running any code from this repo.
+    create: [true|false]  # Default is false and means network is created by cloud admin before running any code from this repo. 
+                          # True means network is created by code from this repo.
     mtu_size: integer
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - ip/mask  # External machines not part of this stack that need to communicate with machines in this stack
                  # and which need to be added to the OpenStack security group rules for this network to allow network traffic.
@@ -128,26 +129,23 @@ stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
     gateway: '172.23.68.1'
-    router_network: vlan16
+    router_wan_name: vlan16
     router_name: vlan1337
-    type: management
-    external: true
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
     gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router_wan_name: vlan16
+    create: true
     mtu_size: '1450'
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 ```
 
 Configure which network to use and on which interface per machine in `static_inventory/[stack-name].yml`:
