@@ -3,6 +3,7 @@
   hosts:
     - sys_admin_interface
     - deploy_admin_interface
+    - data_transfer
   roles:
      - nhc_standalone
 ...
