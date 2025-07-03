@@ -18,7 +18,7 @@ ip_addresses:
       address: 172.23.60.6
       netmask: /32
     vlan1338:
-      address: 172.23.69.106
+      address: 172.23.69.21
       netmask: /32
     vlan985:
       address: 172.23.59.95
@@ -28,7 +28,7 @@ ip_addresses:
       address: 172.23.60.29
       netmask: /32
     vlan1338:
-      address: 172.23.69.111
+      address: 172.23.69.80
       netmask: /32
     vlan985:
       address: 172.23.59.90
@@ -38,7 +38,7 @@ ip_addresses:
       address: 172.23.60.15
       netmask: /32
     vlan1338:
-      address: 172.23.69.163
+      address: 172.23.69.76
       netmask: /32
     vlan985:
       address: 172.23.59.213
@@ -48,20 +48,10 @@ ip_addresses:
       address: 172.23.60.16
       netmask: /32
     vlan1338:
-      address: 172.23.69.123
+      address: 172.23.69.48
       netmask: /32
     vlan985:
       address: 172.23.59.225
-      netmask: /32
-  nb-node-a05:
-    vlan1068:
-      address: 172.23.60.3
-      netmask: /32
-    vlan1338:
-      address: 172.23.69.210
-      netmask: /32
-    vlan985:
-      address: 172.23.59.86
       netmask: /32
   nb-node-b01:
     vlan1068:
