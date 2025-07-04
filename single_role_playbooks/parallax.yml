@@ -1,0 +1,7 @@
+---
+- hosts:
+   - chaperone
+   - cluster
+  roles:
+   - parallax
+...
