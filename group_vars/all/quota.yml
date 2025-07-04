@@ -44,7 +44,6 @@ lfs_quota:
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 6144
-      umcg-ucu: 1024
       umcg-ugli: 2048
       umcg-verbeek: 1024
       umcg-vdakker: 1024
@@ -131,6 +130,7 @@ lfs_quota:
       umcg-lifelines: 21504
       umcg-solve-rd: 5120
       umcg-sysops: 1024
+      umcg-ucu: 4096
   rsc04:
     quota_limits:  # All values in GB.
       #umcg-biogen: value not approved yet.
@@ -242,7 +242,7 @@ lfs_quota:
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
-      umcg-ucu: 1024
+      umcg-ucu: 2048
       umcg-ugli: 1024
       umcg-ukb: 3072
       umcg-verbeek: 1024
@@ -269,7 +269,6 @@ lfs_quota:
       umcg-llnext: 1024
       umcg-nephrology: 1024
       umcg-tifn: 1024
-      umcg-ucu: 1024
       umcg-ugli: 1024
   tmp08:
     quota_limits:  # All values in GB.
