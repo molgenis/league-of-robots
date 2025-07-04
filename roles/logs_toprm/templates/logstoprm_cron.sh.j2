@@ -19,7 +19,9 @@ for _earl_name in "${earl_servers[@]}"; do
    _main_lock_dir="${_logs_toprm_destination}/lock_dirs"
    _rsync_log="${_logs_toprm_destination}/rsync.${_earl_name}.log"
    _command="HOSTALIASES=/etc/hosts-LoR rsync -au --rsh=\"ssh -l ${_earl_user}\" --log-file=\"${_rsync_log}\" \"${_earl_name}\"::logstoprm \"${_logs_toprm_destination}/${_earl_name}/\""
+   echo "$(date)   Running parallax for "${_earl_name}\""
    parallax.sh --command="${_command:-exit 1}" --lock-dir="${_main_lock_dir:-/error}" --logger-tag="logstoprm"
+   echo "$(date)    ... done"
 done
 
 ~/deduplicate_logs.sh -d
