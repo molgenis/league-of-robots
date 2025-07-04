@@ -75,7 +75,7 @@
     hour: '*/8'
     day: '*'
     user: '{{ logs_toprm_chaperone_user }}'
-    job: /bin/bash -c '{{ home_path.stdout }}/logstoprm_cron.sh'
+    job: /bin/bash -c '{{ home_path.stdout }}/logstoprm_cron.sh >> {{ home_path.stdout }}/logstoprm_cron.sh.log'
     cron_file: 'logstoprm'
   become: true
 ...
