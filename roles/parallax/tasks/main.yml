@@ -1,0 +1,10 @@
+---
+- name: "Installing parallax.sh script into /usr/local/bin/"
+  ansible.builtin.copy:
+    src: "files/parallax.sh"
+    dest: "/usr/local/bin/"
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+...

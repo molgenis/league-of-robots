@@ -14,20 +14,20 @@ set -ueo pipefail
 DAILY_KEEP=31     # one month worth
 WEEKLY_KEEP=52    # one year worth
 
-{% for each_ogm_server in ogm_servers %}
+{% if item['psql_dump_location'] is defined and item['psql_dump_location'] | length > 0 %}
 
-_PRM_MOUNT="{{ each_ogm_server['prm_location'] }}"
+_PRM_MOUNT="{{ item['prm_location'] }}"
 # check if mount point is set
 if ! mountpoint -q "${_PRM_MOUNT}"; then
    echo "$(date +%FT%T) ${0}: backup folder '${_PRM_MOUNT}' is not mounted, exiting the backup script!"
    exit 1
 fi
-_OGM_SERVER="{{ each_ogm_server['server'] | default("error_remote_server")}}"
-_OGM_USER="{{ each_ogm_server['user'] | default("error_remote_user") }}"
+_OGM_SERVER="{{ item['server'] | default("error_remote_server")}}"
+_OGM_USER="{{ item['user'] | default("error_remote_user") }}"
 _PRM_SERVER_DIR="${_PRM_MOUNT}/${_OGM_SERVER}"
 
 # Change to the backup directory
-PSQL_DUMP_LOCATION="${_PRM_SERVER_DIR}/{{ each_ogm_server['psql_dump_location']}}"
+PSQL_DUMP_LOCATION="${_PRM_SERVER_DIR}/{{ item['psql_dump_location']}}"
 cd "${PSQL_DUMP_LOCATION:-does_not_exists}" || { echo "Failed to change directory to ${PSQL_DUMP_LOCATION}"; exit 1; }
 
 ## Check if this weeks backup has been made and if not, make it
@@ -60,4 +60,4 @@ if [[ "${WEEKLY_COUNT}" -gt "${WEEKLY_KEEP}" ]]; then
   ls -1 *-weekly-*.sql.gz | head -n "${DELETE_WEEKLY_COUNT}" | xargs rm -f
 fi
 
-{% endfor %}
+{% endif %}
