@@ -903,6 +903,7 @@ lfs_mounts:
       - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
+      - name: umcg-ucu
       - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
