@@ -317,11 +317,8 @@ function other_hosts_are_running(){
          # first check time
          _remote_time_result=$(check_time "${_each_host}")
          # then update the remotepidfile inside, and not updating change time of ^ hosts directory
-#         # update remote only if pid file exists
-#         if test -e "${_main_lock_dir}/${_each_host}/pid"; then
-            ${_debug} && _logme "(${$} ${FUNCNAME})      Appending hostname into ${_remote_file}"
-            echo "${_hostname}" >> "${_remote_file}" # log attempt
-#         fi
+         ${_debug} && _logme "(${$} ${FUNCNAME})      Appending hostname into ${_remote_file}"
+         echo "${_hostname}" >> "${_remote_file}" # log attempt
          _logme "($$ ${FUNCNAME}) 'file \'${_each_host//\/}/remote\' has \'${_remote_file_lines}\' lines inside!'"
          # remove lock and pid, if time expired or script was restarted for too many times
          if [[ "${_remote_time_result}" -eq "14" ]] || \
@@ -333,14 +330,9 @@ function other_hosts_are_running(){
          fi
        } 2>/dev/null || continue
    done
-#   if [[ "${_try_again}" -eq "0" ]]; then
    _logme "($$ ${FUNCNAME})   removing our host from the race and exit ... "
    test -d "${_hostname}" && [ -z "$(ls -A ${_hostname})" ] && rmdir "${_hostname}" && sync
    exit 250
-#   else
-#      sleep "${_small_random_delay}"
-#      start_flow
-#   fi
 }
 
 

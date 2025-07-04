@@ -15,7 +15,7 @@
     - item.user is defined
   become: true
 
-- name: Deploy backup script
+- name: Deploy backup cleanup script
   ansible.builtin.template:
     src: "templates/ogm_cron_clean_psql_backups.sh.j2"
     dest: "~umcg-ogm-dm/manage_psql_backups-{{ srvid }}.sh"
