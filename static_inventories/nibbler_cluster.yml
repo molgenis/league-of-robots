@@ -13,6 +13,9 @@ all:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
@@ -22,6 +25,9 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_repo"
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
           swap_file_size: 2
     data_transfer:
       hosts:
@@ -31,6 +37,9 @@ all:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
           local_volume_size_extra: 10000
 #
 # iRODS machines in Nibbler stack currently disabled as they are no longer used for the microscopy project
@@ -98,6 +107,9 @@ all:
 #          - name: "{{ stack_prefix }}_internal_management"
 #            security_group: "{{ stack_prefix }}_irods"
 #            assign_floating_ip: false  # Floating IP is used from this network, but assigned manually to be able to switch from production to test and back.
+#            assign_hostname: true
+#            nmstate_interface:
+#              name: ens3
 #        local_volume_size_extra: 20
 #        davrods_icat_ip: "{{ ip_addresses[inventory_hostname]['nb_internal_management']['address'] }}"
     docs:
@@ -110,13 +122,27 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
+              nmstate_interface:
+                name: enp0s6
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp0s3
+              lnet:
+                name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp0s4
+              lnet:
+                name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              nmstate_interface:
+                name: enp0s5
+              lnet:
+                name: tcp15
     deploy_admin_interface:
       hosts:
         nb-dai:
@@ -124,13 +150,27 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
+              nmstate_interface:
+                name: enp0s6
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp0s3
+              lnet:
+                name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp0s4
+              lnet:
+                name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              nmstate_interface:
+                name: enp0s5
+              lnet:
+                name: tcp15
           local_volume_size_extra: 3000
     user_interface:
       hosts:
@@ -139,20 +179,27 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
               nmstate_interface:
                 name: enp0s6
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp0s3
+              lnet:
+                name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp0s4
+              lnet:
+                name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp0s5
+              lnet:
+                name: tcp15
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               nmstate_interface:
@@ -160,7 +207,6 @@ all:
                 name: enp0s11  # Will most likely change to enp0s7 after reboot.
                 ipv4:
                   auto-route-metric: 80
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
           slurm_sockets: 16
           slurm_cores_per_socket: 1
           slurm_real_memory: 63788
@@ -180,6 +226,7 @@ all:
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
                 - name: vlan985
                   security_group: "{{ stack_prefix }}_storage"
                 - name: vlan1068
@@ -219,21 +266,22 @@ all:
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
+                  nmstate_interface:
+                    name: enp0s5
                 - name: vlan985
                   security_group: "{{ stack_prefix }}_storage"
+                  nmstate_interface:
+                    name: enp0s3
+                  lnet:
+                    name: tcp14
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
+                  nmstate_interface:
+                    name: enp0s4
+                  lnet:
+                    name: tcp20
                 # DH5 not used on compute nodes (yet).
-                #- name: vlan1073
-                #  security_group: "{{ stack_prefix }}_storage"
-              lustre_client_networks:
-                - name: tcp14
-                  interface: enp0s3
-                - name: tcp20
-                  interface: enp0s4
-                # DH5 not used on compute nodes (yet).
-                #- name: tcp15
-                #  interface: ens7
               local_volume_size_extra: 1
               slurm_sockets: 31
               slurm_cores_per_socket: 1
@@ -258,6 +306,7 @@ all:
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
                   nmstate_interface:
                     name: enp130s0f0
                 - name: vlan1068
@@ -271,9 +320,8 @@ all:
                       base-iface: enp130s0f0
                     ipv4:
                       dhcp: false
-              lustre_client_networks:
-                - name: tcp20
-                  interface: enp130s0f0.1068
+                  lnet:
+                    name: tcp20
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"

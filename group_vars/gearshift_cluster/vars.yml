@@ -410,11 +410,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
-  - name: tcp11
-    interface: vlan985.lustre
-  - name: tcp14
-    interface: vlan985.lustre
 pfs_mounts:
   - pfs: umcgst10
     source: 'gcc-storage001.stor.hpc.local:/ifs/rekencluster'

@@ -13,6 +13,9 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
@@ -22,6 +25,9 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
           swap_file_size: 2
     data_transfer:
       hosts:
@@ -31,6 +37,7 @@ all:
 #            - name: "{{ stack_prefix }}_internal_management"
 #              security_group: "{{ stack_prefix }}_ds"
 #              assign_floating_ip: true
+#              assign_hostname: true
 #          local_volume_size_extra: 10000
     docs:
       hosts:
@@ -42,11 +49,21 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
             - name: DH4 Lustre
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: ens4
+              lnet:
+                name: tcp14
             - name: lustre
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              nmstate_interface:
+                name: ens5
+              lnet:
+                name: tcp15
     deploy_admin_interface:
       hosts:
         vt-dai:
@@ -54,11 +71,21 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
             - name: DH4 Lustre
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: ens4
+              lnet:
+                name: tcp14
             - name: lustre
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              nmstate_interface:
+                name: ens5
+              lnet:
+                name: tcp15
           local_volume_size_extra: 1000
     user_interface:
       hosts:
@@ -67,11 +94,21 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
+              nmstate_interface:
+                name: ens3
             - name: DH4 Lustre
-              security_group: "{{ stack_prefix }}_storage"
+              security_gro up: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: ens4
+              lnet:
+                name: tcp14
             - name: lustre
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              nmstate_interface:
+                name: ens5
+              lnet:
+                name: tcp15
           slurm_sockets: 7
           slurm_cores_per_socket: 1
           slurm_real_memory: 31072
@@ -91,9 +128,15 @@ all:
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
+                  nmstate_interface:
+                    name: eno12409np1
                 - name: lustre
                   security_group: "{{ stack_prefix }}_storage"
-              lustre_client_networks: "{{ lustre_client_networks_baremetal }}"
+                  nmstate_interface:
+                    name: eno12399np0
+                  lnet:
+                    name: tcp15
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
@@ -131,11 +174,15 @@ all:
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
+                  nmstate_interface:
+                    name: eno12409
                 - name: lustre
                   security_group: "{{ stack_prefix }}_storage"
-              lustre_client_networks:
-                - name: tcp15
-                  interface: eno12399
+                  nmstate_interface:
+                    name: eno12399
+                  lnet:
+                    name: tcp15
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"

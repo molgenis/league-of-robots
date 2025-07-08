@@ -579,16 +579,6 @@ local_mount_subfolders:
 #
 # Shared storage related variables
 #
-lustre_client_networks_vm:
-  - name: tcp14
-    interface: enp0s3
-  - name: tcp20
-    interface: enp0s4
-  - name: tcp15
-    interface: enp0s5
-#
-# lustre_client_networks for baremetal machines specified in static_inventory.
-#
 pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'

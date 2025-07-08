@@ -579,14 +579,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks_vm:
-  - name: tcp14
-    interface: ens4
-  - name: tcp15
-    interface: ens5
-lustre_client_networks_baremetal:
-  - name: tcp15
-    interface: eno12399np0
 pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'

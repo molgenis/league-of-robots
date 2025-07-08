@@ -13,6 +13,7 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              assign_hostname: true
               nmstate_interface:
                 name: enp3s0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
@@ -24,6 +25,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_repo"
+              assign_hostname: true
               nmstate_interface:
                 name: enp3s0
           swap_file_size: 2
@@ -35,6 +37,7 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: false
+              assign_hostname: true
               nmstate_interface:
                 name: enp3s0
           local_volume_size_extra: 100
@@ -63,13 +66,15 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp3s0
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              lnet:
+                name: tcp20
     deploy_admin_interface:
       hosts:
         tl-dai:
@@ -77,13 +82,15 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp3s0
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              lnet:
+                name: tcp20
           local_volume_size_extra: 300
     user_interface:
       hosts:
@@ -92,19 +99,21 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp3s0
+              lnet:
+                name: tcp20
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               nmstate_interface:
                 name: enp5s0
                 ipv4:
                   auto-route-metric: 80
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
           slurm_sockets: 4
           slurm_cores_per_socket: 1
           slurm_real_memory: 7684
@@ -126,6 +135,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
                   nmstate_interface:
                     name: eth2
                 - name: vlan1068
@@ -139,11 +149,8 @@ all:
                       base-iface: eth2
                     ipv4:
                       dhcp: false
-              lustre_client_networks:
-                #- name: tcp20
-                #  interface: enp130s0f0.1068
-                - name: tcp20
-                  interface: eth2.1068
+                  lnet:
+                    name: tcp20
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
@@ -183,6 +190,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
                   nmstate_interface:
                     name: enp65s0np0
                 - name: vlan1068
@@ -196,9 +204,8 @@ all:
                       base-iface: enp65s0np0
                     ipv4:
                       dhcp: false
-              lustre_client_networks:
-                - name: tcp20
-                  interface: enp65s0np0.1068
+                  lnet:
+                    name: tcp20
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
@@ -233,15 +240,15 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  assign_hostname: true
                   nmstate_interface:
                     name: eth0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
                     name: eth1
-              lustre_client_networks:
-                - name: tcp20
-                  interface: eth1
+                  lnet:
+                    name: tcp20
               local_volume_size_extra: 1
               slurm_sockets: 4
               slurm_cores_per_socket: 1
@@ -260,6 +267,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              assign_hostname: true
           #
           # Overrule regular users and groups compared to rest of Talos:
           #

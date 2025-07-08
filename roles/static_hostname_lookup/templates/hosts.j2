@@ -28,31 +28,27 @@
     | map(attribute='name')
     | flatten
     | unique %}
-{% for other_host in groups['all'] %}
-  {% if hostvars[other_host]['host_networks'] is defined %}
-    {% set other_host_network_names = hostvars[other_host]['host_networks']
-        | map(attribute='name')
-        | flatten
-        | unique %}
-    {% set first_joined_management_network_name = stack_networks
-        | selectattr('type', 'equalto', 'management')
-        | map(attribute='name')
-        | intersect(this_host_network_names)
-        | intersect(other_host_network_names)
-        | first
-        | default('none') %}
-    {% for network in this_host_network_names %}
-      {% if ip_addresses[other_host][network] is defined %}
-        {% if network == first_joined_management_network_name and hostvars[other_host]['fqdn'] is defined %}
-{{ "%-15s" | format(ip_addresses[other_host][network].address) }}    {{ hostvars[other_host]['fqdn'] }}    {{ hostvars[other_host]['fqdn'] | regex_replace('\..*$', '')}}    {{ other_host }}    {{ other_host }}_{{ network }}
-        {% elif network == first_joined_management_network_name and hostvars[other_host]['fqdn'] is not defined %}
-{{ "%-15s" | format(ip_addresses[other_host][network].address) }}    {{ other_host }}    {{ other_host }}_{{ network}}
-        {% else %}
-{{ "%-15s" | format(ip_addresses[other_host][network].address) }}    {{ other_host }}_{{ network}}
-        {% endif %}
+{% for stack_host in groups['all'] %}
+  {% for network in this_host_network_names %}
+    {% if hostvars[stack_host]['host_networks']
+          | default([])
+          | selectattr('name', 'equalto', network)
+          | first is defined
+       and ip_addresses[stack_host][network] is defined %}
+      {% set stack_host_network = hostvars[stack_host]['host_networks']
+          | selectattr('name', 'equalto', network)
+          | first %}
+      {% if ip_addresses[stack_host][network]['fqdn'] is       defined and stack_host_network['assign_hostname'] | default(false) | bool %}
+{{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ ip_addresses[stack_host][network]['fqdn'] }}    {{ ip_addresses[stack_host][network]['fqdn'] | regex_replace('\..*$', '')}}    {{ stack_host }}    {{ stack_host }}_{{ network }}
+      {% elif ip_addresses[stack_host][network]['fqdn'] is     defined and stack_host_network['assign_hostname'] | default(false) | bool %}
+{{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ ip_addresses[stack_host][network]['fqdn'] }}    {{ ip_addresses[stack_host][network]['fqdn'] | regex_replace('\..*$', '')}}    {{ stack_host }}_{{ network }}
+      {% elif ip_addresses[stack_host][network]['fqdn'] is not defined and stack_host_network['assign_hostname'] | default(false) | bool %}
+{{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ stack_host }}    {{ stack_host }}_{{ network}}
+      {% else %}
+{{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ stack_host }}_{{ network}}
       {% endif %}
-    {% endfor %}
-  {% endif %}
+    {% endif %}
+  {% endfor %}
 {% endfor %}
 
 {% if additional_etc_hosts is defined and additional_etc_hosts | length >= 1 %}

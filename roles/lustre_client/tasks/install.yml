@@ -192,14 +192,20 @@
 - name: 'Create lustre lnet config: part 3.'
   ansible.builtin.command:
     cmd: |
-         lnetctl net add --net "{{ item.name }}" --if "{{ item.interface }}"
+         lnetctl net add \
+                 --net "{{ host_network['lnet']['name'] }}" \
+                 --if "{{ host_network['nmstate_interface']['name'] }}"
   register: lnetctl_add_status
   changed_when:
     - lnetctl_add_status.rc == 0
   failed_when:
     - lnetctl_add_status.rc > 0
     - '"errno: -17" not in lnetctl_add_status.stderr'
-  with_items: "{{ lustre_client_networks }}"
+  loop: "{{ host_networks
+            | default([])
+            | rejectattr('lnet', 'undefined') }}"
+  loop_control:
+    loop_var: host_network
   become: true
 
 - name: Save lustre lnet config to /etc/lnet.conf

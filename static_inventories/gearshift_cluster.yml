@@ -12,12 +12,14 @@ all:
           os_distribution: 'rocky9'
           host_networks:
             - name: vlan983
+              assign_hostname: true
     repo:
       hosts:
         gs-repo:
           cloud_flavor: 2C-4GB
           host_networks:
             - name: vlan983
+              assign_hostname: true
     docs:
       hosts:
         docs-on-bateleur:
@@ -27,6 +29,7 @@ all:
           cloud_flavor: 4C-8GB
           host_networks:
             - name: vlan983
+              assign_hostname: true
             - name: vlan985
     deploy_admin_interface:
       hosts:
@@ -34,6 +37,7 @@ all:
           cloud_flavor: 4C-8GB
           host_networks:
             - name: vlan983
+              assign_hostname: true
             - name: vlan985
           local_volume_size_extra: 2900
     user_interface:
@@ -42,6 +46,7 @@ all:
           cloud_flavor: 24C-240GB
           host_networks:
             - name: vlan983
+              assign_hostname: true
             - name: vlan985
           slurm_sockets: 2
           slurm_cores_per_socket: 12
@@ -71,6 +76,7 @@ all:
           vars:
             host_networks:
               - name: vlan983
+                assign_hostname: true
               - name: vlan985
             cloud_flavor: 24C-240GB
             slurm_sockets: 2

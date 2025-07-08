@@ -264,12 +264,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks_vm:
-  - name: tcp20
-    interface: enp3s0
-#
-# lustre_client_networks for baremetal machines specified in static_inventory.
-#
 pfs_mounts:
   - pfs: umcgst04/slice4
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'

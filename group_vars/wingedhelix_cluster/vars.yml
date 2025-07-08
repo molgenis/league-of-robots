@@ -446,9 +446,6 @@ local_mount_subfolders:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
-  - name: tcp20
-    interface: enp5s0
 pfs_mounts:
   - pfs: umcgst12
     source: "{{ ip_addresses['wh-sai'][stack_prefix + '_internal_storage']['address'] }}:/mnt"

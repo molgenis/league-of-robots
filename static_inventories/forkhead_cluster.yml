@@ -14,6 +14,7 @@ all:
           ansible_host: 10.96.52.12
           host_networks:
             - name: vnet-medgen-t
+              assign_hostname: true
           local_yum_repository: true # enable local yum repository
     deploy_admin_interface:
       hosts:
