@@ -12,6 +12,7 @@ ssh_client_known_hosts: "\
   az-porch*,\
   74.234.160.235,\
   *bb-transfer*,\
+  *bb-storage,\
   *betabarrel,\
   *docs-on-bateleur,\
   *bb-* \
