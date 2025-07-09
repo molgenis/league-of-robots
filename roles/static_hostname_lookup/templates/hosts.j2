@@ -38,11 +38,14 @@
       {% set stack_host_network = hostvars[stack_host]['host_networks']
           | selectattr('name', 'equalto', network)
           | first %}
-      {% if ip_addresses[stack_host][network]['fqdn'] is       defined and stack_host_network['assign_hostname'] | default(false) | bool %}
+      {% if ip_addresses[stack_host][network]['fqdn'] is defined
+         and stack_host_network['add_hostname_to_ip_address'] | default(false) | bool %}
 {{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ ip_addresses[stack_host][network]['fqdn'] }}    {{ ip_addresses[stack_host][network]['fqdn'] | regex_replace('\..*$', '')}}    {{ stack_host }}    {{ stack_host }}_{{ network }}
-      {% elif ip_addresses[stack_host][network]['fqdn'] is     defined and stack_host_network['assign_hostname'] | default(false) | bool %}
+      {% elif ip_addresses[stack_host][network]['fqdn'] is defined
+         and not stack_host_network['add_hostname_to_ip_address'] | default(false) | bool %}
 {{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ ip_addresses[stack_host][network]['fqdn'] }}    {{ ip_addresses[stack_host][network]['fqdn'] | regex_replace('\..*$', '')}}    {{ stack_host }}_{{ network }}
-      {% elif ip_addresses[stack_host][network]['fqdn'] is not defined and stack_host_network['assign_hostname'] | default(false) | bool %}
+      {% elif ip_addresses[stack_host][network]['fqdn'] is not defined
+         and stack_host_network['add_hostname_to_ip_address'] | default(false) | bool %}
 {{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ stack_host }}    {{ stack_host }}_{{ network}}
       {% else %}
 {{ "%-15s" | format(ip_addresses[stack_host][network]['address']) }}    {{ stack_host }}_{{ network}}

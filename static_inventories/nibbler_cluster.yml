@@ -13,7 +13,7 @@ all:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: ens3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
@@ -25,7 +25,7 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_repo"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: ens3
           swap_file_size: 2
@@ -37,7 +37,7 @@ all:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: ens3
           local_volume_size_extra: 10000
@@ -107,7 +107,7 @@ all:
 #          - name: "{{ stack_prefix }}_internal_management"
 #            security_group: "{{ stack_prefix }}_irods"
 #            assign_floating_ip: false  # Floating IP is used from this network, but assigned manually to be able to switch from production to test and back.
-#            assign_hostname: true
+#            add_hostname_to_ip_address: true
 #            nmstate_interface:
 #              name: ens3
 #        local_volume_size_extra: 20
@@ -122,7 +122,7 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp0s6
             - name: vlan985
@@ -150,7 +150,7 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp0s6
             - name: vlan985
@@ -179,7 +179,7 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp0s6
             - name: vlan985
@@ -226,7 +226,7 @@ all:
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
-                  assign_hostname: true
+                  add_hostname_to_ip_address: true
                 - name: vlan985
                   security_group: "{{ stack_prefix }}_storage"
                 - name: vlan1068
@@ -266,7 +266,7 @@ all:
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
-                  assign_hostname: true
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp0s5
                 - name: vlan985
@@ -306,7 +306,7 @@ all:
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
-                  assign_hostname: true
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp130s0f0
                 - name: vlan1068

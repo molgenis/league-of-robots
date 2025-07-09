@@ -13,7 +13,7 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
@@ -25,7 +25,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_repo"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
           swap_file_size: 2
@@ -37,7 +37,7 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: false
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
           local_volume_size_extra: 100
@@ -66,7 +66,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
@@ -82,7 +82,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
@@ -99,7 +99,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
@@ -135,7 +135,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
-                  assign_hostname: true
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: eth2
                 - name: vlan1068
@@ -190,7 +190,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
-                  assign_hostname: true
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp65s0np0
                 - name: vlan1068
@@ -240,7 +240,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
-                  assign_hostname: true
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: eth0
                 - name: vlan1068
@@ -267,7 +267,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
           #
           # Overrule regular users and groups compared to rest of Talos:
           #

@@ -16,7 +16,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
-              assign_hostname: true
+              add_hostname_to_ip_address: true
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -48,7 +48,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -69,7 +69,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
-              assign_hostname: true
+              add_hostname_to_ip_address: true
           local_volume_size_extra: 8300
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -128,7 +128,7 @@ all:
         betabarrel:
           host_networks:
             - name: vlan16
-              assign_hostname: true
+              add_hostname_to_ip_address: true
             - name: vlan990
           local_yum_repository: true # enable local yum repository
           local_mounts:
@@ -253,7 +253,7 @@ all:
           host_networks:
             - name: vlan1336
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.

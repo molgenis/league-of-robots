@@ -13,7 +13,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: ens3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
@@ -33,7 +33,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: ens3
           swap_file_size: 2
@@ -45,7 +45,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
           local_volume_size_extra: 8300
@@ -108,7 +108,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
             - name: "{{ stack_prefix }}_internal_storage"
@@ -133,7 +133,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
             - name: "{{ stack_prefix }}_internal_storage"
@@ -157,7 +157,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
             - name: "{{ stack_prefix }}_internal_storage"
@@ -189,7 +189,7 @@ all:
             host_networks:
               - name: "{{ stack_prefix }}_internal_management"
                 security_group: "{{ stack_prefix }}_cluster"
-                assign_hostname: true
+                add_hostname_to_ip_address: true
                 nmstate_interface:
                   name: enp3s0
               - name: "{{ stack_prefix }}_internal_storage"

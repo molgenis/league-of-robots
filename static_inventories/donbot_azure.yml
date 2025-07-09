@@ -12,7 +12,7 @@ all:
           host_networks:
             - name: donbot_external_network
               security_group: "{{ stack_prefix }}_cluster"
-              assign_hostname: true
+              add_hostname_to_ip_address: true
           use_sssd: true
           use_ldap: false
           # Ldap server settings
