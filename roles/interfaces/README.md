@@ -105,7 +105,7 @@ and once we can deploy this role we use it to disable network configuration by _
 
 ## Configuring network settings using this interfaces role
 
-Configure all networks used by the stack in `group_vars/[stack-name]/vars.yml`;
+Configure all networks used by the stack in `group_vars/{{ stack_name }}/vars.yml`;
 Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here:
 ```yaml
 stack_networks:
@@ -148,7 +148,7 @@ security_group_mods:
       - 172.23.60.164/32  # Lustre server
 ```
 
-Configure which network to use and on which interface per machine in `static_inventory/[stack-name].yml`:
+Configure which network to use and on which interface per machine in `static_inventory/{{ stack_name }}.yml`:
 ```yaml
 ---
 all:
@@ -200,7 +200,7 @@ all:
               # which may use an untagged VLAN, after initial provisioning of the machine.
               # In this case DHCP is disabled and a specific IP is configured: this IP
               # must not be specified here as it will get looked up automagically from:
-              #     group_vars/[stack-name]/ip_addresses.yml.
+              #     group_vars/{{ stack_name }}/ip_addresses.yml.
               #
               nmstate_interface:
                 name: base_interface_name.vlan_ID  # Must use this format. E.g. enp4s0.1068

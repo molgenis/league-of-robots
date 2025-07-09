@@ -6,7 +6,7 @@ This role can be used to create
 
 ## networks, subnets and optional routers
 
-All networks used by the stack must be configured in `group_vars/[stack-name]/vars.yml` using the `stack_networks` variable;
+All networks used by the stack must be configured in `group_vars/{{ stack_name }}/vars.yml` using the `stack_networks` variable;
 Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here:
 ```yaml
 stack_networks:
@@ -35,7 +35,7 @@ This role contains functionality to create a limited set of _**security groups**
  *  ```{{ stack_prefix }}_webservers```
  *  ```{{ stack_prefix }}_logservers```
 
-A _security group_ is only created when at least one host listed in `static_inventory/[stack_name].yml`
+A _security group_ is only created when at least one host listed in `static_inventory/{{ stack_name }}.yml`
 uses that _security group_ for at least one of its network interfaces;
 see the description of the `host_networks` variable in [../interfaces/README.md](../interfaces/README.md) for details.
 
