@@ -8,6 +8,7 @@ This role can be used to create
 
 All networks used by the stack must be configured in `group_vars/{{ stack_name }}/vars.yml` using the `stack_networks` variable;
 Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here:
+
 ```yaml
 stack_networks:
   - name: string            # Required.
@@ -21,6 +22,7 @@ stack_networks:
     create: [true|false]    # Default is false and means the network is created by a cloud admin before running any code from this repo. 
                             # True means network is created by code from this repo.
     mtu_size: integer       # Optional. Note that a default value may differ per network or OpenStack cloud config.
+```
 
 ## security groups
 
