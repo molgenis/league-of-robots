@@ -6,7 +6,7 @@
 #
 # Sanity check.
 #
-- name: "Fail when unsupported security groups are are found."
+- name: "Fail when security group is not supported."
   ansible.builtin.debug:
     msg: "FATAL: at least one host from the {{ stack_name }} stack inventory specifies an unsupported security group: {{ item }}."
   vars:
