@@ -245,6 +245,7 @@ all:
     storage_server:
       hosts:
         bb-storage:
+          ansible_host: bb-porch+betabarrel+bb-storage
           cloud_image: Rocky-9.5
           cloud_user: rocky
           os_distribution: 'rocky9'

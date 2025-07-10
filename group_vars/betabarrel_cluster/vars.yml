@@ -57,6 +57,10 @@ additional_etc_hosts:
     nodes:
       - name: bb-dragen
         network: vlan990
+  - group: betabarrel_cluster
+    nodes:
+      - name: bb-storage
+        network: vlan990
   - group: copperfist_cluster
     nodes:
       - name: copperfist
