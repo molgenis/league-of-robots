@@ -53,7 +53,7 @@ nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
 ]
-stack_networks:
+azure_networks:
   - name: vnet-medgen-t
     cidr: '10.96.52.12/24'
 iptables_allow_icmp_inbound:

@@ -85,7 +85,8 @@ ldap_domains:
     listserv_mailinglist: UMCG-HPC
 stack_networks:
   - name: vlan983
-    router_wan_name: vlan16
+    router:
+      external_network: vlan16
   - name: vlan985
     type: storage
 nameservers: [

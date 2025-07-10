@@ -13,12 +13,13 @@ Not all networks must be used by all machines, but all networks used by any mach
 stack_networks:
   - name: string            # Required.
     cidr: 'ip/mask'         # Required.
-    gateway: ip             # Optional; used when network is bridged to another network using a router/gateway. 
-    router_wan_name: string # Optional; used when network is bridged to another network using a router/gateway.
-                            # This is the name of the other network that is connected to the router for this network. 
-    router_name: string     # Optional; used when network is bridged to another network using a router/gateway
-                            # and the router has a non-default name. When omitted the default name for the router is:
-                            # "Router bridging {{ network['router_wan_name'] }} and {{ network['name'] }}"
+    router:                 # Optional; used when network is bridged to another network using a router/gateway.
+      next-hop-address: ip     # Required when router is added for this network.
+      external_network: string # Required when router is added for this network.
+                               # This is the name of the other network that is connected to the router for this network.
+      name: string             # Optional and used when the router has a non-default name.
+                               # When omitted the default name for the router is:
+                               # "Router bridging {{ network['router_wan_name'] }} and {{ network['name'] }}"
     create: [true|false]    # Default is false and means the network is created by a cloud admin before running any code from this repo. 
                             # True means network is created by code from this repo.
     mtu_size: integer       # Optional. Note that a default value may differ per network or OpenStack cloud config.

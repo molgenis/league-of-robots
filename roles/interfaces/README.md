@@ -111,11 +111,11 @@ Not all networks must be used by all machines, but all networks used by any mach
 stack_networks:
   - name: string
     cidr: 'ip/mask'
-    gateway: ip
-    router_wan_name: string
-    router_name: string
-    create: [true|false]  # Default is false and means network is created by cloud admin before running any code from this repo. 
-                          # True means network is created by code from this repo.
+    router:
+      next-hop-address: ip
+      external_network: string
+      name: string
+    create: [true|false]
     mtu_size: integer
 security_group_mods:
   - name: "{{ stack_prefix }}_storage"
@@ -128,13 +128,15 @@ Example for the Talos test cluster:
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
-    gateway: '172.23.68.1'
-    router_wan_name: vlan16
-    router_name: vlan1337
+    router:
+      next-hop-address: '172.23.68.1'
+      external_network: vlan16
+      name: vlan1337
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_wan_name: vlan16
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
     create: true
     mtu_size: '1450'
   - name: vlan1068  # Private Lustre
@@ -160,6 +162,7 @@ all:
             - name: string
               security_group: string
               assign_floating_ip: [true|false]  # Default is false when omitted.
+              add_hostname_to_ip_address: [true|false]  # Default is false when omitted; see static_hostname_lookup role.
               #
               # Details for nmstate in the same YAML syntax/structure as for a single item from the
               # "interfaces" key in the YAML output from nmstatectl or as listed in nmstate config files; See
@@ -224,6 +227,7 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
     user_interface:
@@ -232,6 +236,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
@@ -252,6 +257,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp65s0np0
                 - name: vlan1068

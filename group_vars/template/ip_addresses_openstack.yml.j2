@@ -36,7 +36,7 @@ ip_addresses:
   {% endfor %}
 {% endfor %}
 {% for stack_network in stack_networks
-   | selectattr('router_wan_name', 'defined')
+   | selectattr('router', 'defined')
    | sort(attribute='name') %}
   {#
    # Unfortunately, we can only use the router name to lookup the info for the router.
@@ -44,15 +44,15 @@ ip_addresses:
    # and the IP used in that internal VLAN may not be unique as it can be used in multiple VLANs
    # used in the same or even in other stacks.
    # Therefore we default to using
-   #    'Router bridging ' + stack_network.router_wan_name + ' and ' + stack_network.name
+   #    'Router bridging ' + stack_network['router']['external_network'] + ' and ' + stack_network['name']
    # which is used by the openstack_networking role when we create routers ourselves.
    # If the router was created by an external cloud admin instead,
-   # then the stack_network must have a router_name attribute with the correct name.
+   # then the stack_network must have a stack_network['router']['name'] attribute with the correct name.
    #}
-  {% set router_name = stack_network['router_name'] | default('Router bridging ' + stack_network['router_wan_name'] + ' and ' + stack_network['name']) %}
-  {{ stack_network['name'] }}-{{ stack_network['router_wan_name'] }}-router:
+  {% set router_name = stack_network['router']['name'] | default('Router bridging ' + stack_network['router']['external_network'] + ' and ' + stack_network['name']) %}
+  {{ stack_network['name'] }}-{{ stack_network['router']['external_network'] }}-router:
     {{ stack_network['name'] }}:
-      address: {{ stack_network['gateway'] }}
+      address: {{ stack_network['router']['next-hop-address'] }}
       netmask: /32
     {% if api_router_info['routers']
           | selectattr('name', 'equalto', router_name)
@@ -60,7 +60,7 @@ ip_addresses:
           | map(attribute='external_fixed_ips')
           | first
        is defined %}
-    {{ stack_network['router_wan_name'] }}:
+    {{ stack_network['router']['external_network'] }}:
       address: {{ api_router_info['routers']
                   | selectattr('name', 'equalto', router_name)
                   | map(attribute='external_gateway_info')

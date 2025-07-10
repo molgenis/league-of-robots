@@ -57,8 +57,9 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_wan_name: 'Internet-GDR'
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: Internet-GDR
     create: true
   - name: Weka-vlan4
     cidr: '10.0.4.0/24'
