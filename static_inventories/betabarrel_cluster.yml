@@ -44,6 +44,45 @@ all:
               nodes:
                 - name: copperfist
                   network: vlan16
+        bb-porch-1336:
+          cloud_image: Rocky-9.5
+          cloud_user: rocky
+          os_distribution: 'rocky9'
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: vlan1336
+              security_group: "{{ stack_prefix }}_jumphosts"
+              assign_floating_ip: true
+              add_hostname_to_ip_address: true
+              #nmstate_interface:
+              #  name: enp3s0
+          basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
+          iptables_allow_icmp_inbound:
+            - "{{ all.ip_addresses['umcg']['net1'] }}"
+            - "{{ all.ip_addresses['umcg']['net2'] }}"
+            - "{{ all.ip_addresses['umcg']['net3'] }}"
+            - "{{ all.ip_addresses['umcg']['net4'] }}"
+            - "{{ all.ip_addresses['rug']['bwp_net'] }}"
+            - "{{ all.ip_addresses['rug']['operator'] }}"
+          ssh_client_configs:
+            - logs_library
+          additional_etc_hosts:
+            - group: docs_library
+              nodes:
+                - name: docs-on-bateleur
+                  network: external
+            - group: betabarrel_cluster
+              nodes:
+                - name: bb-dragen
+                  network: vlan16
+            - group: betabarrel_cluster
+              nodes:
+                - name: betabarrel
+                  network: vlan16
+            - group: copperfist_cluster
+              nodes:
+                - name: copperfist
+                  network: vlan16
         az-porch:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
@@ -245,7 +284,7 @@ all:
     storage_server:
       hosts:
         bb-storage:
-          ansible_host: bb-porch+betabarrel+bb-storage
+          ansible_host: bb-porch-1336+bb-storage
           cloud_image: Rocky-9.5
           cloud_user: rocky
           os_distribution: 'rocky9'
