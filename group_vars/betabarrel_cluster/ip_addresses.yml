@@ -7,8 +7,11 @@ ip_addresses:
     vlan990:
       address: 192.168.1.61
       netmask: /32
-    vlan990_bmc:
+    vlan990_bmc_ipmi:
       address: 10.10.1.101
+      netmask: /32
+    vlan990_bmc_mgmt:
+      address: 10.10.1.71
       netmask: /32
   bb-porch:
     bb_internal_management:
