@@ -56,7 +56,7 @@ additional_etc_hosts:
   - group: {{ stack_name }}
     nodes:
       - name: {{ machine_name }}
-        network: {{ netork_name }}
+        network: {{ network_name }}
 ```
 
 This will create entries in `/etc/hosts` like this:
