@@ -13,6 +13,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
     repo:
       hosts:
         fd-repo:
@@ -20,6 +21,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
+              add_hostname_to_ip_address: true
     docs:
       hosts:
         docs-on-bateleur:
@@ -30,6 +32,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
             - name: subnet-nfs-data-2541
               security_group: "{{ stack_prefix }}_storage"
     deploy_admin_interface:
@@ -39,6 +42,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
             - name: subnet-nfs-data-2541
               security_group: "{{ stack_prefix }}_storage"
           local_volume_size_extra: 2000
@@ -52,6 +56,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
             - name: subnet-nfs-data-2541
               security_group: "{{ stack_prefix }}_storage"
           slurm_sockets: 4
@@ -71,6 +76,7 @@ all:
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
                 - name: subnet-nfs-data-2541
                   security_group: "{{ stack_prefix }}_storage"
               local_volume_size_extra: 1

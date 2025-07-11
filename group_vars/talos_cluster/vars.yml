@@ -134,27 +134,26 @@ availability_zone: nova
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
-    gateway: '172.23.68.1'
-    router_network: vlan16
-    router_name: vlan1337
-    type: management
-    external: true
+    router:
+      next-hop-address: '172.23.68.1'
+      external_network: vlan16
+      name: vlan1337
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
     mtu_size: '1450'
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -266,12 +265,6 @@ sudoers:
     become: 'umcg-vipt-dm'
 #
 # Shared storage related variables
-#
-lustre_client_networks_vm:
-  - name: tcp20
-    interface: enp5s0
-#
-# lustre_client_networks for baremetal machines specified in static_inventory.
 #
 pfs_mounts:
   - pfs: umcgst04/slice4

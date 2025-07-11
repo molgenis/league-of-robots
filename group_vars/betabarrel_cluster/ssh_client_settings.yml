@@ -2,6 +2,8 @@
 ssh_client_jumphosts:
   - alias: bb-porch
     hostname: 195.169.22.140
+  - alias: bb-porch-1336
+    hostname: 195.169.22.156
   - alias: az-porch
     hostname: 74.234.160.235
 
@@ -9,9 +11,12 @@ ssh_client_known_hosts: "\
   @cert-authority \
   bb-porch*,\
   195.169.22.140,\
+  bb-porch-1336*,\
+  195.169.22.156,\
   az-porch*,\
   74.234.160.235,\
   *bb-transfer*,\
+  *bb-storage,\
   *betabarrel,\
   *docs-on-bateleur,\
   *bb-* \

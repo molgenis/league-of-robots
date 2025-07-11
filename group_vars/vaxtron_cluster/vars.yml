@@ -147,25 +147,22 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: external
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: external
+    create: true
     mtu_size: '1450'
   - name: DH4 Lustre
     cidr: '172.23.56.0/22'
+  - name: lustre
+    cidr: '172.23.12.0/22'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.57.213/32  # Lustre server
       - 172.23.57.214/32  # Lustre server
-    type: storage
-    external: true
-  - name: lustre
-    cidr: '172.23.12.0/22'
-    allow_ingress:
       - 172.23.15.186/32  # Lustre server
       - 172.23.15.187/32  # Lustre server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -583,14 +580,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks_vm:
-  - name: tcp14
-    interface: ens4
-  - name: tcp15
-    interface: ens5
-lustre_client_networks_baremetal:
-  - name: tcp15
-    interface: eno12399np0
 pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'

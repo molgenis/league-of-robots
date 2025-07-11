@@ -85,12 +85,10 @@ ldap_domains:
     listserv_mailinglist: UMCG-HPC
 stack_networks:
   - name: vlan983
-    router_network: vlan16
-    type: management
-    external: true
+    router:
+      external_network: vlan16
   - name: vlan985
     type: storage
-    external: true
 nameservers: [
   '172.23.40.244', # Order is important: local DNS for Isilon storage first!
   '8.8.4.4',       # Google DNS.
@@ -413,11 +411,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
-  - name: tcp11
-    interface: vlan985.lustre
-  - name: tcp14
-    interface: vlan985.lustre
 pfs_mounts:
   - pfs: umcgst10
     source: 'gcc-storage001.stor.hpc.local:/ifs/rekencluster'

@@ -10,17 +10,15 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
     mtu_size: '1450'
-# Azure
 azure_networks:
-  # types: management, logservers
   - name: "{{ stack_prefix }}_external"
-    type: logservers
     cidr: '10.10.1.0/24'
+    create: true
 azure_image:
   rocky9:
     offer: 'rockylinux-x86_64'
@@ -34,7 +32,6 @@ nameservers: [
 ]
 local_admin_groups:
   - 'admin'
-
 # To limit access to sensitive logs, access is limited to: NEED-TO-HAVE personnel
 local_admin_users:
   - 'gerben'

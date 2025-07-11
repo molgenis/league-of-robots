@@ -13,6 +13,9 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: ens3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -30,6 +33,9 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: ens3
           swap_file_size: 2
     data_transfer:
       hosts:
@@ -39,6 +45,9 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
           local_volume_size_extra: 8300
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -99,12 +108,23 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
             - name: "{{ stack_prefix }}_internal_storage"
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp5s0
+              lnet:
+                name: tcp20
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp6s0
           local_volume_size_extra: 3072
     deploy_admin_interface:
       hosts:
@@ -113,10 +133,19 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
             - name: "{{ stack_prefix }}_internal_storage"
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp5s0
+              lnet:
+                name: tcp20
           local_volume_size_extra: 2000
     ldap_server:
       hosts:
@@ -128,10 +157,19 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
             - name: "{{ stack_prefix }}_internal_storage"
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp4s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp5s0
+              lnet:
+                name: tcp20
           slurm_sockets: 8
           slurm_cores_per_socket: 1
           slurm_real_memory: 15724
@@ -151,10 +189,19 @@ all:
             host_networks:
               - name: "{{ stack_prefix }}_internal_management"
                 security_group: "{{ stack_prefix }}_cluster"
+                add_hostname_to_ip_address: true
+                nmstate_interface:
+                  name: enp3s0
               - name: "{{ stack_prefix }}_internal_storage"
                 security_group: "{{ stack_prefix }}_storage"
+                nmstate_interface:
+                  name: enp4s0
               - name: vlan1068
                 security_group: "{{ stack_prefix }}_storage"
+                nmstate_interface:
+                  name: enp5s0
+                lnet:
+                  name: tcp20
             local_volume_size_extra: 1
             slurm_sockets: 63
             slurm_cores_per_socket: 1
