@@ -1,4 +1,5 @@
 #jinja2: trim_blocks:False
+{% set example_tmp_lfs = lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | map(attribute='lfs') | first %}
 {%if groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | sum > 0 %}{# checks if this stack has GPUs or not #}
 # How to use GPU nodes
 
@@ -49,14 +50,14 @@ Or can be use as the argument on the command line
 Example 2 runs the same GPU example in an interactive session using `srun`.
 
 ```bash
-    $ mkdir -p /groups/umcg-GROUP/tmpXX/projects/${USER}/gpu_test
-    $ cd /groups/umcg-GROUP/tmpXX/projects/${USER}/gpu_test
+    $ mkdir -p /groups/[group]/{{ example_tmp_lfs }}/projects/${USER}/gpu_test
+    $ cd /groups/[group]/{{ example_tmp_lfs }}/projects/${USER}/gpu_test
     $ srun --qos=interactive-short --gres=gpu:{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:2 --time=01:00:00 --pty bash -i
     $ echo ${SLURM_GPUS_ON_NODE}
     2  
 ```
 
-Replace `GROUP` and `tmpXX` placeholders with correct values for group and tmp filesystem. The returned value is the number of GPUs available for the job. Use the `nvidia-smi` command to see more information about the GPU devices that are available inside the job.
+Replace `GROUP` (and if needed `{{ example_tmp_lfs }}`) placeholders with correct values for group and tmp filesystem. The returned value is the number of GPUs available for the job. Use the `nvidia-smi` command to see more information about the GPU devices that are available inside the job.
 
 ```bash
     $ nvidia-smi 
@@ -122,8 +123,8 @@ To check the driver and cuda version, run `nvidia-smi` on the compute node:
 
 ```bash
     # Replace the YYY with apropriate values.
-    mkdir -p /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
-    cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
+    mkdir -p /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/cuda_samples
+    cd /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/cuda_samples
     wget https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.2.tar.gz -O - | tar -xz
     cd cuda-samples-12.2/Samples/6_Performance/UnifiedMemoryPerf
     # Increase the matrix size, so that the calulation takes long enough to capture with nvidia-smi.
@@ -176,8 +177,8 @@ To run this example
 1. create the working directory on the `tmp` filesystem and navigate into it
 
 ```bash
-   mkdir /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
-   cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
+   mkdir /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/gpu_apptainer_test
+   cd /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/gpu_apptainer_test
 ```
 
 2. Create two files
@@ -252,10 +253,10 @@ This basic training python script example
 Running interactive ollama on GPU node
 
 ```
-     [{{ groups['user_interface'] | first }}]$ # First ensure that ollama/models are stored on tmp0X storage and not home dir
+     [{{ groups['user_interface'] | first }}]$ # First ensure that ollama/models are stored on {{ example_tmp_lfs }} storage and not home dir
      [{{ groups['user_interface'] | first }}]$ mkdir ~/.ollama
-     [{{ groups['user_interface'] | first }}]$ mkdir -p /groups/[group]/tmp02/users/[user]/ollama/models
-     [{{ groups['user_interface'] | first }}]$ ln -s /groups/[group]/tmp02/users/[user]/ollama/models ~/.ollama/models
+     [{{ groups['user_interface'] | first }}]$ mkdir -p /groups/[group]/{{ example_tmp_lfs }}/users/[user]/ollama/models
+     [{{ groups['user_interface'] | first }}]$ ln -s /groups/[group]/{{ example_tmp_lfs }}/users/[user]/ollama/models ~/.ollama/models
      [{{ groups['user_interface'] | first }}]$ srun --qos regular -N 1 -n 1 --gres=gpu:a40:1 -t 01:00:00 --mem 19240M --pty bash -i
      srun: job 1479320 queued and waiting for resources
      srun: job 1479320 has been allocated resources
