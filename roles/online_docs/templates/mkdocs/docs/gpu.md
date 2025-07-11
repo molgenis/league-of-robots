@@ -103,9 +103,9 @@ which will list the type and number of GPUs used in the last column like this:
 
 ```
         JOBID    NAME     USER        ST      TIME  NODES  NODELIST(REASON)  TRES_PER_NODE
-         1234    bash     umcg-user1  R       8:27      1  nb-vcompute05     gres:gpu:a40:2
-         1235    somejob  umcg-user2  R    2:09:14      1  nb-vcompute05     N/A
-         1236    somejob  umcg-user3  R    2:19:53      1  nb-vcompute04     N/A
+         1234    bash     user1  R       8:27      1  nb-vcompute05     gres:gpu:a40:2
+         1235    somejob  user2  R    2:09:14      1  nb-vcompute05     N/A
+         1236    somejob  user3  R    2:19:53      1  nb-vcompute04     N/A
          ...
 ```
 
@@ -123,8 +123,8 @@ To check the driver and cuda version, run `nvidia-smi` on the compute node:
 
 ```bash
     # Replace the YYY with apropriate values.
-    mkdir -p /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/cuda_samples
-    cd /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/cuda_samples
+    mkdir -p /groups/[group]/{{ example_tmp_lfs }}/users/[group]/cuda_samples
+    cd /groups/[group]/{{ example_tmp_lfs }}/users/[group]/cuda_samples
     wget https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.2.tar.gz -O - | tar -xz
     cd cuda-samples-12.2/Samples/6_Performance/UnifiedMemoryPerf
     # Increase the matrix size, so that the calulation takes long enough to capture with nvidia-smi.
@@ -177,8 +177,8 @@ To run this example
 1. create the working directory on the `tmp` filesystem and navigate into it
 
 ```bash
-   mkdir /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/gpu_apptainer_test
-   cd /groups/umcg-YYY/{{ example_tmp_lfs }}/users/umcg-YYY/gpu_apptainer_test
+   mkdir /groups/[group]/{{ example_tmp_lfs }}/users/[group]/gpu_apptainer_test
+   cd /groups/[group]/{{ example_tmp_lfs }}/users/[group]/gpu_apptainer_test
 ```
 
 2. Create two files
