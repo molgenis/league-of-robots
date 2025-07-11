@@ -256,7 +256,7 @@ Running interactive ollama on GPU node
      [{{ groups['user_interface'] | first }}]$ mkdir ~/.ollama
      [{{ groups['user_interface'] | first }}]$ mkdir -p /groups/[group]/tmp02/users/[user]/ollama/models
      [{{ groups['user_interface'] | first }}]$ ln -s /groups/[group]/tmp02/users/[user]/ollama/models ~/.ollama/models
-     [{{ groups['user_interface'] | first }}]$ srun --qos regular -N 1 -n 1 --gres=gpu:a40:2 -t 08:00:00 --mem 38480M --pty bash -i
+     [{{ groups['user_interface'] | first }}]$ srun --qos regular -N 1 -n 1 --gres=gpu:a40:1 -t 01:00:00 --mem 38480M --pty bash -i
      srun: job 1479320 queued and waiting for resources
      srun: job 1479320 has been allocated resources
      [{{ stack_prefix }}-node-b02]$ ml ollama
