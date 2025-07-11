@@ -256,14 +256,14 @@ Running interactive ollama on GPU node
      [{{ groups['user_interface'] | first }}]$ mkdir ~/.ollama
      [{{ groups['user_interface'] | first }}]$ mkdir -p /groups/[group]/tmp02/users/[user]/ollama/models
      [{{ groups['user_interface'] | first }}]$ ln -s /groups/[group]/tmp02/users/[user]/ollama/models ~/.ollama/models
-     [{{ groups['user_interface'] | first }}]$ srun --qos regular -N 1 -n 1 --gres=gpu:a40:1 -t 01:00:00 --mem 38480M --pty bash -i
+     [{{ groups['user_interface'] | first }}]$ srun --qos regular -N 1 -n 1 --gres=gpu:a40:1 -t 01:00:00 --mem 19240M --pty bash -i
      srun: job 1479320 queued and waiting for resources
      srun: job 1479320 has been allocated resources
      [{{ stack_prefix }}-node-b02]$ ml ollama
-     [nb-node-b02]$ unset ROCR_VISIBLE_DEVICES
-     [nb-node-b02]$ ollama serve 1>ollama-serve.log 2>&1 &
+     [{{ stack_prefix }}-node-b02]$ unset ROCR_VISIBLE_DEVICES
+     [{{ stack_prefix }}-node-b02]$ ollama serve 1>ollama-serve.log 2>&1 &
      [1] 11998
-     [umcg-scimerman@nb-node-b02 umcg-scimerman]$ echo "what is the speed of light?" | ollama run deepseek-r1:14b
+     [{{ stack_prefix }}-node-b02]$ echo "what is the speed of light?" | ollama run deepseek-r1:14b
      The **speed of light** in a vacuum is approximately **299,792 kilometers per second** (or about 186,282 miles per second). This is often 
      denoted by the letter **c** and is considered one of the fundamental constants of nature. In different transparent media, such as glass or 
      water, light travels slower than this speed.
