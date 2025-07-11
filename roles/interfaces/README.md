@@ -105,19 +105,20 @@ and once we can deploy this role we use it to disable network configuration by _
 
 ## Configuring network settings using this interfaces role
 
-Configure all networks used by the stack in `group_vars/[stack-name]/vars.yml`;
+Configure all networks used by the stack in `group_vars/{{ stack_name }}/vars.yml`;
 Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here:
 ```yaml
 stack_networks:
   - name: string
     cidr: 'ip/mask'
-    gateway: ip
-    router_network: string
-    router_name: string
-    type: [management|storage]  # Effects security group applied to network by openstack_networking role.
-    external: [true|false]      # Default is false when omitted and means network is created by code from this repo.
-                                # True means network is created by cloud admin before running any code from this repo.
+    router:
+      next-hop-address: ip
+      external_network: string
+      name: string
+    create: [true|false]
     mtu_size: integer
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - ip/mask  # External machines not part of this stack that need to communicate with machines in this stack
                  # and which need to be added to the OpenStack security group rules for this network to allow network traffic.
@@ -127,30 +128,29 @@ Example for the Talos test cluster:
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
-    gateway: '172.23.68.1'
-    router_network: vlan16
-    router_name: vlan1337
-    type: management
-    external: true
+    router:
+      next-hop-address: '172.23.68.1'
+      external_network: vlan16
+      name: vlan1337
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
     mtu_size: '1450'
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 ```
 
-Configure which network to use and on which interface per machine in `static_inventory/[stack-name].yml`:
+Configure which network to use and on which interface per machine in `static_inventory/{{ stack_name }}.yml`:
 ```yaml
 ---
 all:
@@ -162,6 +162,7 @@ all:
             - name: string
               security_group: string
               assign_floating_ip: [true|false]  # Default is false when omitted.
+              add_hostname_to_ip_address: [true|false]  # Default is false when omitted; see static_hostname_lookup role.
               #
               # Details for nmstate in the same YAML syntax/structure as for a single item from the
               # "interfaces" key in the YAML output from nmstatectl or as listed in nmstate config files; See
@@ -202,7 +203,7 @@ all:
               # which may use an untagged VLAN, after initial provisioning of the machine.
               # In this case DHCP is disabled and a specific IP is configured: this IP
               # must not be specified here as it will get looked up automagically from:
-              #     group_vars/[stack-name]/ip_addresses.yml.
+              #     group_vars/{{ stack_name }}/ip_addresses.yml.
               #
               nmstate_interface:
                 name: base_interface_name.vlan_ID  # Must use this format. E.g. enp4s0.1068
@@ -226,6 +227,7 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
     user_interface:
@@ -234,6 +236,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
@@ -254,6 +257,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp65s0np0
                 - name: vlan1068

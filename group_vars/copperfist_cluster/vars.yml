@@ -137,20 +137,18 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: external
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: external
+    create: true
   - name: vlan16
     cidr: '195.169.22.0/23'
-    type: management
-    external: true
   - name: vlan990
     cidr: '192.168.1.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - '192.168.1.0/24'
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.

@@ -155,29 +155,25 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
   - name: "{{ stack_prefix }}_internal_storage"
     cidr: '10.10.2.0/24'
-    type: storage
-    external: false
+    create: true
   - name: vlan990
     cidr: '192.168.1.0/24'
-    allow_ingress:
-      - '192.168.1.0/25'
-    type: storage
-    external: true
   - name: vlan1068
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
+      - 192.168.1.0/25
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -451,9 +447,6 @@ local_mount_subfolders:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
-  - name: tcp20
-    interface: enp5s0
 pfs_mounts:
   - pfs: umcgst12
     source: "{{ ip_addresses['wh-sai'][stack_prefix + '_internal_storage']['address'] }}:/mnt"

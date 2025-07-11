@@ -57,6 +57,10 @@ additional_etc_hosts:
     nodes:
       - name: bb-dragen
         network: vlan990
+  - group: betabarrel_cluster
+    nodes:
+      - name: bb-storage
+        network: vlan990
   - group: copperfist_cluster
     nodes:
       - name: copperfist
@@ -124,22 +128,26 @@ cloud_image: CentOS 7
 cloud_user: centos
 availability_zone: nova
 stack_networks:
+  - name: vlan1336  # Internal management for VMs and BMs
+    cidr: '172.23.77.0/24'
+    router:
+      next-hop-address: '172.23.77.1'
+      external_network: vlan16
+      name: vlan1336
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
   - name: vlan16
     cidr: '195.169.22.0/23'
-    type: management
-    external: true
   - name: vlan990
     cidr: '192.168.1.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - '192.168.1.0/25'
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.

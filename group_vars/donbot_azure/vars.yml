@@ -4,19 +4,10 @@ stack_domain: 'donbot'
 stack_name: "{{ stack_domain }}_azure"  # stack_name must match the name of the folder that contains this vars.yml file.
 repo_manager: 'none'
 os_distribution: 'rocky9'
-stack_networks:
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.3.0.4/16'
-    router_network: donbot_external_network
-    type: management
-    external: true
-    mtu_size: '1450'
-# Azure
 azure_networks:
   - name: "{{ stack_prefix }}_internal_management"
-    external: false
     cidr: '10.10.1.0/24'
-    type: management
+    create: true
 azure_image:
   rocky9:
     offer: 'rockylinux-x86_64'
