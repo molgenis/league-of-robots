@@ -31,4 +31,29 @@
   become: true
   become_user: "{{ repo_management_user }}"
   no_log: true
+
+- name: "Create remotes for alternate content sources for {{ pulp_repo['name'] }} repo."
+  pulp.squeezer.rpm_remote:
+    name: "{{ pulp_repo['name'] }}-{{ acs['name'] }}-acs-remote"
+    url: "{{ acs['remote_url'] }}"
+    policy: on_demand
+    state: present
+    pulp_url: "{{ pulp_api_baseurl }}"
+    username: "{{ pulp_api_user }}"
+    password: "{{ pulp_api_password }}"
+    validate_certs: false
+  vars:
+    ansible_python_interpreter: "/admin/{{ repo_management_user }}/pulp-cli.venv/bin/python3"
+  become: true
+  become_user: "{{ repo_management_user }}"
+  #no_log: true
+  loop: "{{ pulp_repo['acs'] | default([]) }}"
+  loop_control:
+    loop_var: acs
+    label: "{{ acs['name'] }}: {{ acs['remote_url'] }}"
+  when: pulp_repo['acs'] is defined
 ...
+
+# pulp rpm remote create --name baseos_acs_remote --policy on_demand --url https://dl.rockylinux.org/vault/rocky/9.5/BaseOS/x86_64/os/
+# pulp rpm acs create --name baseos_acs --remote baseos_acs_remote
+# pulp rpm acs refresh --name baseos_acs
