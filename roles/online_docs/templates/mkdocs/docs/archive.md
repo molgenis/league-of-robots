@@ -90,7 +90,7 @@ this will result (in comparison to the option a)
  - but it will use more disk space both on prm and archive
  - and it will take longer to copy the entire file to the archive and back
 
-### Checksumming
+### Local checksum
 
 (highly recommended) Creata a checksum of the file data content. This _fingerprint_ can
 be later compared to check that the file content was successfully uploaded to archive and
@@ -110,7 +110,7 @@ Upload of the file(s) to the archive
 
 ```
 
-### Checksum
+### Remote checksum
 
 (highly recommended) If file was copied recently, it _can be_ still on regular disks
 on the remote archive server, so we can simply issue remote command to calculate the
