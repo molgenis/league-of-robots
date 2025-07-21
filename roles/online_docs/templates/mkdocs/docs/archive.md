@@ -64,7 +64,8 @@ Become the data manager
 
 ### Bundling
 
-(optional, but highly recommended) Preperate the data by merging multiple files/folders
+Optional, but highly recommended:
+Prepare the data by merging multiple files/folders
  into one compressed **tar** file.
 
 Here are two options available
