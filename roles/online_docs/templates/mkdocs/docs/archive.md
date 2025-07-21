@@ -112,7 +112,7 @@ Upload of the file(s) to the archive
 
 ### Remote checksum
 
-(highly recommended) If file was copied recently, it _can be_ still on regular disks
+If file was copied recently, it _can be_ still on regular disks
 on the remote archive server, so we can simply issue remote command to calculate the
 `sha256sum` value of it
 ```
