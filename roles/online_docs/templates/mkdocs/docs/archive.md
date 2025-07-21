@@ -48,7 +48,8 @@ The data migrates on remote server from disk to tape and during this it has diff
 | Unmigrating | `QUE` | **No** | Yes | File queued for staging from tape. Not yet copied from tape. |
 | Unmigrating | `STG` | **No**t yet / Partially | Yes | File being staged from tape to disk. Content is is unavailable until copy is finished. |
 
-Note that the folders are always online (in state `REG`) and as such you can always browse folders and check file permissions and their metadata information.
+Note that the folders are always online (in state `REG`) and as such you can always
+browse folders and check file permissions and their metadata information.
 
 ## 3. Workflow example
 
@@ -63,25 +64,61 @@ Become the data manager
 
 ### Bundling
 
-(optional, but highly recommended) Preperate the data by merging multiple files/folders into one compressed **tar** file
+Optional, but be aware that upload to an archive system should be in average well above 1GB per file:
+Prepare the data by merging multiple files/folders
+ into one compressed **tar** file.
+
+Here are two options available
+
+a) data is compressed
+
+the data can be bundled and *compressed* at the same time
 ```
    dm-user $ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
 ```
+this will result (in comparison with the option b) in
+ - taking longer to compress and decompress the files
+ - smaller .tar.bz file - so less storage consumed on both prm and remote archive
+ - taking less time to upload the file to the remote archive storage
+
+b) or it can be simply bundled without compression
+```
+   dm-user $ tar -cvf /groups/[group]/[prm0X]/projects/project-x.tar /groups/[group]/[prm0X]/projects/x/*
+```
+
+this will result (in comparison to the option a)
+ - in faster creation and possibly later extraction of the .tar file
+ - but it will use more disk space both on prm and archive
+ - and it will take longer to copy the entire file to the archive and back
+
+### Local checksum
+
+Create a checksum of the file. This _fingerprint_ can
+be checked later to verify that the file was successfully uploaded to the archive and that it was correctly restored when when downloading it back from the archive.
+```
+   dm-user $ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
+```
+
+Checksum verification process on the remote storage side supports only **`sha256sum`**
 
 ### Uploading
 
-Upload file(s) to the archive
+Upload of the file(s) to the archive
 ```
    dm-user $ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
 
 ```
 
-### Checksum
+### Remote checksum
 
-(highly recommended) If file was copied recently, it *can be* still on regular disks on the remote archive server, so we can simply issue remote command to calculate the `sha256sum` value of it
+If file was copied recently, it _can be_ still on regular disks
+on the remote archive server, so we can simply issue remote command to calculate the
+`sha256sum` value of it
 ```
    arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
 ```
+
+If checkum was also made just after the .tar file was created, then both values can be checked if they are still identical.
 
 ### Migrating
 
