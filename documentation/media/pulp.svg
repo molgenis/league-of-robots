@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="884 1008 1861 776" width="1861" height="776">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" viewBox="884 674.27865 1861 1042.7214" width="1861" height="1042.7214">
   <defs>
     <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#666">
       <g>
@@ -17,284 +17,419 @@
         <path d="M 3.7333333 0 L 0 -1.4 L 0 1.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
-    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_4" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#003776">
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_4" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#b34400">
       <g>
         <path d="M 3.7333333 0 L 0 -1.4 L 0 1.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
-    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_5" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#b34400">
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_5" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#003776">
       <g>
         <path d="M 3.7333333 0 L 0 -1.4 L 0 1.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
   </defs>
-  <g id="Canvas_1" stroke="none" stroke-dasharray="none" fill-opacity="1" stroke-opacity="1" fill="none">
+  <g id="Canvas_1" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill-opacity="1" fill="none">
     <title>Canvas 1</title>
-    <rect fill="white" x="884" y="1008" width="1861" height="776"/>
+    <rect fill="white" x="884" y="674.27865" width="1861" height="1042.7214"/>
     <g id="Canvas_1_Layer_1">
       <title>Layer 1</title>
       <g id="Graphic_235">
-        <path d="M 917 1021 L 2712 1021 C 2723.0457 1021 2732 1029.9543 2732 1041 L 2732 1751 C 2732 1762.0457 2723.0457 1771 2712 1771 L 917 1771 C 905.9543 1771 897 1762.0457 897 1751 L 897 1041 C 897 1029.9543 905.9543 1021 917 1021 Z" fill="white"/>
-        <path d="M 917 1021 L 2712 1021 C 2723.0457 1021 2732 1029.9543 2732 1041 L 2732 1751 C 2732 1762.0457 2723.0457 1771 2712 1771 L 917 1771 C 905.9543 1771 897 1762.0457 897 1751 L 897 1041 C 897 1029.9543 905.9543 1021 917 1021 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 917 687.27865 L 2712 687.27865 C 2723.0457 687.27865 2732 696.23295 2732 707.27865 L 2732 1684 C 2732 1695.0457 2723.0457 1704 2712 1704 L 917 1704 C 905.9543 1704 897 1695.0457 897 1684 L 897 707.27865 C 897 696.23295 905.9543 687.27865 917 687.27865 Z" fill="white"/>
+        <path d="M 917 687.27865 L 2712 687.27865 C 2723.0457 687.27865 2732 696.23295 2732 707.27865 L 2732 1684 C 2732 1695.0457 2723.0457 1704 2712 1704 L 917 1704 C 905.9543 1704 897 1695.0457 897 1684 L 897 707.27865 C 897 696.23295 905.9543 687.27865 917 687.27865 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
-      <g id="Group_182">
-        <g id="Graphic_172">
-          <text transform="translate(953.5862 1152.3333)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="0" y="23" xml:space="preserve">Remote (single repo URL or list of mirrors)</tspan>
-          </text>
-        </g>
-        <g id="Graphic_174">
-          <path d="M 948.8012 1139.8333 L 1438.3712 1139.8333 C 1443.3417 1139.8333 1447.3712 1143.8628 1447.3712 1148.8333 L 1447.3712 1183.8333 C 1447.3712 1188.8039 1443.3417 1192.8333 1438.3712 1192.8333 L 948.8012 1192.8333 C 943.8306 1192.8333 939.8012 1188.8039 939.8012 1183.8333 L 939.8012 1148.8333 C 939.8012 1143.8628 943.8306 1139.8333 948.8012 1139.8333 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-        </g>
-      </g>
-      <g id="Group_183">
-        <g id="Graphic_170">
-          <path d="M 1129.8225 1310.5 L 1257.3498 1310.5 C 1262.3204 1310.5 1266.3498 1314.5294 1266.3498 1319.5 L 1266.3498 1354.5 C 1266.3498 1359.4706 1262.3204 1363.5 1257.3498 1363.5 L 1129.8225 1363.5 C 1124.8519 1363.5 1120.8225 1359.4706 1120.8225 1354.5 L 1120.8225 1319.5 C 1120.8225 1314.5294 1124.8519 1310.5 1129.8225 1310.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-        </g>
-        <g id="Graphic_173">
-          <text transform="translate(1130.1612 1323)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="3.5889816" y="23" xml:space="preserve">Repository</tspan>
-          </text>
-        </g>
-      </g>
-      <g id="Line_175">
-        <line x1="1193.5862" y1="1192.8333" x2="1193.5862" y2="1294.6" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Group_178">
-        <g id="Group_98">
-          <g id="Group_105">
-            <g id="Graphic_107">
-              <path d="M 955.42 1315.38 L 944.18 1315.38 L 944.18 1343.78 L 962.35 1343.78 L 962.35 1322.03 L 955.42 1322.03 Z" fill="white"/>
-              <path d="M 955.42 1315.38 L 944.18 1315.38 L 944.18 1343.78 L 962.35 1343.78 L 962.35 1322.03 L 955.42 1322.03 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-            </g>
-            <g id="Graphic_106">
-              <path d="M 955.42 1315.38 L 955.42 1322.03 L 962.35 1322.03 Z" fill="white"/>
-              <path d="M 955.42 1315.38 L 955.42 1322.03 L 962.35 1322.03 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-            </g>
+      <g id="Group_308">
+        <g id="Group_182">
+          <g id="Graphic_172">
+            <text transform="translate(953.5862 1093.211)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="0" y="23" xml:space="preserve">Remote (single repo URL or list of mirrors)</tspan>
+            </text>
           </g>
-          <g id="Group_102">
-            <g id="Graphic_104">
-              <path d="M 948.28 1321.8 L 937.04 1321.8 L 937.04 1350.2 L 955.21 1350.2 L 955.21 1328.45 L 948.28 1328.45 Z" fill="white"/>
-              <path d="M 948.28 1321.8 L 937.04 1321.8 L 937.04 1350.2 L 955.21 1350.2 L 955.21 1328.45 L 948.28 1328.45 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-            </g>
-            <g id="Graphic_103">
-              <path d="M 948.28 1321.8 L 948.28 1328.45 L 955.21 1328.45 Z" fill="white"/>
-              <path d="M 948.28 1321.8 L 948.28 1328.45 L 955.21 1328.45 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-            </g>
-          </g>
-          <g id="Group_99">
-            <g id="Graphic_101">
-              <path d="M 941.14 1328.21 L 929.9 1328.21 L 929.9 1356.62 L 948.07 1356.62 L 948.07 1334.87 L 941.14 1334.87 Z" fill="white"/>
-              <path d="M 941.14 1328.21 L 929.9 1328.21 L 929.9 1356.62 L 948.07 1356.62 L 948.07 1334.87 L 941.14 1334.87 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-            </g>
-            <g id="Graphic_100">
-              <path d="M 941.14 1328.21 L 941.14 1334.87 L 948.07 1334.87 Z" fill="white"/>
-              <path d="M 941.14 1328.21 L 941.14 1334.87 L 948.07 1334.87 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-            </g>
+          <g id="Graphic_174">
+            <path d="M 948.8012 1080.711 L 1438.3712 1080.711 C 1443.3417 1080.711 1447.3712 1084.7404 1447.3712 1089.711 L 1447.3712 1124.711 C 1447.3712 1129.6815 1443.3417 1133.711 1438.3712 1133.711 L 948.8012 1133.711 C 943.8306 1133.711 939.8012 1129.6815 939.8012 1124.711 L 939.8012 1089.711 C 939.8012 1084.7404 943.8306 1080.711 948.8012 1080.711 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
           </g>
         </g>
-        <g id="Graphic_176">
-          <path d="M 929.5 1310.5 L 1039.5 1310.5 C 1044.4706 1310.5 1048.5 1314.5294 1048.5 1319.5 L 1048.5 1354.5 C 1048.5 1359.4706 1044.4706 1363.5 1039.5 1363.5 L 929.5 1363.5 C 924.5294 1363.5 920.5 1359.4706 920.5 1354.5 L 920.5 1319.5 C 920.5 1314.5294 924.5294 1310.5 929.5 1310.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+        <g id="Group_183">
+          <g id="Graphic_170">
+            <path d="M 1129.8225 1251.3776 L 1257.3498 1251.3776 C 1262.3204 1251.3776 1266.3498 1255.407 1266.3498 1260.3776 L 1266.3498 1295.3776 C 1266.3498 1300.3482 1262.3204 1304.3776 1257.3498 1304.3776 L 1129.8225 1304.3776 C 1124.8519 1304.3776 1120.8225 1300.3482 1120.8225 1295.3776 L 1120.8225 1260.3776 C 1120.8225 1255.407 1124.8519 1251.3776 1129.8225 1251.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_173">
+            <text transform="translate(1130.1612 1263.8776)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="3.5889816" y="23" xml:space="preserve">Repository</tspan>
+            </text>
+          </g>
         </g>
-        <g id="Graphic_177">
-          <text transform="translate(981.5 1323)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="0" y="23" xml:space="preserve">Files</tspan>
+        <g id="Line_175">
+          <line x1="1193.5862" y1="1133.711" x2="1193.5862" y2="1235.4776" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Group_178">
+          <g id="Group_98">
+            <g id="Group_105">
+              <g id="Graphic_107">
+                <path d="M 955.42 1256.2576 L 944.18 1256.2576 L 944.18 1284.6576 L 962.35 1284.6576 L 962.35 1262.9076 L 955.42 1262.9076 Z" fill="white"/>
+                <path d="M 955.42 1256.2576 L 944.18 1256.2576 L 944.18 1284.6576 L 962.35 1284.6576 L 962.35 1262.9076 L 955.42 1262.9076 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+              <g id="Graphic_106">
+                <path d="M 955.42 1256.2576 L 955.42 1262.9076 L 962.35 1262.9076 Z" fill="white"/>
+                <path d="M 955.42 1256.2576 L 955.42 1262.9076 L 962.35 1262.9076 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+            </g>
+            <g id="Group_102">
+              <g id="Graphic_104">
+                <path d="M 948.28 1262.6776 L 937.04 1262.6776 L 937.04 1291.0776 L 955.21 1291.0776 L 955.21 1269.3276 L 948.28 1269.3276 Z" fill="white"/>
+                <path d="M 948.28 1262.6776 L 937.04 1262.6776 L 937.04 1291.0776 L 955.21 1291.0776 L 955.21 1269.3276 L 948.28 1269.3276 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+              <g id="Graphic_103">
+                <path d="M 948.28 1262.6776 L 948.28 1269.3276 L 955.21 1269.3276 Z" fill="white"/>
+                <path d="M 948.28 1262.6776 L 948.28 1269.3276 L 955.21 1269.3276 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+            </g>
+            <g id="Group_99">
+              <g id="Graphic_101">
+                <path d="M 941.14 1269.0876 L 929.9 1269.0876 L 929.9 1297.4976 L 948.07 1297.4976 L 948.07 1275.7476 L 941.14 1275.7476 Z" fill="white"/>
+                <path d="M 941.14 1269.0876 L 929.9 1269.0876 L 929.9 1297.4976 L 948.07 1297.4976 L 948.07 1275.7476 L 941.14 1275.7476 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+              <g id="Graphic_100">
+                <path d="M 941.14 1269.0876 L 941.14 1275.7476 L 948.07 1275.7476 Z" fill="white"/>
+                <path d="M 941.14 1269.0876 L 941.14 1275.7476 L 948.07 1275.7476 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+          <g id="Graphic_176">
+            <path d="M 929.5 1251.3776 L 1039.5 1251.3776 C 1044.4706 1251.3776 1048.5 1255.407 1048.5 1260.3776 L 1048.5 1295.3776 C 1048.5 1300.3482 1044.4706 1304.3776 1039.5 1304.3776 L 929.5 1304.3776 C 924.5294 1304.3776 920.5 1300.3482 920.5 1295.3776 L 920.5 1260.3776 C 920.5 1255.407 924.5294 1251.3776 929.5 1251.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_177">
+            <text transform="translate(981.5 1263.8776)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="0" y="23" xml:space="preserve">Files</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_179">
+          <line x1="1048.5" y1="1277.8776" x2="1104.9225" y2="1277.8776" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_180">
+          <text transform="translate(1053.5 1256.3776)" fill="black">
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="14.965626" y="15" xml:space="preserve">add</tspan>
+          </text>
+        </g>
+        <g id="Graphic_181">
+          <text transform="translate(1187.5 1183.0443)" fill="black">
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="12.578907" y="15" xml:space="preserve">sync</tspan>
+          </text>
+        </g>
+        <g id="Group_199">
+          <g id="Graphic_192">
+            <path d="M 1566.5 1194.3776 L 1812.5 1194.3776 C 1817.4706 1194.3776 1821.5 1198.407 1821.5 1203.3776 L 1821.5 1238.3776 C 1821.5 1243.3482 1817.4706 1247.3776 1812.5 1247.3776 L 1566.5 1247.3776 C 1561.5294 1247.3776 1557.5 1243.3482 1557.5 1238.3776 L 1557.5 1203.3776 C 1557.5 1198.407 1561.5294 1194.3776 1566.5 1194.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_191">
+            <text transform="translate(1564.6694 1206.8776)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="9.289604" y="23" xml:space="preserve">Repository Version 1</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_200">
+          <g id="Graphic_196">
+            <path d="M 1566.5 1274.3776 L 1812.5 1274.3776 C 1817.4706 1274.3776 1821.5 1278.407 1821.5 1283.3776 L 1821.5 1318.3776 C 1821.5 1323.3482 1817.4706 1327.3776 1812.5 1327.3776 L 1566.5 1327.3776 C 1561.5294 1327.3776 1557.5 1323.3482 1557.5 1318.3776 L 1557.5 1283.3776 C 1557.5 1278.407 1561.5294 1274.3776 1566.5 1274.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_195">
+            <text transform="translate(1564.6694 1286.8776)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="9.289604" y="23" xml:space="preserve">Repository Version 2</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_201">
+          <g id="Graphic_198">
+            <path d="M 1566.5 1354.3776 L 1812.5 1354.3776 C 1817.4706 1354.3776 1821.5 1358.407 1821.5 1363.3776 L 1821.5 1398.3776 C 1821.5 1403.3482 1817.4706 1407.3776 1812.5 1407.3776 L 1566.5 1407.3776 C 1561.5294 1407.3776 1557.5 1403.3482 1557.5 1398.3776 L 1557.5 1363.3776 C 1557.5 1358.407 1561.5294 1354.3776 1566.5 1354.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_197">
+            <text transform="translate(1564.6694 1366.8776)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="9.289604" y="23" xml:space="preserve">Repository Version 3</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_202">
+          <path d="M 1266.3498 1264.6276 C 1306.0998 1266.816 1317.5 1264.3776 1342.5 1231.3776 C 1365.083 1201.568 1484.7685 1217.4538 1541.6063 1220.4355" marker-end="url(#FilledArrow_Marker_2)" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_203">
+          <path d="M 1266.3498 1291.1276 C 1306.0998 1293.316 1338.5 1306.3776 1339.5 1344.3776 C 1340.3858 1378.0395 1487.2282 1380.313 1541.5976 1380.7409" marker-end="url(#FilledArrow_Marker_2)" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Line_204">
+          <path d="M 1266.3498 1277.8776 C 1306.0998 1280.066 1340.5 1271.3776 1353.5 1291.3776 C 1364.7404 1308.6706 1493.5436 1303.9088 1541.6185 1301.6566" marker-end="url(#FilledArrow_Marker_2)" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_205">
+          <text transform="translate(1330.5 1237.3776)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="28.371094" y="15" xml:space="preserve">Each </tspan>
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" y="15" xml:space="preserve">sync</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="15" xml:space="preserve"> or </tspan>
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" y="15" xml:space="preserve">add</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="15" xml:space="preserve"> creates</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="30.054688" y="34" xml:space="preserve">a new Repository Version</tspan>
+          </text>
+        </g>
+        <g id="Group_206">
+          <g id="Graphic_208">
+            <path d="M 2104.5 1194.3776 L 2268.5 1194.3776 C 2273.4706 1194.3776 2277.5 1198.407 2277.5 1203.3776 L 2277.5 1238.3776 C 2277.5 1243.3482 2273.4706 1247.3776 2268.5 1247.3776 L 2104.5 1247.3776 C 2099.5294 1247.3776 2095.5 1243.3482 2095.5 1238.3776 L 2095.5 1203.3776 C 2095.5 1198.407 2099.5294 1194.3776 2104.5 1194.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_207">
+            <text transform="translate(2101.9956 1206.8776)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="10.70562" y="23" xml:space="preserve">Publication X</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_209">
+          <path d="M 1821.5 1220.8776 C 1833.3837 1221.153 2022.234 1221.434 2079.6028 1221.0812" marker-end="url(#FilledArrow_Marker_3)" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_219">
+          <path d="M 2104.5 1354.3776 L 2268.5 1354.3776 C 2273.4706 1354.3776 2277.5 1358.407 2277.5 1363.3776 L 2277.5 1398.3776 C 2277.5 1403.3482 2273.4706 1407.3776 2268.5 1407.3776 L 2104.5 1407.3776 C 2099.5294 1407.3776 2095.5 1403.3482 2095.5 1398.3776 L 2095.5 1363.3776 C 2095.5 1358.407 2099.5294 1354.3776 2104.5 1354.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+        </g>
+        <g id="Graphic_218">
+          <text transform="translate(2101.9956 1366.8776)" fill="black">
+            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="10.770073" y="23" xml:space="preserve">Publication Y</tspan>
+          </text>
+        </g>
+        <g id="Line_216">
+          <path d="M 1821.5 1380.8776 C 1833.3837 1381.153 2022.234 1381.434 2079.6028 1381.0812" marker-end="url(#FilledArrow_Marker_3)" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Group_223">
+          <g id="Graphic_225">
+            <path d="M 2431.5 1274.3776 L 2595.5 1274.3776 C 2600.4706 1274.3776 2604.5 1278.407 2604.5 1283.3776 L 2604.5 1318.3776 C 2604.5 1323.3482 2600.4706 1327.3776 2595.5 1327.3776 L 2431.5 1327.3776 C 2426.5294 1327.3776 2422.5 1323.3482 2422.5 1318.3776 L 2422.5 1283.3776 C 2422.5 1278.407 2426.5294 1274.3776 2431.5 1274.3776 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_224">
+            <text transform="translate(2428.9956 1286.8776)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="18.29937" y="23" xml:space="preserve">Distribution </tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Graphic_226">
+          <text transform="translate(1833.5 1194.3776)" fill="black">
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="92.28906" y="15" xml:space="preserve">Publish</tspan>
+          </text>
+        </g>
+        <g id="Graphic_227">
+          <text transform="translate(1833.5 1272.3776)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="4.3828125" y="15" xml:space="preserve">Not all Repository Versions must </tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="9.933594" y="34" xml:space="preserve">be published; here we skipped </tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="47.160156" y="53" xml:space="preserve">Repository Version 2</tspan>
+          </text>
+        </g>
+        <g id="Line_229">
+          <path d="M 2277.5 1380.8776 C 2307.25 1380.6276 2347.166 1382.6335 2353.5664 1350.3776 C 2358.5117 1325.4549 2385.9237 1318.1506 2406.6656 1315.541" marker-end="url(#FilledArrow_Marker_4)" stroke="#b34400" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_231">
+          <text transform="translate(2346 1352.3776)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="15.894531" y="15" xml:space="preserve">Linking the Distribution to another Publication</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="1.90625" y="34" xml:space="preserve">to update Pulp clients to a new Repository Version</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="78.58594" y="53" xml:space="preserve">(or roll back to an older one)</tspan>
           </text>
         </g>
       </g>
-      <g id="Line_179">
-        <line x1="1048.5" y1="1337" x2="1104.9225" y2="1337" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Graphic_180">
-        <text transform="translate(1053.5 1315.5)" fill="black">
-          <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="14.965626" y="15" xml:space="preserve">add</tspan>
-        </text>
-      </g>
-      <g id="Graphic_181">
-        <text transform="translate(1187.5 1242.1667)" fill="black">
-          <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="12.578907" y="15" xml:space="preserve">sync</tspan>
-        </text>
-      </g>
-      <g id="Group_199">
-        <g id="Graphic_192">
-          <path d="M 1566.5 1253.5 L 1812.5 1253.5 C 1817.4706 1253.5 1821.5 1257.5294 1821.5 1262.5 L 1821.5 1297.5 C 1821.5 1302.4706 1817.4706 1306.5 1812.5 1306.5 L 1566.5 1306.5 C 1561.5294 1306.5 1557.5 1302.4706 1557.5 1297.5 L 1557.5 1262.5 C 1557.5 1257.5294 1561.5294 1253.5 1566.5 1253.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+      <g id="Group_310">
+        <g id="Group_250">
+          <g id="Graphic_246">
+            <path d="M 1045.5601 1466.6589 L 1341.6122 1466.6589 C 1346.5828 1466.6589 1350.6122 1470.6883 1350.6122 1475.6589 L 1350.6122 1510.6589 C 1350.6122 1515.6294 1346.5828 1519.6589 1341.6122 1519.6589 L 1045.5601 1519.6589 C 1040.5896 1519.6589 1036.5601 1515.6294 1036.5601 1510.6589 L 1036.5601 1475.6589 C 1036.5601 1470.6883 1040.5896 1466.6589 1045.5601 1466.6589 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_247">
+            <text transform="translate(1047.4292 1479.1589)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="3.322937" y="23" xml:space="preserve">Remote (single repo URL)</tspan>
+            </text>
+          </g>
         </g>
-        <g id="Graphic_191">
-          <text transform="translate(1564.6694 1266)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="9.289604" y="23" xml:space="preserve">Repository Version 1</tspan>
+        <g id="Group_251">
+          <g id="Graphic_244">
+            <path d="M 1009.7421 1629.014 L 1377.4303 1629.014 C 1382.4008 1629.014 1386.4303 1633.0434 1386.4303 1638.014 L 1386.4303 1673.014 C 1386.4303 1677.9846 1382.4008 1682.014 1377.4303 1682.014 L 1009.7421 1682.014 C 1004.7715 1682.014 1000.7421 1677.9846 1000.7421 1673.014 L 1000.7421 1638.014 C 1000.7421 1633.0434 1004.7715 1629.014 1009.7421 1629.014 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_243">
+            <text transform="translate(1015.4778 1641.514)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="1.7984924" y="23" xml:space="preserve">Alternate Content Source (ACS)</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_241">
+          <line x1="1193.5862" y1="1519.6589" x2="1193.5862" y2="1613.114" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_240">
+          <text transform="translate(1199.5 1564.8364)" fill="black">
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="1.7742195" y="15" xml:space="preserve">refresh</tspan>
+          </text>
+        </g>
+        <g id="Graphic_249">
+          <text transform="translate(1375.8854 1474.1589)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="12.52214" y="15" xml:space="preserve">Remotes for Alternate Content Sources</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="59.694016" y="34" xml:space="preserve">do </tspan>
+            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">not</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> support mirrorlists</tspan>
+          </text>
+        </g>
+        <g id="Graphic_252">
+          <text transform="translate(1430.4844 1609.514)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="15" xml:space="preserve">Alternate Content Sources</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="34" xml:space="preserve"> • Do </tspan>
+            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">not</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> have </tspan>
+            <tspan font-family="Trebuchet MS" font-style="italic" font-size="16" fill="black" y="34" xml:space="preserve">versions</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve">, </tspan>
+            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">nor</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> </tspan>
+            <tspan font-family="Trebuchet MS" font-style="italic" font-size="16" fill="black" y="34" xml:space="preserve">publications</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> </tspan>
+            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">nor</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> </tspan>
+            <tspan font-family="Trebuchet MS" font-style="italic" font-size="16" fill="black" y="34" xml:space="preserve">distributions</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve">: (meta-)data is always whatever was available on last refresh.</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="53" xml:space="preserve"> • Have a global scope and are not tied to a specific repo: all ACS will be taken into account when requesting content from any repository (version)</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="72" xml:space="preserve"> • Have priority: when content is not available from any ACS, then Pulp will try to fetch it from the the repository (remotes).</tspan>
           </text>
         </g>
       </g>
-      <g id="Group_200">
-        <g id="Graphic_196">
-          <path d="M 1566.5 1333.5 L 1812.5 1333.5 C 1817.4706 1333.5 1821.5 1337.5294 1821.5 1342.5 L 1821.5 1377.5 C 1821.5 1382.4706 1817.4706 1386.5 1812.5 1386.5 L 1566.5 1386.5 C 1561.5294 1386.5 1557.5 1382.4706 1557.5 1377.5 L 1557.5 1342.5 C 1557.5 1337.5294 1561.5294 1333.5 1566.5 1333.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+      <g id="Group_307">
+        <g id="Group_304">
+          <g id="Graphic_306">
+            <text transform="translate(953.5862 794.263)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="0" y="23" xml:space="preserve">Remote (single repo URL or list of mirrors)</tspan>
+            </text>
+          </g>
+          <g id="Graphic_305">
+            <path d="M 948.8012 781.763 L 1438.3712 781.763 C 1443.3417 781.763 1447.3712 785.7925 1447.3712 790.763 L 1447.3712 825.763 C 1447.3712 830.7336 1443.3417 834.763 1438.3712 834.763 L 948.8012 834.763 C 943.8306 834.763 939.8012 830.7336 939.8012 825.763 L 939.8012 790.763 C 939.8012 785.7925 943.8306 781.763 948.8012 781.763 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
         </g>
-        <g id="Graphic_195">
-          <text transform="translate(1564.6694 1346)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="9.289604" y="23" xml:space="preserve">Repository Version 2</tspan>
+        <g id="Group_301">
+          <g id="Graphic_303">
+            <path d="M 1129.8225 952.4297 L 1257.3498 952.4297 C 1262.3204 952.4297 1266.3498 956.4591 1266.3498 961.4297 L 1266.3498 996.4297 C 1266.3498 1001.4003 1262.3204 1005.4297 1257.3498 1005.4297 L 1129.8225 1005.4297 C 1124.8519 1005.4297 1120.8225 1001.4003 1120.8225 996.4297 L 1120.8225 961.4297 C 1120.8225 956.4591 1124.8519 952.4297 1129.8225 952.4297 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_302">
+            <text transform="translate(1130.1612 964.9297)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="3.5889816" y="23" xml:space="preserve">Repository</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_300">
+          <line x1="1193.5862" y1="834.763" x2="1193.5862" y2="936.5297" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Group_287">
+          <g id="Group_290">
+            <g id="Group_297">
+              <g id="Graphic_299">
+                <path d="M 955.42 957.3097 L 944.18 957.3097 L 944.18 985.7097 L 962.35 985.7097 L 962.35 963.9597 L 955.42 963.9597 Z" fill="white"/>
+                <path d="M 955.42 957.3097 L 944.18 957.3097 L 944.18 985.7097 L 962.35 985.7097 L 962.35 963.9597 L 955.42 963.9597 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+              <g id="Graphic_298">
+                <path d="M 955.42 957.3097 L 955.42 963.9597 L 962.35 963.9597 Z" fill="white"/>
+                <path d="M 955.42 957.3097 L 955.42 963.9597 L 962.35 963.9597 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+            </g>
+            <g id="Group_294">
+              <g id="Graphic_296">
+                <path d="M 948.28 963.7297 L 937.04 963.7297 L 937.04 992.1297 L 955.21 992.1297 L 955.21 970.3797 L 948.28 970.3797 Z" fill="white"/>
+                <path d="M 948.28 963.7297 L 937.04 963.7297 L 937.04 992.1297 L 955.21 992.1297 L 955.21 970.3797 L 948.28 970.3797 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+              <g id="Graphic_295">
+                <path d="M 948.28 963.7297 L 948.28 970.3797 L 955.21 970.3797 Z" fill="white"/>
+                <path d="M 948.28 963.7297 L 948.28 970.3797 L 955.21 970.3797 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+            </g>
+            <g id="Group_291">
+              <g id="Graphic_293">
+                <path d="M 941.14 970.1397 L 929.9 970.1397 L 929.9 998.5497 L 948.07 998.5497 L 948.07 976.7997 L 941.14 976.7997 Z" fill="white"/>
+                <path d="M 941.14 970.1397 L 929.9 970.1397 L 929.9 998.5497 L 948.07 998.5497 L 948.07 976.7997 L 941.14 976.7997 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+              <g id="Graphic_292">
+                <path d="M 941.14 970.1397 L 941.14 976.7997 L 948.07 976.7997 Z" fill="white"/>
+                <path d="M 941.14 970.1397 L 941.14 976.7997 L 948.07 976.7997 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+          <g id="Graphic_289">
+            <path d="M 929.5 952.4297 L 1039.5 952.4297 C 1044.4706 952.4297 1048.5 956.4591 1048.5 961.4297 L 1048.5 996.4297 C 1048.5 1001.4003 1044.4706 1005.4297 1039.5 1005.4297 L 929.5 1005.4297 C 924.5294 1005.4297 920.5 1001.4003 920.5 996.4297 L 920.5 961.4297 C 920.5 956.4591 924.5294 952.4297 929.5 952.4297 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_288">
+            <text transform="translate(981.5 964.9297)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="0" y="23" xml:space="preserve">Files</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_286">
+          <line x1="1048.5" y1="978.9297" x2="1104.9225" y2="978.9297" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_285">
+          <text transform="translate(1053.5 957.4297)" fill="black">
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="14.965626" y="15" xml:space="preserve">add</tspan>
+          </text>
+        </g>
+        <g id="Graphic_284">
+          <text transform="translate(1187.5 884.0964)" fill="black">
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="12.578907" y="15" xml:space="preserve">sync</tspan>
+          </text>
+        </g>
+        <g id="Group_281">
+          <g id="Graphic_283">
+            <path d="M 1566.5 895.4297 L 1812.5 895.4297 C 1817.4706 895.4297 1821.5 899.4591 1821.5 904.4297 L 1821.5 939.4297 C 1821.5 944.4003 1817.4706 948.4297 1812.5 948.4297 L 1566.5 948.4297 C 1561.5294 948.4297 1557.5 944.4003 1557.5 939.4297 L 1557.5 904.4297 C 1557.5 899.4591 1561.5294 895.4297 1566.5 895.4297 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_282">
+            <text transform="translate(1564.6694 907.9297)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="9.289604" y="23" xml:space="preserve">Repository Version 1</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_274">
+          <path d="M 1266.3498 965.6797 C 1306.0998 967.8682 1317.5 965.4297 1342.5 932.4297 C 1365.083 902.6201 1484.7685 918.5059 1541.6063 921.4876" marker-end="url(#FilledArrow_Marker_2)" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_271">
+          <text transform="translate(1330.5 938.4297)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="28.371094" y="15" xml:space="preserve">Each </tspan>
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" y="15" xml:space="preserve">sync</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="15" xml:space="preserve"> or </tspan>
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" y="15" xml:space="preserve">add</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="15" xml:space="preserve"> creates</tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="30.054688" y="34" xml:space="preserve">a new Repository Version</tspan>
+          </text>
+        </g>
+        <g id="Group_268">
+          <g id="Graphic_270">
+            <path d="M 2104.5 895.4297 L 2268.5 895.4297 C 2273.4706 895.4297 2277.5 899.4591 2277.5 904.4297 L 2277.5 939.4297 C 2277.5 944.4003 2273.4706 948.4297 2268.5 948.4297 L 2104.5 948.4297 C 2099.5294 948.4297 2095.5 944.4003 2095.5 939.4297 L 2095.5 904.4297 C 2095.5 899.4591 2099.5294 895.4297 2104.5 895.4297 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_269">
+            <text transform="translate(2101.9956 907.9297)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="10.70562" y="23" xml:space="preserve">Publication X</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Line_267">
+          <path d="M 1821.5 921.9297 C 1833.3837 922.205 2022.234 922.4861 2079.6028 922.1333" marker-end="url(#FilledArrow_Marker_3)" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_266">
+          <text transform="translate(1833.5 933.4297)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="22.898438" y="15" xml:space="preserve">Add meta data required by </tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="2.7070312" y="34" xml:space="preserve">clients to consume content from </tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="49.378906" y="53" xml:space="preserve">repository (version)</tspan>
+          </text>
+        </g>
+        <g id="Group_260">
+          <g id="Graphic_262">
+            <path d="M 2431.5 975.4297 L 2595.5 975.4297 C 2600.4706 975.4297 2604.5 979.4591 2604.5 984.4297 L 2604.5 1019.4297 C 2604.5 1024.4003 2600.4706 1028.4297 2595.5 1028.4297 L 2431.5 1028.4297 C 2426.5294 1028.4297 2422.5 1024.4003 2422.5 1019.4297 L 2422.5 984.4297 C 2422.5 979.4591 2426.5294 975.4297 2431.5 975.4297 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+          </g>
+          <g id="Graphic_261">
+            <text transform="translate(2428.9956 987.9297)" fill="black">
+              <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="18.29937" y="23" xml:space="preserve">Distribution </tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Graphic_259">
+          <text transform="translate(1833.5 895.4297)" fill="black">
+            <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="92.28906" y="15" xml:space="preserve">Publish</tspan>
+          </text>
+        </g>
+        <g id="Line_257">
+          <path d="M 2277.5 921.9297 C 2307.25 921.6797 2340 922.4297 2347.5 960.4297 C 2353.3403 990.0207 2384.4975 990.6566 2406.6187 989.4889" marker-end="url(#FilledArrow_Marker_5)" stroke="#003776" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+        </g>
+        <g id="Graphic_255">
+          <text transform="translate(2317 905.4297)" fill="black">
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="3.6953125" y="15" xml:space="preserve">Distribution serves a publication </tspan>
+            <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="30.859375" y="34" xml:space="preserve">via a stable HTTP(S) URL</tspan>
           </text>
         </g>
       </g>
-      <g id="Group_201">
-        <g id="Graphic_198">
-          <path d="M 1566.5 1413.5 L 1812.5 1413.5 C 1817.4706 1413.5 1821.5 1417.5294 1821.5 1422.5 L 1821.5 1457.5 C 1821.5 1462.4706 1817.4706 1466.5 1812.5 1466.5 L 1566.5 1466.5 C 1561.5294 1466.5 1557.5 1462.4706 1557.5 1457.5 L 1557.5 1422.5 C 1557.5 1417.5294 1561.5294 1413.5 1566.5 1413.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-        </g>
-        <g id="Graphic_197">
-          <text transform="translate(1564.6694 1426)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="9.289604" y="23" xml:space="preserve">Repository Version 3</tspan>
-          </text>
-        </g>
-      </g>
-      <g id="Line_202">
-        <path d="M 1266.3498 1323.75 C 1306.0998 1325.9385 1317.5 1323.5 1342.5 1290.5 C 1365.083 1260.6904 1484.7685 1276.5762 1541.6063 1279.5579" marker-end="url(#FilledArrow_Marker_2)" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Line_203">
-        <path d="M 1266.3498 1350.25 C 1306.0998 1352.4385 1338.5 1365.5 1339.5 1403.5 C 1340.3858 1437.1619 1487.2282 1439.4353 1541.5976 1439.8633" marker-end="url(#FilledArrow_Marker_2)" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Line_204">
-        <path d="M 1266.3498 1337 C 1306.0998 1339.1885 1340.5 1330.5 1353.5 1350.5 C 1364.7404 1367.793 1493.5436 1363.0312 1541.6185 1360.779" marker-end="url(#FilledArrow_Marker_2)" stroke="#005c5d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Graphic_205">
-        <text transform="translate(1330.5 1296.5)" fill="black">
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="28.371094" y="15" xml:space="preserve">Each </tspan>
-          <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" y="15" xml:space="preserve">sync</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="15" xml:space="preserve"> or </tspan>
-          <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" y="15" xml:space="preserve">add</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="15" xml:space="preserve"> creates</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="30.054688" y="34" xml:space="preserve">a new Repository Version</tspan>
-        </text>
-      </g>
-      <g id="Group_206">
-        <g id="Graphic_208">
-          <path d="M 2104.5 1253.5 L 2268.5 1253.5 C 2273.4706 1253.5 2277.5 1257.5294 2277.5 1262.5 L 2277.5 1297.5 C 2277.5 1302.4706 2273.4706 1306.5 2268.5 1306.5 L 2104.5 1306.5 C 2099.5294 1306.5 2095.5 1302.4706 2095.5 1297.5 L 2095.5 1262.5 C 2095.5 1257.5294 2099.5294 1253.5 2104.5 1253.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-        </g>
-        <g id="Graphic_207">
-          <text transform="translate(2101.9956 1266)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="10.70562" y="23" xml:space="preserve">Publication X</tspan>
-          </text>
-        </g>
-      </g>
-      <g id="Line_209">
-        <path d="M 1821.5 1280 C 1833.3837 1280.2754 2022.234 1280.5564 2079.6028 1280.2036" marker-end="url(#FilledArrow_Marker_3)" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Graphic_210">
-        <text transform="translate(1833.5 1291.5)" fill="black">
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="22.898438" y="15" xml:space="preserve">Add meta data required by </tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="2.7070312" y="34" xml:space="preserve">clients to consume content from </tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="49.378906" y="53" xml:space="preserve">repository (version)</tspan>
-        </text>
-      </g>
-      <g id="Graphic_219">
-        <path d="M 2104.5 1413.5 L 2268.5 1413.5 C 2273.4706 1413.5 2277.5 1417.5294 2277.5 1422.5 L 2277.5 1457.5 C 2277.5 1462.4706 2273.4706 1466.5 2268.5 1466.5 L 2104.5 1466.5 C 2099.5294 1466.5 2095.5 1462.4706 2095.5 1457.5 L 2095.5 1422.5 C 2095.5 1417.5294 2099.5294 1413.5 2104.5 1413.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-      </g>
-      <g id="Graphic_218">
-        <text transform="translate(2101.9956 1426)" fill="black">
-          <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="10.770073" y="23" xml:space="preserve">Publication Y</tspan>
-        </text>
-      </g>
-      <g id="Line_216">
-        <path d="M 1821.5 1440 C 1833.3837 1440.2754 2022.234 1440.5564 2079.6028 1440.2036" marker-end="url(#FilledArrow_Marker_3)" stroke="#b1001c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Group_223">
-        <g id="Graphic_225">
-          <path d="M 2431.5 1333.5 L 2595.5 1333.5 C 2600.4706 1333.5 2604.5 1337.5294 2604.5 1342.5 L 2604.5 1377.5 C 2604.5 1382.4706 2600.4706 1386.5 2595.5 1386.5 L 2431.5 1386.5 C 2426.5294 1386.5 2422.5 1382.4706 2422.5 1377.5 L 2422.5 1342.5 C 2422.5 1337.5294 2426.5294 1333.5 2431.5 1333.5 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-        </g>
-        <g id="Graphic_224">
-          <text transform="translate(2428.9956 1346)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="18.29937" y="23" xml:space="preserve">Distribution </tspan>
-          </text>
-        </g>
-      </g>
-      <g id="Graphic_226">
-        <text transform="translate(1833.5 1253.5)" fill="black">
-          <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="92.28906" y="15" xml:space="preserve">Publish</tspan>
-        </text>
-      </g>
-      <g id="Graphic_227">
-        <text transform="translate(1833.5 1371.5)" fill="black">
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="4.3828125" y="15" xml:space="preserve">Not all Repository Versions must </tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="9.933594" y="34" xml:space="preserve">be published; here we skipped </tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="47.160156" y="53" xml:space="preserve">Repository Version 2</tspan>
-        </text>
-      </g>
-      <g id="Line_228">
-        <path d="M 2277.5 1280 C 2307.25 1279.75 2340 1280.5 2347.5 1318.5 C 2353.3403 1348.091 2384.4975 1348.7269 2406.6187 1347.5593" marker-end="url(#FilledArrow_Marker_4)" stroke="#003776" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Line_229">
-        <path d="M 2277.5 1440 C 2307.25 1439.75 2347.166 1441.7559 2353.5664 1409.5 C 2358.5117 1384.5773 2385.9237 1377.273 2406.6656 1374.6634" marker-end="url(#FilledArrow_Marker_5)" stroke="#b34400" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Graphic_230">
-        <text transform="translate(2317 1263.5)" fill="black">
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="3.6953125" y="15" xml:space="preserve">Distribution serves a publication </tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="30.859375" y="34" xml:space="preserve">via a stable HTTP(S) URL</tspan>
-        </text>
-      </g>
-      <g id="Graphic_231">
-        <text transform="translate(2346 1411.5)" fill="black">
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="15.894531" y="15" xml:space="preserve">Linking the Distribution to another Publication</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="1.90625" y="34" xml:space="preserve">to update Pulp clients to a new Repository Version</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="78.58594" y="53" xml:space="preserve">(or roll back to an older one)</tspan>
-        </text>
-      </g>
-      <g id="Graphic_234">
-        <text transform="translate(1282 1050.349)" fill="#666">
+      <g id="Graphic_253">
+        <text transform="translate(1282 692.27865)" fill="#666">
           <tspan font-family="Trebuchet MS" font-weight="bold" font-size="48" fill="#666" x="165.63281" y="45" xml:space="preserve">Pulp repo management concepts</tspan>
-        </text>
-      </g>
-      <g id="Group_250">
-        <g id="Graphic_246">
-          <path d="M 1045.5601 1529.213 L 1341.6122 1529.213 C 1346.5828 1529.213 1350.6122 1533.2425 1350.6122 1538.213 L 1350.6122 1573.213 C 1350.6122 1578.1836 1346.5828 1582.213 1341.6122 1582.213 L 1045.5601 1582.213 C 1040.5896 1582.213 1036.5601 1578.1836 1036.5601 1573.213 L 1036.5601 1538.213 C 1036.5601 1533.2425 1040.5896 1529.213 1045.5601 1529.213 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-        </g>
-        <g id="Graphic_247">
-          <text transform="translate(1047.4292 1541.713)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="3.322937" y="23" xml:space="preserve">Remote (single repo URL)</tspan>
-          </text>
-        </g>
-      </g>
-      <g id="Group_251">
-        <g id="Graphic_244">
-          <path d="M 1009.7421 1691.5682 L 1377.4303 1691.5682 C 1382.4008 1691.5682 1386.4303 1695.5976 1386.4303 1700.5682 L 1386.4303 1735.5682 C 1386.4303 1740.5388 1382.4008 1744.5682 1377.4303 1744.5682 L 1009.7421 1744.5682 C 1004.7715 1744.5682 1000.7421 1740.5388 1000.7421 1735.5682 L 1000.7421 1700.5682 C 1000.7421 1695.5976 1004.7715 1691.5682 1009.7421 1691.5682 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-        </g>
-        <g id="Graphic_243">
-          <text transform="translate(1015.4778 1704.0682)" fill="black">
-            <tspan font-family="Trebuchet MS" font-weight="bold" font-size="24" fill="black" x="1.7984924" y="23" xml:space="preserve">Alternate Content Source (ACS)</tspan>
-          </text>
-        </g>
-      </g>
-      <g id="Line_241">
-        <line x1="1193.5862" y1="1582.213" x2="1193.5862" y2="1675.6682" marker-end="url(#FilledArrow_Marker)" stroke="#666" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-      </g>
-      <g id="Graphic_240">
-        <text transform="translate(1199.5 1627.3906)" fill="black">
-          <tspan font-family="Trebuchet MS" font-style="italic" font-weight="bold" font-size="16" fill="black" x="1.7742195" y="15" xml:space="preserve">refresh</tspan>
-        </text>
-      </g>
-      <g id="Graphic_249">
-        <text transform="translate(1375.8854 1536.713)" fill="black">
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="12.52214" y="15" xml:space="preserve">Remotes for Alternate Content Sources</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="59.694016" y="34" xml:space="preserve">do </tspan>
-          <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">not</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> support mirrorlists</tspan>
-        </text>
-      </g>
-      <g id="Graphic_252">
-        <text transform="translate(1430.4844 1672.0682)" fill="black">
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="15" xml:space="preserve">Alternate Content Sources</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="34" xml:space="preserve"> • Do </tspan>
-          <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">not</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> have </tspan>
-          <tspan font-family="Trebuchet MS" font-style="italic" font-size="16" fill="black" y="34" xml:space="preserve">versions</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve">, </tspan>
-          <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">nor</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> </tspan>
-          <tspan font-family="Trebuchet MS" font-style="italic" font-size="16" fill="black" y="34" xml:space="preserve">publications</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> </tspan>
-          <tspan font-family="Trebuchet MS" font-weight="bold" font-size="16" fill="black" y="34" xml:space="preserve">nor</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve"> </tspan>
-          <tspan font-family="Trebuchet MS" font-style="italic" font-size="16" fill="black" y="34" xml:space="preserve">distributions</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" y="34" xml:space="preserve">: (meta-)data is always whatever was available on last refresh.</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="53" xml:space="preserve"> • Have a global scope and are not tied to a specific repo: all ACS will be taken into account when requesting content from any repository (version)</tspan>
-          <tspan font-family="Trebuchet MS" font-size="16" fill="black" x="0" y="72" xml:space="preserve"> • Have priority: when content is not available from any ACS, then Pulp will try to fetch it from the the repository (remotes).</tspan>
         </text>
       </g>
     </g>
