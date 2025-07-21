@@ -64,7 +64,7 @@ Become the data manager
 
 ### Bundling
 
-Optional, but highly recommended:
+Optional, but be aware that upload to an archive system should be in average well above 1GB per file:
 Prepare the data by merging multiple files/folders
  into one compressed **tar** file.
 
