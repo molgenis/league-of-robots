@@ -5,7 +5,7 @@ Table of Contents:
 * [Intro](#-intro): About Pulp, concepts and documentation.
 * [Create Server](#-create-server): Create VM for Pulp with Ansible.
 * [Install and configure with Ansible](#-install-and-configure-with-ansible): Deploy Pulp & configure repositories both with Ansible.
-* [Maintenance](#-maintenance): Various manual Pulp maintenance tasks.
+* [Maintenance](#-various-manual-pulp-maintenance-tasks): Various manual Pulp maintenance tasks.
 * [Configure manually with API](#-configure-manually-with-api): configure repositories manually using the Pulp API.
 
 ---
