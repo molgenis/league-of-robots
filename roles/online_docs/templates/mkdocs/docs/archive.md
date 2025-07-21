@@ -93,9 +93,8 @@ this will result (in comparison to the option a)
 
 ### Local checksum
 
-(highly recommended) Creata a checksum of the file data content. This _fingerprint_ can
-be later compared to check that the file content was successfully uploaded to archive and
-when downloading it back, that it was correctly restored.
+(highly recommended) Create a checksum of the file. This _fingerprint_ can
+be checked later to verify that the file was successfully uploaded to the archive and that it was correctly restored when when downloading it back from the archive.
 ```
    dm-user $ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
 ```
