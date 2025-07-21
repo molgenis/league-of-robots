@@ -99,7 +99,7 @@ be checked later to verify that the file was successfully uploaded to the archiv
    dm-user $ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
 ```
 
-In order to speed up the checkup process when checking on the remote storage side, it is
+To expedite the checksum verification process on the remote storage side, it is
 recommended to use **`sha256sum`** for making a fingerprint.
 
 ### Uploading
