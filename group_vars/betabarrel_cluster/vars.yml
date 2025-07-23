@@ -234,7 +234,7 @@ regular_users:
   - name: 'umcg-gap-dm'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
   - name: 'umcg-gd-ateambot'
-    groups: ['umcg-gd', 'umcg-gap', "{{ functional_users_group }}"]
+    groups: ['umcg-gd', 'umcg-gap', 'umcg-ogm', "{{ functional_users_group }}"]
   - name: 'umcg-gd-dm'
     groups: ['umcg-gd', "{{ functional_users_group }}"]
   - name: 'umcg-genomescan-ateambot'
