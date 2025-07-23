@@ -36,7 +36,7 @@
     desired_auto_mounts: "{{ desired_auto_mounts | default([])  + [ item.0.local_top_level_mount | regex_replace('\/', '') + '-'
         + item.1 | regex_replace('-', '\\\\x2d') + '-' + item.0.name | regex_replace('-', '\\\\x2d')] }}"
   with_subelements:
-    - "{{ archive_groups | default([], true) | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'groups'
 
 - name: Set disable_auto_mounts
@@ -122,7 +122,7 @@
     test -d "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}" \
       && test -x "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}"
   with_subelements:
-    - "{{ archive_groups | default([], true) }}"
+    - "{{ remote_archive | default([], true) }}"
     - groups
   register: folder_test
   failed_when: folder_test.rc != 0
@@ -133,7 +133,7 @@
     test -d "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}/{{ item.1 }}" \
       && test -x "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}/{{ item.1 }}"
   with_subelements:
-    - "{{ archive_groups | default([], true) }}"
+    - "{{ remote_archive | default([], true) }}"
     - groups
   register: subfolder_test
   failed_when: subfolder_test.rc != 0
@@ -153,10 +153,10 @@
     path: "/{{ item.0.local_top_level_mount | regex_replace('\/', '') }}/{{ item.1 }}/{{ item.0.name }}"
     mode: "2750"
     state: "directory"
-  when: archive_groups | default([], true) | length >= 1
+  when: remote_archive | default([], true) | length >= 1
   register: created_mount_point
   with_subelements:
-    - "{{ archive_groups | default([], true) | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'groups'
   become: true
 ...

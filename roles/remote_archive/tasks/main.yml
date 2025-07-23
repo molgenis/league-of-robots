@@ -3,14 +3,14 @@
   ansible.builtin.include_tasks:
     file: automounts.yml
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
 
 - name: Configure ssh and sshfs
   ansible.builtin.include_tasks:
     file: sshfs.yml
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
 
 - name: Create mount files from templates
@@ -23,14 +23,14 @@
     group: root
     mode: "0644"
   with_subelements:
-    - "{{ archive_groups | default([], true) | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'groups'
   notify:
     - 'archive_systemd_reload'
     - 'archive_mount_stop'
     - 'archive_automount_enable'
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
@@ -44,14 +44,14 @@
     group: root
     mode: "0644"
   with_subelements:
-    - "{{ archive_groups | default([], true) | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'groups'
   notify:
     - 'archive_systemd_reload'
     - 'archive_mount_stop'
     - 'archive_automount_enable'
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
@@ -59,6 +59,6 @@
   ansible.builtin.include_tasks:
     file: recall.yml
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
 ...
