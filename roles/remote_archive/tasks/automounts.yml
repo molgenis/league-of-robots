@@ -70,8 +70,8 @@
 
 - name: Set auto_mounts_existing_marked that contains only basenames
   ansible.builtin.set_fact:
-    auto_mounts_existing_marked: "{{ auto_mounts_existing_marked | default([]) + [ item | basename
-          | regex_replace('\\.(mount|automount)+$', '') ] }}"
+    auto_mounts_existing_marked: "{{ auto_mounts_existing_marked | default([]) + [item | basename
+          | regex_replace('\\.(mount|automount)+$', '')] }}"
   loop: "{{ auto_mounts_tagged_files }}"
 
 - name: Print basename files that contains tags (auto_mounts_existing_marked)
@@ -150,6 +150,8 @@
 - name: Remove mountpoint directories
   ansible.builtin.command: rmdir "/{{ item }}"
   with_items: "{{ remove_mountpoints }}"
+  register: rmdir_register
+  changed_when: rmdir_register.rc == 0
   when: remove_mountpoints is defined and remove_mountpoints | length > 0
   become: true
 
