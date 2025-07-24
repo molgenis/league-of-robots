@@ -54,8 +54,7 @@
     grep -l 'ansible_remote_archive' "{{ item.path }}"
   register: auto_mounts_grep
   changed_when: false
-  failed_when: false
-  ignore_errors: true
+  failed_when: auto_mounts_grep.rc >= 2
   loop: "{{ auto_mounts_all_existing.files }}"
   loop_control:
     label: "{{ item.path }}"
@@ -153,10 +152,8 @@
   when: remove_mountpoints is defined and remove_mountpoints | length > 0
   become: true
 
-- name: Check if mountpoint directories exist
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
+- name: Remove mountpoint directories
+  ansible.builtin.command: rmdir "/{{ item }}"
   with_items: "{{ remove_mountpoints }}"
   when: remove_mountpoints is defined and remove_mountpoints | length > 0
   become: true
