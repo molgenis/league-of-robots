@@ -79,14 +79,9 @@
     msg: "{{ auto_mounts_existing_marked }}"
   when: auto_mounts_tagged_files is defined and auto_mounts_tagged_files | length > 0
 
-- name: Set auto_mounts_existing_marked_formatted
-  ansible.builtin.set_fact:
-    auto_mounts_existing_marked_formatted: "{{ auto_mounts_existing_marked_formatted | default([]) + [ item ] }}"
-  with_items: "{{ auto_mounts_existing_marked }}"
-
 - name: Set auto_mounts_existing_unique
   ansible.builtin.set_fact:
-    auto_mounts_existing_unique: "{{ auto_mounts_existing_marked_formatted | default([]) | unique }}"
+    auto_mounts_existing_unique: "{{ auto_mounts_existing_marked | default([]) | unique }}"
 
 - name: Print auto_mounts_existing_unique
   ansible.builtin.debug:
