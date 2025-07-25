@@ -35,7 +35,7 @@ nav:
 {% if groups['data_transfer'] is defined and groups['data_transfer'] | length >= 1 %}
     - 'Data transfers - Using a dedicated data transfer server': 'dedicated-dt-server-overview.md'
 {% endif %}
-{% if archive_groups is defined and archive_groups | length >= 1 %}
+{% if remote_archive is defined and remote_archive | length >= 1 %}
     - 'Archive - Using a remote archive storage': 'archive.md'
 {% endif %}
   - Compute:

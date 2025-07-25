@@ -1,6 +1,6 @@
 #jinja2: trim_blocks:False
 
-{% if archive_groups is defined and archive_groups | length >= 1 %}
+{% if remote_archive is defined and remote_archive | length >= 1 %}
 
 # Using remote archive storage
 

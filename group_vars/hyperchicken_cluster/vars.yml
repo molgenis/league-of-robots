@@ -110,7 +110,7 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 # Remote archive settings
-archive_groups:
+remote_archive:
   - name: arc01
     local_top_level_mount: '/groups'
     groups:
