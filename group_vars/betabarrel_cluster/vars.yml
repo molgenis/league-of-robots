@@ -319,59 +319,59 @@ sudoers:
   - who: ['%umcg-vipt']
     become: 'umcg-vipt-dm'
 remote_users_in_local_groups:
-  - user: 'benjaminsm'
+  - name: 'benjaminsm'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'bijlsmam'
+  - name: 'bijlsmam'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'charbonb'
+  - name: 'charbonb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
         'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
-  - user: 'cimermans'
+  - name: 'cimermans'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'hendriksend'
+  - name: 'hendriksend'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
         'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
-  - user: 'langek'
+  - name: 'langek'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'kanningaroj'
+  - name: 'kanningaroj'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'neerincxp'
+  - name: 'neerincxp'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'vriesgb'
+  - name: 'vriesgb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
