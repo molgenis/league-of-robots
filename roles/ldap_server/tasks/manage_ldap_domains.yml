@@ -18,7 +18,7 @@
   become: true
 
 - name: Find databases
-  set_fact:
+  ansible.builtin.set_fact:
     ldap_db_index: "{{ ldap_db_index_out.stdout }}"
 
 - name: 'Create database for "{{ ldap_domain }}" domain in the OpenLDAP config database.'
