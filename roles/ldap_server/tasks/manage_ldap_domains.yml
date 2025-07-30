@@ -8,10 +8,23 @@
     group: ldap
   become: true
 
+- name: Find database index
+  ansible.builtin.shell: >
+    set -euo pipefail;
+    grep -rl '"{{ ldap_domains[ldap_domain]['base'] }}"' /usr/local/openldap/etc/openldap/slapd.d/cn\=config/*mdb* |
+    sed 's/.*olcDatabase={\([0-9]\+\)}mdb.ldif/\1/'
+  register: ldap_db_index_out
+  changed_when: false
+  become: true
+
+- name: Find databases
+  set_fact:
+    ldap_db_index: "{{ ldap_db_index_out.stdout }}"
+
 - name: 'Create database for "{{ ldap_domain }}" domain in the OpenLDAP config database.'
   community.general.ldap_entry:
     server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_domains[ldap_domain]['ldap_db_index'] }}{% raw %}}{% endraw %}mdb,cn=config"
+    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
     state: present
     objectClass:
       - olcDatabaseConfig
@@ -20,7 +33,7 @@
       #
       # These attributes cannot be changed with this role.
       #
-      olcDatabase: "{% raw %}{{% endraw %}{{ ldap_domains[ldap_domain]['ldap_db_index'] }}{% raw %}}{% endraw %}mdb"
+      olcDatabase: "{% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb"
       olcDbDirectory: "/usr/local/openldap/var/{{ ldap_domain }}-data"
       olcSuffix: "{{ ldap_domains[ldap_domain]['base'] }}"
   become: true
@@ -28,7 +41,7 @@
 - name: 'Update "{{ ldap_domain }}" database attributes in the OpenLDAP config database.'
   community.general.ldap_attrs:
     server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_domains[ldap_domain]['ldap_db_index'] }}{% raw %}}{% endraw %}mdb,cn=config"
+    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
     state: exact
     attributes:
       olcDbMode: '0600'
@@ -48,7 +61,7 @@
 - name: 'Update OpenLDAP config database to create memberOf overlay for dynamic memberOf attributes in "{{ ldap_domain }}" database.'
   community.general.ldap_entry:
     server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcOverlay={0}memberof,olcDatabase={% raw %}{{% endraw %}{{ ldap_domains[ldap_domain]['ldap_db_index'] }}{% raw %}}{% endraw %}mdb,cn=config"
+    dn: "olcOverlay={0}memberof,olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
     state: present
     objectClass:
       - olcOverlayConfig
@@ -70,7 +83,7 @@
 - name: 'Update "{{ ldap_domain }}" database ACLs in the OpenLDAP config database.'
   community.general.ldap_attrs:
     server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_domains[ldap_domain]['ldap_db_index'] }}{% raw %}}{% endraw %}mdb,cn=config"
+    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
     state: exact
     ordered: true
     attributes:
@@ -126,7 +139,7 @@
 - name: 'Configure replication provider for "{{ ldap_domain }}" database.'
   community.general.ldap_attrs:
     server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_domains[ldap_domain]['ldap_db_index'] }}{% raw %}}{% endraw %}mdb,cn=config"
+    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
     state: exact
     ordered: true
     attributes:
