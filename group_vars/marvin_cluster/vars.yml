@@ -50,7 +50,6 @@ ldap_domains:
     user_member_of: memberOf
     group_member: member
     create_ldap: true
-    ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
 cloud_image: CentOS-7-x86_64-GenericCloud-2211
 cloud_user: centos
 availability_zone: nova
