@@ -8,155 +8,177 @@
     group: ldap
   become: true
 
-- name: Find database index
+- name: "Find {{ ldap_domains[ldap_domain]['base'] }} database index"
   ansible.builtin.shell: >
     set -euo pipefail;
-    grep -rl '"{{ ldap_domains[ldap_domain]['base'] }}"' /usr/local/openldap/etc/openldap/slapd.d/cn\=config/*mdb* |
-    sed 's/.*olcDatabase={\([0-9]\+\)}mdb.ldif/\1/'
-  register: ldap_db_index_out
+    _dir='/usr/local/openldap/etc/openldap/slapd.d/cn=config' && test -d "${_dir}";
+    grep -rl '"{{ ldap_domains[ldap_domain]['base'] }}"' "${_dir}"/*mdb* | sed 's/.*={\([0-9]\+\)}mdb.ldif/\1/'
+  register: found_db_index
+  failed_when: found_db_index.rc >= 2
   changed_when: false
   become: true
 
-- name: Find databases
-  ansible.builtin.set_fact:
-    ldap_db_index: "{{ ldap_db_index_out.stdout }}"
-
-- name: 'Create database for "{{ ldap_domain }}" domain in the OpenLDAP config database.'
-  community.general.ldap_entry:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
-    state: present
-    objectClass:
-      - olcDatabaseConfig
-      - olcMdbConfig
-    attributes:
-      #
-      # These attributes cannot be changed with this role.
-      #
-      olcDatabase: "{% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb"
-      olcDbDirectory: "/usr/local/openldap/var/{{ ldap_domain }}-data"
-      olcSuffix: "{{ ldap_domains[ldap_domain]['base'] }}"
+- name: 'Find maximum index number of all databases'
+  ansible.builtin.shell: >
+    set -euo pipefail;
+    _dir='/usr/local/openldap/etc/openldap/slapd.d/cn=config' && test -d "${_dir}";
+    echo $(( $(ls -1 "${_dir}" | grep -o '\{[0-9-]\+\}' | grep -o '[0-9-]\+' | sort -n | tail -n1) + 1 )) || echo 1
+  register: ldap_max_index
+  changed_when: false
   become: true
 
-- name: 'Update "{{ ldap_domain }}" database attributes in the OpenLDAP config database.'
-  community.general.ldap_attrs:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
-    state: exact
-    attributes:
-      olcDbMode: '0600'
-      olcDbMaxSize: 104857600
-      olcRootDN: "cn=manager,{{ ldap_domains[ldap_domain]['base'] }}"
-      olcRootPW: "{{ openldap_root_hash }}"
-      olcLimits: '{0}users size=unlimited time=unlimited'
-      olcMonitoring: 'TRUE'
-      olcDbNoSync: 'FALSE'
-      olcDbIndex:
-        - objectClass eq
-        - cn,givenName,sn,mail pres,eq,sub
-        - uid pres,eq
-        - member eq
-  become: true
+- name: test
+  vars:
+    this_database_number: >-
+      {% if found_db_index.rc == 0 and found_db_index.stdout | int %}{{ found_db_index.stdout }}{% else %}{{ ldap_max_index.stdout }}{% endif %}
+    this_database: "{% raw %}{{% endraw %}{{ this_database_number }}{% raw %}}{% endraw %}"
+  block:
+    - name: debug
+      debug:
+        msg: "this_database={{ this_database }}"
 
-- name: 'Update OpenLDAP config database to create memberOf overlay for dynamic memberOf attributes in "{{ ldap_domain }}" database.'
-  community.general.ldap_entry:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcOverlay={0}memberof,olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
-    state: present
-    objectClass:
-      - olcOverlayConfig
-      - olcMemberOf
-    attributes:
-      #
-      # These attributes cannot be changed with this role.
-      #
-      olcOverlay: '{0}memberof'
-      #
-      # These attributes can be changed.
-      #
-      olcMemberOfRefInt: 'TRUE'
-      olcMemberOfGroupOC: groupOfMembers
-      olcMemberOfMemberAD: member
-      olcMemberOfMemberOfAD: memberOf
-  become: true
+- name: Configure OpenLDAP databases
+  vars:
+    this_database_number: >-
+      {% if found_db_index.rc == 0 and found_db_index.stdout | int %}{{ found_db_index.stdout }}{% else %}{{ ldap_max_index.stdout }}{% endif %}
+    this_database: "{% raw %}{{% endraw %}{{ this_database_number }}{% raw %}}{% endraw %}"
+  block:
+    - name: 'Create database for "{{ ldap_domain }}" domain in the OpenLDAP config database {{ this_database }}.'
+      community.general.ldap_entry:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        state: present
+        objectClass:
+          - olcDatabaseConfig
+          - olcMdbConfig
+        attributes:
+          #
+          # These attributes cannot be changed with this role.
+          #
+          olcDatabase: "{{ this_database }}mdb"
+          olcDbDirectory: "/usr/local/openldap/var/{{ ldap_domain }}-data"
+          olcSuffix: "{{ ldap_domains[ldap_domain]['base'] }}"
+      become: true
 
-- name: 'Update "{{ ldap_domain }}" database ACLs in the OpenLDAP config database.'
-  community.general.ldap_attrs:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
-    state: exact
-    ordered: true
-    attributes:
-      olcAccess:
-        - to * by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage by * break
-        - to attrs=userPassword by anonymous auth by * none
-        - to dn.subtree="{{ ldap_domains[ldap_domain]['base'] }}"
-          by dn="{{ ldap_credentials[ldap_domain]['admin']['dn'] }}" write
-          by dn="{{ ldap_credentials[ldap_domain]['readonly']['dn'] }}" read
-          by * none
-  become: true
+    - name: 'Update "{{ ldap_domain }}" database attributes in the OpenLDAP config database.'
+      community.general.ldap_attrs:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        state: exact
+        attributes:
+          olcDbMode: '0600'
+          olcDbMaxSize: 104857600
+          olcRootDN: "cn=manager,{{ ldap_domains[ldap_domain]['base'] }}"
+          olcRootPW: "{{ openldap_root_hash }}"
+          olcLimits: '{0}users size=unlimited time=unlimited'
+          olcMonitoring: 'TRUE'
+          olcDbNoSync: 'FALSE'
+          olcDbIndex:
+            - objectClass eq
+            - cn,givenName,sn,mail pres,eq,sub
+            - uid pres,eq
+            - member eq
+      become: true
 
-- name: 'Create top level entry in "{{ ldap_domain }}" LDAP database.'
-  community.general.ldap_entry:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "{{ ldap_domains[ldap_domain]['base'] }}"
-    state: present
-    objectClass:
-      - domain
-  become: true
+    - name: 'Update OpenLDAP config database to create memberOf overlay for dynamic memberOf attributes in "{{ ldap_domain }}" database.'
+      community.general.ldap_entry:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        state: present
+        objectClass:
+          - olcOverlayConfig
+          - olcMemberOf
+        attributes:
+          #
+          # These attributes cannot be changed with this role.
+          #
+          olcOverlay: '{0}memberof'
+          #
+          # These attributes can be changed.
+          #
+          olcMemberOfRefInt: 'TRUE'
+          olcMemberOfGroupOC: groupOfMembers
+          olcMemberOfMemberAD: member
+          olcMemberOfMemberOfAD: memberOf
+      become: true
 
-- name: 'Create functional accounts to access the "{{ ldap_domain }}" LDAP database.'
-  community.general.ldap_entry:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "{{ ldap_credentials[ldap_domain][item]['dn'] }}"
-    state: present
-    objectClass:
-      - simpleSecurityObject
-      - organizationalRole
-    attributes:
-      #
-      # These attributes cannot be changed with this role.
-      #
-      cn: "{{ ldap_credentials[ldap_domain][item]['dn'] | regex_replace('^cn=([^,]+),.*', '\\1') }}"
-      #
-      # These mandatory attributes will be updated if necessary with the ldap_attrs task below.
-      #
-      userPassword: "{{ ldap_credentials[ldap_domain][item]['hash'] }}"
-  loop: "{{ ldap_functional_accounts | flatten(levels=1) }}"
-  become: true
+    - name: 'Update "{{ ldap_domain }}" database ACLs in the OpenLDAP config database.'
+      community.general.ldap_attrs:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        state: exact
+        ordered: true
+        attributes:
+          olcAccess:
+            - to * by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage by * break
+            - to attrs=userPassword by anonymous auth by * none
+            - to dn.subtree="{{ ldap_domains[ldap_domain]['base'] }}"
+              by dn="{{ ldap_credentials[ldap_domain]['admin']['dn'] }}" write
+              by dn="{{ ldap_credentials[ldap_domain]['readonly']['dn'] }}" read
+              by * none
+      become: true
 
-- name: 'Update attributes of functional accounts used to access the "{{ ldap_domain }}" LDAP database.'
-  community.general.ldap_attrs:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "{{ ldap_credentials[ldap_domain][item]['dn'] }}"
-    state: exact
-    attributes:
-      userPassword: "{{ ldap_credentials[ldap_domain][item]['hash'] }}"
-      description: "LDAP {{ item }} user for {{ ldap_domains[ldap_domain]['base'] }}."
-  loop: "{{ ldap_functional_accounts | flatten(levels=1) }}"
-  become: true
+    - name: 'Create top level entry in "{{ ldap_domain }}" LDAP database.'
+      community.general.ldap_entry:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "{{ ldap_domains[ldap_domain]['base'] }}"
+        state: present
+        objectClass:
+          - domain
+      become: true
 
-- name: 'Configure replication provider for "{{ ldap_domain }}" database.'
-  community.general.ldap_attrs:
-    server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-    dn: "olcDatabase={% raw %}{{% endraw %}{{ ldap_db_index }}{% raw %}}{% endraw %}mdb,cn=config"
-    state: exact
-    ordered: true
-    attributes:
-      olcSyncrepl:
-        - rid=001
-          provider="{{ ldap_domains[ldap_domain]['replication_provider_uri'] }}/"
-          searchbase="{{ ldap_domains[ldap_domain]['replication_provider_base'] }}"
-          type=refreshAndPersist
-          bindmethod=simple
-          binddn="{{ ldap_credentials[ldap_domain]['replication_provider']['dn'] }}"
-          credentials="{{ ldap_credentials[ldap_domain]['replication_provider']['pw'] }}"
-          retry="60 +"
-          timeout=30
-          network-timeout=5
-          tls_cacert="/etc/pki/tls/certs/ca-bundle.trust.crt"
-  when:
-    - ldap_domains[ldap_domain]['replication_provider_uri'] is defined and ldap_domains[ldap_domain]['replication_provider_uri'] | length >= 1
-    - ldap_domains[ldap_domain]['replication_provider_base'] is defined and ldap_domains[ldap_domain]['replication_provider_base'] | length >= 1
-  become: true
+    - name: 'Create functional accounts to access the "{{ ldap_domain }}" LDAP database.'
+      community.general.ldap_entry:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "{{ ldap_credentials[ldap_domain][item]['dn'] }}"
+        state: present
+        objectClass:
+          - simpleSecurityObject
+          - organizationalRole
+        attributes:
+          #
+          # These attributes cannot be changed with this role.
+          #
+          cn: "{{ ldap_credentials[ldap_domain][item]['dn'] | regex_replace('^cn=([^,]+),.*', '\\1') }}"
+          #
+          # These mandatory attributes will be updated if necessary with the ldap_attrs task below.
+          #
+          userPassword: "{{ ldap_credentials[ldap_domain][item]['hash'] }}"
+      loop: "{{ ldap_functional_accounts | flatten(levels=1) }}"
+      become: true
+
+    - name: 'Update attributes of functional accounts used to access the "{{ ldap_domain }}" LDAP database.'
+      community.general.ldap_attrs:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "{{ ldap_credentials[ldap_domain][item]['dn'] }}"
+        state: exact
+        attributes:
+          userPassword: "{{ ldap_credentials[ldap_domain][item]['hash'] }}"
+          description: "LDAP {{ item }} user for {{ ldap_domains[ldap_domain]['base'] }}."
+      loop: "{{ ldap_functional_accounts | flatten(levels=1) }}"
+      become: true
+
+    - name: 'Configure replication provider for "{{ ldap_domain }}" database.'
+      community.general.ldap_attrs:
+        server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
+        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        state: exact
+        ordered: true
+        attributes:
+          olcSyncrepl:
+            - rid=001
+              provider="{{ ldap_domains[ldap_domain]['replication_provider_uri'] }}/"
+              searchbase="{{ ldap_domains[ldap_domain]['replication_provider_base'] }}"
+              type=refreshAndPersist
+              bindmethod=simple
+              binddn="{{ ldap_credentials[ldap_domain]['replication_provider']['dn'] }}"
+              credentials="{{ ldap_credentials[ldap_domain]['replication_provider']['pw'] }}"
+              retry="60 +"
+              timeout=30
+              network-timeout=5
+              tls_cacert="/etc/pki/tls/certs/ca-bundle.trust.crt"
+      when:
+        - ldap_domains[ldap_domain]['replication_provider_uri'] is defined and ldap_domains[ldap_domain]['replication_provider_uri'] | length >= 1
+        - ldap_domains[ldap_domain]['replication_provider_base'] is defined and ldap_domains[ldap_domain]['replication_provider_base'] | length >= 1
+      become: true
 ...
