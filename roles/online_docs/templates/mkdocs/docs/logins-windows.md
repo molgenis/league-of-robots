@@ -3,8 +3,8 @@
 
 There are two options to login to clusters from Windows
 
- 1. (preferred) Either by using MobaXterm client software which requires installation
- 2. alternative option is to use built-in OpenSSH software that comes pre-installed with newer versions of Windows (10+)
+ 1. (preferred) Either by using [MobaXterm client](#11-launch-mobaxterm-and-create-a-new-session) software which requires installation
+ 2. alternative option is to use built-in [OpenSSH software](#2-using-windows-openssh) that comes pre-installed with newer versions of Windows (10+)
 
 
 ## 1. MobaXterm option
@@ -105,13 +105,13 @@ You can download the executable script from here [logins-windows.bat](../logins-
 
 If you try to download the script with Microsoft Edge (default browser), then
 
- - Microsoft Edge: **you will twice need to confirm that the file is safe and that your really want to store it** (Under download you will need to click `Keep`, then `Show more` > `Keep anyway`)
- - another browser: download works, but when executing you get `Windows protected` warning, and you must click on `More info` (small text at top right part of the window), then click `Run anyway`.
- - alternatively, you can simply click on the link, select and copy paste text into a filename called `logins-windows.bat` (the `.bat` ending is needed in order for the file to become exeutable)
+ - Microsoft Edge: **you will twice need to confirm that the file is safe and that your really want to store it** (see Download icon, where you must select `Keep`, then `Show more` > `Keep anyway`)
+ - other web browsers: the download itself is easier, but when executing you get `Windows protected` warning, and you must click on `More info` text (small text at top left part of the window), then select `Run anyway`.
+ - alternatively, you can simply click on [the link](../logins-windows.bat), then select all the text, copy and paste into a filename named `logins-windows.bat` (the `.bat` ending is mandatory in order the file to become executable)
 
-Once you have the file, run it and the rest of the configuration will be done mostly autormatically.
+Once you have the file, run it and the rest of the configuration will be (for except two prompts) done almost automatically.
 
-The configuration is stored inside the `C:\Users\[Username]\.ssh\` folder.
+The configuration files will be stored inside the `C:\Users\[Username]\.ssh\` folder.
 
 ### 2.1 Manual configuration with
 
@@ -122,12 +122,27 @@ The ssh configuration files can be created inside the `C:\Users\[Username]\.ssh\
 There are **many** differences between the linux and windows OpenSSH configuration. One of the biggest is the difference beween linux `/` and windows `\` as directory path separator. But there are many more. Users that do not understand those differences, should use the MobaXterm or semi-automatic .bat script options above.
 
 
-### Connecting to the system
+### 2.3 Connecting to the system
 
 In order to connect to the {{ slurm_cluster_name }}
 
 - first open Start menu, search and execute the `cmd` or `Command Prompt` program
 - login to {{ slurm_cluster_name }} by using a command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
+
+## 3 Converting Putty .ppk key into OpenSSH format
+
+
+Public/private keypairs created with `Putty` program are by default stored in the **P**utty **p**rivate **k**ey (ppk) format. The private keys files also have `.ppk` ending. The file format is not compatible with generic `OpenSSH` format (which most of ssh client programs use) and the key must either be recreated (and public part sent to helpdesk) or existing private key must be converted into more usable OpenSSH format.
+
+In order to convert an existing keypair from Putty into OpenSSH format
+
+- `puttygen.exe` can be downloaded from `https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html`
+- run program > click `Load` > select ppk (private key)
+- to store the PUBLIC part of the keypair into OpenSSH format, select all the text inside `Key`: `Public key for pasting into OpenSSH authorized_keys file` and save it in a file with `.pub` ending (like `username.pub`)
+- to store PRIVATE part of the keypair (while still loaded the same ppk key)
+  - click `Conversions`
+  - `Export OpenSSH key` > confirm
+  - store same filename but **without** any ending (simply a username for a filename should be descriptive enough)
 
 -----
 
