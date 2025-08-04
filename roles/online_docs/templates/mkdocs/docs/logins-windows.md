@@ -129,7 +129,7 @@ In order to connect to the {{ slurm_cluster_name }}
 - first open Start menu, search and execute the `cmd` or `Command Prompt` program
 - login to {{ slurm_cluster_name }} by using a command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
 
-## 3 Converting Putty .ppk key into OpenSSH format
+## 2.4 Converting Putty .ppk key into OpenSSH format
 
 
 Public/private keypairs created with `Putty` program are by default stored in the **P**utty **p**rivate **k**ey (ppk) format. The private keys files also have `.ppk` ending. The file format is not compatible with generic `OpenSSH` format (which most of ssh client programs use) and the key must either be recreated (and public part sent to helpdesk) or existing private key must be converted into more usable OpenSSH format.
