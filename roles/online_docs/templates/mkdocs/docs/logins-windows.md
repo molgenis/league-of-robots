@@ -136,7 +136,7 @@ Public/private keypairs created with `Putty` program are by default stored in th
 
 In order to convert an existing keypair from Putty into OpenSSH format
 
-- `puttygen.exe` can be downloaded from `https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html`
+- `puttygen.exe` can be downloaded from [Putty webpage](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
 - run program > click `Load` > select ppk (private key)
 - to store the PUBLIC part of the keypair into OpenSSH format, select all the text inside `Key`: `Public key for pasting into OpenSSH authorized_keys file` and save it in a file with `.pub` ending (like `username.pub`)
 - to store PRIVATE part of the keypair (while still loaded the same ppk key)
