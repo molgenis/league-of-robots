@@ -111,9 +111,16 @@ If you try to download the script with Microsoft Edge (default browser), then
 
 Once you have the file, run it and the rest of the configuration will be done mostly autormatically.
 
+The configuration is stored inside the `C:\Users\[Username]\.ssh\` folder.
+
 ### 2.1 Manual configuration with
 
 (to be updated)
+
+The ssh configuration files can be created inside the `C:\Users\[Username]\.ssh\` folder. In order to manually create them, you can simply follow the instructions for [linux ssh configuration](../logins-linux-config/).
+
+There are **many** differences between the linux and windows OpenSSH configuration. One of the biggest is the difference beween linux `/` and windows `\` as directory path separator. But there are many more. Users that do not understand those differences, should use the MobaXterm or semi-automatic .bat script options above.
+
 
 ### Connecting to the system
 
