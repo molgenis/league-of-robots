@@ -14,24 +14,27 @@ if not exist "%SSH_DIR%" (
    mkdir "%SSH_DIR%"
 )
 
-echo.- private key location (like C:\Users\%USERNAME%\OneDrive - UMCG\Desktop, note
-echo.  that you can right click on a file, select 'Copy as path' and paste it here)
-echo.  If you don't have one yet, leave it empty and one will be created in the
-echo.  default location (C:\Users\%USERNAME%\.ssh)
-set /p PRIVATEKEY=  private key path: 
-if not exist %PRIVATEKEY% (
-   if not exist "%PRIVATEKEY%" (
-      echo.- error, incorrect path, no private key is found at %PRIVATEKEY%
-      echo.  you can exit and restart this script (press CTRL+C), or press enter to
-      echo.  continue creating a public/private keypair in the default location
+echo.- private key location [ like C:\Users\%USERNAME%\OneDrive - UMCG\Desktop ], note
+echo.  that you can right click on file, select 'Copy as path' and paste it here.
+echo.  If you don't have private key yet, simply press enter and script will create it
+echo.  in the default location [ C:\Users\%USERNAME%\.ssh ]
+set /p PRIVATEKEYRAW=  private key path: 
+REM Remove all " from path
+set PRIVATEKEY=%PRIVATEKEYRAW:"=%
+
+if not exist "%PRIVATEKEY%" (
+      echo.- error, incorrect path, no private key is found at "%PRIVATEKEY%" make sure
+      echo.  you provided correct path [ and without quotes ]. Now you can either exit
+      echo.  this script [press CTRL-C] and restart it again, or you can press enter to
+      echo.  continue with creating a public/private keypair in the default location
+      set /p CONTINUE= press [ CTRL-c ] to cancel or [ enter ] to continue
       if not exist "%SSH_DIR%\id_ed25519" (
          echo.- public/private keypair are missing, creating them now ...
          %OPENSSH%/ssh-keygen.exe -f "%SSH_DIR%\id_ed25519"
       )
       set "PRIVATEKEY=%SSH_DIR%\id_ed25519"
-   ) else (
-      echo.  private key file found
-   )
+) else (
+   echo.  private key file found
 )
 
 if not exist "%SSH_DIR%\tmp" (
@@ -66,7 +69,7 @@ echo. - configuring %SSH_DIR%\conf.d\%CLUSTER%
   {%- else -%}
     {%- set ssh_hostname = ip_addresses[jumphost][network_id]['fqdn'] -%}
   {%- endif -%}
-echo.Host {% for jumphost in groups['jumphost'] %}{{ jumphost }}* {% endfor %}{% raw %}{% endraw %}
+echo.Host {% for jumphost in groups['jumphost'] %}{{ jumphost }} {% endfor %}
 echo.   HostName {{ ssh_hostname }}
 echo.   User %USERNAME%
 echo.   ServerAliveInterval 60
@@ -80,7 +83,12 @@ echo.   ControlPersist 10m
 echo.
 echo.Host {{ jumphost }}+{{ userinterface }} {{ userinterface }}
 echo.   ProxyJump {{ jumphost }}
-echo.   HostKeyAlias {{ jumphost }}
+echo.   HostName {{ userinterface }}
+echo.   HostKeyAlias {{ userinterface }}
+echo.   ServerAliveInterval 60
+echo.   ServerAliveCountMax 5
+echo.   IdentityFile "%PRIVATEKEY%"
+echo.   User %USERNAME%
 {% endfor -%}
 {% endfor -%}
 ) > "%SSH_DIR%\conf.d\%CLUSTER%"

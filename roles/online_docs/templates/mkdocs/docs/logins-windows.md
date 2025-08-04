@@ -105,10 +105,11 @@ You can download the executable script from here [logins-windows.bat](../logins-
 
 If you try to download the script with Microsoft Edge (default browser), then
 
- - **you will twice need to confirm that the file is safe and that your really want to store it** (Under download you will need to click `Keep`, then `Show more` > `Keep anyway`)
- - alternatively you can open the link and copy the file content and paste on your Windows computer and save it with 'windows-login.bat' filename
+ - Microsoft Edge: **you will twice need to confirm that the file is safe and that your really want to store it** (Under download you will need to click `Keep`, then `Show more` > `Keep anyway`)
+ - another browser: download works, but when executing you get `Windows protected` warning, and you must click on `More info` (small text at top right part of the window), then click `Run anyway`.
+ - alternatively, you can simply click on the link, select and copy paste text into a filename called `logins-windows.bat` (the `.bat` ending is needed in order for the file to become exeutable)
 
-Once you save the file, you can execute, and the configuration will be done almost automatically.
+Once you have the file, run it and the rest of the configuration will be done mostly autormatically.
 
 ### 2.1 Manual configuration with
 
@@ -116,8 +117,10 @@ Once you save the file, you can execute, and the configuration will be done almo
 
 ### Connecting to the system
 
-- Open Start menu, search and execute the `cmd` or `Command Prompt` program.
-- You can use command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
+In order to connect to the {{ slurm_cluster_name }}
+
+- first open Start menu, search and execute the `cmd` or `Command Prompt` program
+- login to {{ slurm_cluster_name }} by using a command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
 
 -----
 
