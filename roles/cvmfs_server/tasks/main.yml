@@ -21,6 +21,7 @@
       - curl
       - nano
       - rsync
+      - wget
   become: true
 
 - name: 'Ensure CVMFS repo is installed.'
