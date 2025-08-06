@@ -129,7 +129,25 @@ In order to connect to the {{ slurm_cluster_name }}
 - first open Start menu, search and execute the `cmd` or `Command Prompt` program
 - login to {{ slurm_cluster_name }} by using a command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
 
-### 2.4 Converting Putty .ppk key into OpenSSH format
+### 2.4 Port forwarding to the compute nodes
+
+Users can connect ports on own computer to the ports on the compute nodes behind the jumphosts - by using port forwarding (binding).
+In order to do this, user must open another `cmd` environment and establish a connection with numbers of the ports to be forwarded
+
+    ssh -J {{ groups['jumphost'] | first }} {{ groups['user_interface'] | first }} -L XXXXX:NODE:XXXXX
+
+where
+
+- `-J {{ groups['jumphost'] | first }}` specify which jumphost machine is going to be used in order oppening the connection to ...
+- `{{ groups['user_interface'] | first }}` is the name of the machine that user will connect and have the command line started
+- `-L XXXXX:NODE:XXXXX` defines the ports and machines to connect
+    - `XXXXX` can be set to any port in the range (1024 < `XXXXX` <= 65535) as long it is **free** on both (your local and remote) servers,
+    - note that this example binds the **same** `XXXXX` ports on both local as well as remote server - but this is not mandatory, they can be different,
+    - `NODE` is the name of the remote server behind a jumphsot to which the ports should be forwarded.
+
+More information about `ssh` options can be find on the [ssh man pages](https://man.openbsd.org/ssh).
+
+### 2.5 Converting Putty .ppk key into OpenSSH format
 
 
 Public/private keypairs created with `Putty` program are by default stored in the **P**utty **p**rivate **k**ey (ppk) format. The private keys files also have `.ppk` ending. The file format is not compatible with generic `OpenSSH` format (which most of ssh client programs use) and the key must either be recreated (and public part sent to helpdesk) or existing private key must be converted into more usable OpenSSH format.
