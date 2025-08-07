@@ -122,7 +122,7 @@ There are **many** differences between the linux and windows OpenSSH configurati
 
 ### 2.3 Connecting to the system
 
-In order to connect to the {{ slurm_cluster_name }}
+In order to connect to {{ slurm_cluster_name | capitalize }}
 
 - first open Start menu, search and execute the `cmd` or `Command Prompt` program
 - login to {{ slurm_cluster_name }} by using a command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
