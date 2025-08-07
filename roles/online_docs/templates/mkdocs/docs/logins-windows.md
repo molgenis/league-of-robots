@@ -115,7 +115,7 @@ The configuration files will be stored inside the `C:\Users\[Username]\.ssh\` fo
 
 (to be updated)
 
-The ssh configuration files can be created inside the `C:\Users\[Username]\.ssh\` folder. In order to manually create them, you can simply follow the instructions for [linux ssh configuration](../logins-linux-config/).
+If you are familiar with he SSH configuration files, and would like to create them manually, you can do that by editing the `%USERPROFILE%\.ssh` folder - which defaults to`C:\Users\[Username]\.ssh\`. Options about SSH configurations are further explained in the instructions for [Linux users](../logins-linux-config/).
 
 There are **many** differences between the linux and windows OpenSSH configuration. One of the biggest is the difference beween linux `/` and windows `\` as directory path separator. But there are many more. Users that do not understand those differences, should use the MobaXterm or semi-automatic .bat script options above.
 
