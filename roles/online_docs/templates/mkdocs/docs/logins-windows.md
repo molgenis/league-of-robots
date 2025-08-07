@@ -102,12 +102,10 @@ while the right part remains a terminal where you can type commands.
 ### 2.1 Semi-automatic configuration with .bat script
 
 You can download the executable script from here [logins-windows.bat](../logins-windows.bat) and use it to configure ssh connection for the {{ slurm_cluster_name }}.
-
-If you try to download the script with Microsoft Edge (default browser), then
-
- - Microsoft Edge: **you will twice need to confirm that the file is safe and that your really want to store it** (see Download icon, where you must select `Keep`, then `Show more` > `Keep anyway`)
- - other web browsers: the download itself is easier, but when executing you get `Windows protected` warning, and you must click on `More info` text (small text at top left part of the window), then select `Run anyway`.
- - alternatively, you can simply click on [the link](../logins-windows.bat), then select all the text, copy and paste into a filename named `logins-windows.bat` (the `.bat` ending is mandatory in order the file to become executable)
+ - Using Microsoft's Edge web browser: you will need to confirm that the file is safe **twice**  
+   (see _Download_ icon, where you must select `Keep`, then `Show more` > `Keep anyway`)
+ - Using other web browsers: the download itself is easier, but when you try to execute the script, you will get a `Windows protected` warning and you must click `More info` (small text at top left part of the window) followed by `Run anyway`.
+ - Alternatively, you can simply follow the link [logins-windows.bat](../logins-windows.bat), select & copy the text, then paste into a file named `logins-windows.bat` on your windows machine. (The `.bat` filename extension is mandatory make the file executable.)
 
 Once you have the file, run it and the rest of the configuration will be (for except two prompts) done almost automatically.
 
