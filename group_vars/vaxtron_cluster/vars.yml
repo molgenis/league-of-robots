@@ -51,7 +51,7 @@ slurm_qos_limit_fractions:
   interactive-short:
     user: 0.5
 #
-# Remote logging settings - for diagnostics servers
+# Cluster classification (used by `logs` and `login` roles)
 #
 cluster_class: 'research'
 repo_manager: 'pulp'
@@ -230,8 +230,6 @@ regular_groups:
   - name: "{{ data_transfer_only_group }}"
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
-  - name: 'umcg-aad'
-    sponsor: umcg-mswertz
   - name: 'umcg-as'
     sponsor: umcg-mswertz
   - name: 'umcg-atd'
@@ -335,8 +333,6 @@ regular_groups:
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
-  - name: 'umcg-aad-dm'
-    groups: ['umcg-aad']
   - name: 'umcg-capicebot'
     groups: ['umcg-as']
   - name: 'umcg-vipbot'
@@ -446,8 +442,6 @@ regular_users:
   - name: 'umcg-wijmenga-dm'
     groups: ['umcg-wijmenga']
 sudoers:
-  - who: ['%umcg-aad']
-    become: 'umcg-aad-dm'
   - who: ['%umcg-as']
     become: 'umcg-capicebot'
   - who: ['%umcg-as']
@@ -652,7 +646,6 @@ lfs_mounts:
   - lfs: prm02
     pfs: umcgst01
     groups:
-      - name: umcg-aad
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -705,7 +698,6 @@ lfs_mounts:
   - lfs: prm03
     pfs: umcgst02
     groups:
-      - name: umcg-aad
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
