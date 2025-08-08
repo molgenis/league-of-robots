@@ -217,8 +217,9 @@ remote_archive:
   - name: arc02
     local_top_level_mount: '/groups'
     groups:
-      - 'umcg-fg'
       - 'umcg-biogen'
+      - 'umcg-bios'
+      - 'umcg-fg'
     archive_user: 'pdeelen'
     archive_system: 'archive.surfsara.nl'
     archive_system_fingerprints:
