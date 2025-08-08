@@ -76,7 +76,7 @@
     path: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     owner: "{{ item.1.name }}-dm"
     group: "{{ item.1.name }}"
-    mode: "{{ item.1.mode | default('2770', true) }}"
+    mode: "{{ item.1.mode | default('2750', true) }}"
     state: 'directory'
   with_subelements:
     - "{{ lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | list }}"
