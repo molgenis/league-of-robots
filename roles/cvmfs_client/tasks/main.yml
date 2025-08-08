@@ -34,9 +34,11 @@
   become: true
 
 - name: 'Reload autofs service in order to apply the updated configuration.'
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: autofs
     state: reloaded
+    enabled: true
+    daemon_reload: true
   become: true
 
 - name: 'Add repositories to cvmfs and make sure file exists.'
