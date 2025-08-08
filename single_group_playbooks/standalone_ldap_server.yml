@@ -23,4 +23,5 @@
     - regular_users   # to create lsaai user
     - cluster         # to install perun software
     - lsaai           # configure lsaai scripts and config files
+      when: perun_facility_name is defined
 ...
