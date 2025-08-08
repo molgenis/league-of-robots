@@ -190,7 +190,7 @@ sponsors:
   - name: umcg-mswertz
     slurm_shares: 570
 # Remote archive settings
-archive_groups:
+remote_archive:
   - name: arc01
     local_top_level_mount: '/groups'
     groups:

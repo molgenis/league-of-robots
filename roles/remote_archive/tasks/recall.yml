@@ -16,7 +16,7 @@
     owner: root
     group: root
   with_items:
-    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+    - "{{ remote_archive | selectattr('recall_cron_script', 'defined') }}"
   become: true
 
 - name: Install recall script
@@ -27,7 +27,7 @@
     owner: root
     group: root
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
@@ -39,12 +39,12 @@
     group: root
     mode: "0644"
   with_items:
-    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+    - "{{ remote_archive | selectattr('recall_cron_script', 'defined') }}"
   notify:
     - 'archive_systemd_reload'
     - 'archive_path_monitor_enable'
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
@@ -56,12 +56,12 @@
     group: root
     mode: "0644"
   with_items:
-    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+    - "{{ remote_archive | selectattr('recall_cron_script', 'defined') }}"
   notify:
     - 'archive_systemd_reload'
     - 'archive_path_monitor_enable'
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
@@ -73,12 +73,12 @@
     group: root
     mode: "0755"
   with_items:
-    - "{{ archive_groups | selectattr('recall_cron_script', 'defined') }}"
+    - "{{ remote_archive | selectattr('recall_cron_script', 'defined') }}"
   notify:
     - 'archive_systemd_reload'
     - 'archive_path_monitor_enable'
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
   become: true
 ...

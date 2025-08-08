@@ -6,11 +6,11 @@
 
 `vi group_vars/hyperchicken_cluster/vars.yml`
 
-define variable `archive_groups`:
+define variable `remote_archive`:
 
 ```yml
 # Remote archive settings
-archive_groups:
+remote_archive:
   - name: arc01
     groups:
       - 'umcg-atd'
@@ -28,10 +28,10 @@ this defines for the groups `solve-rd` and `umcg-atd` an archive folders of `arc
 
 ### Removing arcXX from a group
 
-Leave the `archive_groups` variables defined, except the `archive_groups.groups` should be emptied (see empty list below) and then rerun the playbook. This will unmount the mountpoints, disable the systemd `.automount` services and removed their systemd unit files (.mount and .automount). After this you can (if you need) remove the entire `archive_groups` variable.
+Leave the `remote_archive` variables defined, except the `remote_archive.groups` should be emptied (see empty list below) and then rerun the playbook. This will unmount the mountpoints, disable the systemd `.automount` services and removed their systemd unit files (.mount and .automount). After this you can (if you need) remove the entire `remote_archive` variable.
 
 ```yml
-archive_groups:
+remote_archive:
   - name: arc01
     groups: []  # define an empty group
 #    groups:
@@ -84,7 +84,7 @@ If you wish to change it, so that remote archive folders would be mounted on the
 ## Prerequisites
 
  - this role will be deployed on the user interface machines only
- - the groups that have access to the archive, are defined in the `archive_groups`
+ - the groups that have access to the archive, are defined in the `remote_archive`
    of the `group_vars/[stack]_cluster/vars.yml`
  - (if missing on stack user interface machine) role creates ssh key-pair for user root
  - (if ^ public key is missing on remote archive server's `.ssh/authorized_keys`, then
