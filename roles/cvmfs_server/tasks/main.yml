@@ -56,9 +56,10 @@
   become: true
 
 - name: Enable webserver.
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: httpd
     enabled: true
     state: started
+    daemon_reload: true
   become: true
 ...
