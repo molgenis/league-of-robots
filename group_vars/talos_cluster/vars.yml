@@ -285,6 +285,7 @@ lfs_mounts:
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-atd
       - name: umcg-gcc
