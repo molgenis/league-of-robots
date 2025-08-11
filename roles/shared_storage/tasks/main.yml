@@ -503,6 +503,37 @@
 
 - name: 'Remove PFS mounts, which were used to create bind mounts for Logical File Systems (LFSs) per group.'
   ansible.posix.mount:
+    path: "/mnt/{{ pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}"
+    src: "{{ pfs_mount['source'] }}/{{ pfs }}"
+    fstype: "{{ pfs_mount['type'] }}"
+    opts: "{{ pfs_mount['rw_options'] }}"
+    state: absent
+  vars:
+    rw_machines: "{{ lfs_mounts
+                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                     | selectattr('type', 'equalto', 'bind')
+                     | rejectattr('rw_machines', 'undefined')
+                     | map(atrribute='rw_machines')
+                     | unique }}"
+    ro_machines: "{{ lfs_mounts
+                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                     | selectattr('type', 'equalto', 'bind')
+                     | rejectattr('ro_machines', 'undefined')
+                     | map(atrribute='ro_machines')
+                     | unique }}"
+    pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', pfs) | first }}"
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+            | selectattr('type', 'equalto', 'bind')
+            | map(atrribute='pfs')
+            | unique }}"
+  loop_control:
+    loop_var: pfs
+  tag: groups
+  when:
+    - inventory_hostname in rw_machines | default ([]) or
+      inventory_hostname in ro_machines | default ([])
+  become: true
 
 ###############################################################################################
 # End of workaround to prevent Lustre clients from running out of Lustre IDs.
