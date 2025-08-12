@@ -453,7 +453,8 @@
             | unique }}"
   loop_control:
     loop_var: pfs
-  tag: groups
+  tags:
+    - groups
   when:
     - inventory_hostname in rw_machines | default ([]) or
       inventory_hostname in ro_machines | default ([])
@@ -529,7 +530,8 @@
             | unique }}"
   loop_control:
     loop_var: pfs
-  tag: groups
+  tags:
+    - groups
   when:
     - inventory_hostname in rw_machines | default ([]) or
       inventory_hostname in ro_machines | default ([])
