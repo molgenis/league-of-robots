@@ -470,14 +470,15 @@
 #
 - name: 'Create read-write PFS mounts to create bind mounts for Logical File Systems (LFSs) per group.'
   ansible.posix.mount:
-    path: "/mnt/{{ pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
-    src: "{{ pfs_mount['source'] }}/{{ pfs }}/groups"
+    path: "/mnt/{{ pfs_mount['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+    src: "{{ pfs_mount['source'] }}/{{ pfs_mount['pfs'] }}/groups"
     fstype: "{{ pfs_mount['type'] }}"
     opts: "{{ pfs_mount['rw_options'] }}"
-    state: 'mounted'
+    state: mounted
   vars:
     rw_machines: "{{ lfs_mounts
                      | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
                      | rejectattr('type', 'undefined')
                      | selectattr('type', 'equalto', 'bind')
                      | rejectattr('rw_machines', 'undefined')
@@ -486,20 +487,15 @@
                      | unique }}"
     ro_machines: "{{ lfs_mounts
                      | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
                      | selectattr('type', 'equalto', 'bind')
                      | rejectattr('ro_machines', 'undefined')
                      | map(attribute='ro_machines')
                      | flatten
                      | unique }}"
-    pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', pfs) | first }}"
-  loop: "{{ lfs_mounts
-            | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
-            | rejectattr('type', 'undefined')
-            | selectattr('type', 'equalto', 'bind')
-            | map(attribute='pfs')
-            | unique }}"
+  loop: "{{ pfs_mounts }}"
   loop_control:
-    loop_var: pfs
+    loop_var: pfs_mount
   tags:
     - groups
   when:
@@ -511,13 +507,14 @@
 - name: 'Bind mount Logical File Systems (LFSs) per group from shared storage read-write.'
   ansible.posix.mount:
     path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/\
-          /groups/{{ item.1.name }}/{{ item.0.lfs }}"
+    src: "{{ parent_mount_point }}/{{ item.1.name }}/{{ item.0.lfs }}"
     fstype: none
-    opts: 'bind,rw'  # Bind mounting read-write will only work of the src was also mounted read-write.
+    # Bind mounting read-write will only work of the src was also mounted read-write.
+    opts: "bind,rw,x-systemd.requires-mounts-for={{ parent_mount_point }},x-systemd.mount-timeout=20s,retry=3"
     state: mounted
   vars:
     pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | first }}"
+    parent_mount_point: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
   loop: "{{ lfs_mounts
             | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
             | rejectattr('type', 'undefined')
@@ -534,13 +531,13 @@
 - name: 'Bind mount Logical File Systems (LFSs) per group from shared storage read-only.'
   ansible.posix.mount:
     path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
-    src: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/\
-          /groups/{{ item.1.name }}/{{ item.0.lfs }}"
+    src: "{{ parent_mount_point }}/{{ item.1.name }}/{{ item.0.lfs }}"
     fstype: none
-    opts: 'bind,ro'
+    opts: "bind,ro,x-systemd.requires-mounts-for={{ parent_mount_point }},x-systemd.mount-timeout=20s,retry=3"
     state: mounted
   vars:
     pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | first }}"
+    parent_mount_point: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
   loop: "{{ lfs_mounts
             | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
             | rejectattr('type', 'undefined')
@@ -559,14 +556,15 @@
 #
 #- name: 'Remove PFS mounts, which were used to create bind mounts for Logical File Systems (LFSs) per group.'
 #  ansible.posix.mount:
-#    path: "/mnt/{{ pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
-#    src: "{{ pfs_mount['source'] }}/{{ pfs }}/groups"
+#    path: "/mnt/{{ pfs_mount['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+#    src: "{{ pfs_mount['source'] }}/{{ pfs_mount['pfs'] }}/groups"
 #    fstype: "{{ pfs_mount['type'] }}"
 #    opts: "{{ pfs_mount['rw_options'] }}"
 #    state: absent
 #  vars:
 #    rw_machines: "{{ lfs_mounts
 #                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+#                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
 #                     | rejectattr('type', 'undefined')
 #                     | selectattr('type', 'equalto', 'bind')
 #                     | rejectattr('rw_machines', 'undefined')
@@ -575,26 +573,22 @@
 #                     | unique }}"
 #    ro_machines: "{{ lfs_mounts
 #                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+#                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
 #                     | rejectattr('type', 'undefined')
 #                     | selectattr('type', 'equalto', 'bind')
 #                     | rejectattr('ro_machines', 'undefined')
 #                     | map(attribute='ro_machines')
 #                     | flatten
 #                     | unique }}"
-#    pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', pfs) | first }}"
-#  loop: "{{ lfs_mounts
-#            | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
-#            | rejectattr('type', 'undefined')
-#            | selectattr('type', 'equalto', 'bind')
-#            | map(attribute='pfs')
-#            | unique }}"
+#  loop: "{{ pfs_mounts }}"
 #  loop_control:
-#    loop_var: pfs
+#    loop_var: pfs_mount
 #  tags:
 #    - groups
 #  when:
 #    - inventory_hostname in rw_machines | default ([]) or
 #      inventory_hostname in ro_machines | default ([])
+#    - "'automount' not in pfs_mount['rw_options']"
 #  become: true
 
 ###############################################################################################
