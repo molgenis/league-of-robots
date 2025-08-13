@@ -276,8 +276,8 @@ pfs_mounts:
   - pfs: umcgst04/slice5
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -296,6 +296,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
@@ -303,6 +304,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
