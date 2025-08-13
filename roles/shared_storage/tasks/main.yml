@@ -554,42 +554,42 @@
 #
 # Only to be used for removing the workaround:
 #
-#- name: 'Remove PFS mounts, which were used to create bind mounts for Logical File Systems (LFSs) per group.'
-#  ansible.posix.mount:
-#    path: "/mnt/{{ pfs_mount['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
-#    src: "{{ pfs_mount['source'] }}/{{ pfs_mount['pfs'] }}/groups"
-#    fstype: "{{ pfs_mount['type'] }}"
-#    opts: "{{ pfs_mount['rw_options'] }}"
-#    state: absent
-#  vars:
-#    rw_machines: "{{ lfs_mounts
-#                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
-#                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
-#                     | rejectattr('type', 'undefined')
-#                     | selectattr('type', 'equalto', 'bind')
-#                     | rejectattr('rw_machines', 'undefined')
-#                     | map(attribute='rw_machines')
-#                     | flatten
-#                     | unique }}"
-#    ro_machines: "{{ lfs_mounts
-#                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
-#                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
-#                     | rejectattr('type', 'undefined')
-#                     | selectattr('type', 'equalto', 'bind')
-#                     | rejectattr('ro_machines', 'undefined')
-#                     | map(attribute='ro_machines')
-#                     | flatten
-#                     | unique }}"
-#  loop: "{{ pfs_mounts }}"
-#  loop_control:
-#    loop_var: pfs_mount
-#  tags:
-#    - groups
-#  when:
-#    - inventory_hostname in rw_machines | default ([]) or
-#      inventory_hostname in ro_machines | default ([])
-#    - "'automount' not in pfs_mount['rw_options']"
-#  become: true
+#  - name: 'Remove PFS mounts, which were used to create bind mounts for Logical File Systems (LFSs) per group.'
+#    ansible.posix.mount:
+#      path: "/mnt/{{ pfs_mount['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+#      src: "{{ pfs_mount['source'] }}/{{ pfs_mount['pfs'] }}/groups"
+#      fstype: "{{ pfs_mount['type'] }}"
+#      opts: "{{ pfs_mount['rw_options'] }}"
+#      state: absent
+#    vars:
+#      rw_machines: "{{ lfs_mounts
+#                       | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+#                       | selectattr('pfs', 'equalto', pfs_mount['pfs'])
+#                       | rejectattr('type', 'undefined')
+#                       | selectattr('type', 'equalto', 'bind')
+#                       | rejectattr('rw_machines', 'undefined')
+#                       | map(attribute='rw_machines')
+#                       | flatten
+#                       | unique }}"
+#      ro_machines: "{{ lfs_mounts
+#                       | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+#                       | selectattr('pfs', 'equalto', pfs_mount['pfs'])
+#                       | rejectattr('type', 'undefined')
+#                       | selectattr('type', 'equalto', 'bind')
+#                       | rejectattr('ro_machines', 'undefined')
+#                       | map(attribute='ro_machines')
+#                       | flatten
+#                       | unique }}"
+#    loop: "{{ pfs_mounts }}"
+#    loop_control:
+#      loop_var: pfs_mount
+#    tags:
+#      - groups
+#    when:
+#      - inventory_hostname in rw_machines | default ([]) or
+#        inventory_hostname in ro_machines | default ([])
+#      - "'automount' not in pfs_mount['rw_options']"
+#    become: true
 
 ###############################################################################################
 # End of workaround to prevent Lustre clients from running out of Lustre IDs.
