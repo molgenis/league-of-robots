@@ -27,26 +27,16 @@
   changed_when: false
   become: true
 
-- name: test
-  vars:
-    this_database_number: >-
-      {% if found_db_index.rc == 0 and found_db_index.stdout | int %}{{ found_db_index.stdout }}{% else %}{{ ldap_max_index.stdout }}{% endif %}
-    this_database: "{% raw %}{{% endraw %}{{ this_database_number }}{% raw %}}{% endraw %}"
-  block:
-    - name: debug
-      debug:
-        msg: "this_database={{ this_database }}"
-
 - name: Configure OpenLDAP databases
   vars:
-    this_database_number: >-
+    current_db_num: >-
       {% if found_db_index.rc == 0 and found_db_index.stdout | int %}{{ found_db_index.stdout }}{% else %}{{ ldap_max_index.stdout }}{% endif %}
-    this_database: "{% raw %}{{% endraw %}{{ this_database_number }}{% raw %}}{% endraw %}"
+    current_db_brackets: "{% raw %}{{% endraw %}{{ current_db_num }}{% raw %}}{% endraw %}"
   block:
-    - name: 'Create database for "{{ ldap_domain }}" domain in the OpenLDAP config database {{ this_database }}.'
+    - name: 'Create database for "{{ ldap_domain }}" domain in the OpenLDAP config database {{ current_db_brackets }}.'
       community.general.ldap_entry:
         server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        dn: "olcDatabase={{ current_db_brackets }}mdb,cn=config"
         state: present
         objectClass:
           - olcDatabaseConfig
@@ -55,7 +45,7 @@
           #
           # These attributes cannot be changed with this role.
           #
-          olcDatabase: "{{ this_database }}mdb"
+          olcDatabase: "{{ current_db_brackets }}mdb"
           olcDbDirectory: "/usr/local/openldap/var/{{ ldap_domain }}-data"
           olcSuffix: "{{ ldap_domains[ldap_domain]['base'] }}"
       become: true
@@ -63,7 +53,7 @@
     - name: 'Update "{{ ldap_domain }}" database attributes in the OpenLDAP config database.'
       community.general.ldap_attrs:
         server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        dn: "olcDatabase={{ current_db_brackets }}mdb,cn=config"
         state: exact
         attributes:
           olcDbMode: '0600'
@@ -83,7 +73,7 @@
     - name: 'Update OpenLDAP config database to create memberOf overlay for dynamic memberOf attributes in "{{ ldap_domain }}" database.'
       community.general.ldap_entry:
         server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        dn: "olcDatabase={{ current_db_brackets }}mdb,cn=config"
         state: present
         objectClass:
           - olcOverlayConfig
@@ -105,7 +95,7 @@
     - name: 'Update "{{ ldap_domain }}" database ACLs in the OpenLDAP config database.'
       community.general.ldap_attrs:
         server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        dn: "olcDatabase={{ current_db_brackets }}mdb,cn=config"
         state: exact
         ordered: true
         attributes:
@@ -161,7 +151,7 @@
     - name: 'Configure replication provider for "{{ ldap_domain }}" database.'
       community.general.ldap_attrs:
         server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
-        dn: "olcDatabase={{ this_database }}mdb,cn=config"
+        dn: "olcDatabase={{ current_db_brackets }}mdb,cn=config"
         state: exact
         ordered: true
         attributes:

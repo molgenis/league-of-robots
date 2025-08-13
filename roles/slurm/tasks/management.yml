@@ -202,6 +202,7 @@
 
 - name: 'Install Slurm job_submit.lua script.'
   ansible.builtin.template:
+    # noqa: jinja[spacing]
     src: "job_submit.lua.el
          {%- if ansible_facts['distribution_major_version'] is version('8', '>=') -%}
            8

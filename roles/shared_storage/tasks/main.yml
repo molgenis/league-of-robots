@@ -178,6 +178,7 @@
   vars:
     group_id: "{{ getent_group[item.1.name][1] | default('') }}"
     lfs_type: "{{ item.0.lfs | regex_search('((tmp)|(rsc)|(prm))[0-9]+$', '\\1') | first }}"
+    # noqa: jinja[spacing]
     lfs_type_project_id_increment: "
       {%- if lfs_type == 'home' -%}
         0
