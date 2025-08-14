@@ -124,8 +124,8 @@ There are **many** differences between the linux and windows OpenSSH configurati
 
 In order to connect to {{ slurm_cluster_name | capitalize }}
 
-- first open Start menu, search and execute the `cmd` or `Command Prompt` program
-- login to {{ slurm_cluster_name }} by using a command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
+- Open the _Start_ menu, search for `PowerShell` or `cmd` (a.k.a. `Command Prompt`) and then start that application
+- Execute `ssh {{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
 
 ### 2.4 Port forwarding to the compute nodes
 
