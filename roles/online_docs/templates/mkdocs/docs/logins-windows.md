@@ -54,7 +54,7 @@ If you prefer another terminal application consult the corresponding manual.
     * 8: Click the small button to select the _**private key file**_ you generated previously (same as for 4).  
       **Important**: the path to the selected private key will be shown.
       Depending on how you browsed to the private key file, the path may
-        * Either start with a drive letter, colon and single backslash.
+        * Either start with a drive letter, colon and single backslash.  
           E.g. ```H:\path\to\private_key.ppk```
           This is fine and should work.
         * Or start with two backslashes.
