@@ -51,7 +51,7 @@ If you prefer another terminal application consult the corresponding manual.
       However if you encounter a network where port 22 is blocked, you can try port 443. (Normally used for HTTPS, but our Jumposts can use it for SSH too.)
     * 6: _Username_ field: Use your _**account name**_ as you received it by email from the helpdesk (same as for 3).
     * 7: Select _Use SSH key_ and
-    * 8: Click the small button to select the _**private key file**_ you generated previously (same as for 4).
+    * 8: Click the small button to select the _**private key file**_ you generated previously (same as for 4).  
       **Important**: the path to the selected private key will be shown.
       Depending on how you browsed to the private key file, the path may
         * Either start with a drive letter, colon and single backslash.
