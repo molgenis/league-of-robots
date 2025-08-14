@@ -57,7 +57,7 @@ If you prefer another terminal application consult the corresponding manual.
         * Either start with a drive letter, colon and single backslash.  
           E.g. ```H:\path\to\private_key.ppk```
           This is fine and should work.
-        * Or start with two backslashes.
+        * Or start with two backslashes.  
           E.g. ```\\path\to\private_key.ppk```  
           This won't work and MobaXterm will fail silently: no login, no error, no nothing.
           Use a different route in the GUI to browse to your private key file such that the path starts with a drive letter, colon and single backslash.
