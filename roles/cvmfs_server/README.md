@@ -13,7 +13,7 @@ Create a new repo and publish:
  * ```cvmfs_server mkfs [repo_name]```
  * ```cvmfs_server transaction [repo_name]```
  * ```cd /cvmfs/[repo_name]/``` and make changes
- * ```cvmfs_server publish [repo_name]```
+ * ```cvmfs_server publish -a [tag] [repo_name]```
  * check created repo: ```cvmfs_server info [repo_name]```
 
 In order to mount the newly created repo on the client (startum 1), these configurations are needed on the client:
@@ -24,5 +24,7 @@ In order to mount the newly created repo on the client (startum 1), these config
  * Copy ```/etc/cvmfs/keys/[repo_name].pub``` to the client
 
 NOTE:
-- When repo is in production, add a cronjob to renew the master key on the server:
-```cvmfs_server resign [repo.name]``` (it expires after 30 days)
+- When repo is in production, add a cronjob to renew the master key every 20th day of the month:
+```8 0 20 * * root /usr/bin/cvmfs_server resign [repo_name]``` (it expires after 30 days)
+
+- For testing purposes, the client role is only deployed on talos. When moving to prodcution, please change the hosts in single_role_playbooks/cvmfs_client.yml.
