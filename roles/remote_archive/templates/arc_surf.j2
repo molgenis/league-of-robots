@@ -57,7 +57,7 @@ done
 
 _groups="$(echo "${_path}" | cut -s -d'/' -f2)"
 _correct_path=false
-_top_mounts=({% for archive in archive_groups %} "{{ archive.local_top_level_mount }}" {% endfor %})
+_top_mounts=({% for archive in remote_archive %} "{{ archive.local_top_level_mount }}" {% endfor %})
 for _each_group in "${_top_mounts[@]}"; do
    [[ "/${_groups}" == "${_each_group}" ]] && _correct_path=true && break
 done

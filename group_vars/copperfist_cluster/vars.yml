@@ -235,7 +235,7 @@ regular_users:
   - name: 'umcg-gap-dm'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
   - name: 'umcg-gd-ateambot'
-    groups: ['umcg-gd', 'umcg-gap', "{{ functional_users_group }}"]
+    groups: ['umcg-gd', 'umcg-gap', 'umcg-ogm', "{{ functional_users_group }}"]
   - name: 'umcg-gd-dm'
     groups: ['umcg-gd', "{{ functional_users_group }}"]
   - name: 'umcg-genomescan-ateambot'
@@ -531,17 +531,25 @@ lfs_mounts:
     pfs: local_raid
     groups:
       - name: umcg-atd
+        mode: '2770'
       - name: umcg-gap
+        mode: '2770'
       - name: umcg-gd
+        mode: '2770'
       - name: umcg-genomescan
+        mode: '2770'
       - name: umcg-gsad
+        mode: '2770'
       - name: umcg-gst
+        mode: '2770'
       - name: umcg-lab
-        mode: '2750'
       - name: umcg-labgnkbh
+        mode: '2770'
       - name: umcg-patho
+        mode: '2770'
       # - name: umcg-pr
       - name: umcg-vipt
+        mode: '2770'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: tmp16
     pfs: 'umcgst16'
