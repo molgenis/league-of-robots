@@ -1,0 +1,3 @@
+cvmfs_repo_url: https://cvmrepo.web.cern.ch/cvmrepo/yum/cernvm.repo
+cvmfs_repo_key_url: https://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM
+cvmfs_package_state: latest  # Change to `latest` to update cvmfs if a newer release is available.
