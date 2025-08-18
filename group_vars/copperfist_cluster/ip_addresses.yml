@@ -7,11 +7,8 @@ ip_addresses:
     vlan990:
       address: 192.168.1.62
       netmask: /32
-    vlan990_bmc_ipmi:
-      address: 10.10.1.102
-      netmask: /32
-    vlan990_bmc_mgmt:
-      address: 10.10.1.72
+    vlan990_ipmi:
+      address: 192.168.1.242
       netmask: /32
   cf-porch:
     cf_internal_management:
