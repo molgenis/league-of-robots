@@ -49,16 +49,13 @@ ldap_domains:
     ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
     replication_provider_uri: ldap://172.19.34.180
     replication_provider_base: dc=rug,dc=nl
-
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
 ]
-stack_networks:
+azure_networks:
   - name: vnet-medgen-t
     cidr: '10.96.52.12/24'
-    type: management
-    external: true
 iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['umcg']['internal1'] }}"
   - "{{ all.ip_addresses['umcg']['basiswerkplek'] }}"
@@ -227,7 +224,6 @@ lfs_mounts:
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-lab
-        mode: '2750'
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05

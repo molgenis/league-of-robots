@@ -1,5 +1,5 @@
 #
-# Install webserver.
+# Install cvmfs_sever.
 #
 ---
 - name: 'Check OS version of target host.'
@@ -21,6 +21,7 @@
       - curl
       - nano
       - rsync
+      - wget
   become: true
 
 - name: 'Ensure CVMFS repo is installed.'
@@ -33,13 +34,32 @@
   ansible.builtin.rpm_key:
     state: present
     key: "{{ cvmfs_repo_key_url }}"
-    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
   become: true
 
-- name: 'Install CVMFS.'
+- name: 'Install CVMFS and additional packages.'
   ansible.builtin.package:
-    name: cvmfs
+    name:
+      - cvmfs
+      - cvmfs-server
+      - cvmfs-keys
+      - cvmfs-init-scripts
     state: "{{ cvmfs_package_state }}"
     update_cache: true
+  become: true
+
+- name: 'Install apache webserver.'
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+    name:
+      - httpd
+  become: true
+
+- name: Enable webserver.
+  ansible.builtin.systemd:
+    name: httpd
+    enabled: true
+    state: started
+    daemon_reload: true
   become: true
 ...

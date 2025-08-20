@@ -1,15 +1,11 @@
 ---
 openstack_api_timeout: 180
 #
-# network_names_of_all_hosts_created_in_openstack are the ones specified in the inventory for hosts,
+# security_group_names_of_all_hosts_created_in_openstack are the hosts specified in the inventory,
 # which also have a `cloud_flavor` specified, indicating these machines are created in OpenStack.
 #
-network_names_of_all_hosts_created_in_openstack: "{{ hostvars
-    | json_query('* | [?cloud_flavor] | [].host_networks[].name')
-    | flatten
-    | unique }}"
-inventory_groups_with_hosts_created_in_openstack: "{{ hostvars
-    | json_query('* | [?cloud_flavor] | [].group_names')
+security_group_names_of_all_hosts_created_in_openstack: "{{ hostvars
+    | json_query('* | [?cloud_flavor] | [].host_networks[].security_group')
     | flatten
     | unique }}"
 ...

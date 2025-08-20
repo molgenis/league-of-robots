@@ -6,7 +6,76 @@
 ### Functions to manage Pulp repos.
 ##
 #
-
+function pulp-refresh-acs() {
+	#
+	# Configure variables.
+	#
+	declare -a _pulp_alternate_content_sources
+	local      _pulp_repo_management_user='{{ repo_management_user }}'
+	local      _pulp_acs
+	_pulp_alternate_content_sources=(
+		{% for pulp_repo in pulp_repos[os_distribution] | selectattr('acs', 'defined') %}
+		  {% for pulp_acs in pulp_repo['acs'] %}
+		{{ pulp_repo['name'] }}-{{ pulp_acs['name'] }}-acs
+			{% endfor %}
+		{% endfor %}
+	)
+	{% raw %}
+	#
+	# Check and modify env.
+	#
+	local _opt_nounset_was_enbled
+	if [[ -o nounset ]]; then
+		_opt_nounset_was_enbled='true'
+	else
+		_opt_nounset_was_enbled='false'
+		set -u
+	fi
+	#
+	# Check if Python venv was initialized.
+	#
+	if [[ -z "${VIRTUAL_ENV:-}" ]]; then
+		echo 'ERROR: ${VIRTUAL_ENV} is empty.'
+		echo 'FATAL: This code requires the pulp-cli and its dependencies installed in a Python virtual environment.'
+		echo '       Try:'
+		echo "           source /admin/${_pulp_repo_management_user}/pulp-cli.venv/bin/activate"
+		echo '       to load the Python virtual environment.'
+		echo 'FATAL: See https://github.com/rug-cit-hpc/league-of-robots/blob/develop/documentation/Configuring_Pulp.md for additional instructions.'
+		return 1
+	fi
+	echo '######################################################################################'
+	echo '# Create/update alternate content sources (acs).'
+	echo '######################################################################################'
+	for _pulp_acs in "${_pulp_alternate_content_sources[@]}"; do
+		local _acs_action
+		if pulp rpm acs show --name "${_pulp_acs}" >/dev/null 2>&1; then
+			_acs_action='update'
+			echo "INFO: Updating ${_pulp_acs} alternate content source ..."
+		else
+			_acs_action='create'
+			echo "INFO: Creating ${_pulp_acs} alternate content source ..."
+		fi
+		pulp rpm acs "${_acs_action}" \
+			--name "${_pulp_acs}" \
+			--remote "${_pulp_acs}-remote"
+		echo '======================================================================================'
+	done
+	echo '######################################################################################'
+	echo '# Refresh alternate content sources.'
+	echo '######################################################################################'
+	for _pulp_acs in "${_pulp_alternate_content_sources[@]}"; do
+		echo "INFO: Refreshing ${_pulp_acs} using its remote ..."
+		pulp rpm acs refresh --name "${_pulp_acs}"
+		echo '======================================================================================'
+	done
+	#
+	# Reset env.
+	#
+	if [[ "${_opt_nounset_was_enbled}" == 'false' ]]; then
+		set +u
+	fi
+}
+{% endraw %}
 function pulp-sync-publish-distribute() {
 	#
 	# Configure variables.
@@ -188,6 +257,7 @@ function pulp-sync-publish-distribute() {
 	fi
 }
 
+echo 'INFO: Added "pulp-refresh-acs" function/command to environment.'
 echo 'INFO: Added "pulp-sync-publish-distribute" function/command to environment.'
 
 {% endraw %}

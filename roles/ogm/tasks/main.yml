@@ -1,5 +1,15 @@
 ---
 - name: Install and configure OGM backup
   ansible.builtin.include_tasks: script_and_cron.yml
-  when: ogm_enabled
+
+- name: Install OGM trendanalysis script and cron
+  ansible.builtin.include_tasks: trendanalysis.yml
+  vars:
+    ogm_server: "{{ item.server }}"
+    prm_location: "{{ item.prm_location }}"
+    trendanalysis_api_username: "{{ item.trendanalysis_api_username }}"
+    trendanalysis_cron_disabled: "{{ item.trendanalysis_cron_disabled }}"
+    trendanalysis_cron_command: "{{ item.trendanalysis_cron_command }}"
+  loop: "{{ ogm_servers | default([]) }}"
+  when: item.trendanalysis_cron_disabled is defined
 ...

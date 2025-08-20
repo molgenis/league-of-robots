@@ -1,4 +1,5 @@
 #jinja2: trim_blocks:False
+{% set example_tmp_lfs = lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | map(attribute='lfs') | first %}
 {%if groups['compute_node'] | map('extract', hostvars, 'gpu_count') | select('defined') | default([0], true) | map('int') | sum > 0 %}{# checks if this stack has GPUs or not #}
 # How to use GPU nodes
 
@@ -49,14 +50,14 @@ Or can be use as the argument on the command line
 Example 2 runs the same GPU example in an interactive session using `srun`.
 
 ```bash
-    $ mkdir -p /groups/umcg-GROUP/tmpXX/projects/${USER}/gpu_test
-    $ cd /groups/umcg-GROUP/tmpXX/projects/${USER}/gpu_test
+    $ mkdir -p /groups/[group]/{{ example_tmp_lfs }}/projects/${USER}/gpu_test
+    $ cd /groups/[group]/{{ example_tmp_lfs }}/projects/${USER}/gpu_test
     $ srun --qos=interactive-short --gres=gpu:{{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:2 --time=01:00:00 --pty bash -i
     $ echo ${SLURM_GPUS_ON_NODE}
     2  
 ```
 
-Replace `GROUP` and `tmpXX` placeholders with correct values for group and tmp filesystem. The returned value is the number of GPUs available for the job. Use the `nvidia-smi` command to see more information about the GPU devices that are available inside the job.
+Replace `GROUP` (and if needed `{{ example_tmp_lfs }}`) placeholders with correct values for group and tmp filesystem. The returned value is the number of GPUs available for the job. Use the `nvidia-smi` command to see more information about the GPU devices that are available inside the job.
 
 ```bash
     $ nvidia-smi 
@@ -102,9 +103,9 @@ which will list the type and number of GPUs used in the last column like this:
 
 ```
         JOBID    NAME     USER        ST      TIME  NODES  NODELIST(REASON)  TRES_PER_NODE
-         1234    bash     umcg-user1  R       8:27      1  nb-vcompute05     gres:gpu:a40:2
-         1235    somejob  umcg-user2  R    2:09:14      1  nb-vcompute05     N/A
-         1236    somejob  umcg-user3  R    2:19:53      1  nb-vcompute04     N/A
+         1234    bash     user1  R       8:27      1  nb-vcompute05     gres:gpu:a40:2
+         1235    somejob  user2  R    2:09:14      1  nb-vcompute05     N/A
+         1236    somejob  user3  R    2:19:53      1  nb-vcompute04     N/A
          ...
 ```
 
@@ -122,8 +123,8 @@ To check the driver and cuda version, run `nvidia-smi` on the compute node:
 
 ```bash
     # Replace the YYY with apropriate values.
-    mkdir -p /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
-    cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/cuda_samples
+    mkdir -p /groups/[group]/{{ example_tmp_lfs }}/users/[group]/cuda_samples
+    cd /groups/[group]/{{ example_tmp_lfs }}/users/[group]/cuda_samples
     wget https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.2.tar.gz -O - | tar -xz
     cd cuda-samples-12.2/Samples/6_Performance/UnifiedMemoryPerf
     # Increase the matrix size, so that the calulation takes long enough to capture with nvidia-smi.
@@ -176,8 +177,8 @@ To run this example
 1. create the working directory on the `tmp` filesystem and navigate into it
 
 ```bash
-   mkdir /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
-   cd /groups/umcg-YYY/tmpYY/users/umcg-YYY/gpu_apptainer_test
+   mkdir /groups/[group]/{{ example_tmp_lfs }}/users/[group]/gpu_apptainer_test
+   cd /groups/[group]/{{ example_tmp_lfs }}/users/[group]/gpu_apptainer_test
 ```
 
 2. Create two files
@@ -245,6 +246,29 @@ This basic training python script example
 2. builds a neural network machine learning model that classifies images,
 3. trains this neural network and
 4. evaluates the accuracy of the model.
+
+
+## Example 5: Large language models
+
+Running interactive ollama on GPU node
+
+```
+     [{{ groups['user_interface'] | first }}]$ # First ensure that ollama/models are stored on {{ example_tmp_lfs }} storage and not home dir
+     [{{ groups['user_interface'] | first }}]$ mkdir ~/.ollama
+     [{{ groups['user_interface'] | first }}]$ mkdir -p /groups/[group]/{{ example_tmp_lfs }}/users/[user]/ollama/models
+     [{{ groups['user_interface'] | first }}]$ ln -s /groups/[group]/{{ example_tmp_lfs }}/users/[user]/ollama/models ~/.ollama/models
+     [{{ groups['user_interface'] | first }}]$ srun --qos regular -N 1 -n 1 --gres=gpu:a40:1 -t 01:00:00 --mem 19240M --pty bash -i
+     srun: job 1479320 queued and waiting for resources
+     srun: job 1479320 has been allocated resources
+     [{{ stack_prefix }}-node-b02]$ ml ollama
+     [{{ stack_prefix }}-node-b02]$ unset ROCR_VISIBLE_DEVICES
+     [{{ stack_prefix }}-node-b02]$ ollama serve 1>ollama-serve.log 2>&1 &
+     [1] 11998
+     [{{ stack_prefix }}-node-b02]$ echo "what is the speed of light?" | ollama run deepseek-r1:14b
+     The **speed of light** in a vacuum is approximately **299,792 kilometers per second** (or about 186,282 miles per second). This is often 
+     denoted by the letter **c** and is considered one of the fundamental constants of nature. In different transparent media, such as glass or 
+     water, light travels slower than this speed.
+```
 
 ## Additional documentation
 

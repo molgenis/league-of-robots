@@ -17,4 +17,5 @@
     - shared_storage
     - role: soft_partition
       when: soft_partitions is defined
+    - parallax
 ...

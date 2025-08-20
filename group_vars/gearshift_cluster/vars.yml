@@ -85,12 +85,10 @@ ldap_domains:
     listserv_mailinglist: UMCG-HPC
 stack_networks:
   - name: vlan983
-    router_network: vlan16
-    type: management
-    external: true
+    router:
+      external_network: vlan16
   - name: vlan985
     type: storage
-    external: true
 nameservers: [
   '172.23.40.244', # Order is important: local DNS for Isilon storage first!
   '8.8.4.4',       # Google DNS.
@@ -413,11 +411,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
-  - name: tcp11
-    interface: vlan985.lustre
-  - name: tcp14
-    interface: vlan985.lustre
 pfs_mounts:
   - pfs: umcgst10
     source: 'gcc-storage001.stor.hpc.local:/ifs/rekencluster'
@@ -458,7 +451,6 @@ lfs_mounts:
       - name: umcg-ejp-rd
       - name: umcg-endocrinology
       - name: umcg-fg
-        mode: '2750'
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gaf
@@ -468,41 +460,31 @@ lfs_mounts:
       - name: umcg-gdi
       - name: umcg-gdio
       - name: umcg-gonl
-        mode: '2750'
       - name: umcg-griac
       - name: umcg-grip
-        mode: '2750'
       - name: umcg-gsad
       - name: umcg-hematology
       - name: umcg-hlhs
-        mode: '2750'
       - name: umcg-immunogenetics
       - name: umcg-impact
       - name: umcg-lifelines
-        mode: '2750'
       - name: umcg-lld
       - name: umcg-llnext
       - name: umcg-mic
       - name: umcg-micompany
       - name: umcg-msb
       - name: umcg-nawijn
-        mode: '2750'
       - name: umcg-neonatology
-        mode: '2750'
       - name: umcg-pgx
-        mode: '2750'
       - name: umcg-pmb
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
-        mode: '2750'
       - name: umcg-solve-rd
       - name: umcg-sommer
-        mode: '2750'
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ukb
-        mode: '2750'
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker

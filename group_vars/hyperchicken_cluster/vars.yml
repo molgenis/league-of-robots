@@ -80,18 +80,18 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: public
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: public
+    create: true
   - name: subnet-nfs-data-2541
     cidr: '10.35.141.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 10.35.141.251/32  # NFS server
       - 10.35.141.252/32  # NFS server
       - 10.35.141.253/32  # NFS server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -110,7 +110,7 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 # Remote archive settings
-archive_groups:
+remote_archive:
   - name: arc01
     local_top_level_mount: '/groups'
     groups:

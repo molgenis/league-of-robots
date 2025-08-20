@@ -34,7 +34,7 @@
 
 - name: Set list of unique ssh hosts
   ansible.builtin.set_fact:
-    archive_unique_hosts: "{{ archive_groups | map(attribute='archive_system', default='') | unique }}"
+    archive_unique_hosts: "{{ remote_archive | map(attribute='archive_system', default='') | unique }}"
 
 - name: Deploy ssh configuration settings for accessing archive
   ansible.builtin.template:
@@ -49,7 +49,7 @@
   ansible.builtin.set_fact:
     archive_all_fingerprints: "{{ archive_all_fingerprints | default([]) + [item.0.archive_system + ' ' + item.1] }}"
   with_subelements:
-    - "{{ archive_groups | default([], true) | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'archive_system_fingerprints'
 
 - name: Write public keys into known_hosts
@@ -83,7 +83,7 @@
   register: archive_dir_test
   changed_when: false
   with_subelements:
-    - "{{ archive_groups | default([], true) | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'groups'
   become: true
 ...

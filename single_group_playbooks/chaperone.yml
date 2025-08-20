@@ -38,6 +38,7 @@
     - shared_storage
     - build_environment
     - envsync
+    - parallax
 
 - name: '###==-> Roles only for partially managed chaperones <-==###'
   hosts: mit_chaperone

@@ -14,7 +14,7 @@ slurm_partitions:
     max_mem_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
     local_disk: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
-    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_r6515  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -23,7 +23,7 @@ slurm_partitions:
     max_mem_per_node: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
     local_disk: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
-    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_vm  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-c01"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -134,27 +134,26 @@ availability_zone: nova
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
-    gateway: '172.23.68.1'
-    router_network: vlan16
-    router_name: vlan1337
-    type: management
-    external: true
+    router:
+      next-hop-address: '172.23.68.1'
+      external_network: vlan16
+      name: vlan1337
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
     mtu_size: '1450'
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -191,7 +190,7 @@ sponsors:
   - name: umcg-mswertz
     slurm_shares: 570
 # Remote archive settings
-archive_groups:
+remote_archive:
   - name: arc01
     local_top_level_mount: '/groups'
     groups:
@@ -267,12 +266,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks_vm:
-  - name: tcp20
-    interface: enp5s0
-#
-# lustre_client_networks for baremetal machines specified in static_inventory.
-#
 pfs_mounts:
   - pfs: umcgst04/slice4
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
@@ -283,8 +276,8 @@ pfs_mounts:
   - pfs: umcgst04/slice5
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -292,18 +285,18 @@ lfs_mounts:
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-atd
       - name: umcg-gcc
-        mode: '2750'
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-sysops
-        mode: '2750'
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
@@ -311,6 +304,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
