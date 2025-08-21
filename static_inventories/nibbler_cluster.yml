@@ -212,11 +212,6 @@ all:
           slurm_real_memory: 63788
           slurm_local_disk: 0
           slurm_features: 'prm02,prm03,rsc02,tmp02'
-          slurm_ethernet_interfaces:
-            - enp0s3
-            - enp0s4
-            - enp0s5
-            - enp0s6
     compute_node:
       children:
         cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -268,9 +263,6 @@ all:
               slurm_local_disk: 3002000
               slurm_features: 'rsc02,tmp02'
               slurm_weight: 5
-              slurm_ethernet_interfaces:
-                - eth2
-                - eth2.1068
         gpu_a40:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-b[01:02]:
@@ -304,13 +296,6 @@ all:
               slurm_local_disk: 900
               slurm_features: 'rsc02,tmp02,gpu,A40'
               slurm_weight: 10
-              slurm_ethernet_interfaces:
-                - enp0s3
-                - enp0s4
-                - enp0s5
-                # DH4 and DH5 not used on compute nodes (yet).
-                #- ens6
-                #- ens7
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-c[01:10]:
@@ -360,9 +345,6 @@ all:
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
               slurm_features: 'rsc02,tmp02'
-              slurm_ethernet_interfaces:
-                - enp130s0f0
-                - enp130s0f0.1068
 administration:
   children:
     sys_admin_interface:
