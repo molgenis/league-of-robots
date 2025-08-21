@@ -295,22 +295,27 @@ all:
             - name: vlan1336
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: eth2
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
-#               nmstate_interface:
-#                 name: enp65s0np0.990
-#                 type: vlan
-#                 vlan:
-#                   id: 990
-#                   base-iface: enp65s0np0
-#                 ipv4:
-#                   dhcp: false
+              nmstate_interface:
+                name: eth2.990
+                type: vlan
+                vlan:
+                  id: 990
+                  base-iface: eth2
+                ipv4:
+                  dhcp: false
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
           local_mounts:
             - mount_point: '/mnt/umcgst15'
-              device: '/dev/data/hdd'
+              device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+              label: local
+              perc_controller: 0
+              perc_virtual_drive: 239
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
