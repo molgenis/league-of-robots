@@ -61,6 +61,7 @@ Now make sure you:
 ## 2. Using Windows OpenSSH
 
 Newer versions of Windows (10+) come with built-in OpenSSH software. The benefits of using this client software are
+
  - you don't need to install any additional software
  - it is open source implementation, following the OpenSSH code base that is used on Linux/Unix environments
  - (mostly) compatible with OpenSSH command options on Linux/Unix systems
@@ -74,12 +75,12 @@ This will save private/public keypair into the `C:\Users\[Username]\.ssh` folder
 If you wish to create them at another another location, use
 
 ```
-    C:\Users\[Username]\.ssh>ssh-keygen -f "C:\Users\[Username]\OneDrive - UMCG\Desktop\id_ed25519"
+    C:\Users\[Username]\.ssh>ssh-keygen -f "C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key"
     Generating public/private ed25519 key pair.
     Enter passphrase (empty for no passphrase):
     Enter same passphrase again:
-    Your identification has been saved in C:\Users\[Username]\OneDrive - UMCG\Desktop\id_ed25519
-    Your public key has been saved in C:\Users\[Username]\OneDrive - UMCG\Desktop\id_ed25519.pub
+    Your identification has been saved in C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key
+    Your public key has been saved in C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key
     The key fingerprint is:
     SHA256:JvnMkEf6lrP8x4LnzMIqi48/MRbd+gSz8ab+8mFwqQQ zkh\[Username]@ctxw11mup0108
     The key's randomart image is:
@@ -94,9 +95,19 @@ If you wish to create them at another another location, use
     |   oo o+=*o o    |
     |  oo+=o====o     |
     +----[SHA256]-----+
-    
+
     C:\Users\[Username]\.ssh>
 ```
+
+then simply use the path and print the *public* key content
+
+```
+    C:\Users\[Username]\.ssh>type "C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key"
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaeeGaCcRBjgwtOfQ6IKGs1GO8uT42tD3+4zZRKkMba example_key
+    C:\Users\[Username]\.ssh>
+```
+
+you can copy-paste it in the email you'll send in the next step.
 
 ## 3. Request account and have the public key linked to your account
 
