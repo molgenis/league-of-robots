@@ -517,6 +517,8 @@ sudoers:
     become: 'umcg-gdi-dm'
   - who: ['%umcg-gdio-dms']
     become: 'umcg-gdio-dm'
+  - who: ['%umcg-gdio-dms']
+    become: 'umcg-gridion-dm'
   - who: ['%umcg-gonl-dms']
     become: 'umcg-gonl-dm'
   - who: ['%umcg-griac-dms']
