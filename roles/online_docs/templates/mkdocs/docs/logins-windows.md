@@ -101,7 +101,7 @@ while the right part remains a terminal where you can type commands.
 
 ### 2.1 Semi-automatic configuration with .bat script
 
-You can download the executable script from here [logins-windows.bat](../logins-windows.bat) and use it to configure ssh connection for the {{ slurm_cluster_name }}.
+Download the [logins-windows.bat](../logins-windows.bat) script and use it to configure the SSH connection for {{ slurm_cluster_name | capitalize }}:
  - Using Microsoft's Edge web browser: you will need to confirm that the file is safe **twice**  
    (see _Download_ icon, where you must select `Keep`, then `Show more` > `Keep anyway`)
  - Using other web browsers: the download itself is easier, but when you try to execute the script, you will get a `Windows protected` warning and you must click `More info` (small text at top left part of the window) followed by `Run anyway`.
