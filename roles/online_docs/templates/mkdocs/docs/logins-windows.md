@@ -51,14 +51,14 @@ If you prefer another terminal application consult the corresponding manual.
       However if you encounter a network where port 22 is blocked, you can try port 443. (Normally used for HTTPS, but our Jumposts can use it for SSH too.)
     * 6: _Username_ field: Use your _**account name**_ as you received it by email from the helpdesk (same as for 3).
     * 7: Select _Use SSH key_ and
-    * 8: Click the small button to select the _**private key file**_ you generated previously (same as for 4).
+    * 8: Click the small button to select the _**private key file**_ you generated previously (same as for 4).  
       **Important**: the path to the selected private key will be shown.
       Depending on how you browsed to the private key file, the path may
-        * Either start with a drive letter, colon and single backslash.
+        * Either start with a drive letter, colon and single backslash.  
           E.g. ```H:\path\to\private_key.ppk```
           This is fine and should work.
-        * Or start with two backslashes.
-          E.g. ```\\path\to\private_key.ppk```
+        * Or start with two backslashes.  
+          E.g. ```\\path\to\private_key.ppk```  
           This won't work and MobaXterm will fail silently: no login, no error, no nothing.
           Use a different route in the GUI to browse to your private key file such that the path starts with a drive letter, colon and single backslash.
     * 9: Click _**OK**_
@@ -102,12 +102,10 @@ while the right part remains a terminal where you can type commands.
 ### 2.1 Semi-automatic configuration with .bat script
 
 You can download the executable script from here [logins-windows.bat](../logins-windows.bat) and use it to configure ssh connection for the {{ slurm_cluster_name }}.
-
-If you try to download the script with Microsoft Edge (default browser), then
-
- - Microsoft Edge: **you will twice need to confirm that the file is safe and that your really want to store it** (see Download icon, where you must select `Keep`, then `Show more` > `Keep anyway`)
- - other web browsers: the download itself is easier, but when executing you get `Windows protected` warning, and you must click on `More info` text (small text at top left part of the window), then select `Run anyway`.
- - alternatively, you can simply click on [the link](../logins-windows.bat), then select all the text, copy and paste into a filename named `logins-windows.bat` (the `.bat` ending is mandatory in order the file to become executable)
+ - Using Microsoft's Edge web browser: you will need to confirm that the file is safe **twice**  
+   (see _Download_ icon, where you must select `Keep`, then `Show more` > `Keep anyway`)
+ - Using other web browsers: the download itself is easier, but when you try to execute the script, you will get a `Windows protected` warning and you must click `More info` (small text at top left part of the window) followed by `Run anyway`.
+ - Alternatively, you can simply follow the link [logins-windows.bat](../logins-windows.bat), select & copy the text, then paste into a file named `logins-windows.bat` on your windows machine. (The `.bat` filename extension is mandatory make the file executable.)
 
 Once you have the file, run it and the rest of the configuration will be (for except two prompts) done almost automatically.
 
@@ -117,17 +115,17 @@ The configuration files will be stored inside the `C:\Users\[Username]\.ssh\` fo
 
 (to be updated)
 
-The ssh configuration files can be created inside the `C:\Users\[Username]\.ssh\` folder. In order to manually create them, you can simply follow the instructions for [linux ssh configuration](../logins-linux-config/).
+If you are familiar with he SSH configuration files, and would like to create them manually, you can do that by editing the `%USERPROFILE%\.ssh` folder - which defaults to`C:\Users\[Username]\.ssh\`. Options about SSH configurations are further explained in the instructions for [Linux users](../logins-linux-config/).
 
 There are **many** differences between the linux and windows OpenSSH configuration. One of the biggest is the difference beween linux `/` and windows `\` as directory path separator. But there are many more. Users that do not understand those differences, should use the MobaXterm or semi-automatic .bat script options above.
 
 
 ### 2.3 Connecting to the system
 
-In order to connect to the {{ slurm_cluster_name }}
+In order to connect to {{ slurm_cluster_name | capitalize }}
 
-- first open Start menu, search and execute the `cmd` or `Command Prompt` program
-- login to {{ slurm_cluster_name }} by using a command `ssh umcg-username@{{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
+- Open the _Start_ menu, search for `PowerShell` or `cmd` (a.k.a. `Command Prompt`) and then start that application
+- Execute `ssh {{ groups['jumphost'] | first }}+{{ groups['user_interface'] | first }}`
 
 ### 2.4 Port forwarding to the compute nodes
 
