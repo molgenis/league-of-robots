@@ -8,7 +8,7 @@ Before you decide which client you wish to use, note that different client progr
 There are two options to login to clusters from Windows
 
  1. Either by using [MobaXterm client](#1-mobaxterm-option) software which requires installation
- 2. or use built-in [OpenSSH software](#2-using-windows-openssh)
+ 2. Or simply use Windows built-in [OpenSSH](#2-using-windows-openssh) software
 
 ## 1. MobaXterm option
 
