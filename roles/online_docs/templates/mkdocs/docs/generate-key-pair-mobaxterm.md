@@ -12,7 +12,7 @@ There are two options to login to clusters from Windows
 
 ## 1. MobaXterm option
 
-### Get MobaXterm - a terminal and key generator application
+### 1.1 Get MobaXterm - a terminal and key generator application
 
 There are many options all of which have their own pros and cons; we suggest you give [MobaXterm](https://mobaxterm.mobatek.net) version >= 12.3 a try 
 as it features a key generator, terminal and graphical user interface for data transfers all-in-one.
@@ -20,27 +20,27 @@ The following steps use the *portable* version of *MobaXterm Home Edition*, whic
 just download, unpack and execute.
 If you want to use another terminal, key generator or data transfer app please consult their manuals...
 
-#### 1.1 Launch MobaXterm key pair generator
+#### 1.2 Launch MobaXterm key pair generator
 
  * 0: Check your MobaXterm version is **12.3 or newer** as older ones have a known bug and won't work.
  * 1: Launch MobaXterm and choose the ```MobaKeyGen (SSH key generator)``` from the tools as shown in the screenshot below.
 
 ![launch MobaKeyGen](img/MobaXterm1.png)
 
-#### 1.2 Configure key pair generator
+#### 1.3 Configure key pair generator
 
 ![Select key type](img/MobaXterm2.png)
 
  * 2: From the **parameters** section at the bottom of the window choose: ```Type of key to generate:``` **ED25519**
  * 3: Click the **Generate** button...
 
-#### 1.3 Generate key pair
+#### 1.4 Generate key pair
 
 ![Generate randomness and subsequently key pair](img/MobaXterm3.png)
 
  * 4: Yes you really have to move the mouse now: computers are pretty bad at generating random numbers and MobaKeyGen uses the coordinates of your mouse movement as a seed to generate a random number.
 
-#### 1.4 Secure private key and save pair to disk
+#### 1.5 Secure private key and save pair to disk
 
 Your key pair was generated.
 
