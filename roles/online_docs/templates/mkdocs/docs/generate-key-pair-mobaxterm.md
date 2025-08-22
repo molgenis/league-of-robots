@@ -67,7 +67,7 @@ Newer versions of Windows (10+) come with built-in OpenSSH software. The benefit
 
 The main disadvantages might be that is less user-friendly for less experienced users, as it does not offer any graphical interface. It only provides with command line interfaces.
 
-### 2.1 Creating a key
+### 2.1 Creating a keypair with OpenSSH
 
 Start `PowerShell` or `cmd` (`Command prompt`) programs and run command `ssh-keygen`.
 This will save private/public keypair into the `C:\Users\[Username]\.ssh` folder.

@@ -145,10 +145,13 @@ where
 
 More information about `ssh` options can be find on the [ssh man pages](https://man.openbsd.org/ssh).
 
-### 2.5 Converting Putty .ppk key into OpenSSH format
+### 2.5 Creating keypair
 
+See [instructions how to generate keypair](../generate-key-pair-mobaxterm).
 
-Public/private keypairs created with `Putty` program are by default stored in the **P**utty **p**rivate **k**ey (ppk) format. The private keys files also have `.ppk` ending. The file format is not compatible with generic `OpenSSH` format (which most of ssh client programs use) and the key must either be recreated (and public part sent to helpdesk) or existing private key must be converted into more usable OpenSSH format.
+## 3. Converting keypair from Putty .ppk to OpenSSH format
+
+Public/private keypair created with `Putty` are by default stored in the **P**utty **p**rivate **k**ey (ppk) format. The private keys files also have `.ppk` ending. The file format is not compatible with generic `OpenSSH` format (which most of ssh client programs use) and the key must either be recreated (and public part sent to helpdesk) or existing private key must be converted into more usable OpenSSH format.
 
 In order to convert an existing keypair from Putty into OpenSSH format
 
