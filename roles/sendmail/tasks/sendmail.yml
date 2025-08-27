@@ -18,4 +18,7 @@
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= "8"
   become: true
+
+- name: Flush handlers for sendmail role.
+  ansible.builtin.meta: flush_handlers
 ...
