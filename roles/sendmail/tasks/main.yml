@@ -1,7 +1,0 @@
----
-- name: Configure sendmail
-  ansible.builtin.include_tasks:
-    file: sendmail.yml
-  when:
-    - sendmail_configure is defined and sendmail_configure
-...
