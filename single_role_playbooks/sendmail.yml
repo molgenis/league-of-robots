@@ -1,0 +1,7 @@
+---
+- name: Configure sendmail as default mail sender
+  hosts:
+   - all
+  roles:
+   - sendmail
+...

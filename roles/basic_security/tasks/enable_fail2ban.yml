@@ -5,6 +5,11 @@
     state: present
   become: true
 
+# fail2ban makes problems with mailing clients, this is solving this issue
+# to get more information, check the roles/sendmail/README.md
+- ansible.builtin.include_role:
+    name: sendmail
+
 - name: Copy fail2ban custom configuration file into place.
   ansible.builtin.template:
     src: "{{ basic_security_fail2ban_custom_configuration_template }}"

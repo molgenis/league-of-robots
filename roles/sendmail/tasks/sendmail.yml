@@ -1,0 +1,21 @@
+---
+- name: Install sendmail package
+  ansible.builtin.package:
+    name: 'sendmail'
+    state: latest
+    update_cache: true
+  notify: sendmail_service
+  become: true
+
+- name: Configure sendmail as default mail sender
+  ansible.builtin.command:
+    cmd: alternatives --set mta /usr/sbin/sendmail.sendmail
+  register: alternatives_sendmail_config
+  changed_when: alternatives_sendmail_config.rc == 0
+  failed_when: alternatives_sendmail_config.rc != 0
+  notify: sendmail_service
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] >= "8"
+  become: true
+...

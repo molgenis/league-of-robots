@@ -1,0 +1,10 @@
+---
+- name: 'Enable and (re)start sendmail.service'
+  ansible.builtin.systemd:
+    name: 'sendmail.service'
+    state: 'restarted'
+    enabled: true
+    daemon_reload: true
+  become: true
+  listen: sendmail_service
+...
