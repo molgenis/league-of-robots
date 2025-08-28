@@ -1,0 +1,58 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
+#!/bin/bash
+
+# It starts both at opening and closing of the session, line is simply limiting
+# it to run only at the open session
+[ "$PAM_TYPE" != "open_session" ] && exit
+
+_days_warning="{{ screen_days_warning | default('14') }}"
+_days_kill="{{ screen_days_kill | default('28') }}"
+
+logger -t screen_reaper "[$0] $(date +%D" "%T): executing by user=$(id -un) for the user=${USER}"
+
+[[ -n "${PAM_USER}" ]] && USER="${PAM_USER}"
+
+if test -d /run/screen/S-${USER}; then
+   _old_screens="$(find /run/screen/S-${USER} \( -atime +"${_days_warning}" -a -atime -"${_days_kill}" \) -type s)"
+   _kill_screens="$(find /run/screen/S-${USER} -atime +"${_days_kill}" -type s)"
+fi
+
+if [[ -n "${_old_screens}" ]] || [[ -n "${_kill_screens}" ]]; then
+   echo "################################################################################"
+   echo "#                 Warning: detected abandoned screen sessions"
+   echo "#"
+   echo "#  There are screen sessions running on this server, which have not being used."
+   echo "#  for a while. They are consuming (or perhaps even blocking) system resources."
+   echo "#  Eventually they will be cleaned up, but you should clean them before that."
+   echo "#  You can simply list them with 'screen -ls', then attach them with command"
+   echo "#  'screen -r <screenid>', and then (from the inside of the session) check if"
+   echo "#  it is still running/containing anything important. If not, simply use command"
+   echo "#  'exit' or 'logout' to remove them."
+   echo "#  (Or if you don't need ANY of them anymore, simply clean them ALL with a"
+   echo "#  'pkill -u ${USER} screen'."
+
+   if [[ -n "${_old_screens}" ]]; then
+      echo "#"
+      echo "#  List of ABANDONED screens that have been unused for more than ${_days_warning} days"
+      echo "#    ${_old_screens}" | sed "s|/run/screen/S-${USER}/||g"
+   fi
+
+   if [[ -n "${_kill_screens}" ]]; then
+      echo "#"
+      echo "#  List of screens that have BEEN NOW CLEANED (because they have run for too long)"
+      echo "#  (during the testing period, the screen sessions will not be killed - but this will"
+      echo "#  change in the near future)"
+      for _screen in ${_kill_screens}; do
+         echo -n "#    ${_screen}" | sed "s|/run/screen/S-${USER}/||g"
+         #rm -f "${_screen}" && echo " (killed)"   # not used at the moment, just show warning for now
+         echo "    (will be automatically killed in the near future)"
+      done
+   fi
+
+   echo "#"
+   echo "#  Please avoid abandoning screen sessions, instead regularly run 'screen -ls'"
+   echo "#  to find out which ones are still running. You can find more information at"
+   echo "#     https://www.gnu.org/software/screen/manual/screen.html"
+   echo "#"
+   echo "################################################################################"
+fi

@@ -88,6 +88,29 @@
         inventory_hostname in groups['cluster'] | default([])
   become: true
 
+- name: 'Deploy custom screen_reaper shell cleaning abandoned screen sessions'
+  ansible.builtin.template:
+    src: 'pam_screen_reaper.sh.j2'
+    dest: /etc/pam-script.d/screen_reaper.sh
+    owner: root
+    group: root
+    mode: '0755'
+  when: screen_cleanup_deploy | default(true)
+  become: true
+
+- name: 'Include screen_reaper in the pam session config of postlogin'
+  ansible.builtin.lineinfile:
+    path: "/etc/authselect/custom/{{ stack_name }}/postlogin"
+    state: present
+    insertafter: 'EOF'
+    regexp: 'session.*pam_exec\.so.*screen_reaper\.sh'
+    line: 'session     optional                   pam_exec.so stdout /etc/pam-script.d/screen_reaper.sh'
+    owner: root
+    group: root
+    mode: '0644'
+  when: screen_cleanup_deploy | default(true)
+  become: true
+
 - name: "Force enable authselect {{ stack_name }} profile."
   ansible.builtin.command:
     cmd: >
