@@ -63,9 +63,9 @@
     group: "{{ item.1.name }}"
     mode: '2750'
     state: 'directory'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
-    - 'groups'
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+            | subelements('groups') }}"
   tags:
     - groups
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
@@ -76,11 +76,11 @@
     path: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     owner: "{{ item.1.name }}-dm"
     group: "{{ item.1.name }}"
-    mode: "{{ item.1.mode | default('2770', true) }}"
+    mode: "{{ item.1.mode | default('2750', true) }}"
     state: 'directory'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | list }}"
-    - 'groups'
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', 'tmp[0-9]+$')
+            | subelements('groups') }}"
   tags:
     - groups
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
@@ -93,9 +93,9 @@
     group: "{{ item.1.name }}"
     mode: "{{ item.1.mode | default('2750', true) }}"
     state: 'directory'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'rsc[0-9]+$') | list }}"
-    - 'groups'
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', 'rsc[0-9]+$')
+            | subelements('groups') }}"
   tags:
     - groups
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
@@ -108,9 +108,9 @@
     group: "{{ item.1.name }}"
     mode: "{{ item.1.mode | default('2750', true) }}"
     state: 'directory'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'prm[0-9]+$') | list }}"
-    - 'groups'
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', 'prm[0-9]+$')
+            | subelements('groups') }}"
   tags:
     - groups
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
@@ -123,9 +123,9 @@
     group: "{{ item.1.name }}"
     mode: "{{ item.1.mode | default('2770', true) }}"
     state: 'directory'
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', 'dat[0-9]+$') | list }}"
-    - 'groups'
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', 'dat[0-9]+$')
+            | subelements('groups') }}"
   tags:
     - groups
   when: inventory_hostname in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='machines') | first | default([])
@@ -226,7 +226,7 @@
 ### Unmount LFS-ses, which are no longer configured to be mounted.
 ##
 #
-- name: 'Unmount shared storage LFS-ses no longer configured to be mounted. (WARNING: cannot check and unmount autofs mounts.)'
+- name: 'Unmount shared storage LFS-ses no longer configured to be mounted: device based check. (WARNING: cannot check and unmount autofs mounts.)'
   ansible.posix.mount:  # noqa jinja[spacing]
     path: "{{ item['mount'] }}"
     src: "{{ item['device'] }}"
@@ -246,10 +246,17 @@
         {%- if inventory_hostname in lfs_mount['rw_machines'] | default([])
             or inventory_hostname in lfs_mount['ro_machines'] | default([]) -%}
           {%- for group in lfs_mount['groups'] -%}
+            {%- if lfs_mount['type'] is defined and lfs_mount['type'] == 'bind' -%}
+      {{ pfs_mounts
+         | selectattr('pfs', 'equalto', lfs_mount['pfs'])
+         | map(attribute='source')
+         | first }}/{{ lfs_mount['pfs'] }}/groups#
+            {%- else -%}
       {{ pfs_mounts
          | selectattr('pfs', 'equalto', lfs_mount['pfs'])
          | map(attribute='source')
          | first }}/{{ lfs_mount['pfs'] }}/groups/{{ group['name'] }}/{{ lfs_mount['lfs'] }}#
+            {%- endif -%}
           {%- endfor -%}
         {%- endif -%}
       {%- endfor -%}
@@ -281,9 +288,40 @@
     | list }}"
   tags:
     - groups
-  when: item['device'] not in configured_lfs_mount_devices
+  when:
+    - item['device'] not in configured_lfs_mount_devices
   become: true
 
+- name: 'Unmount shared storage LFS-ses no longer configured to be mounted: mount point based check for bind mounts of group dirs.'
+  ansible.posix.mount:  # noqa jinja[spacing]
+    path: "{{ item['mount'] }}"
+    src: "{{ item['device'] }}"
+    state: absent
+  vars:
+    configured_lfs_mount_points_string: "
+      {%- for lfs_mount in lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list -%}
+        {%- if inventory_hostname in lfs_mount['rw_machines'] | default([])
+            or inventory_hostname in lfs_mount['ro_machines'] | default([]) -%}
+          {%- for group in lfs_mount['groups'] -%}
+      /groups/{{ group['name'] }}/{{ lfs_mount['lfs'] }}#
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endfor -%}"
+    configured_lfs_mount_points: "{{ configured_lfs_mount_points_string
+      | regex_replace('#+$', '')
+      | split('#') }}"
+  with_items: "{{ ansible_mounts
+    | selectattr('mount', 'defined')
+    | selectattr('mount', 'search', '^/groups/')
+    | selectattr('device', 'defined')
+    | selectattr('device', 'search', '(^//)|(:/)')
+    | sort(attribute='device')
+    | list }}"
+  tags:
+    - groups
+  when:
+    - item['mount'] not in configured_lfs_mount_points
+  become: true
 #
 ##
 ### Mount all LFS-ses on cluster components/machines.
@@ -368,9 +406,15 @@
       {%- if pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first == 'cifs' -%}
       ,credentials=/etc/sysconfig/{{ item.0.pfs | regex_replace('\$$', '') }}.cifs,uid={{ item.1.name }}-dm,gid={{ item.1.name }},dir_mode=02750,file_mode=0640
       {%- endif -%}
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
-    - 'groups'
+  loop:
+    "{{ lfs_mounts
+        | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+        | selectattr('type', 'undefined')
+        | union(lfs_mounts
+                | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                | selectattr('type', 'defined')
+                | rejectattr('type', 'equalto', 'bind'))
+        | subelements('groups') }}"
   tags:
     - groups
   when:
@@ -392,15 +436,164 @@
       {%- if pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first == 'cifs' -%}
       ,credentials=/etc/sysconfig/{{ item.0.pfs | regex_replace('\$$', '') }}.cifs,uid={{ item.1.name }}-dm,gid={{ item.1.name }},dir_mode=02750,file_mode=0640
       {%- endif -%}
-  with_subelements:
-    - "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$') | list }}"
-    - 'groups'
+  loop:
+    "{{ lfs_mounts
+        | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+        | selectattr('type', 'undefined')
+        | union(lfs_mounts
+                | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                | selectattr('type', 'defined')
+                | rejectattr('type', 'equalto', 'bind'))
+        | subelements('groups') }}"
   tags:
     - groups
   when:
     - inventory_hostname in item.0.ro_machines | default ([])
     - pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='type') | first != "beegfs"
   become: true
+
+###############################################################################################
+# Start of workaround to prevent Lustre clients from running out of Lustre IDs.
+###############################################################################################
+#
+# Use bind mounts for group folders instead of "regular" mount as defined by the PFS for the LFS.
+# The only reason to use bind mounts is to reduce the amount of Lustre IDs,
+# which has a hard coded limit that will be removed in Lustre 2.17.x.
+# This workaround
+#  * has no benefits for other types of file systems and can be dropped
+#    once all Lustre servers and clients run version >= 2.17.x
+#  * has the disadvantage that the entire PFS needs to be temporarily mounted during playbook execution, during boot
+#    and during any other action that would try to bind mount the group folder;
+#    This may (temprarily) expose data from that PFS, which is not supposed to be available
+#    on the machines where the LFS-ses from a PFS are to be mounted.
+#  * is not compatible with automounts.
+#
+- name: 'Create read-write PFS mounts to create bind mounts for Logical File Systems (LFSs) per group.'
+  ansible.posix.mount:
+    path: "/mnt/{{ pfs_mount['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+    src: "{{ pfs_mount['source'] }}/{{ pfs_mount['pfs'] }}/groups"
+    fstype: "{{ pfs_mount['type'] }}"
+    opts: "{{ pfs_mount['rw_options'] }}"
+    state: mounted
+  vars:
+    rw_machines: "{{ lfs_mounts
+                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
+                     | rejectattr('type', 'undefined')
+                     | selectattr('type', 'equalto', 'bind')
+                     | rejectattr('rw_machines', 'undefined')
+                     | map(attribute='rw_machines')
+                     | flatten
+                     | unique }}"
+    ro_machines: "{{ lfs_mounts
+                     | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+                     | selectattr('pfs', 'equalto', pfs_mount['pfs'])
+                     | selectattr('type', 'equalto', 'bind')
+                     | rejectattr('ro_machines', 'undefined')
+                     | map(attribute='ro_machines')
+                     | flatten
+                     | unique }}"
+  loop: "{{ pfs_mounts }}"
+  loop_control:
+    loop_var: pfs_mount
+  tags:
+    - groups
+  when:
+    - inventory_hostname in rw_machines | default ([]) or
+      inventory_hostname in ro_machines | default ([])
+    - "'automount' not in pfs_mount['rw_options']"
+  become: true
+
+- name: 'Bind mount Logical File Systems (LFSs) per group from shared storage read-write.'
+  ansible.posix.mount:
+    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
+    src: "{{ parent_mount_point }}/{{ item.1.name }}/{{ item.0.lfs }}"
+    fstype: none
+    # Bind mounting read-write will only work of the src was also mounted read-write.
+    opts: "bind,rw,x-systemd.requires-mounts-for={{ parent_mount_point }},x-systemd.mount-timeout=20s,retry=3"
+    state: mounted
+  vars:
+    pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | first }}"
+    parent_mount_point: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+            | rejectattr('type', 'undefined')
+            | selectattr('type', 'equalto', 'bind')
+            | subelements('groups') }}"
+  tags:
+    - groups
+  when:
+    - inventory_hostname in item.0.rw_machines | default ([])
+    - pfs_mount['type'] != "beegfs"
+    - "'automount' not in pfs_mount['rw_options']"
+  become: true
+
+- name: 'Bind mount Logical File Systems (LFSs) per group from shared storage read-only.'
+  ansible.posix.mount:
+    path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
+    src: "{{ parent_mount_point }}/{{ item.1.name }}/{{ item.0.lfs }}"
+    fstype: none
+    opts: "bind,ro,x-systemd.requires-mounts-for={{ parent_mount_point }},x-systemd.mount-timeout=20s,retry=3"
+    state: mounted
+  vars:
+    pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | first }}"
+    parent_mount_point: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+  loop: "{{ lfs_mounts
+            | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+            | rejectattr('type', 'undefined')
+            | selectattr('type', 'equalto', 'bind')
+            | subelements('groups') }}"
+  tags:
+    - groups
+  when:
+    - inventory_hostname in item.0.ro_machines | default ([])
+    - pfs_mount['type'] != "beegfs"
+    - "'automount' not in pfs_mount['rw_options']"
+  become: true
+
+#
+# Only to be used for removing the workaround:
+#
+#  - name: 'Remove PFS mounts, which were used to create bind mounts for Logical File Systems (LFSs) per group.'
+#    ansible.posix.mount:
+#      path: "/mnt/{{ pfs_mount['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+#      src: "{{ pfs_mount['source'] }}/{{ pfs_mount['pfs'] }}/groups"
+#      fstype: "{{ pfs_mount['type'] }}"
+#      opts: "{{ pfs_mount['rw_options'] }}"
+#      state: absent
+#    vars:
+#      rw_machines: "{{ lfs_mounts
+#                       | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+#                       | selectattr('pfs', 'equalto', pfs_mount['pfs'])
+#                       | rejectattr('type', 'undefined')
+#                       | selectattr('type', 'equalto', 'bind')
+#                       | rejectattr('rw_machines', 'undefined')
+#                       | map(attribute='rw_machines')
+#                       | flatten
+#                       | unique }}"
+#      ro_machines: "{{ lfs_mounts
+#                       | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+#                       | selectattr('pfs', 'equalto', pfs_mount['pfs'])
+#                       | rejectattr('type', 'undefined')
+#                       | selectattr('type', 'equalto', 'bind')
+#                       | rejectattr('ro_machines', 'undefined')
+#                       | map(attribute='ro_machines')
+#                       | flatten
+#                       | unique }}"
+#    loop: "{{ pfs_mounts }}"
+#    loop_control:
+#      loop_var: pfs_mount
+#    tags:
+#      - groups
+#    when:
+#      - inventory_hostname in rw_machines | default ([]) or
+#        inventory_hostname in ro_machines | default ([])
+#      - "'automount' not in pfs_mount['rw_options']"
+#    become: true
+
+###############################################################################################
+# End of workaround to prevent Lustre clients from running out of Lustre IDs.
+###############################################################################################
 
 - name: 'Mount "env" Logical File Systems (LFSs) from shared storage read-write.'
   ansible.posix.mount:

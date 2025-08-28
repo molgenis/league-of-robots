@@ -119,10 +119,6 @@ all:
           slurm_real_memory: 7684
           slurm_local_disk: 0
           slurm_features: 'prm08,tmp08'
-          slurm_ethernet_interfaces:
-            - enp3s0
-            - enp4s0
-            - enp5s0
     compute_node:
       children:
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -177,11 +173,6 @@ all:
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
               slurm_features: 'tmp08'
-              slurm_ethernet_interfaces:
-                #- enp130s0f0
-                #- enp130s0f0.1068
-                - eth2
-                - eth2.1068
         cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-b01:
@@ -228,9 +219,6 @@ all:
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
               slurm_features: 'tmp08'
-              slurm_ethernet_interfaces:
-                - enp65s0np0
-                - enp65s0np0.1068
         cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-c01:
@@ -252,14 +240,11 @@ all:
               local_volume_size_extra: 1
               slurm_sockets: 4
               slurm_cores_per_socket: 1
-              slurm_real_memory: 257320
+              slurm_real_memory: 7684
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 900
               slurm_features: 'tmp08'
-              slurm_ethernet_interfaces:
-              - eth0
-              - eth1
     chaperone:
       hosts:
         tl-chaperone:
