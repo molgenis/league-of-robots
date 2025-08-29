@@ -8,6 +8,8 @@
     - irods
     - ldap_server
     - logs
+    - data_transfer
+    - jenkins
   roles:
     - role: static_hostname_lookup
 
