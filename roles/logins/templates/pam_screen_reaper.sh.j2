@@ -19,9 +19,13 @@ fi
 
 if [[ -n "${_old_screens}" ]] || [[ -n "${_kill_screens}" ]]; then
    echo "################################################################################"
+   echo "#"
+   echo "#"
+   echo "#"
    echo "#                 Warning: abandoned screen sessions found!"
-   echo "# You get warning for screen sessions unused for more than ${_days_warning} days."
-   echo "# Sessions older than ${_days_kill} are automatically removed."
+   echo "#"
+   echo "#  You see this warning because you have screen sessions unused for more than ${_days_warning}"
+   echo "#  days. If they are not used for more than ${_days_kill} days, they will be killed."
 
    if [[ -n "${_old_screens}" ]]; then
       echo "#"
@@ -34,12 +38,15 @@ if [[ -n "${_old_screens}" ]] || [[ -n "${_kill_screens}" ]]; then
       echo "#  This is a list of screen sessions that were automatically CLEANED (because"
       echo "#  then have been unused for more than ${_days_kill} days:"
       for _screen in ${_kill_screens}; do
-         if test -e "${_screen}" && continue; then
+         if test -e "${_screen}"; then
            echo -n "#      ${_screen}" | sed "s|/run/screen/S-${USER}/||g"
            rm -f "${_screen}" && echo "      (cleaned)"
          fi
       done
    fi
 
+   echo "#"
+   echo "#"
+   echo "#"
    echo "################################################################################"
 fi
