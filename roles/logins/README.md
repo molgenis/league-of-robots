@@ -103,7 +103,9 @@ can produce following output
 
 ## Script pam_screen_reaper.sh
 
-The script is added to authselect's postlogin and to the sudo.
+The script is added to authselect's
+ - `/etc/pam.d/postlogin`, to start at the first (multiplexed!) sshd connection, and to the
+ - `/etc/pam.d/sudo` - to start at `sudo -u ...-dm/ateambot` sessions
 It checks on the behalf of running user if there are older screen session or not.
 The PAM script is the only viable option, since
  - /etc/ssh/sshrc is limited to ssh logins (and thus not sudo), and
