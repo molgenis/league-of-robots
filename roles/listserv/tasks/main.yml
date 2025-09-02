@@ -38,7 +38,7 @@
     job: |
          /bin/bash -c '/root/mailinglists/LDAP2LISTSERV.bash -l ERROR -u -n 2>&1  | /bin/logger'
     cron_file: 'ldap-2-mailinglists'
-    disabled: False
+    disabled: false
   become: true
 
 - name: Create cron job to manage mailing list subscriptions and create backup.
@@ -51,6 +51,6 @@
     job: |
          /bin/bash -c '/root/mailinglists/LDAP2LISTSERV.bash -l ERROR -u -n -b /root/mailinglists/listserv_backups 2>&1 | /bin/logger'
     cron_file: 'ldap-2-mailinglists'
-    disabled: False
+    disabled: false
   become: true
 ...
