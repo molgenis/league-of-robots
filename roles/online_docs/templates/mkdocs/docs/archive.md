@@ -21,12 +21,26 @@ The following guidelines apply to this archive storage
 - Tape storage has the [ISO 27001 certification](https://www.surf.nl/en/services/data-archive)
 - Data is stored in two physical locations in the Netherlands.
 
-
 ### 1.2. How it works
 
 Archive is automatically mounted when user navigates to the `/groups/[GROUP]/arc[XX]` folder. At that moment storage from remote server gets mounted on the folder. It remains accessible until some specific idle time is reached.
 
 Data-manager account of the specific group is the **only** account that has **read** and **write** access to the archive folder of the group. This is to prevent users accidentally recalling files online when not needed. Also to make sure that all the files are stored in correct format (see 'Best practices' below).
+
+### 1.3 How can group request an access to the archive
+
+In order for the groups to use SURF archive solution, they can either make a request to use a joint Shared Contract from Helpdesk or they can choose to make their own Individual Contract with the SURF.
+
+**Shared Contract**
+
+Shared contract is a one-stop shop for the groups who want to avoid arranging their own SURF archive storage contract.
+Groups that are using a Shared Contract, can access their SURF archive storage only within the HPC systems that Helpdesk group is managing.
+Data separation  between the groups is supported only within our HPC environments. And due to the fact that we cannot guarantee the separation outside of our systems, we do not provide the archive access for the groups outside our HPC environments. Groups that need this external access, should consider Individual Contrac instead.
+
+**Individual Contract**
+
+Groups can arrange their own (separate) contract with SURF Archive, allowing unrestricted access to the archive storage from **any** external system. (As long as they use a protocol supported by the SURF archive server - SSH protocol.)
+If a group wants its SURF Archive storage attached to the HPC system, the group owner must coordinate the request with (and provide the access to) the Helpdesk.
 
 ## 2. Managing data
 
