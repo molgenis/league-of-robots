@@ -322,8 +322,6 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-ucu'
     sponsor: umcg-research-it
-  - name: 'umcg-ukb'
-    sponsor: umcg-research-it
   - name: 'umcg-ugli'
     sponsor: umcg-research-it
   - name: 'umcg-verbeek'
@@ -445,8 +443,6 @@ regular_users:
     groups: ['umcg-tifn']
   - name: 'umcg-ucu-dm'
     groups: ['umcg-ucu']
-  - name: 'umcg-ukb-dm'
-    groups: ['umcg-ukb']
   - name: 'umcg-ugli-dm'
     groups: ['umcg-ugli']
   - name: 'umcg-verbeek-dm'
@@ -572,8 +568,6 @@ sudoers:
     become: 'umcg-tifn-dm'
   - who: ['%umcg-ucu-dms']
     become: 'umcg-ucu-dm'
-  - who: ['%umcg-ukb-dms']
-    become: 'umcg-ukb-dm'
   - who: ['%umcg-ugli-dms']
     become: 'umcg-ugli-dm'
   - who: ['%umcg-verbeek']
@@ -648,7 +642,6 @@ local_mount_subfolders:
           - umcg-tifn
           - umcg-ucu
           - umcg-ugli
-          - umcg-ukb
           - umcg-verbeek
           - umcg-vdakker
           - umcg-visclasataxia
@@ -739,7 +732,6 @@ lfs_mounts:
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
-      - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker
@@ -798,7 +790,6 @@ lfs_mounts:
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
-      - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker
@@ -856,7 +847,6 @@ lfs_mounts:
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
-      - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker
@@ -911,7 +901,6 @@ lfs_mounts:
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
-      - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker
