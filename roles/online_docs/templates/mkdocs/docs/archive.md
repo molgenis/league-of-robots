@@ -8,7 +8,9 @@
 
 ### 1.1. Basic overview
 
-It is the storage that is hosted on the tapes on the remote location. Currently we only have one archive provider - [SURF](https://www.surf.nl/en/services/data-archive).
+Remote archive is the storage, that is hosted on the tapes on the remote location.
+Remote archive is connected to the UMCG research HPC clusters.
+Currently, only [SURF archive](https://www.surf.nl/en/services/data-archive) is available as archive provider.
 
 The following guidelines apply to this archive storage
 
