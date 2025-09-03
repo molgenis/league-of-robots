@@ -168,13 +168,14 @@
 - name: 'Include screen_reaper in the pam session config of sudo (in not using authselect)'
   ansible.builtin.lineinfile:
     path: "/etc/pam.d/sudo"
-    state: present
+    state: "{{ pam_state }}"
     insertafter: 'EOF'
     regexp: 'session.*pam_exec\.so.*screen_reaper\.sh'
     line: 'session    optional     pam_exec.so stdout seteuid /etc/pam-script.d/screen_reaper.sh'
     owner: root
     group: root
     mode: '0644'
-  when: screen_cleanup_deploy | default(true)
+  vars:
+    pam_state: "{% if screen_cleanup_deploy is defined and screen_cleanup_deploy %}present{% else %}absent{% endif %}"
   become: true
 ...

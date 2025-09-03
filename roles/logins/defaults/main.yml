@@ -1,3 +1,5 @@
 ---
 screen_cleanup_deploy: true
+screen_warning: 7
+screen_kill: 21
 ...

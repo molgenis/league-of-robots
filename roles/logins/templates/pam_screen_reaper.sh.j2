@@ -7,8 +7,8 @@ set -ue
 # it to run only at the open session
 [ "$PAM_TYPE" != "open_session" ] && exit
 
-_days_warning="{{ screen_days_warning | default('7') }}"
-_days_kill="{{ screen_days_kill | default('21') }}"
+_days_warning="{{ screen_warning | default('7') }}"
+_days_kill="{{ screen_kill | default('21') }}"
 
 [[ -n "${PAM_USER}" ]] && USER="${PAM_USER}"
 
