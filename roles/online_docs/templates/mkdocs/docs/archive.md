@@ -36,7 +36,7 @@ In order for the groups to use SURF archive solution, they can either make a req
 **Shared Contract**
 
 Shared contract is a one-stop shop for the groups who want to avoid arranging their own SURF archive storage contract.
-Groups that are using a Shared Contract, can access their SURF archive storage only within the HPC systems that Helpdesk group is managing.
+Groups that are using a Shared Contract, can access their SURF archive storage only within the UMCG HPC clusters maintained by the HPC Helpdesk.
 Data separation  between the groups is supported only within our HPC environments. And due to the fact that we cannot guarantee the separation outside of our systems, we do not provide the archive access for the groups outside our HPC environments. Groups that need this external access, should consider Individual Contrac instead.
 
 **Individual Contract**
