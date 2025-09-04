@@ -31,18 +31,18 @@ Data-manager account of the specific group is the **only** account that has **re
 
 ### 1.3 How can group request an access to the archive
 
-In order for the groups to use SURF archive solution, they can either make a request to use a joint Shared Contract from Helpdesk or they can choose to make their own Individual Contract with the SURF.
+In order for the groups to use SURF archive solution, they can either make a request to use a joint Shared Contract from the [Helpdesk](../contact) or they can choose to make their own Individual Contract with the SURF.
 
 **Shared Contract**
 
 Shared contract is a one-stop shop for the groups who want to avoid arranging their own SURF archive storage contract.
-Groups that are using a Shared Contract, can access their SURF archive storage only within the UMCG HPC clusters maintained by the HPC Helpdesk.
-Data separation  between the groups is supported only within our HPC environments. And due to the fact that we cannot guarantee the separation outside of our systems, we do not provide the archive access for the groups outside our HPC environments. Groups that need this external access, should consider Individual Contrac instead.
+Groups that are using a Shared Contract, can access their SURF archive storage only within the UMCG HPC clusters maintained by the HPC [Helpdesk](../contact).
+Data separation  between the groups is supported only within our HPC environments. And due to the fact that we cannot guarantee the separation outside of our systems, we do not provide the archive access for the groups outside our HPC environments. Groups that need this external access, should consider Individual Contract instead.
 
 **Individual Contract**
 
 Groups can arrange their own (separate) contract with SURF Archive, allowing unrestricted access to the archive storage from **any** external system. (As long as they use a protocol supported by the SURF archive server - SSH protocol.)
-If a group wants its SURF Archive storage attached to the HPC system, the group owner must coordinate the request with (and provide the access to) the Helpdesk.
+If a group wants its SURF Archive storage attached to the HPC system, the group owner must coordinate the request with (and provide the access to) the [Helpdesk](../contact).
 
 ## 2. Managing data
 
@@ -222,10 +222,10 @@ Which means that archiving and restoring of the large datasets can take (dependi
 
 So far most of the bugs have been resolved, but it could happen that
 
- - the archive folder is not available - please inform the helpdesk unless maintenance was announced,
+ - the archive folder is not available - please inform the [helpdesk](../contact) unless maintenance was announced,
  - download/upload perfomance occasionally drops - this most probably depends on the Login node usage (and data copy by other users) - notify helpdesk if it persists for a longer period,
 
-If you expirence any issues with the archive solution, please notify helpdesk.
+If you expirence any issues with the archive solution, please notify the helpdesk.
 
 ```
 Where is my data stored?
