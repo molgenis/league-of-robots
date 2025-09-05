@@ -538,7 +538,7 @@ sudoers:
     become: 'umcg-micompany-dm'
   - who: ['%umcg-mmbimg-dms']
     become: 'umcg-mmbimg-dm'
-  - who: ['%umcg-monitor-connect']
+  - who: ['%umcg-monitor-connect-dms']
     become: 'umcg-monitor-connect-dm'
   - who: ['%umcg-msb']
     become: 'umcg-msb-dm'
