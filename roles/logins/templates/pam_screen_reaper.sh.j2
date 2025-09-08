@@ -19,7 +19,7 @@ if test -d /run/screen/S-${USER}; then
    _kill_screens="$(find /run/screen/S-${USER} -atime +"${_days_kill}" -type s)"
 fi
 
-if [[ -n "${_old_screens}" ]] || [[ -n "${_kill_screens}" ]]; then
+if [[ -n "${_old_screens:-}" ]] || [[ -n "${_kill_screens:-}" ]]; then
    echo "################################################################################"
    echo "#"
    echo "#"
