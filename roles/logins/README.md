@@ -109,7 +109,7 @@ The script is added to authselect's
 It checks on the behalf of running user if there are older screen session or not.
 The PAM script is the only viable option, since
  - /etc/ssh/sshrc is limited to ssh logins (and thus not sudo), and
- - /etc/profile is shell depended ttherefore it works only for bash, but not for zsh and other shells
+ - /etc/profile is shell depended therefore it works only for bash, but not for zsh and other shells
 
 ## More information
 
