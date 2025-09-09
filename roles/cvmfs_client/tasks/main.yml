@@ -47,6 +47,7 @@
     block: | 
       CVMFS_REPOSITORIES=hpc.umcg.nl
       CVMFS_HTTP_PROXY=DIRECT
+      CVMFS_QUOTA_LIMIT=5000
     create: true
   become: true
 ...
