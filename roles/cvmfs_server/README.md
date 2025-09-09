@@ -34,11 +34,11 @@ Server side - stratum 0:
 Client side:
 * Local cache dir for storage of the downloaded file contents and other client-specific data - ```/var/lib/cvmfs``` (configurable via CVMFS_CACHE_BASE)
 * Authoritative configuration files for the repos - ```/etc/cvmfs/```
-* Mount point for repos - default: ```/cvmfs/```, automounted by autofs
-
+* Mount point for repos - default: ```/cvmfs/```, automounted by autofs  
+  
 
 **NOTE:**
-- When repo is in production, add a cronjob to renew the master key every first and 15th day of the month (it expires after 30 days):
+- When repo is in production, add a cronjob to renew the master key every first and 15th day of the month (it expires after 30 days):  
 ```0 9 1,15 * * root /usr/bin/cvmfs_server resign [repo_name]```
 
 - For testing purposes, the client role is only deployed on talos. When moving to prodcution, please change the hosts in single_role_playbooks/cvmfs_client.yml.
