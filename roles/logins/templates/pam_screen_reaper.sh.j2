@@ -38,7 +38,7 @@ if [[ -n "${_old_screens:-}" ]] || [[ -n "${_kill_screens:-}" ]]; then
    if [[ -n "${_kill_screens}" ]]; then
       echo "#"
       echo "#  This is a list of screen sessions that were automatically CLEANED (because"
-      echo "#  then have been unused for more than ${_days_kill} days:"
+      echo "#  they have been unused for more than ${_days_kill} days:"
       for _screen in ${_kill_screens}; do
          if test -e "${_screen:-/path/error}"; then
            echo -n "#      ${_screen}" | sed "s|/run/screen/S-${USER}/||g"
