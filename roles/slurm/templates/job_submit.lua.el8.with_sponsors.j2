@@ -167,9 +167,13 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
     --
     submit_user = posix.getpasswd(submit_uid)
     --
-    -- Force jobs to share nodes when they don't consume all resources on a node.
+    -- Check if job can share resources on a node.
     --
-    if job_desc.shared == 0 then
+    if string.match(tostring(job_desc.features), 'dragen') then
+        slurm.log_debug("Detected 'dragen' in features requested for job and will disable sharing of resources as dragen needs whole node exclusively.")
+        job_desc.shared = 0
+    else
+        slurm.log_debug("Forcing job to share node when it does not need all resources.")
         job_desc.shared = 1
     end
     --

@@ -180,4 +180,3 @@ class InventoryModule(BaseFileInventoryPlugin):
 					os.getenv('AI_PROXY') != host and
 					'ansible_host' not in variables):
 				self.inventory.set_variable(host, 'ansible_host', os.getenv('AI_PROXY') + '+' + host)
-

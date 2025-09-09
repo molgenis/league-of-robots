@@ -103,7 +103,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
-            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}" 
+            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
     docs:
       hosts:
@@ -170,6 +170,7 @@ all:
           hosts:
             cf-dragen:
               # ansible_host: cf-porch+copperfist+cf-dragen
+              os_distribution: 'oracle8'
               local_mounts:
                 - mount_point: '/staging'
                   device: 'LABEL=staging'
@@ -185,6 +186,7 @@ all:
                   mounted_mode: '0755'
                   mount_options: 'bind,nofail'
                   type: none
+              slurm_version: '20.11.9-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
               slurm_threads_per_core: 2
@@ -198,8 +200,6 @@ all:
                 - enp5s0  # BMC
                 - ens3f0.16  # VLAN16
               slurm_weight: 10
-              slurm_version: '20.11.9-1.el8.umcg'
-              os_distribution: 'oracle8'
               local_yum_repository: true # enable local yum repository
     mit_chaperone:
       hosts:
@@ -229,7 +229,6 @@ all:
             - name: 'umcg-vipt'
           ssh_client_configs:
             - logs_library
-          local_yum_repository: true # enable local yum repository
     storage_server:
       hosts:
         cf-storage:

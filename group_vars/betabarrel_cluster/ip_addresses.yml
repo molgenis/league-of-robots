@@ -30,7 +30,7 @@ ip_addresses:
       fqdn: 'NXDOMAIN'
   bb-storage:
     vlan1336:
-      address: 172.23.77.56
+      address: 172.23.77.63
       netmask: /32
     vlan990:
       address: 192.168.1.158

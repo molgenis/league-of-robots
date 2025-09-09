@@ -31,6 +31,7 @@ lfs_quota:
       umcg-mic: 2048
       umcg-micompany: 512
       umcg-mmbimg: 1024
+      umcg-monitor-connect: 1024
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 2048
@@ -54,7 +55,7 @@ lfs_quota:
       umcg-atd: 1024
       umcg-biogen: 17408
       umcg-bionic-mdd-gwama: 13312
-      umcg-bios: 1024
+      umcg-bios: 1
       umcg-dag3: 3072
       umcg-datateam: 1024
       umcg-ejp-rd: 1024
@@ -95,7 +96,6 @@ lfs_quota:
       umcg-tifn: 5120
       umcg-ucu: 1024
       umcg-ugli: 6144
-      umcg-ukb: 3072
       umcg-vdakker: 1024
       umcg-weersma: 8192
       umcg-wijmenga: 3072
@@ -168,12 +168,13 @@ lfs_quota:
       umcg-immunogenetics: 2048
       umcg-impact: 1024
       umcg-intercept: 2048
-      umcg-lifelines: 81920
+      umcg-lifelines: 92160
       umcg-lld: 1024
       umcg-llnext: 2048
       umcg-mic: 2048
       umcg-micompany: 512
       umcg-mmbimg: 1024
+      umcg-monitor-connect: 1024
       umcg-msb: 1024
       umcg-muhas: 1024
       umcg-nawijn: 4096
@@ -192,7 +193,6 @@ lfs_quota:
       umcg-tifn: 2048
       umcg-ucu: 2048
       umcg-ugli: 1024
-      umcg-ukb: 3072
       umcg-verbeek: 1024
       umcg-vdakker: 1024
       umcg-visclasataxia: 1024
@@ -239,7 +239,6 @@ lfs_quota:
       umcg-sysops: 1024
       umcg-tifn: 2048
       umcg-ugli: 1024
-      umcg-ukb: 3072
       umcg-vdakker: 1024
       umcg-verbeek: 1024
       umcg-weersma: 10240

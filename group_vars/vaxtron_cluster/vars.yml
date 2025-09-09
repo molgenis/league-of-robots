@@ -297,6 +297,8 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-mmbimg'
     sponsor: umcg-research-it
+  - name: 'umcg-monitor-connect'
+    sponsor: umcg-research-it
   - name: 'umcg-msb'
     sponsor: umcg-research-it
   - name: 'umcg-muhas'
@@ -331,8 +333,6 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-ucu'
     sponsor: umcg-cvandiemen
-  - name: 'umcg-ukb'
-    sponsor: umcg-research-it
   - name: 'umcg-ugli'
     sponsor: umcg-mswertz
   - name: 'umcg-verbeek'
@@ -422,6 +422,8 @@ regular_users:
     groups: ['umcg-micompany']
   - name: 'umcg-mmbimg-dm'
     groups: ['umcg-mmbimg']
+  - name: 'umcg-monitor-connect-dm'
+    groups: ['umcg-monitor-connect']
   - name: 'umcg-msb-dm'
     groups: ['umcg-msb']
   - name: 'umcg-muhas-dm'
@@ -456,8 +458,6 @@ regular_users:
     groups: ['umcg-tifn']
   - name: 'umcg-ucu-dm'
     groups: ['umcg-ucu']
-  - name: 'umcg-ukb-dm'
-    groups: ['umcg-ukb']
   - name: 'umcg-ugli-dm'
     groups: ['umcg-ugli']
   - name: 'umcg-verbeek-dm'
@@ -549,6 +549,8 @@ sudoers:
     become: 'umcg-micompany-dm'
   - who: ['%umcg-mmbimg-dms']
     become: 'umcg-mmbimg-dm'
+  - who: ['%umcg-monitor-connect-dms']
+    become: 'umcg-monitor-connect-dm'
   - who: ['%umcg-msb']
     become: 'umcg-msb-dm'
   - who: ['%umcg-muhas-dms']
@@ -583,8 +585,6 @@ sudoers:
     become: 'umcg-tifn-dm'
   - who: ['%umcg-ucu-dms']
     become: 'umcg-ucu-dm'
-  - who: ['%umcg-ukb-dms']
-    become: 'umcg-ukb-dm'
   - who: ['%umcg-ugli-dms']
     become: 'umcg-ugli-dm'
   - who: ['%umcg-verbeek']
@@ -681,6 +681,7 @@ lfs_mounts:
       - name: umcg-llnext
       - name: umcg-mic
       - name: umcg-micompany
+      - name: umcg-monitor-connect
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-nephrology
@@ -690,7 +691,6 @@ lfs_mounts:
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
-      - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker
@@ -734,6 +734,7 @@ lfs_mounts:
       - name: umcg-mic
       - name: umcg-micompany
       - name: umcg-mmbimg
+      - name: umcg-monitor-connect
       - name: umcg-msb
       - name: umcg-muhas
       - name: umcg-nawijn
@@ -749,7 +750,6 @@ lfs_mounts:
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
-      - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker
@@ -792,6 +792,7 @@ lfs_mounts:
       - name: umcg-llnext
       - name: umcg-mic
       - name: umcg-micompany
+      - name: umcg-monitor-connect
       - name: umcg-msb
       - name: umcg-muhas
       - name: umcg-nawijn
@@ -808,7 +809,6 @@ lfs_mounts:
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
-      - name: umcg-ukb
       - name: umcg-ugli
       - name: umcg-verbeek
       - name: umcg-vdakker
@@ -827,6 +827,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-hlhs
       - name: umcg-lifelines
+      - name: umcg-monitor-connect
       - name: umcg-solve-rd
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
