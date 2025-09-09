@@ -25,18 +25,19 @@ In order to mount the newly created repo on the client (startum 1), these config
 
 # Data storage locations
 
-stratum 0 - server side
-* Repository data storage - /srv/cvmfs/
-* Temporary scratch area used for creating new files and repository updates (can grow large during repository updates) - /var/spool/cvmfs/
-* Authoritative configuration files for the repos - /etc/cvmfs/
-* Repo creation - /cvmfs/
+Server side - stratum 0:
+* Repository data storage - ```/srv/cvmfs/```
+* Temporary scratch area used for creating new files and repository updates (can grow large during repository updates) - ```/var/spool/cvmfs/```
+* Authoritative configuration files for the repos - ```/etc/cvmfs/```
+* Repo creation - ```/cvmfs/```
 
 Client side:
-* Local cache dir for storage of the downloaded file contents and other client-specific data - /var/lib/cvmfs (configurable via CVMFS_CACHE_BASE)
-* Authoritative configuration files for the repos - /etc/cvmfs/
-* Mount point for repos - default: /cvmfs/, automounted by autofs
+* Local cache dir for storage of the downloaded file contents and other client-specific data - ```/var/lib/cvmfs``` (configurable via CVMFS_CACHE_BASE)
+* Authoritative configuration files for the repos - ```/etc/cvmfs/```
+* Mount point for repos - default: ```/cvmfs/```, automounted by autofs
 
-NOTE:
+
+**NOTE:**
 - When repo is in production, add a cronjob to renew the master key every first and 15th day of the month (it expires after 30 days):
 ```0 9 1,15 * * root /usr/bin/cvmfs_server resign [repo_name]```
 
