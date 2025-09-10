@@ -95,10 +95,12 @@
     owner: root
     group: root
     mode: '0755'
-  when: screen_cleanup_deploy | default(true)
+  when:
+    - screen_cleanup_deploy | default(true)
+    - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
-- name: 'Include screen_reaper in the pam session config of postlogin'
+- name: 'Include/remove screen_reaper.sh from PAM postlogin session'
   ansible.builtin.lineinfile:
     path: "/etc/authselect/custom/{{ stack_name }}/postlogin"
     state: "{{ pam_state }}"
@@ -110,6 +112,8 @@
     mode: '0644'
   vars:
     pam_state: "{% if screen_cleanup_deploy is defined and screen_cleanup_deploy %}present{% else %}absent{% endif %}"
+  when:
+    - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
 - name: "Force enable authselect {{ stack_name }} profile."
