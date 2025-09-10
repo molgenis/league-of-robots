@@ -1,0 +1,13 @@
+---
+- name: 'Allow users in the functional_admins_group to reset the dragen hardware using sudo.'
+  ansible.builtin.template:
+    src: 'templates/91-dragen'
+    dest: '/etc/sudoers.d/91-dragen'
+    owner: 'root'
+    group: 'root'
+    mode: '0440'
+  when:
+    - functional_admin_group is defined and functional_admin_group | length >= 1
+    - slurm_features is search('dragen', ignorecase=true)
+  become: true
+...

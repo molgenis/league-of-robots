@@ -21,7 +21,7 @@ This is done with the following line in the `/etc/pam.d/sshd` file
 A script `/etc/pam-script.d/limitedusers.sh` is called at the login, but upon error
 the login stil gets processed.
 
-## Script
+## Script limitedusers.sh 
 
 The script uses systemd's command line tool `systemctl` to modify the CPU and RAM limit of the user's slice. 
 
@@ -100,6 +100,16 @@ can produce following output
    sys-fs-fuse-connections.mount          -      -     4.0K        -        -
    sys-kernel-config.mount                -      -     4.0K        -        -
 ```
+
+## Script pam_screen_reaper.sh
+
+The script is added to authselect's
+ - `/etc/pam.d/postlogin`, to start at the first (multiplexed!) sshd connection, and to the
+ - `/etc/pam.d/sudo` - to start at `sudo -u ...-dm/ateambot` sessions
+It checks on the behalf of running user if there are older screen session or not.
+The PAM script is the only viable option, since
+ - /etc/ssh/sshrc is limited to ssh logins (and thus not sudo), and
+ - /etc/profile is shell depended therefore it works only for bash, but not for zsh and other shells
 
 ## More information
 

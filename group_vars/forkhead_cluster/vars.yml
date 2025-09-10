@@ -49,16 +49,13 @@ ldap_domains:
     ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
     replication_provider_uri: ldap://172.19.34.180
     replication_provider_base: dc=rug,dc=nl
-
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
 ]
-stack_networks:
+azure_networks:
   - name: vnet-medgen-t
     cidr: '10.96.52.12/24'
-    type: management
-    external: true
 iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['umcg']['internal1'] }}"
   - "{{ all.ip_addresses['umcg']['basiswerkplek'] }}"
@@ -99,55 +96,55 @@ functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
 regular_groups:
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - "{{ functional_users_group }}"
-  - 'umcg-atd'
-  - 'umcg-gap'
-  - 'umcg-gd'
-  - 'umcg-genomescan'
-  - 'umcg-gsad'
-  - 'umcg-gst'
-  - 'umcg-lab'
-  - 'umcg-labgnkbh'
-  - 'umcg-patho'
-  - 'umcg-vipt'
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: "{{ functional_users_group }}"
+  - name: 'umcg-atd'
+  - name: 'umcg-gap'
+  - name: 'umcg-gd'
+  - name: 'umcg-genomescan'
+  - name: 'umcg-gsad'
+  - name: 'umcg-gst'
+  - name: 'umcg-lab'
+  - name: 'umcg-labgnkbh'
+  - name: 'umcg-patho'
+  - name: 'umcg-vipt'
 regular_users:
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
-  - user: 'umcg-atd-ateambot'
+  - name: 'umcg-atd-ateambot'
     groups: ['umcg-atd', 'umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd', "{{ functional_users_group }}"]
-  - user: 'umcg-gap-ateambot'
+  - name: 'umcg-gap-ateambot'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gap-dm'
+  - name: 'umcg-gap-dm'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gd-ateambot'
+  - name: 'umcg-gd-ateambot'
     groups: ['umcg-gd', 'umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gd-dm'
+  - name: 'umcg-gd-dm'
     groups: ['umcg-gd', "{{ functional_users_group }}"]
-  - user: 'umcg-genomescan-ateambot'
+  - name: 'umcg-genomescan-ateambot'
     groups: ['umcg-genomescan', "{{ functional_users_group }}"]
-  - user: 'umcg-genomescan-dm'
+  - name: 'umcg-genomescan-dm'
     groups: ['umcg-genomescan', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-ateambot'
+  - name: 'umcg-gsad-ateambot'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-dm'
+  - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-ateambot'
+  - name: 'umcg-gst-ateambot'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-dm'
+  - name: 'umcg-gst-dm'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-labgnkbh-ateambot'
+  - name: 'umcg-labgnkbh-ateambot'
     groups: ['umcg-labgnkbh', "{{ functional_users_group }}"]
-  - user: 'umcg-labgnkbh-dm'
+  - name: 'umcg-labgnkbh-dm'
     groups: ['umcg-labgnkbh', "{{ functional_users_group }}"]
-  - user: 'umcg-patho-ateambot'
+  - name: 'umcg-patho-ateambot'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
-  - user: 'umcg-patho-dm'
+  - name: 'umcg-patho-dm'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
-  - user: 'umcg-vipt-dm'
+  - name: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd']
@@ -227,7 +224,6 @@ lfs_mounts:
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-lab
-        mode: '2750'
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05

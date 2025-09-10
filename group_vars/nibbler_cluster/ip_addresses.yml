@@ -18,7 +18,7 @@ ip_addresses:
       address: 172.23.60.6
       netmask: /32
     vlan1338:
-      address: 172.23.69.106
+      address: 172.23.69.21
       netmask: /32
     vlan985:
       address: 172.23.59.95
@@ -28,7 +28,7 @@ ip_addresses:
       address: 172.23.60.29
       netmask: /32
     vlan1338:
-      address: 172.23.69.111
+      address: 172.23.69.80
       netmask: /32
     vlan985:
       address: 172.23.59.90
@@ -38,7 +38,7 @@ ip_addresses:
       address: 172.23.60.15
       netmask: /32
     vlan1338:
-      address: 172.23.69.163
+      address: 172.23.69.76
       netmask: /32
     vlan985:
       address: 172.23.59.213
@@ -48,20 +48,10 @@ ip_addresses:
       address: 172.23.60.16
       netmask: /32
     vlan1338:
-      address: 172.23.69.123
+      address: 172.23.69.48
       netmask: /32
     vlan985:
       address: 172.23.59.225
-      netmask: /32
-  nb-node-a05:
-    vlan1068:
-      address: 172.23.60.3
-      netmask: /32
-    vlan1338:
-      address: 172.23.69.210
-      netmask: /32
-    vlan985:
-      address: 172.23.59.86
       netmask: /32
   nb-node-b01:
     vlan1068:
@@ -132,6 +122,20 @@ ip_addresses:
     vlan1338:
       address: 172.23.69.62
       netmask: /32
+  nb-node-c08:
+    vlan1068:
+      address: 172.23.60.5
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.200
+      netmask: /32
+  nb-node-c09:
+    vlan1068:
+      address: 172.23.60.17
+      netmask: /32
+    vlan1338:
+      address: 172.23.69.130
+      netmask: /32
   nb-repo:
     vlan1338:
       address: 172.23.69.140
@@ -159,6 +163,9 @@ ip_addresses:
       netmask: /32
       fqdn: 'nb-transfer.hpc.rug.nl'
   nibbler:
+    nb_internal_management:
+      address: 10.10.1.222
+      netmask: /32
     vlan1068:
       address: 172.23.60.4
       netmask: /32
@@ -180,6 +187,14 @@ ip_addresses:
       address: 195.169.22.136
       netmask: /32
       fqdn: 'tunnel.hpc.rug.nl'
+  nb_internal_management-vlan16-router:
+    nb_internal_management:
+      address: 10.10.1.1
+      netmask: /32
+    vlan16:
+      address: 195.169.22.148
+      netmask: /32
+      fqdn: 'NXDOMAIN'
   vlan1338-vlan16-router:
     vlan1338:
       address: 172.23.69.1

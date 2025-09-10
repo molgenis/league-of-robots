@@ -16,7 +16,7 @@
       ansible.builtin.user:
         name: "{{ envsync_user }}"
         group: "{{ envsync_user }}"
-        groups: "{{ regular_users | selectattr('user', 'equalto', envsync_user) | map(attribute='groups') | flatten | unique }}"
+        groups: "{{ regular_users | selectattr('name', 'equalto', envsync_user) | map(attribute='groups') | flatten | unique }}"
         home: "/home/{{ envsync_user }}"
         create_home: false
         append: false

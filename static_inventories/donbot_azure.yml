@@ -12,6 +12,7 @@ all:
           host_networks:
             - name: donbot_external_network
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
           use_sssd: true
           use_ldap: false
           # Ldap server settings
@@ -32,9 +33,9 @@ all:
               create_ldap: true
               ldap_db_index: 2  # Indices up to 1 are already used by default for the "config" and "monitor" databases. (Example database on "2" was removed.)
           regular_groups:
-            - 'lsaai'
+            - name: 'lsaai'
           regular_users:
-            - user: "lsaai"
+            - name: "lsaai"
               groups:
                 - "lsaai"
           iptables_allow_ssh_inbound:

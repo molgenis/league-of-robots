@@ -1,4 +1,44 @@
 ---
+- name: Create mount files from templates
+  ansible.builtin.template:
+    src: archive_mount.j2
+    dest: /etc/systemd/system/{{ item.0.local_top_level_mount | regex_replace('\/', '') | regex_replace('-', '\\x2d') }}-{{
+      item.1 | regex_replace('-', '\\x2d') }}-{{ item.0.name }}.mount
+    owner: root
+    group: root
+    mode: "0644"
+  with_subelements:
+    - "{{ remote_archive | default([], true) }}"
+    - 'groups'
+  notify:
+    - 'archive_systemd_reload'
+    - 'archive_mount_stop'
+    - 'archive_automount_enable'
+  when:
+    - remote_archive is defined
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
+
+- name: Create automount files from templates
+  ansible.builtin.template:
+    src: archive_automount.j2
+    dest: /etc/systemd/system/{{ item.0.local_top_level_mount | regex_replace('\/', '') | regex_replace('-', '\\x2d') }}-{{
+      item.1 | regex_replace('-', '\\x2d') }}-{{ item.0.name }}.automount
+    owner: root
+    group: root
+    mode: "0644"
+  with_subelements:
+    - "{{ remote_archive | default([], true) }}"
+    - 'groups'
+  notify:
+    - 'archive_systemd_reload'
+    - 'archive_mount_stop'
+    - 'archive_automount_enable'
+  when:
+    - remote_archive is defined
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
+
 - name: Find all .auto/.automount files in /etc/systemd/system
   ansible.builtin.find:
     paths: /etc/systemd/system
@@ -6,71 +46,83 @@
       - "*.mount"
       - "*.automount"
     recurse: true
-  register: automounts_all_existing
+  register: auto_mounts_all_existing
   become: true
 
 - name: Search for files containing marker
-  ansible.builtin.command: grep -l 'ansible_remote_archive' "{{ item.path }}"
-  with_items: "{{ automounts_all_existing.files }}"
-  register: automounts_grep
+  ansible.builtin.command: >
+    grep -l 'ansible_remote_archive' "{{ item.path }}"
+  register: auto_mounts_grep
   changed_when: false
-  failed_when: false  # Avoid failure if no matches are found
-  ignore_errors: true # Ignore errors from grep when no matches are found
+  failed_when: auto_mounts_grep.rc >= 2
+  loop: "{{ auto_mounts_all_existing.files }}"
+  loop_control:
+    label: "{{ item.path }}"
   become: true
 
-- name: Make a list of file paths with marker
+- name: Set auto_mounts_tagged_files that contains the list of file paths with marker
   ansible.builtin.set_fact:
-    automounts_tagged_files: "{{ automounts_grep.results | selectattr('rc', 'equalto', 0) | map(attribute='item.path') | default([]) | list }}"
+    auto_mounts_tagged_files: >-
+      {{ auto_mounts_grep.results
+         | selectattr('rc', 'equalto', 0)
+         | map(attribute='item.path')
+         | list }}
 
-- name: Extract basenames from automounts
+- name: Set auto_mounts_existing_marked that contains only basenames
   ansible.builtin.set_fact:
-    automounts_existing_marked: "{{ automounts_existing_marked | default([]) + [item | basename | regex_replace('\\.(mount|automount)+$', '')] }}"
-  with_items: "{{ automounts_tagged_files }}"
+    auto_mounts_existing_marked: "{{ auto_mounts_existing_marked | default([]) + [item | basename
+          | regex_replace('\\.(mount|automount)+$', '')] }}"
+  loop: "{{ auto_mounts_tagged_files }}"
 
-- name: Collect unique automount files without extension
+- name: Print basename files that contains tags (auto_mounts_existing_marked)
+  ansible.builtin.debug:
+    msg: "{{ auto_mounts_existing_marked }}"
+  when: auto_mounts_tagged_files is defined and auto_mounts_tagged_files | length > 0
+
+- name: Set auto_mounts_existing_unique
   ansible.builtin.set_fact:
-    automounts_existing_unique: "{{ automounts_existing_marked | default([]) | unique }}"
+    auto_mounts_existing_unique: "{{ auto_mounts_existing_marked | default([]) | unique }}"
+
+- name: Print auto_mounts_existing_unique
+  ansible.builtin.debug:
+    msg: "{{ auto_mounts_existing_unique }}"
+  when: auto_mounts_existing_unique is defined and auto_mounts_existing_unique | length > 0
 
 - name: Make a list of desired mount and automount files
   ansible.builtin.set_fact:
-    desired_auto_mounts: "{{ desired_auto_mounts | default([])  + ['groups-' + item.1 | regex_replace('-', '\\\\x2d') +
-                         '-' + item.0.name | regex_replace('-', '\\\\x2d')] }}"
+    desired_auto_mounts: "{{ desired_auto_mounts | default([])  + [ item.0.local_top_level_mount | regex_replace('\/', '') + '-'
+        + item.1 | regex_replace('-', '\\\\x2d') + '-' + item.0.name | regex_replace('-', '\\\\x2d')] }}"
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ remote_archive | default([], true) }}"
     - 'groups'
 
-- name: Set disable_auto_mounts
-  ansible.builtin.set_fact:
-    disable_auto_mounts: "{{ automounts_existing_unique | difference(desired_auto_mounts | default([])) }}"
-
-- name: Set format mountpoints path
-  ansible.builtin.set_fact:
-    remove_mountpoints: "{{ remove_mountpoints | default([]) + ['/' + item | regex_replace('-', '\/') |
-                         regex_replace('\\\\x2d', '-') | regex_replace('\\.(mount|automount)$', '')] }}"
-  with_items: "{{ disable_auto_mounts }}"
-  when: disable_auto_mounts is defined and disable_auto_mounts | length > 0
-
-- name: List of existing auto/mounts with correct marker
-  ansible.builtin.debug:
-    msg: "{{ automounts_existing_unique }}"
-  when: automounts_existing_unique is defined and automounts_existing_unique | length > 0
-
-- name: List of desired auto/mounts
+- name: Print desired_auto_mounts
   ansible.builtin.debug:
     msg: "{{ desired_auto_mounts }}"
   when: desired_auto_mounts is defined and desired_auto_mounts | length > 0
 
-- name: List of auto/mounts to be disabled
+- name: Set disable_auto_mounts
+  ansible.builtin.set_fact:
+    disable_auto_mounts: "{{ auto_mounts_existing_unique | difference(desired_auto_mounts | default([])) }}"
+
+- name: Print disable_auto_mounts
   ansible.builtin.debug:
     msg: "{{ disable_auto_mounts }}"
   when: disable_auto_mounts is defined and disable_auto_mounts | length > 0
 
-- name: List of mount points to be removed
+- name: Set remove_mountpoints with formatted path
+  ansible.builtin.set_fact:
+    remove_mountpoints: "{{ remove_mountpoints | default([]) + [item | regex_replace('-', '\/') |
+                         regex_replace('\\\\x2d', '-') | regex_replace('\\.(mount|automount)$', '')] }}"
+  with_items: "{{ disable_auto_mounts }}"
+  when: disable_auto_mounts is defined and disable_auto_mounts | length > 0
+
+- name: Print remove_mountpoints
   ansible.builtin.debug:
     msg: "{{ remove_mountpoints }}"
   when: remove_mountpoints is defined and remove_mountpoints | length > 0
 
-- name: Make a list of mounts and automounts
+- name: Set disable_full_path, a list of mounts and automounts to be disabled
   ansible.builtin.set_fact:
     disable_full_path: "{{ disable_full_path | default([]) + [item + '.automount'] + [item + '.mount'] }}"
   loop: "{{ disable_auto_mounts }}"
@@ -83,7 +135,7 @@
   register: result_systemd_stop
   failed_when: "result_systemd_stop is failed and 'Could not find the requested service' not in result_systemd_stop.msg"
   when: disable_full_path is defined
-  with_items: "{{ disable_full_path | union(automounts_existing_unique) }}"
+  with_items: "{{ disable_full_path | union(auto_mounts_existing_unique) }}"
   become: true
 
 - name: Unmount mountpoints
@@ -95,11 +147,11 @@
   when: remove_mountpoints is defined and remove_mountpoints | length > 0
   become: true
 
-- name: Check if mountpoint directories exist
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
+- name: Remove mountpoint directories
+  ansible.builtin.command: rmdir "/{{ item }}"
   with_items: "{{ remove_mountpoints }}"
+  register: rmdir_register
+  changed_when: rmdir_register.rc == 0
   when: remove_mountpoints is defined and remove_mountpoints | length > 0
   become: true
 
@@ -112,21 +164,51 @@
     state: absent
   when: disable_full_path is defined
   with_items:
-    - "{{ disable_full_path | union(automounts_existing_unique) }}"
+    - "{{ disable_full_path | union(auto_mounts_existing_unique) }}"
   notify:
     - 'archive_systemd_reload'
   become: true
 
-- name: Create archive directory mountpoint for each group
+- name: "Check if top level mount folders exist and is executable by others"
+  ansible.builtin.shell: |
+    test -d "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}" \
+      && test -x "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}"
+  with_subelements:
+    - "{{ remote_archive | default([], true) }}"
+    - groups
+  register: folder_test
+  failed_when: folder_test.rc != 0
+  changed_when: false
+
+- name: "Check if group folder inside exist and is executable by others"
+  ansible.builtin.shell: |
+    test -d "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}/{{ item.1 }}" \
+      && test -x "/{{ item.0.local_top_level_mount | regex_replace('/', '') }}/{{ item.1 }}"
+  with_subelements:
+    - "{{ remote_archive | default([], true) }}"
+    - groups
+  register: subfolder_test
+  failed_when: subfolder_test.rc != 0
+  changed_when: false
+
+# We don't assign the user and group permissions for two reasons:
+#  - this task should create folder only if is missing
+#  - it should not assign user or group ownership
+#  - the user and group ownership change at mount time, and assinging them
+#    would make this task fail - which is not needed
+#  - we only assign mode 2750 which reflects the permissions of the mounted
+#    folders - so this is fine
+#  - from security point of view, as mentioned before, user and group change
+#    at mount time, so that only -dm users can view and edit archive content
+- name: Create archive folder mountpoint for each group
   ansible.builtin.file:
-    path: "/groups/{{ item.1 }}/{{ item.0.name }}"
-    owner: "{{ item.1 }}-dm"
-    group: "{{ item.1 }}"
+    path: "/{{ item.0.local_top_level_mount | regex_replace('\/', '') }}/{{ item.1 }}/{{ item.0.name }}"
     mode: "2750"
     state: "directory"
-  when: archive_groups | default([]) | length >= 1
+  when: remote_archive | default([], true) | length >= 1
+  register: created_mount_point
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'groups'
   become: true
 ...

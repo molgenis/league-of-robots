@@ -1,0 +1,65 @@
+#
+# Install cvmfs_sever.
+#
+---
+- name: 'Check OS version of target host.'
+  ansible.builtin.fail:
+    msg: 'This role requires RedHat/CentOS version >= 9.x'
+  when: ansible_facts['os_family'] != "RedHat" or ansible_facts['distribution_major_version'] < "9"
+
+- name: 'Set selinux in permissive mode.'
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+  become: true
+
+- name: 'Install extra RPMs.'
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+    name:
+      - curl
+      - nano
+      - rsync
+      - wget
+  become: true
+
+- name: 'Ensure CVMFS repo is installed.'
+  ansible.builtin.get_url:
+    url: "{{ cvmfs_repo_url }}"
+    dest: /etc/yum.repos.d/cernvm.repo
+  become: true
+
+- name: 'Add CVMFS repo GPG key.'
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ cvmfs_repo_key_url }}"
+  become: true
+
+- name: 'Install CVMFS and additional packages.'
+  ansible.builtin.package:
+    name:
+      - cvmfs
+      - cvmfs-server
+      - cvmfs-keys
+      - cvmfs-init-scripts
+    state: "{{ cvmfs_package_state }}"
+    update_cache: true
+  become: true
+
+- name: 'Install apache webserver.'
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+    name:
+      - httpd
+  become: true
+
+- name: Enable webserver.
+  ansible.builtin.systemd:
+    name: httpd
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+...

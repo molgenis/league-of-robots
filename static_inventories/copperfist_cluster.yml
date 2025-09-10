@@ -16,6 +16,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -53,6 +54,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
           local_volume_size_extra: 8300
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -101,7 +103,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
-            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}" 
+            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
     docs:
       hosts:
@@ -111,6 +113,7 @@ all:
         copperfist:
           host_networks:
             - name: vlan16
+              add_hostname_to_ip_address: true
             - name: vlan990
           local_yum_repository: true # enable local yum repository
           local_mounts:
@@ -167,6 +170,7 @@ all:
           hosts:
             cf-dragen:
               # ansible_host: cf-porch+copperfist+cf-dragen
+              os_distribution: 'oracle8'
               local_mounts:
                 - mount_point: '/staging'
                   device: 'LABEL=staging'
@@ -182,6 +186,7 @@ all:
                   mounted_mode: '0755'
                   mount_options: 'bind,nofail'
                   type: none
+              slurm_version: '20.11.9-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
               slurm_threads_per_core: 2
@@ -195,8 +200,6 @@ all:
                 - enp5s0  # BMC
                 - ens3f0.16  # VLAN16
               slurm_weight: 10
-              slurm_version: '20.11.9-1.el8.umcg'
-              os_distribution: 'oracle8'
               local_yum_repository: true # enable local yum repository
     mit_chaperone:
       hosts:
@@ -209,24 +212,23 @@ all:
           # * Do not create local functional_admin_group, which comes from UMCG AD.
           #
           regular_groups:
-            - "{{ envsync_group }}"
-            - "{{ functional_users_group }}"
-            - 'umcg-atd'
-            - 'umcg-gap'
-            - 'umcg-gd'
-            - 'umcg-genomescan'
-            - 'umcg-gsad'
-            - 'umcg-gst'
-            - 'umcg-lab'
-            - 'umcg-labgnkbh'
-            - 'umcg-logstoprm'
-            - 'umcg-ogm'
-            - 'umcg-patho'
-            - 'umcg-pr'
-            - 'umcg-vipt'
+            - name: "{{ envsync_group }}"
+            - name: "{{ functional_users_group }}"
+            - name: 'umcg-atd'
+            - name: 'umcg-gap'
+            - name: 'umcg-gd'
+            - name: 'umcg-genomescan'
+            - name: 'umcg-gsad'
+            - name: 'umcg-gst'
+            - name: 'umcg-lab'
+            - name: 'umcg-labgnkbh'
+            - name: 'umcg-logstoprm'
+            - name: 'umcg-ogm'
+            - name: 'umcg-patho'
+            - name: 'umcg-pr'
+            - name: 'umcg-vipt'
           ssh_client_configs:
             - logs_library
-          local_yum_repository: true # enable local yum repository
     storage_server:
       hosts:
         cf-storage:
@@ -237,6 +239,7 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
           local_yum_repository: true # enable local yum repository for PERC CLI utility.

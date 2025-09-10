@@ -1,0 +1,51 @@
+---
+stack_name: "silo_server"  # stack_name must match the name of the folder that contains this vars.yml file.
+stack_prefix: 'silo'
+use_ldap: true
+create_ldap: false
+use_sssd: true
+ldap_domains:
+  idvault:
+    uri: ldaps://svrs.id.rug.nl
+    base: ou=umcg,o=asds
+    schema: rfc2307
+    min_id: 50100000
+    max_id: 55999999
+    user_object_class: posixAccount
+    user_name: uid
+    user_ssh_public_key: sshPublicKey
+    user_member_of: groupMembership
+    user_expiration_date: loginExpirationTime
+    group_member: memberUid
+    group_object_class: groupofnames
+cloud_image: Rocky-9.5
+cloud_user: rocky
+availability_zone: nova
+os_distribution: 'rocky9'
+repo_manager: 'none'
+stack_networks:
+  - name: "{{ stack_prefix }}_internal_management"
+    cidr: '10.10.1.0/24'
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
+nameservers: [
+  '8.8.4.4',  # Google DNS.
+  '8.8.8.8',  # Google DNS.
+]
+local_admin_groups:
+  - 'admin'
+local_admin_users:
+  - 'ger'
+  - 'gerben'
+  - 'henkjan'
+  - 'marieke'
+  - 'max'
+  - 'morris'
+  - 'pieter'
+  - 'robin'
+  - 'sandi'
+  - 'wim'
+  - 'wouter'
+...

@@ -68,9 +68,20 @@ PreemptMode=REQUEUE
 #
 # Logging
 #
-SlurmctldDebug=3  # 3 == info (default)
+# Log levels for Slurm*Debug:
+#   1 = fatal
+#   2 = error
+#   3 = info (default)
+#   4 = verbose
+#   5 = debug
+#   6 = debug2
+#   7 = debug3
+#   8 = debug4
+#   9 = debug5
+#
+SlurmctldDebug=3
 SlurmctldLogFile=/var/log/slurm/slurmctld.log
-SlurmdDebug=3  # 3 == info (default)
+SlurmdDebug=3
 SlurmdLogFile=/var/log/slurm/slurmd.log
 JobCompType=jobcomp/filetxt
 JobCompLoc=/var/log/slurm/jobcomp.log

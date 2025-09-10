@@ -1,0 +1,86 @@
+#!/bin/bash
+set -euo pipefail
+
+_tmp_queue="$(basename $(mktemp -u))"
+_tag="surf_archive"
+_main_dir="/var/cache/arcq/"
+_queue_dir="${_main_dir}/queue"
+_stdout_dir="${_main_dir}/output"
+_delay=0.5
+
+function _print_help(){
+   cat << EOF
+   Provide one of the following arguments
+    --quiet                  don't print the start message - supress the extra output
+    --dafind-reg <path>      search for regular files / files that reside only on disk
+                             (there is no copy on tape) Directories are always REG.
+    --dafind-dul <path>      search for files that reside both online (on disk) and offline (on tape)
+    --dafind-ofl <path>      search for files that is no longer on disk (is only on tape)
+    --dafind-que <path>      search for files that are queued for copy FROM TAPE to disk
+                             (are not yet copying, data is also not yet available). This is state before STG.
+    --dafind-stg <path>      search for files which are currently being copied FROM TAPE to disk
+                             (files that are currently copying, but data is not yet available)
+    --daget      <path>      recall / request data to be staged online FROM TAPE to disk
+    --dals       <path>      list file state in long format (including queue state)
+    --darelease  <path>      send to offline / stage TO TAPE
+    --sha256sum  <path>      compute the sha256sum of the file
+EOF
+}
+
+if [[ "$#" -lt 2 ]] || [[ "${1}" == "-h" ]] || [[ "${1}" == "--help" ]]; then
+   _print_help
+fi
+
+# set variable initial values
+_quiet=false
+_command="default"
+_path="/errorpath"
+
+# parse command arguments
+for _eacharg in "$@"; do
+   # if starts with '--'
+   if [[ "${_eacharg:0:2}" == "--" ]]; then
+      if [[ "${_eacharg}" == "--quiet" ]]; then
+         _quiet=true
+      else # if not quiet, it is --dafind, --dals ...
+         _command="${_eacharg}"
+      fi
+   else
+      # probably a path since it does not start with '--'
+      _path="${_eacharg}"
+      if ! test -e "${_path}"; then
+         echo "Error: path must exist!"
+         exit 1
+      fi
+   fi
+done
+
+_groups="$(echo "${_path}" | cut -s -d'/' -f2)"
+_correct_path=false
+_top_mounts=({% for archive in remote_archive %} "{{ archive.local_top_level_mount }}" {% endfor %})
+for _each_group in "${_top_mounts[@]}"; do
+   [[ "/${_groups}" == "${_each_group}" ]] && _correct_path=true && break
+done
+if ! ${_correct_path}; then
+   echo "Error: directory must be from either of '${_top_mounts[@]}'!"
+   exit 1
+fi
+_group_name="$(echo "${_path}" | cut -s -d'/' -f3)"
+_arc_name="$(echo "${_path}" | cut -s -d'/' -f4)"
+
+if [[ ! "${_arc_name}" =~ ^"arc"[0-9][0-9]$ ]]; then
+   echo "Error: directory must be in the arc filesystem!"
+   exit 1
+fi
+
+echo "${_command} ${_path}" >> "${_queue_dir}/${_arc_name}/${_tmp_queue}"
+
+${_quiet} || echo "Submitted to remote host, waiting for reply ..."
+${_quiet} || echo "( You can press CTRL+C and check later for the output in ${_stdout_dir}/${_tmp_queue} )"
+sleep ${_delay} && sync
+while ! test -s "${_stdout_dir}/${_tmp_queue}.done"; do
+   sleep ${_delay}
+done
+
+sync
+cat "${_stdout_dir}/${_tmp_queue}"

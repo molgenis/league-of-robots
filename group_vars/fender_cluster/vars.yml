@@ -64,18 +64,18 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: public
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: public
+    create: true
   - name: subnet-nfs-data-2541
     cidr: '10.35.141.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 10.35.141.251/32  # NFS server
       - 10.35.141.252/32  # NFS server
       - 10.35.141.253/32  # NFS server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -95,249 +95,249 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 regular_groups:
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - 'users'
-  - 'solve-rd'
-  - 'umcg-atd'
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: 'users'
+  - name: 'solve-rd'
+  - name: 'umcg-atd'
 regular_users:
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
-  - user: 'solve-rd-dm'
+  - name: 'solve-rd-dm'
     groups: ['solve-rd']
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd']
-  - user: 'solve-rd-ateambot'
+  - name: 'solve-rd-ateambot'
     groups: ['solve-rd']
-  - user: 'gvdvries'
+  - name: 'gvdvries'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'mbijlsma'
+  - name: 'mbijlsma'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'mswertz'
+  - name: 'mswertz'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'pneerincx'
+  - name: 'pneerincx'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'rkanninga'
+  - name: 'rkanninga'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'ljohansson'
+  - name: 'ljohansson'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'ddanis'
+  - name: 'ddanis'
     groups: ['users', 'solve-rd']
-  - user: 'dhendriksen'
+  - name: 'dhendriksen'
     groups: ['users', "{{ envsync_group }}", 'solve-rd']
-  - user: 'wsteyaert'
+  - name: 'wsteyaert'
     groups: ['users', 'solve-rd']
-  - user: 'slaurie'
+  - name: 'slaurie'
     groups: ['users', 'solve-rd']
-  - user: 'jvdvelde'
+  - name: 'jvdvelde'
     groups: ['users', 'solve-rd']
-  - user: 'fmusacchia'
+  - name: 'fmusacchia'
     groups: ['users', 'solve-rd']
-  - user: 'psivakumar'
+  - name: 'psivakumar'
     groups: ['users', 'solve-rd']
-  - user: 'fandrade'
+  - name: 'fandrade'
     groups: ['users', 'solve-rd']
-  - user: 'gdemidov'
+  - name: 'gdemidov'
     groups: ['users', 'solve-rd']
-  - user: 'amohan'
+  - name: 'amohan'
     groups: ['users']
-  - user: 'dspalding'
+  - name: 'dspalding'
     groups: ['users']
-  - user: 'cthomas'
+  - name: 'cthomas'
     groups: ['users', 'solve-rd']
-  - user: 'mbenjamins'
+  - name: 'mbenjamins'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'lmatalonga'
+  - name: 'lmatalonga'
     groups: ['users', 'solve-rd']
-  - user: 'gbullich'
+  - name: 'gbullich'
     groups: ['users', 'solve-rd']
-  - user: 'ebenetti'
+  - name: 'ebenetti'
     groups: ['users', 'solve-rd']
-  - user: 'kdelange'
+  - name: 'kdelange'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'scimerman'
+  - name: 'scimerman'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'sli'
+  - name: 'sli'
     groups: ['users', 'solve-rd']
-  - user: 'rschuele'
+  - name: 'rschuele'
     groups: ['users', 'solve-rd']
-  - user: 'jvandrovcova'
+  - name: 'jvandrovcova'
     groups: ['users', 'solve-rd']
-  - user: 'itepaske'
+  - name: 'itepaske'
     groups: ['users', 'solve-rd']
-  - user: 'jpelaez'
+  - name: 'jpelaez'
     groups: ['users', 'solve-rd']
-  - user: 'asommer'
+  - name: 'asommer'
     groups: ['users', 'solve-rd']
-  - user: 'droelofs'
+  - name: 'droelofs'
     groups: ['users', 'solve-rd']
-  - user: 'dlagorce'
+  - name: 'dlagorce'
     groups: ['users', 'solve-rd']
-  - user: 'gwarren'
+  - name: 'gwarren'
     groups: ['users', 'solve-rd']
-  - user: 'mmehtarizadeh'
+  - name: 'mmehtarizadeh'
     groups: ['users', 'solve-rd']
-  - user: 'cveal'
+  - name: 'cveal'
     groups: ['users', 'solve-rd']
-  - user: 'rthompson'
+  - name: 'rthompson'
     groups: ['users', 'solve-rd']
-  - user: 'alaner'
+  - name: 'alaner'
     groups: ['users', 'solve-rd']
-  - user: 'edeboer01'
+  - name: 'edeboer01'
     groups: ['users', 'solve-rd']
-  - user: 'adenommepichon'
+  - name: 'adenommepichon'
     groups: ['users', 'solve-rd']
-  - user: 'avitobello'
+  - name: 'avitobello'
     groups: ['users', 'solve-rd']
-  - user: 'yduffourd'
+  - name: 'yduffourd'
     groups: ['users', 'solve-rd']
-  - user: 'elopez02'
+  - name: 'elopez02'
     groups: ['users', 'solve-rd']
-  - user: 'amarcegrau'
+  - name: 'amarcegrau'
     groups: ['users', 'solve-rd']
-  - user: 'cwilke'
+  - name: 'cwilke'
     groups: ['users', 'solve-rd']
-  - user: 'ajackson'
+  - name: 'ajackson'
     groups: ['users', 'solve-rd']
-  - user: 'byaldiz'
+  - name: 'byaldiz'
     groups: ['users', 'solve-rd']
-  - user: 'bcharbon'
+  - name: 'bcharbon'
     groups: ['users', "{{ envsync_group }}", 'solve-rd']
-  - user: 'amaver'
+  - name: 'amaver'
     groups: ['users', 'solve-rd']
-  - user: 'cgilissen'
+  - name: 'cgilissen'
     groups: ['users', 'solve-rd']
-  - user: 'arump'
+  - name: 'arump'
     groups: ['users', 'solve-rd']
-  - user: 'abuhrmann'
+  - name: 'abuhrmann'
     groups: ['users', 'solve-rd']
-  - user: 'mferreira'
+  - name: 'mferreira'
     groups: ['users', 'solve-rd']
-  - user: 'iparamonov'
+  - name: 'iparamonov'
     groups: ['users', 'solve-rd']
-  - user: 'ohongnat'
+  - name: 'ohongnat'
     groups: ['users', 'solve-rd']
-  - user: 'mslofstra'
+  - name: 'mslofstra'
     groups: ['users', 'solve-rd']
-  - user: 'dwilliam'
+  - name: 'dwilliam'
     groups: ['users', 'solve-rd']
-  - user: 'mbeukers'
+  - name: 'mbeukers'
     groups: ['users', 'solve-rd']
-  - user: 'fgao'
+  - name: 'fgao'
     groups: ['users', 'solve-rd']
-  - user: 'druvolo'
+  - name: 'druvolo'
     groups: ['users', 'solve-rd']
-  - user: 'ftranmauthem'
+  - name: 'ftranmauthem'
     groups: ['users', 'solve-rd']
-  - user: 'mjohari'
+  - name: 'mjohari'
     groups: ['users', 'solve-rd']
-  - user: 'mchahdil'
+  - name: 'mchahdil'
     groups: ['users', 'solve-rd']
-  - user: 'aesteve'
+  - name: 'aesteve'
     groups: ['users', 'solve-rd']
-  - user: 'cdoornbos'
+  - name: 'cdoornbos'
     groups: ['users', 'solve-rd']
-  - user: 'kmaassen'
+  - name: 'kmaassen'
     groups: ['users', 'solve-rd']
-  - user: 'gbeen'
+  - name: 'gbeen'
     groups: ['users', 'solve-rd']
-  - user: 'dmei'
+  - name: 'dmei'
     groups: ['users', 'solve-rd']
-  - user: 'hmorsy'
+  - name: 'hmorsy'
     groups: ['users', 'solve-rd']
-  - user: 'kzguro'
+  - name: 'kzguro'
     groups: ['users', 'solve-rd']
-  - user: 'jklimp'
+  - name: 'jklimp'
     groups: ['users', 'solve-rd']
-  - user: 'asalazarvillacorta'
+  - name: 'asalazarvillacorta'
     groups: ['users', 'solve-rd']
-  - user: 'vyepez'
+  - name: 'vyepez'
     groups: ['users', 'solve-rd']
-  - user: 'fbrechtmann'
+  - name: 'fbrechtmann'
     groups: ['users', 'solve-rd']
-  - user: 'cmertes'
+  - name: 'cmertes'
     groups: ['users', 'solve-rd']
-  - user: 'umcg-molgenis'
+  - name: 'umcg-molgenis'
     groups: ['users']
-  - user: 'svandenhoek'
+  - name: 'svandenhoek'
     groups: ['users', 'solve-rd']
-  - user: 'pacthoen'
+  - name: 'pacthoen'
     groups: ['users', 'solve-rd']
-  - user: 'jgagneur'
+  - name: 'jgagneur'
     groups: ['users', 'solve-rd']
-  - user: 'slondhe'
+  - name: 'slondhe'
     groups: ['users', 'solve-rd']
-  - user: 'dbeijer'
+  - name: 'dbeijer'
     groups: ['users', 'solve-rd']
-  - user: 'jmueller'
+  - name: 'jmueller'
     groups: ['users', 'solve-rd']
-  - user: 'nsmal'
+  - name: 'nsmal'
     groups: ['users', 'solve-rd']
-  - user: 'bestevez'
+  - name: 'bestevez'
     groups: ['users', 'solve-rd']
-  - user: 'msynofzik'
+  - name: 'msynofzik'
     groups: ['users', 'solve-rd']
-  - user: 'wmacken'
+  - name: 'wmacken'
     groups: ['users', 'solve-rd']
-  - user: 'klohmann'
+  - name: 'klohmann'
     groups: ['users', 'solve-rd']
-  - user: 'sadiaw'
+  - name: 'sadiaw'
     groups: ['users', 'solve-rd']
-  - user: 'dndebento'
+  - name: 'dndebento'
     groups: ['users', 'solve-rd']
-  - user: 'hhengel'
+  - name: 'hhengel'
     groups: ['users', 'solve-rd']
-  - user: 'jschulzehentrich'
+  - name: 'jschulzehentrich'
     groups: ['users', 'solve-rd']
-  - user: 'atopf'
+  - name: 'atopf'
     groups: ['users', 'solve-rd']
-  - user: 'ejung'
+  - name: 'ejung'
     groups: ['users', 'solve-rd']
-  - user: 'jbaptist'
+  - name: 'jbaptist'
     groups: ['users', 'solve-rd']
-  - user: 'mdabad'
+  - name: 'mdabad'
     groups: ['users', 'solve-rd']
-  - user: 'mbarrero'
+  - name: 'mbarrero'
     groups: ['users', 'solve-rd']
-  - user: 'jkegele'
+  - name: 'jkegele'
     groups: ['users', 'solve-rd']
-  - user: 'mschlotterbek'
+  - name: 'mschlotterbek'
     groups: ['users', 'solve-rd']
-  - user: 'jpark'
+  - name: 'jpark'
     groups: ['users', 'solve-rd']
-  - user: 'izaharieva'
+  - name: 'izaharieva'
     groups: ['users', 'solve-rd']
-  - user: 'kpolavarapu'
+  - name: 'kpolavarapu'
     groups: ['users', 'solve-rd']
-  - user: 'izaganas'
+  - name: 'izaganas'
     groups: ['users', 'solve-rd']
-  - user: 'mmaran'
+  - name: 'mmaran'
     groups: ['users', 'solve-rd']
-  - user: 'bmartinez'
+  - name: 'bmartinez'
     groups: ['users', 'solve-rd']
-  - user: 'elopez'
+  - name: 'elopez'
     groups: ['users', 'solve-rd']
-  - user: 'oakselkilicarslan'
+  - name: 'oakselkilicarslan'
     groups: ['users', 'solve-rd']
-  - user: 'mterradas'
+  - name: 'mterradas'
     groups: ['users', 'solve-rd']
-  - user: 'mkarakaya'
+  - name: 'mkarakaya'
     groups: ['users', 'solve-rd']
-  - user: 'rjimenezheredia'
+  - name: 'rjimenezheredia'
     groups: ['users', 'solve-rd']
-  - user: 'gastuti'
+  - name: 'gastuti'
     groups: ['users', 'solve-rd']
-  - user: 'gbonne'
+  - name: 'gbonne'
     groups: ['users', 'solve-rd']
-  - user: 'kabbott'
+  - name: 'kabbott'
     groups: ['users', 'solve-rd']
-  - user: 'lryba'
+  - name: 'lryba'
     groups: ['users', 'solve-rd']
-  - user: 'hghani'
+  - name: 'hghani'
     groups: ['users', 'solve-rd']
-  - user: 'eraineri'
+  - name: 'eraineri'
     groups: ['users', 'solve-rd']
-  - user: 'hgriffin'
+  - name: 'hgriffin'
     groups: ['users', 'solve-rd']
 sudoers:
   - who: ['%solve-rd']

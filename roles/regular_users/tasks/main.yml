@@ -7,6 +7,8 @@
     regular_users_ldap_bind_dn: "{{ ldap_credentials['stack']['admin']['dn'] }}"
     regular_users_ldap_bind_pw: "{{ ldap_credentials['stack']['admin']['pw'] }}"
     regular_users_ldap_server_uri: "{{ ldap_domains['stack']['uri'] }}"
+  tags:
+    - groups
   when:
     - use_ldap | default(true) | bool
     - ldap_domains['stack']['create_ldap'] | default(false) | bool
@@ -16,6 +18,8 @@
 - name: 'Create local regular users & groups.'
   ansible.builtin.include_tasks:
     file: local_regular_users.yml
+  tags:
+    - groups
   when:
     - not use_ldap | default(true) | bool
     - inventory_hostname in groups['cluster'] | default([]) or
@@ -30,6 +34,8 @@
 - name: 'Add remote regular users to local groups.'
   ansible.builtin.include_tasks:
     file: remote_users_in_local_groups.yml
+  tags:
+    - groups
   when:
     - inventory_hostname in groups['chaperone'] | default([])
     - remote_users_in_local_groups is defined

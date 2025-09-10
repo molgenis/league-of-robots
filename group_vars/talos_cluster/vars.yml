@@ -4,7 +4,7 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'tl'
 stack_dtap_state: development
-slurm_version: '23.02.7-2.el9.umcg'
+slurm_version: '24.11.4-1.el9.umcg'
 slurm_partitions:
   - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
     default: yes
@@ -14,7 +14,7 @@ slurm_partitions:
     max_mem_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
     local_disk: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
-    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_r6515  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -23,6 +23,15 @@ slurm_partitions:
     max_mem_per_node: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
     local_disk: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_vm  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-c01"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_vm']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
@@ -125,20 +134,26 @@ availability_zone: nova
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
-    gateway: '172.23.68.1'
-    router_network: vlan16
-    router_name: vlan1337
-    type: management
-    external: true
+    router:
+      next-hop-address: '172.23.68.1'
+      external_network: vlan16
+      name: vlan1337
+  - name: "{{ stack_prefix }}_internal_management"
+    cidr: '10.10.1.0/24'
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
+    mtu_size: '1450'
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -165,50 +180,67 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
-
+sponsors:
+  - name: umcg-research-it
+    slurm_shares: 570
+  - name: umcg-cvandiemen
+    slurm_shares: 112
+  - name: umcg-lfranke
+    slurm_shares: 136
+  - name: umcg-mswertz
+    slurm_shares: 570
 # Remote archive settings
-archive_groups:
+remote_archive:
   - name: arc01
+    local_top_level_mount: '/groups'
     groups:
       - 'umcg-atd'
       - 'umcg-gcc'
     archive_user: 'umcg-atd-dm'
     archive_system: 'archive.surfsara.nl'
     archive_system_fingerprints:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
-      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-atd-dm/groups'
     recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
 regular_groups:
   # Note, for chaperone machines this is controlled in the static_inventories.
-  - "{{ data_transfer_only_group }}"
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - 'umcg-atd'
-  - 'umcg-gcc'
-  - 'umcg-gsad'
-  - 'umcg-gst'
-  - 'umcg-sysops'
+  - name: "{{ data_transfer_only_group }}"
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: 'umcg-atd'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gcc'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gsad'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gst'
+    sponsor: umcg-mswertz
+  - name: 'umcg-sysops'
+    sponsor: umcg-research-it
+  - name: 'umcg-vipt'
+    sponsor: umcg-mswertz
 regular_users:
   # Note, for chaperone machines this is controlled in the static_inventories.
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
-  - user: 'umcg-atd-ateambot'
+  - name: 'umcg-atd-ateambot'
     groups: ['umcg-atd', "{{ functional_users_group }}"]
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd', "{{ functional_users_group }}"]
-  - user: 'umcg-gcc-dm'
+  - name: 'umcg-gcc-dm'
     groups: ['umcg-gcc', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-ateambot'
+  - name: 'umcg-gsad-ateambot'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-dm'
+  - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-ateambot'
+  - name: 'umcg-gst-ateambot'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-dm'
+  - name: 'umcg-gst-dm'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-sysops-dm'
+  - name: 'umcg-sysops-dm'
     groups: ['umcg-sysops', "{{ functional_users_group }}"]
-  - user: 'umcg-vipt-dm'
+  - name: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
@@ -234,12 +266,6 @@ sudoers:
 #
 # Shared storage related variables
 #
-lustre_client_networks_vm:
-  - name: tcp20
-    interface: enp5s0
-#
-# lustre_client_networks for baremetal machines specified in static_inventory.
-#
 pfs_mounts:
   - pfs: umcgst04/slice4
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
@@ -250,8 +276,8 @@ pfs_mounts:
   - pfs: umcgst04/slice5
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -259,18 +285,18 @@ lfs_mounts:
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-atd
       - name: umcg-gcc
-        mode: '2750'
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-sysops
-        mode: '2750'
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
@@ -278,6 +304,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops

@@ -155,29 +155,25 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
   - name: "{{ stack_prefix }}_internal_storage"
     cidr: '10.10.2.0/24'
-    type: storage
-    external: false
+    create: true
   - name: vlan990
     cidr: '192.168.1.0/24'
-    allow_ingress:
-      - '192.168.1.0/25'
-    type: storage
-    external: true
   - name: vlan1068
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
+      - 192.168.1.0/25
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -207,73 +203,73 @@ functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /et
 hpc_env_prefix: '/apps'
 regular_groups:
 # Note, for chaperone machines this is controlled in the static_inventories
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - "{{ functional_users_group }}"
-  - 'umcg-atd'
-  - 'umcg-gap'
-  - 'umcg-gd'
-  - 'umcg-genomescan'
-  - 'umcg-gsad'
-  - 'umcg-gst'
-  - 'umcg-lab'
-  - 'umcg-labgnkbh'
-  - 'umcg-logstoprm'
-  - 'umcg-patho'
-  - 'umcg-pgx'
-  - 'umcg-pr'
-  - 'umcg-vipt'
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: "{{ functional_users_group }}"
+  - name: 'umcg-atd'
+  - name: 'umcg-gap'
+  - name: 'umcg-gd'
+  - name: 'umcg-genomescan'
+  - name: 'umcg-gsad'
+  - name: 'umcg-gst'
+  - name: 'umcg-lab'
+  - name: 'umcg-labgnkbh'
+  - name: 'umcg-logstoprm'
+  - name: 'umcg-patho'
+  - name: 'umcg-pgx'
+  - name: 'umcg-pr'
+  - name: 'umcg-vipt'
 regular_users:
 # Note, for chaperone machines this is controlled in the static_inventories
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
-  - user: 'umcg-atd-ateambot'
+  - name: 'umcg-atd-ateambot'
     groups: ['umcg-atd', 'umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd', "{{ functional_users_group }}"]
-  - user: 'umcg-gap-ateambot'
+  - name: 'umcg-gap-ateambot'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gap-dm'
+  - name: 'umcg-gap-dm'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gd-ateambot'
-    groups: ['umcg-gd', 'umcg-gap', "{{ functional_users_group }}"]
-  - user: 'umcg-gd-dm'
+  - name: 'umcg-gd-ateambot'
+    groups: ['umcg-gd', 'umcg-gap', 'umcg-ogm', "{{ functional_users_group }}"]
+  - name: 'umcg-gd-dm'
     groups: ['umcg-gd', "{{ functional_users_group }}"]
-  - user: 'umcg-genomescan-ateambot'
+  - name: 'umcg-genomescan-ateambot'
     groups: ['umcg-genomescan', "{{ functional_users_group }}"]
-  - user: 'umcg-genomescan-dm'
+  - name: 'umcg-genomescan-dm'
     groups: ['umcg-genomescan', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-ateambot'
+  - name: 'umcg-gsad-ateambot'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gsad-dm'
+  - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-ateambot'
+  - name: 'umcg-gst-ateambot'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-gst-dm'
+  - name: 'umcg-gst-dm'
     groups: ['umcg-gst', "{{ functional_users_group }}"]
-  - user: 'umcg-lab-ateambot'
+  - name: 'umcg-lab-ateambot'
     groups: ['umcg-lab', "{{ functional_users_group }}"]
-  - user: 'umcg-lab-dm'
+  - name: 'umcg-lab-dm'
     groups: ['umcg-lab', "{{ functional_users_group }}"]
-  - user: 'umcg-labgnkbh-ateambot'
+  - name: 'umcg-labgnkbh-ateambot'
     groups: ['umcg-labgnkbh', "{{ functional_users_group }}"]
-  - user: 'umcg-labgnkbh-dm'
+  - name: 'umcg-labgnkbh-dm'
     groups: ['umcg-labgnkbh', "{{ functional_users_group }}"]
-  - user: 'umcg-logstoprm-dm'
+  - name: 'umcg-logstoprm-dm'
     groups: ['umcg-logstoprm', "{{ functional_users_group }}"]
-  - user: 'umcg-ogm-dm'
+  - name: 'umcg-ogm-dm'
     groups: ['umcg-ogm', "{{ functional_users_group }}"]
-  - user: 'umcg-patho-ateambot'
+  - name: 'umcg-patho-ateambot'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
-  - user: 'umcg-patho-dm'
+  - name: 'umcg-patho-dm'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
-  - user: 'umcg-pgx-dm'
+  - name: 'umcg-pgx-dm'
     groups: ['umcg-pgx', "{{ functional_users_group }}"]
-  - user: 'umcg-pr-ateambot'
+  - name: 'umcg-pr-ateambot'
     groups: ['umcg-pr', "{{ functional_users_group }}"]
-  - user: 'umcg-pr-dm'
+  - name: 'umcg-pr-dm'
     groups: ['umcg-pr', "{{ functional_users_group }}"]
-  - user: 'umcg-vipt-dm'
+  - name: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd']
@@ -327,59 +323,59 @@ sudoers:
   - who: ['%umcg-vipt']
     become: 'umcg-vipt-dm'
 remote_users_in_local_groups:
-  - user: 'benjaminsm'
+  - name: 'benjaminsm'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'bijlsmam'
+  - name: 'bijlsmam'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'charbonb'
+  - name: 'charbonb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
         'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
-  - user: 'cimermans'
+  - name: 'cimermans'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'hendriksend'
+  - name: 'hendriksend'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
         'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
-  - user: 'langek'
+  - name: 'langek'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'kanningaroj'
+  - name: 'kanningaroj'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'neerincxp'
+  - name: 'neerincxp'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'vriesgb'
+  - name: 'vriesgb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
@@ -423,6 +419,14 @@ ogm_servers:
       - /home/bionano/access/web/Server/anchorFiles
       - /home/ADMINIT/pg_dump
     psql_dump_location: /home/ADMINIT/pg_dump
+    trendanalysis_api_username: 'umcg-ogm-dm'
+    trendanalysis_cron_disabled: false
+    trendanalysis_cron_command: "curl -s -k -H 'Cookie: token='\"$(curl -s \"https://${ogm_server}\
+      :3005/administration/api/userLogin?deviceFingerprint=chaperone&userna\
+      me=${trendanalysis_api_username}&password={{ ogm_api_password }}\" | grep -oP '\"to\
+      ken\":\\s*\"\\K[^\"]+')\"'; userrole=3; userpk=24' https://${ogm_server}:3005/proje\
+      ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?period=90 > ${prm_location}/TrendAnalysis/${ogm_server}-$(date +%F)-${stack_prefix}.csv"
+
 #
 # Local storage variables.
 #
@@ -443,9 +447,6 @@ local_mount_subfolders:
 #
 # Shared storage related variables
 #
-lustre_client_networks:
-  - name: tcp20
-    interface: enp5s0
 pfs_mounts:
   - pfs: umcgst12
     source: "{{ ip_addresses['wh-sai'][stack_prefix + '_internal_storage']['address'] }}:/mnt"

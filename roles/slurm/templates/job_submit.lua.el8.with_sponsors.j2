@@ -1,3 +1,4 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
 --[[
 
  This lua script:
@@ -23,6 +24,25 @@
     slurm-VERSION/src/plugins/job_submit/lua/
 
 --]]
+
+--
+-- List of sponsors for all groups.
+-- Jobs are submitted to a Slurm account for a group, which is a member of the Slurm account of its sponsor.
+-- A job's priority is based on multiple factors including "fair share", which is based on
+--  * the amount of Slurm shares assigned to the sponsor's Slurm account and
+--  * recent resource usage by the sponsor's Slurm account and
+--  * the amount of Slurm shares assigned to a group and to the user submitting the job and
+--  * recent resource usage by the user submitting the job.
+--
+group_sponsors = {
+  {% for regular_group in regular_groups %}
+    {% if regular_group['sponsor'] is defined %}
+    ['{{ regular_group["name"] }}'] = '{{ regular_group["sponsor"] }}',
+    {% endif %}
+  {% endfor %}
+}
+
+{% raw %}
 
 --
 -- Only for debugging.
@@ -55,34 +75,28 @@ QOS_TIME_LIMITS = {
 -- Check if the user submitting the job is associated to a Slurm account in the Slurm accounting database and
 -- create the relevant Slurm account and/or Slurm user and/or association if it does not already exist.
 --
-function ensure_user_has_slurm_association(uid, user, group)
+function ensure_user_has_slurm_association(uid, user, group, sponsor)
     --
     -- Skip root user.
     --
     if uid == 0 then
         return true
     end
-    slurm.log_debug("Checking assoc for user %s (uid=%u) in account for group %s...", user, uid, group)
     if association_exists(user, group) then
-        slurm.log_debug("Association of user %s to account %s already exists.", user, group)
+        slurm.log_debug("Association of user %s to slurm account %s already exists.", user, group)
         return true
     else
-        if account_exists(group) then
-            slurm.log_debug("Account %s already exists.", group)
+        if account_exists(group, sponsor) then
+            slurm.log_debug("Slurm account %s sponsored by %s already exists.", group, sponsor)
         else
-            slurm.log_info("Account %s does not exist; creating one...", group)
-            if not create_account(group) then
-                return false
-            end
             --
-            -- Due to Slurm database locking or caching bug a subsequent attempt to create an association in the same job submit attempt,
-            -- will hang and make slurmctld freeze.
+            -- Creating accounts on the fly does not work
             --
-            slurm.log_user("Created new Slurm account %s, but Slurm cannot add user %s to that account due to an account caching bug and this job submission will fail.", group, user)
-            slurm.log_user("Please, simply resubmit this job again!")
+            slurm.log_error("Slurm account %s sponsored by %s does not exist.", group, sponsor)
+            slurm.log_user("Slurm account %s sponsored by %s does not exist.", group, sponsor)
             return false
         end
-        slurm.log_info("Association of user %s to account %s does not exist; creating one...", user, group)
+        slurm.log_info("Association of user %s to slurm account %s does not exist; creating one...", user, group)
         if not create_association(user,group) then
             return false
         end
@@ -90,41 +104,23 @@ function ensure_user_has_slurm_association(uid, user, group)
     return true
 end
 
-function account_exists(group)
+function account_exists(group, sponsor)
     --
     -- Unfortunately, filehandles returned by io.popen() don't have a way to return their exitstatuses in <= lua 5.2.
-    -- Should be reasonably safe here, since if we erroneously conclude the association doesn't exist,
+    -- Should be reasonably safe here, since if we erroneously conclude the account doesn't exist,
     -- then we'll just try to add it.
     -- http://lua-users.org/lists/lua-l/2012-01/msg00364.html
     --
     local query = io.popen(string.format(
-        "sacctmgr --parsable2 --noheader list accounts format=account account='%s'", group))
+        "sacctmgr --parsable2 --noheader list accounts withassoc format='account,parentname' account='%s' parent='%s'", group, sponsor))
     for line in query:lines() do
-        if line == group then
+        if line == group .. '|' .. sponsor then
             query:close()
             return true
         end
     end
     query:close()
     return false
-end
-
---
--- Use fairshare=parent only for (group) accounts to flatten the tree.
--- We use the groups only for reporting and not for differentiation in fair share factors.
--- See: https://bugs.schedmd.com/show_bug.cgi?id=3491
---
-function create_account(group)
-    local success, reason, return_code = os.execute(string.format(
-        "sacctmgr -i create account '%s' descr=scientists org=various parent=users fairshare=parent", group))
-    if success then
-        slurm.log_info("Created account for group %s.", group)
-        return true
-    else
-        slurm.log_error("Failed to create account %s (exit status = %d).", group, return_code)
-        slurm.log_user("Failed to create account %s (exit status = %d).", group, return_code)
-        return false
-    end
 end
 
 function association_exists(user, group)
@@ -156,11 +152,11 @@ function create_association(user, group)
     local success, reason, return_code = os.execute(string.format(
         "sacctmgr -i create user name='%s' account='%s' fairshare=1", user, group))
     if success then
-        slurm.log_info("Created association of user %s to account %s.", user, group)
+        slurm.log_info("Created association of user %s to slurm account %s.", user, group)
         return true
     else
-        slurm.log_error("Failed to create association of user %s to account %s (exit status = %d).", user, group, return_code)
-        slurm.log_user("Failed to create association of user %s to account %s (exit status = %d).", user, group, return_code)
+        slurm.log_error("Failed to create association of user %s to slurm account %s (exit status = %d).", user, group, return_code)
+        slurm.log_user("Failed to create association of user %s to slurm account %s (exit status = %d).", user, group, return_code)
         return false
     end
 end
@@ -171,9 +167,13 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
     --
     submit_user = posix.getpasswd(submit_uid)
     --
-    -- Force jobs to share nodes when they don't consume all resources on a node.
+    -- Check if job can share resources on a node.
     --
-    if job_desc.shared == 0 then
+    if string.match(tostring(job_desc.features), 'dragen') then
+        slurm.log_debug("Detected 'dragen' in features requested for job and will disable sharing of resources as dragen needs whole node exclusively.")
+        job_desc.shared = 0
+    else
+        slurm.log_debug("Forcing job to share node when it does not need all resources.")
         job_desc.shared = 1
     end
     --
@@ -242,6 +242,16 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
             return slurm.ESLURM_NOT_SUPPORTED
         end
     end
+    if group == nil then
+        slurm.log_error(
+            "Failed to determine group for this job.\n" ..
+            "Rejecting job named %s from user %s (uid=%u).", tostring(job_metadata_value), tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
+        slurm.log_user(
+            "Failed to determine group for this job.\n" ..
+            "Contact the helpdesk.\n" ..
+            "Rejecting job named %s from user %s (uid=%u).", tostring(job_metadata_value), tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
+        return slurm.ESLURM_NOT_SUPPORTED
+    end
     slurm.log_debug("Job's feature list contains: %s.", tostring(job_desc.features))
     --
     -- Process final list of features:
@@ -268,12 +278,20 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
     -- Check if the user submitting the job is associated to a Slurm account in the Slurm accounting database and
     -- create the relevant Slurm account and/or Slurm user and/or association if it does not already exist.
     -- Note: as slurm account we use the group that was found last while parsing job_metadata above.
-    --
-    if not ensure_user_has_slurm_association(submit_uid, tostring(submit_user.name), tostring(group)) then
-        slurm.log_error("Failed to create association in the Slurm accounting database for user %s in account/group %s", tostring(submit_user.name), tostring(group))
+    if group_sponsors[group] == nil then
+        slurm.log_error("Failed to lookup sponsor for group %s.", tostring(group))
+        slurm.log_user("Failed to lookup sponsor for group %s.", tostring(group))
+        slurm.log_user("Contact the helpdesk.")
+        return slurm.ESLURM_INVALID_ACCOUNT
+    end
+    local sponsor = group_sponsors[group]
+    slurm.log_debug("Found sponsor %s for group %s.", tostring(sponsor), tostring(group))
+    slurm.log_debug("Checking assoc for user %s (uid=%u) in slurm account for group %s sponsored by %s...", tostring(submit_user.name), job_desc.user_id, tostring(group), tostring(sponsor))
+    if not ensure_user_has_slurm_association(submit_uid, tostring(submit_user.name), tostring(group), tostring(sponsor)) then
+        slurm.log_error("Failed to create association in the Slurm accounting database for user %s in slurm account/group %s", tostring(submit_user.name), tostring(group))
         slurm.log_error("Rejecting job named %s from user %s (uid=%u).", tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
         slurm.log_user("Failed to create association in the Slurm accounting database.")
-        slurm.log_user("Contact an admin if this is reproducible.")
+        slurm.log_user("Contact the helpdesk.")
         slurm.log_user("Rejecting job named %s from user %s (uid=%u).", tostring(job_desc.name), tostring(submit_user.name), job_desc.user_id)
         return slurm.ESLURM_INVALID_ACCOUNT
     end
@@ -389,3 +407,4 @@ end
 
 slurm.log_info("Initialized")
 return slurm.SUCCESS
+{% endraw %}

@@ -85,18 +85,18 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: public
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: public
+    create: true
   - name: subnet-nfs-data-2541
     cidr: '10.35.141.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 10.35.141.251/32  # NFS server
       - 10.35.141.252/32  # NFS server
       - 10.35.141.253/32  # NFS server
-    type: storage
-    external: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -114,51 +114,51 @@ envsync_user: 'envsync'
 envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
-
 # Remote archive settings
-archive_groups:
+remote_archive:
   - name: arc01
+    local_top_level_mount: '/groups'
     groups:
       - 'umcg-atd'
       - 'solve-rd'
     archive_user: 'umcg-atd-dm'
     archive_system: 'archive.surfsara.nl'
     archive_system_fingerprints:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJNpdWNkupmMeY2hjod0Nyu5Eu2W7bnpwXSXnkcQqOap
-      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDORQo/SUxIROOa/dHVEMUTDH9CatGFkQBHvYv0nOUUfeHTYtksNFfjKOHg6HY0X0Fz83bMPMYx+YWFY1THrGwY=
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-atd-dm'
     recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
-
 regular_groups:
-  - "{{ envsync_group }}"
-  - "{{ functional_admin_group }}"
-  - 'users'
-  - 'solve-rd'
-  - 'umcg-atd'
-  - 'umcg-gsad'
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: 'users'
+  - name: 'solve-rd'
+  - name: 'umcg-atd'
+  - name: 'umcg-gsad'
 regular_users:
-  - user: "{{ envsync_user }}"
+  - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
-  - user: 'solve-rd-dm'
+  - name: 'solve-rd-dm'
     groups: ['solve-rd']
-  - user: 'umcg-atd-dm'
+  - name: 'umcg-atd-dm'
     groups: ['umcg-atd']
-  - user: 'umcg-gsad-dm'
+  - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad']
-  - user: 'gvdvries'
+  - name: 'gvdvries'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'mbijlsma'
+  - name: 'mbijlsma'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'mswertz'
+  - name: 'mswertz'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'pneerincx'
+  - name: 'pneerincx'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'rkanninga'
+  - name: 'rkanninga'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'scimerman'
+  - name: 'scimerman'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'mbenjamins'
+  - name: 'mbenjamins'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - user: 'umcg-molgenis'
+  - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
   - who: ['%solve-rd']

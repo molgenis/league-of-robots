@@ -11,5 +11,6 @@
   hosts:
     - compute_node
   roles:
+    - dragen
     - slurm
 ...
