@@ -14,12 +14,12 @@ _days_kill="{{ screen_kill | default('21') }}"
 
 logger -t screen_reaper "[$0] $(date +%D" "%T): executing by user=$(id -un) for the user=${USER}"
 
-if test -d /run/screen/S-${USER}; then
-   _old_screens="$(find /run/screen/S-${USER} \( -atime +"${_days_warning}" -a -atime -"${_days_kill}" \) -type s)"
+if test -d /run/screen/S-"${USER}"; then
+   _warn_screens="$(find /run/screen/S-${USER} \( -atime +"${_days_warning}" -a -atime -"${_days_kill}" \) -type s)"
    _kill_screens="$(find /run/screen/S-${USER} -atime +"${_days_kill}" -type s)"
 fi
 
-if [[ -n "${_old_screens:-}" ]] || [[ -n "${_kill_screens:-}" ]]; then
+if [[ -n "${_warn_screens:-}" ]] || [[ -n "${_kill_screens:-}" ]]; then
    echo "################################################################################"
    echo "#"
    echo "#"
@@ -29,10 +29,11 @@ if [[ -n "${_old_screens:-}" ]] || [[ -n "${_kill_screens:-}" ]]; then
    echo "#  You see this warning because you have screen sessions unused for more than ${_days_warning}"
    echo "#  days. If they are not used for more than ${_days_kill} days, they will be killed."
 
-   if [[ -n "${_old_screens}" ]]; then
+   if [[ -n "${_warn_screens}" ]]; then
       echo "#"
       echo "#  This is a list of unused screen sessions running more than ${_days_warning} days:"
-      echo "#    ${_old_screens}" | sed "s|/run/screen/S-${USER}/||g"
+      echo "#    ${_warn_screens}" | sed "s|/run/screen/S-${USER}/||g"
+      logger -t "screen_reaper" "user ${USER} WARNED about unused screens for more than ${_days_warning} days: ${_warn_screens:-}"
    fi
 
    if [[ -n "${_kill_screens}" ]]; then
@@ -45,6 +46,7 @@ if [[ -n "${_old_screens:-}" ]] || [[ -n "${_kill_screens:-}" ]]; then
            rm -f "${_screen-:/path/error}" && echo "      (cleaned)"
          fi
       done
+      logger -t "screen_reaper" "screens from user ${USER} were KILLED as they have been unused for more than ${_days_kill} days: ${_kill_screens:-}"
    fi
 
    echo "#"
