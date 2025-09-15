@@ -1,32 +1,7 @@
 ---
 - name: Install postfix.
-  ansible.builtin.package:
-    name:
-      - postfix
-    state: latest
-    update_cache: true
-  notify:
-    - restart_postfix
-  become: true
-
-- name: Patch lines in the /etc/postfix/main.cf config file.
-  ansible.builtin.lineinfile:
-    path: /etc/postfix/main.cf
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-  loop:
-    - regexp: '^#?myhostname = '
-      line: "myhostname = {{ listserv_domain_name }}"
-    #- regexp:
-    #  line:
-  notify:
-    - reload_postfix
-  become: true
-
-- name: Make sure postfix service is enabled and started.
-  ansible.builtin.systemd:
-    name: "postfix.service"
-    state: started
-    enabled: true
-  become: true
+  ansible.builtin.include_tasks:
+    file: postfix.yml
+  when:
+    - postfix_hostname is defined
 ...
