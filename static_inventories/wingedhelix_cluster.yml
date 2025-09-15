@@ -126,6 +126,7 @@ all:
               nmstate_interface:
                 name: enp6s0
           local_volume_size_extra: 3072
+          postfix_hostname: "{{ listserv_domain_name }}"
     deploy_admin_interface:
       hosts:
         wh-dai:
