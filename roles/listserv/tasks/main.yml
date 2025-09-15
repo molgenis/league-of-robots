@@ -3,12 +3,12 @@
   ansible.builtin.include_tasks:
     file: listserv.yml
   when:
-   - ldap_domains
-         | default([])
-         | dict2items()
-         | map(attribute='value')
-         | selectattr('listserv_mailinglist', 'defined')
-         | map(attribute='listserv_mailinglist')
-         | length >= 1
-   - postfix_hostname is defined
+    - ldap_domains
+          | default([])
+          | dict2items()
+          | map(attribute='value')
+          | selectattr('listserv_mailinglist', 'defined')
+          | map(attribute='listserv_mailinglist')
+          | length >= 1
+    - postfix_hostname is defined
 ...
