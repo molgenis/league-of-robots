@@ -141,6 +141,7 @@ ldap_domains:
     #
     group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
     group_quota_hard_limit_template: ruggroupumcgquotaLFS
+    listserv_mailinglist: UMCG-HPC
 pam_weblogin:
   machines: "{{ groups['jumphost'] }}"
   excluded:
