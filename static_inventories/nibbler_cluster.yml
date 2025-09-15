@@ -143,6 +143,7 @@ all:
                 name: enp0s5
               lnet:
                 name: tcp15
+          postfix_hostname: "{{ listserv_domain_name }}"
     deploy_admin_interface:
       hosts:
         nb-dai:
