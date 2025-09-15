@@ -1,8 +1,8 @@
 ---
-- name: Install mailx.
+- name: Install s-nail.
   ansible.builtin.package:
     name:
-      - mailx
+      - s-nail
     state: latest
     update_cache: true
   become: true
