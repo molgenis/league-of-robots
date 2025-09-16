@@ -1,0 +1,8 @@
+---
+ip_addresses:
+  p2solo_server:
+    external:
+      address: 192.168.64.11
+      netmask: /32
+      fqdn: '192.168.64.11'
+...

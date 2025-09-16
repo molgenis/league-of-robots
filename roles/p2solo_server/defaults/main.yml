@@ -1,0 +1,8 @@
+---
+oxfordnanoportal_repo_url: https://cdn.oxfordnanoportal.com/apt/ont-repo.pub
+generic_deps:
+  - curl
+  - git
+  - wget
+  - nano
+  - rsync

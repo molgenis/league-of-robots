@@ -1,0 +1,17 @@
+---
+stack_prefix: 'p2solo'
+stack_name: "{{ stack_prefix }}_server"  # stack_name must match the name of the folder that contains this vars.yml file.
+cloud_user: grid
+os_distribution: 'Ubuntu'
+repo_manager: 'none'
+nameservers: [
+  '8.8.4.4',  # Google DNS.
+  '8.8.8.8',  # Google DNS.
+]
+local_admin_groups:
+  - 'admin'
+local_admin_users:
+  - 'grid'
+use_ldap: false
+create_ldap: false
+use_sssd: false
