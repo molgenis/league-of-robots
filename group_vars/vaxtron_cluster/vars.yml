@@ -78,6 +78,8 @@ additional_etc_hosts:
     nodes:
       - name: vip_build
         network: vlan16
+      - name: rocky9-build
+        network: vlan16
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #

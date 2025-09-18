@@ -87,6 +87,8 @@ additional_etc_hosts:
     nodes:
       - name: vip_build
         network: vlan16
+      - name: rocky9-build
+        network: vlan16
   - group: donbot_azure
     nodes:
       - name: ladap

@@ -1,0 +1,8 @@
+---
+ssh_client_jumphosts:
+
+ssh_client_known_hosts: "\
+  @cert-authority \
+  *build-* \
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIT5dCiD3F1PQZEVc5euUkk4QZ8uhDeFPcdnlTYFNo83 CA key for build_library"
+...

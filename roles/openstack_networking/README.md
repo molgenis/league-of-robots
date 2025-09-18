@@ -19,7 +19,7 @@ stack_networks:
                                # This is the name of the other network that is connected to the router for this network.
       name: string             # Optional and used when the router has a non-default name.
                                # When omitted the default name for the router is:
-                               # "Router bridging {{ network['router_wan_name'] }} and {{ network['name'] }}"
+                               # "Router bridging {{ network['router']['external_network'] }} and {{ network['name'] }}"
     create: [true|false]    # Default is false and means the network is created by a cloud admin before running any code from this repo. 
                             # True means network is created by code from this repo.
     mtu_size: integer       # Optional. Note that a default value may differ per network or OpenStack cloud config.
