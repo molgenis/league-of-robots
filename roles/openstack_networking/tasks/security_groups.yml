@@ -347,7 +347,7 @@
           remote_group: "{{ stack_prefix }}_cluster"
         - protocol: icmp
           port: -1  # ICMP protocol does not have any ports.
-          remote_group: "{{ stack_prefix }}_cluster" 
+          remote_group: "{{ stack_prefix }}_cluster"
         - protocol: tcp
           port: 443  # HTTPS
           remote_group: "{{ stack_prefix }}_webservers"
