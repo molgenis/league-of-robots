@@ -110,4 +110,24 @@
   when: cloud_console_pass is defined and cloud_console_pass | length > 1
   changed_when: false
   become: true
+- name: Get list of all members of admin groups.
+  ansible.builtin.shell: |
+    set -o pipefail
+    set -e
+    getent group '{{ item }}' | sed 's|.*:||'
+  loop: "{{ local_admin_groups }}"
+  changed_when: false
+  register: getent_local_admin_group_members
+- name: Delete local admin users, which are no longer configured for this stack.
+  ansible.builtin.user:
+    name: "{{ item }}"
+    state: absent
+    remove: true
+  loop: "{{ getent_local_admin_group_members['results']
+            | map(attribute='stdout')
+            | join(',')
+            | ansible.builtin.split(',') }}"
+  when:
+    - item not in local_admin_users
+  become: true
 ...

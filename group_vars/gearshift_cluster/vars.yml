@@ -104,13 +104,9 @@ local_admin_groups:
   - 'admin'
   - 'docker'
 local_admin_users:
-  - 'bob'
-  - 'fokke'
   - 'ger'
   - 'gerben'
   - 'henkjan'
-  - 'hopko'
-  - 'kees'
   - 'marieke'
   - 'max'
   - 'pieter'
