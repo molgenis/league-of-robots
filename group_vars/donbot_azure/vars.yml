@@ -24,7 +24,6 @@ local_admin_groups:
 local_admin_users:
   - 'gerben'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'sandi'
