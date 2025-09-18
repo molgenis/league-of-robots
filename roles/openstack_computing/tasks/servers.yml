@@ -144,7 +144,10 @@
     server: "{{ inventory_hostname }}"
     state: present
     reuse: true
-    network: "{{ stack_networks | selectattr('name', 'equalto', item['name']) | map(attribute='router_wan_name') | first }}"
+    network: "{{ stack_networks
+                 | selectattr('name', 'equalto', item['name'])
+                 | map(attribute='router')
+                 | map(attribute='external_network') | first }}"
     nat_destination: "{{ item['name'] }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
