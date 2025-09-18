@@ -83,10 +83,8 @@ nameservers: [
 local_admin_groups:
   - 'admin'
 local_admin_users:
-  - 'dick'
   - 'gerben'
   - 'marieke'
-  - 'marloes'
   - 'pieter'
   - 'roan'
   - 'sandi'
