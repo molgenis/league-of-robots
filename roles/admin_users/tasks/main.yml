@@ -126,7 +126,9 @@
   loop: "{{ getent_local_admin_group_members['results']
             | map(attribute='stdout')
             | join(',')
-            | ansible.builtin.split(',') }}"
+            | ansible.builtin.split(',')
+            | sort
+            | unique }}"
   when:
     - item not in local_admin_users
   become: true
