@@ -21,7 +21,7 @@ collections:
   - name: pulp.pulp_installer
     version: '==3.22.1'
   - name: pulp.squeezer
-    version: '>=0.0.16'
+    version: '==0.0.17'
   - name: azure.azcollection
     version: '>=2.6.0'
 ...
