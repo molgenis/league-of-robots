@@ -15,6 +15,7 @@
     - nhc_standalone
     - sudoers
     - subgroup_directories
+    - listserv
     - quota_reports
     # Disabled monitoring: needs update. See also:
     # https://github.com/rug-cit-hpc/league-of-robots/issues/294

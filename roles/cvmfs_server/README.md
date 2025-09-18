@@ -23,8 +23,22 @@ In order to mount the newly created repo on the client (startum 1), these config
     * ```CVMFS_PUBLIC_KEY=/etc/cvmfs/keys/[repo_name].pub```
  * Copy ```/etc/cvmfs/keys/[repo_name].pub``` to the client
 
-NOTE:
-- When repo is in production, add a cronjob to renew the master key every 20th day of the month:
-```8 0 20 * * root /usr/bin/cvmfs_server resign [repo_name]``` (it expires after 30 days)
+# Data storage locations
+
+Server side - stratum 0:
+* Repository data storage - ```/srv/cvmfs/```
+* Temporary scratch area used for creating new files and repository updates (can grow large during repository updates) - ```/var/spool/cvmfs/```
+* Authoritative configuration files for the repos - ```/etc/cvmfs/```
+* Repo creation - ```/cvmfs/```
+
+Client side:
+* Local cache dir for storage of the downloaded file contents and other client-specific data - ```/var/lib/cvmfs``` (configurable via CVMFS_CACHE_BASE)
+* Authoritative configuration files for the repos - ```/etc/cvmfs/```
+* Mount point for repos - default: ```/cvmfs/```, automounted by autofs  
+  
+
+**NOTE:**
+- When repo is in production, add a cronjob to renew the master key every first and 15th day of the month (it expires after 30 days):  
+```0 9 1,15 * * root /usr/bin/cvmfs_server resign [repo_name]```
 
 - For testing purposes, the client role is only deployed on talos. When moving to prodcution, please change the hosts in single_role_playbooks/cvmfs_client.yml.
