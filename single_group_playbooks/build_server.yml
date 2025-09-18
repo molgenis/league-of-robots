@@ -20,4 +20,5 @@
     - regular_users
     - cluster       # installing software
     - sudoers
+    - build_environment
 ...
