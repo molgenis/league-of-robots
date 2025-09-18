@@ -125,9 +125,9 @@ You can _refresh_ an _ACS_ without affecting the _publications_ served to Pulp c
 
 # <a name="Create-Server"/> Create Server
 
-### Use deploy-os_server.yml playbook
+### Use openstack.yml playbook
 
-The `deploy-os_server.yml` playbook can be used to create all VMs for a cluster including a repo server.
+The `openstack.yml` playbook can be used to create all VMs for a cluster including a repo server.
 This playbook requires the _OpenStack SDK_ to be installed and configured on your _Ansible control host_;
 See the `README.md` in the root of this repo for details.
 
@@ -145,7 +145,7 @@ Next you can use
 ```bash
 . ./lor-init
 lor-config [stack_prefix]
-ansible-playbook -u [admin_account] single_role_playbooks/pulp_server.yml
+ansible-playbook -u [admin_account] single_role_playbooks/repo.yml
 ```
 This will install Pulp, create an admin account to manage Pulp and install the Pulp CLI in a Python virtual environment
 for that admin account. It will also do part of the initial configuration, but this is incomplete due to missing features in _Pulp Squeezer_;
