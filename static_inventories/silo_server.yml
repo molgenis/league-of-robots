@@ -15,6 +15,17 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
           local_yum_repository: true
+    repo:
+      hosts:
+        silo-repo:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_repo"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: eth0
+          swap_file_size: 2
     silo:
       hosts:
         silo-01:
@@ -22,10 +33,12 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_webservers"
+              add_hostname_to_ip_address: true
               assign_floating_ip: true
 silo_server:
   children:
     openstack_api:
     jumphost:
+    repo:
     silo:
 ...
