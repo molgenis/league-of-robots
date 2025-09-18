@@ -190,6 +190,9 @@ pulp_repos:
     # - name: beegfs  # Dependency for BeeGFS storage
     #   description: 'BeeGFS filesystem for Enterprise Linux 9.'
     #   remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/
+    - name: cvmfs
+      description: 'CernVM-FS repo'
+      remote_url: https://cvmrepo.web.cern.ch/cvmrepo/yum/
 #
 # List of repos for machines that do not use Pulp.
 #
