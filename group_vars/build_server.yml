@@ -30,4 +30,5 @@ iptables_allow_ssh_outbound:
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
+repo_manager: 'none'
 ...
