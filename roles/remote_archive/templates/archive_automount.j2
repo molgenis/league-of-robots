@@ -4,7 +4,19 @@
 
 [Unit]
 Description=Automount for {{ item.1 }}
-After=network.target
+#
+# We need functional network to access the remote archive,
+# but currently cannot depend on any network service / target,
+# because systemd only supports automounts for local file systems:
+# it always inserts a dependency on local-fs.target for automouts to ensure the unit comes early in the boot sequence,
+# but adding a dependency on network services / targets requires the unit to come late in the boot sequence.
+# This results in cyclic depencencies and random units getting dropped from the boot sequence
+# and hence random services, targets or mounts failing.
+# See systemd bug: #17657 automount units below network mounts result in dep cycles
+#                  https://github.com/systemd/systemd/issues/17657
+#
+#After=network-online.target
+#Wants=network-online.target
 
 [Automount]
 Where=/{{ item.0.local_top_level_mount | regex_replace('\/', '') }}/{{ item.1 }}/{{ item.0.name }}
