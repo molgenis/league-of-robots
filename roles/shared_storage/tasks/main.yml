@@ -509,12 +509,26 @@
     path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     src: "{{ parent_mount_point }}/{{ item.1.name }}/{{ item.0.lfs }}"
     fstype: none
-    # Bind mounting read-write will only work of the src was also mounted read-write.
-    opts: "bind,rw,x-systemd.requires-mounts-for={{ parent_mount_point }},x-systemd.mount-timeout=20s,retry=3"
+    opts: "{{ basic_opts }}{{ extra_opts }}"
     state: mounted
   vars:
     pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | first }}"
     parent_mount_point: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+    #
+    # Note: bind mounting read-write will only work if the src was also mounted read-write.
+    #
+    basic_opts: "bind,rw,x-systemd.requires-mounts-for={{ parent_mount_point }}"
+    #
+    # Explicitly add _netdev to the mount options for the bind mount, when the source was mounted with _netdev option.
+    # This prevents systemd-fstab-generator from assuming that the mount is for a local file system
+    # and from inserting the mount unit too early in the boot sequence creating in a cyclic dependency,
+    # which in turn results in systemd randomly dropping units for services or mounts from the boot sequence.
+    # in an attempt to break the cyclic dependency and continue to boot.
+    #
+    extra_opts: >-
+      {%- if '_netdev' in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='rw_options') | first -%}
+      ,_netdev
+      {%- endif -%}
   loop: "{{ lfs_mounts
             | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
             | rejectattr('type', 'undefined')
@@ -533,11 +547,23 @@
     path: "/groups/{{ item.1.name }}/{{ item.0.lfs }}"
     src: "{{ parent_mount_point }}/{{ item.1.name }}/{{ item.0.lfs }}"
     fstype: none
-    opts: "bind,ro,x-systemd.requires-mounts-for={{ parent_mount_point }},x-systemd.mount-timeout=20s,retry=3"
+    opts: "{{ basic_opts }}{{ extra_opts }}"
     state: mounted
   vars:
     pfs_mount: "{{ pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | first }}"
     parent_mount_point: "/mnt/{{ item.0.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups"
+    basic_opts: "bind,ro,x-systemd.requires-mounts-for={{ parent_mount_point }}"
+    #
+    # Explicitly add _netdev to the mount options for the bind mount, when the source was mounted with _netdev option.
+    # This prevents systemd-fstab-generator from assuming that the mount is for a local file system
+    # and from inserting the mount unit too early in the boot sequence creating in a cyclic dependency,
+    # which in turn results in systemd randomly dropping units for services or mounts from the boot sequence.
+    # in an attempt to break the cyclic dependency and continue to boot.
+    #
+    extra_opts: >-
+      {%- if '_netdev' in pfs_mounts | selectattr('pfs', 'equalto', item.0.pfs) | map(attribute='ro_options') | first -%}
+      ,_netdev
+      {%- endif -%}
   loop: "{{ lfs_mounts
             | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
             | rejectattr('type', 'undefined')
