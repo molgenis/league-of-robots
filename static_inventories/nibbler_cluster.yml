@@ -204,8 +204,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               nmstate_interface:
-                #name: enp0s7
-                name: enp0s11  # Will most likely change to enp0s7 after reboot.
+                name: enp0s7
                 ipv4:
                   auto-route-metric: 80
           slurm_sockets: 16
