@@ -59,6 +59,8 @@
       - NetworkManager
     state: latest
     update_cache: true
+  notify:
+    - NetworkManager_restart
   become: true
 
 - name: Deploy override file to customize NetworkManager configuration.
@@ -68,6 +70,8 @@
     owner: 'root'
     group: 'root'
     mode: '0644'
+  notify:
+    - NetworkManager_restart
   become: true
 
 - name: Find old network interface configs in ifcfg script format.
@@ -111,6 +115,17 @@
     state: started
     daemon_reload: true
   become: true
+
+- name: Start NetworkManager.service.
+  ansible.builtin.systemd:
+    name: NetworkManager.service
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
 
 #
 # Network Manager and its nmcli is a mess and not idempotent in most cases creating yet another config.
