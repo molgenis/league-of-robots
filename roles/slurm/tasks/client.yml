@@ -196,12 +196,15 @@
   become: true
 
 - name: 'Install logrotate config file for slurmd.'
-  ansible.builtin.copy:
-    src: "files/logrotate_slurm"
-    owner: 'root'
-    group: 'root'
-    mode: '0644'
+  ansible.builtin.template:
+    src: 'templates/logrotate_slurm.j2'
     dest: '/etc/logrotate.d/slurm'
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    slurm_daemons:
+      - slurmd
   become: true
 
 - name: 'Create folders for systemd override file.'
