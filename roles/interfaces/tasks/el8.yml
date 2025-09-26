@@ -88,6 +88,8 @@
   loop: "{{ interfaces_found_ifcfg_scripts.files }}"
   loop_control:
     label: "{{ item.path }}"
+  notify:
+    - NetworkManager_restart
   become: true
 
 - name: Deploy /usr/local/sbin/fix_network_interface_names to apply customised udev network device renaming.
@@ -97,6 +99,8 @@
     owner: 'root'
     group: 'root'
     mode: '0750'
+  notify:
+    - fix_network_interface_names_restart
   become: true
 
 - name: Deploy fix_network_interface_names.service for systemd.
@@ -106,6 +110,8 @@
     owner: 'root'
     group: 'root'
     mode: '0644'
+  notify:
+    - fix_network_interface_names_restart
   become: true
 
 - name: Start fix_network_interface_names.service.
