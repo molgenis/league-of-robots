@@ -57,7 +57,6 @@ lfs_quota:
       umcg-bionic-mdd-gwama: 13312
       umcg-dag3: 3072
       umcg-datateam: 1024
-      umcg-ejp-rd: 1024
       umcg-endocrinology: 1024
       umcg-erdera: 1024
       umcg-fg: 3072
