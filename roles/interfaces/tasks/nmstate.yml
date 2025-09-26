@@ -55,7 +55,8 @@
          if [[ "${before}" != "${after}" ]]; then
            echo 'nmstate changed'
          fi
-    creates: "/etc/nmstate/{{ network['name'] }}.applied"
+    # Ignore *.applied files, always execute nmstatectl and determine based on output whether something changed or not.
+    # creates: "/etc/nmstate/{{ network['name'] }}.applied"
   loop: "{{ host_networks | selectattr('nmstate_interface') }}"
   loop_control:
     loop_var: network
