@@ -240,7 +240,7 @@
 - name: Deploy pulp-init.bash with code to manage Pulp repos.
   ansible.builtin.template:
     src: pulp-init.bash.j2
-    dest: "/admin/{{ repo_management_user }}/pulp-init-new.bash"
+    dest: "/admin/{{ repo_management_user }}/pulp-init.bash"
     owner: "{{ repo_management_user }}"
     group: "{{ repo_management_user }}"
     mode: '0640'
