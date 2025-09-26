@@ -246,8 +246,6 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-datateam'
     sponsor: umcg-mswertz
-  - name: 'umcg-ejp-rd'
-    sponsor: umcg-mswertz
   - name: 'umcg-erdera'
     sponsor: umcg-mswertz
   - name: 'umcg-endocrinology'
@@ -369,8 +367,6 @@ regular_users:
     groups: ['umcg-dag3']
   - name: 'umcg-datateam-dm'
     groups: ['umcg-datateam']
-  - name: 'umcg-ejp-rd-dm'
-    groups: ['umcg-ejp-rd']
   - name: 'umcg-endocrinology-dm'
     groups: ['umcg-endocrinology']
   - name: 'umcg-erdera-dm'
@@ -492,8 +488,6 @@ sudoers:
     become: 'umcg-dag3-dm'
   - who: ['%umcg-datateam']
     become: 'umcg-datateam-dm'
-  - who: ['%umcg-ejp-rd-dms']
-    become: 'umcg-ejp-rd-dm'
   - who: ['%umcg-endocrinology-dms']
     become: 'umcg-endocrinology-dm'
   - who: ['%umcg-erdera-dms']
@@ -709,7 +703,6 @@ lfs_mounts:
       - name: umcg-bios
       - name: umcg-dag3
       - name: umcg-datateam
-      - name: umcg-ejp-rd
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
@@ -768,7 +761,6 @@ lfs_mounts:
       - name: umcg-bios
       - name: umcg-dag3
       - name: umcg-datateam
-      - name: umcg-ejp-rd
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg

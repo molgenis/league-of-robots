@@ -1,10 +1,12 @@
 ---
-- name: Install NetworkManager and nmstate.
+- name: Install nmstate.
   ansible.builtin.package:
     name:
       - nmstate
     state: latest
     update_cache: true
+  notify:
+    - nmstate_restart
   become: true
 
 - name: Deploy nmstate configuration file.
@@ -12,6 +14,8 @@
     src: nmstate.conf
     dest: /etc/nmstate/nmstate.conf
     mode: '0644'
+  notify:
+    - nmstate_restart
   become: true
 
 - name: Deploy network device configuration file for nmstate based on template.
@@ -23,7 +27,8 @@
   loop_control:
     loop_var: network
   register: interfaces_changed_nmstate_files
-  notify: restart_nmstate_service
+  notify:
+    - nmstate_restart
   become: true
 
 - name: Remove /etc/nmstate/*.applied when corresponding /etc/nmstate/*.yml got updated.
@@ -50,7 +55,8 @@
          if [[ "${before}" != "${after}" ]]; then
            echo 'nmstate changed'
          fi
-    creates: "/etc/nmstate/{{ network['name'] }}.applied"
+    # Ignore *.applied files, always execute nmstatectl and determine based on output whether something changed or not.
+    # creates: "/etc/nmstate/{{ network['name'] }}.applied"
   loop: "{{ host_networks | selectattr('nmstate_interface') }}"
   loop_control:
     loop_var: network
@@ -58,7 +64,7 @@
   changed_when: "'nmstate changed' in interfaces_apply_nmstate.stdout"
   become: true
 
-- name: Make sure nmstate.service enabled at boot and started.
+- name: Make sure nmstate.service is enabled at boot and started.
   ansible.builtin.systemd:
     name: nmstate.service
     enabled: true
