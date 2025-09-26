@@ -1,3 +1,4 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
 #
 # Slurm Logrotate Configuration
 #
@@ -15,7 +16,9 @@
     size 10M
     create 640 slurm root
     postrotate
-        pkill -x --signal SIGUSR2 slurmd
+        {% for slurm_daemon in slurm_daemons %}
+        pkill -x --signal SIGUSR2 {{ slurm_daemon }}
+        {% endfor %}
         exit 0
     endscript
 }
