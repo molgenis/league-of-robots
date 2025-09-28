@@ -142,4 +142,29 @@
     file: nmstate.yml
   when:
     - host_networks | default([]) | selectattr('nmstate_interface', 'defined') | length() >= 1
+
+- name: List all automatically created, unused NetworkManager configs.
+  ansible.builtin.shell:
+    cmd: |
+         set -u
+         set -e
+         set -o pipefail
+         nmcli --fields UUID,TIMESTAMP-REAL con show \
+           | awk '$2 ~ /never/ {print $1}'
+  register: nmcli_con_show_never_used
+  changed_when: nmcli_con_show_never_used['stdout'] | length > 1
+
+- name: Delete all automatically created, unused NetworkManager configs.
+  ansible.builtin.shell:
+    cmd: |
+         set -u
+         set -e
+         set -o pipefail
+         nmcli con delete uuid '{{ item }}'
+  register: nmcli_con_delete
+  changed_when: "'successfully deleted' in nmcli_con_delete['stdout']"
+  loop: "{{ nmcli_con_show_never_used['stdout_lines'] }}"
+  loop_control:
+    label: "{{ nmcli_con_delete['stdout'] }}"
+  become: true
 ...
