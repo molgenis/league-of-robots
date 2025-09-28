@@ -310,21 +310,21 @@ all:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
-                  #nmstate_interface:
-                  #  name: enp130s0f0
+                  nmstate_interface:
+                    name: eth2
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
-                  #nmstate_interface:
-                  #  name: enp130s0f0.1068
-                  #  type: vlan
-                  #  vlan:
-                  #    id: 1068
-                  #    base-iface: enp130s0f0
-                  #  ipv4:
-                  #    dhcp: false
-                  #lnet:
-                  #  name: tcp20
+                  nmstate_interface:
+                    name: eth2.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: eth2
+                    ipv4:
+                      dhcp: false
+                  lnet:
+                    name: tcp20
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
