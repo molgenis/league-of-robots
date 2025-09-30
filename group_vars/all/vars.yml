@@ -192,7 +192,7 @@ pulp_repos:
     #   remote_url: https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel9/
     - name: cvmfs
       description: 'CernVM-FS repo'
-      remote_url: https://cvmrepo.web.cern.ch/cvmrepo/yum/
+      remote_url: https://cvmrepo.web.cern.ch/cvmrepo/yum/cvmfs/EL/9/x86_64/
 #
 # List of repos for machines that do not use Pulp.
 #
