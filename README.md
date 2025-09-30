@@ -525,10 +525,9 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
 * Define accounts used to deploy playbooks
   ```bash
   #
-  # CentOS 7.x default_cloud_image_user = centos
-  # Rocky 9.x default_cloud_image_user = cloud-user
+  # Rocky 9.x default_cloud_image_user = rocky
   #
-  default_cloud_image_user='centos|cloud-user'
+  default_cloud_image_user='rocky'
   lor_admin_user='your_admin_account'
   ```
 * Firstly, create the jumphost, which is required to access the other machines.  
