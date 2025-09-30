@@ -551,7 +551,7 @@ yum_repos:
       baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/codeready/builder/$basearch/
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
-      enabled: 0
+      enabled: 1
     - file: oracle-linux-ol8.repo
       id: ol8_distro_builder
       name: 'Oracle Linux 8 Distro Builder ($basearch) - Unsupported'

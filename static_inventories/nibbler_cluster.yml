@@ -9,6 +9,7 @@ all:
       hosts:
         tunnel:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_jumphosts"
@@ -22,6 +23,7 @@ all:
       hosts:
         nb-repo:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_repo"
@@ -33,6 +35,7 @@ all:
       hosts:
         nb-transfer:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_ds"
@@ -119,6 +122,7 @@ all:
       hosts:
         nb-sai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
@@ -148,6 +152,7 @@ all:
       hosts:
         nb-dai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
@@ -177,6 +182,7 @@ all:
       hosts:
         nibbler:
           cloud_flavor: umcg.v1.vm.16-64
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
@@ -218,8 +224,6 @@ all:
           hosts:
             nb-node-a[01:05]:
               cloud_flavor: umcg.v1.bm.64-512-0.vlan1338
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_type: baremetal
               host_networks:
                 - name: vlan1338
@@ -267,6 +271,7 @@ all:
           hosts:
             nb-node-b[01:02]:
               cloud_flavor: umcg.v1.vm.31-120.8a40
+              cloud_image: RockyLinux-9.3_xfs
               gpu_count: 8
               gpu_type: 'a40'
               host_networks:
@@ -306,16 +311,16 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: enp130s0f0
+                    name: eth2
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
                   nmstate_interface:
-                    name: enp130s0f0.1068
+                    name: eth2.1068
                     type: vlan
                     vlan:
                       id: 1068
-                      base-iface: enp130s0f0
+                      base-iface: eth2
                     ipv4:
                       dhcp: false
                   lnet:
