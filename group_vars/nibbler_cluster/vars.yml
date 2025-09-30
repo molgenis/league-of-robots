@@ -158,8 +158,7 @@ pam_weblogin:
   max_uid: "{{ ldap_domains['sram']['max_id'] }}"
   retries: 3
   cache_duration: 3600  # seconds
-cloud_image: RockyLinux-9.3_xfs
-cloud_user: cloud-user
+cloud_image: Rocky-9.5
 availability_zone: nova
 stack_networks:
   - name: vlan1338  # Internal management for VMs and BMs
