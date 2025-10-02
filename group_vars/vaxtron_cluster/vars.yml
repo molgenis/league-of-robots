@@ -84,7 +84,6 @@ additional_etc_hosts:
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
 ssh_client_configs:
-  - gearshift_cluster
   - nibbler_cluster
 use_ldap: true
 create_ldap: false

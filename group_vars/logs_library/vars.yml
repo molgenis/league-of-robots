@@ -64,10 +64,6 @@ use_sssd: false
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
 #
 external_jumphosts:
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception

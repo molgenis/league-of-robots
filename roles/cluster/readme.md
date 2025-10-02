@@ -1,4 +1,8 @@
 # cluster
 
-This role is meant for all components of the virtualized cluster.
-ie: all vms of gearshift.
+This role is meant for all machines of an HPC cluster, which inclucdes:
+  * Sys Admin Interface
+  * Deploy Admin interface
+  * User Interface
+  * Compute nodes
+
