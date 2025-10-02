@@ -181,7 +181,7 @@ rsync -av --rsync-path 'sudo -u repoadmin rsync' [os_distribution] [admin]@[jump
 
 The remaining tasks can be performed on the Pulp server in one go with the functions
  * ```pulp-refresh-acs```
- * ```pulp-sync-publish-distribute```
+ * ```pulp-sync-publish-distribute [all|single_repo]```
 which were deployed on the repo server by the ```pulp_server``` role.
 
 #### Manual work - on the Pulp server: pulp-refresh-acs
@@ -205,11 +205,11 @@ pulp-refresh-acs
 
 The `pulp-sync-publish-distribute` function is used to
  * Add new content (RPMs) to our `cpel` _repository_, which does not have a _remote_.
- * Sync all _repositories_ with their _remotes_ for the ones that do have _remotes_.
- * This creates new _repository versions_ for all _repositories_.
- * Create new _publications_ for all _repository versions_.
+ * Sync all or a single _repository_ with their _remotes_ for the ones that do have _remotes_.
+ * This creates new _repository versions_ for all or a single _repository_.
+ * Create new _publications_ for all or a single _repository version_.
  * Create new _distributions_ to serve the latest _publications_ if the _distributions_ did not exist yet.
- * Update all existing _distributions_ to serve the latest _publications_.
+ * Update all or a single existing _distribution_ to serve the latest _publication_.
 
 Hence this procedure changes what will be served to Pulp clients if any _repository_ had changed content since the previous sync.
 
@@ -221,7 +221,7 @@ source ./pulp-cli.venv/bin/activate
 set -u
 pulp status
 source ./pulp-init.bash
-pulp-sync-publish-distribute
+pulp-sync-publish-distribute [all|single_repo]
 ```
 
 Alternatively or for debugging issues with ```pulp-sync-publish-distribute``` you can also perform these tasks manually using:
