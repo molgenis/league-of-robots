@@ -4,10 +4,6 @@
 # We will use the hostnames for these jumphosts when creating the signed host keys with the ssh_host_signer role.
 #
 external_jumphosts:
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception
