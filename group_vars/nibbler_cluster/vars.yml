@@ -97,7 +97,6 @@ additional_etc_hosts:
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
 ssh_client_configs:
-  - gearshift_cluster
   - vaxtron_cluster
 ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/umcg-hpc-development-ca"
 use_ldap: true

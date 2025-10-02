@@ -510,7 +510,7 @@ In some cases you might need more information about how the container is behavin
 ```
     $ apptainer run -C ./busybox.sif 
     Apptainer> 
-    (base) [umcg-user@gearshift mycontainer]$
+    (base) [user@hostname mycontainer]$
 ```
 
 and the same container with debug option
@@ -617,7 +617,7 @@ and the run with
 
 ```
     $ apptainer run centos7.sif
-                   ..                    umcg-scimerman@gearshift
+                   ..                    user@hostname
                  .PLTJ.                  OS: CentOS 
                 <><><><>                 Kernel: x86_64 Linux 3.10.0-1160.80.1.el7.x86_64
        KKSSV' 4KKK LJ KKKL.'VSSKK        Uptime: 42d 20h 33m
