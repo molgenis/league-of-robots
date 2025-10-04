@@ -42,3 +42,4 @@ Client side:
 ```0 9 1,15 * * root /usr/bin/cvmfs_server resign [repo_name]```
 
 - For testing purposes, the client role is only deployed on talos. When moving to prodcution, please change the hosts in single_role_playbooks/cvmfs_client.yml.
+- Put cvmfs rpm(s) on client repo server(s) and use following command to only sync this repo: ```pulp-sync-publish-distribute cvmfs```
