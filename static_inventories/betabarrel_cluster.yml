@@ -226,6 +226,22 @@ all:
             bb-dragen:
               ansible_host: bb-porch+betabarrel+bb-dragen
               os_distribution: 'oracle8'
+              host_networks:
+                - name: vlan990
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp26s0f0
+                    ipv4:
+                      dhcp: false
+                - name: vlan16
+                  nmstate_interface:
+                    name: enp134s0f0.16
+                    type: vlan
+                    vlan:
+                      id: 16
+                      base-iface: enp134s0f0  # altname ens3f0
+                    ipv4:
+                      dhcp: false
               local_mounts:
                 - mount_point: '/staging'
                   device: 'LABEL=staging'
