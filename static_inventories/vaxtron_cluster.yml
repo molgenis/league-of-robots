@@ -38,7 +38,9 @@ all:
 #              security_group: "{{ stack_prefix }}_ds"
 #              assign_floating_ip: true
 #              add_hostname_to_ip_address: true
-#          local_volume_size_extra: 10000
+#          local_volume_extra:
+#            - name: groups
+#              size: 10000
     docs:
       hosts:
         docs-on-bateleur:
@@ -86,7 +88,9 @@ all:
                 name: ens5
               lnet:
                 name: tcp15
-          local_volume_size_extra: 1000
+          local_volume_extra:
+            - name: apps
+              size: 1000
     user_interface:
       hosts:
         vaxtron:
@@ -150,7 +154,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 32
               slurm_real_memory: 2063196
@@ -193,7 +196,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 96
               slurm_real_memory: 768000
