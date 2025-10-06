@@ -39,8 +39,8 @@ all:
 #              assign_floating_ip: true
 #              add_hostname_to_ip_address: true
 #          local_volume_extra:
-             -name: groups
-              size: 10000
+#            - name: groups
+#              size: 10000
     docs:
       hosts:
         docs-on-bateleur:
