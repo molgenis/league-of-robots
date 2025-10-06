@@ -89,8 +89,8 @@ all:
               lnet:
                 name: tcp15
           local_volume_extra:
-            -name: apps
-             size: 1000
+            - name: apps
+              size: 1000
     user_interface:
       hosts:
         vaxtron:
