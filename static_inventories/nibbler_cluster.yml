@@ -264,7 +264,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 1
               slurm_sockets: 1
               slurm_cores_per_socket: 64
               slurm_real_memory: 514860
@@ -298,7 +297,9 @@ all:
                     name: enp0s4
                   lnet:
                     name: tcp20
-              local_volume_size_extra: 1
+              local_volume_extra:
+                - name: local
+                  size: 1
               slurm_sockets: 31
               slurm_cores_per_socket: 1
               slurm_real_memory: 117397
@@ -348,7 +349,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 14
               slurm_real_memory: 257320
