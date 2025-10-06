@@ -154,9 +154,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_extra:
-                - name: local
-                - size:  0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 32
               slurm_real_memory: 2063196
@@ -199,9 +196,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_extra:
-                - name: local
-                  size: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 96
               slurm_real_memory: 768000

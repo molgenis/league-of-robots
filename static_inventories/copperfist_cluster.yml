@@ -259,9 +259,6 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
-          local_volume_extra:
-            - name: local
-              size: 0  # No extra virtual disk present on bare metal nodes.
     smb_server:
       hosts:
         copperfist:
