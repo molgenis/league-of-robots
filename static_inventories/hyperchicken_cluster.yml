@@ -45,7 +45,9 @@ all:
               add_hostname_to_ip_address: true
             - name: subnet-nfs-data-2541
               security_group: "{{ stack_prefix }}_storage"
-          local_volume_size_extra: 400
+          local_volume_extra:
+            - name: apps
+              size: 400
     ldap_server:
       hosts:
         hc-dai:
@@ -80,7 +82,9 @@ all:
                   add_hostname_to_ip_address: true
                 - name: subnet-nfs-data-2541
                   security_group: "{{ stack_prefix }}_storage"
-              local_volume_size_extra: 1
+              local_volume_extra:
+                - name: local
+                  size: 1
               slurm_sockets: 16
               slurm_cores_per_socket: 1
               slurm_real_memory: 63790

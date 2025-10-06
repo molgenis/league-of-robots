@@ -39,13 +39,13 @@
       when: ip_addresses[inventory_hostname][item.name]['address'] is not defined
 - name: Create persistent storage volume.
   openstack.cloud.volume:
-    display_name: "{{ inventory_hostname }}-volume"
-    size: "{{ local_volume_size_extra }}"
+    display_name: "{{ inventory_hostname }}-volume-{{ item['name'] }}"
+    size: "{{ item['size'] }}"
     state: present
     availability_zone: "{{ storage_availability_zone | default('nova') }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
-  when: local_volume_size_extra is defined and local_volume_size_extra > 0
+  loop: "{{ local_volume_extra | default([]) }}"
 - name: Create list of network port names for servers.
   ansible.builtin.set_fact:
     instance_nics: "{{ instance_nics | default([]) + [{'port-name': inventory_hostname + '-' + item}] }}"
@@ -135,10 +135,10 @@
 - name: Attach persistent storage volume to servers.
   openstack.cloud.server_volume:
     server: "{{ inventory_hostname }}"
-    volume: "{{ inventory_hostname }}-volume"
+    volume: "{{ inventory_hostname }}-volume-{{ item['name'] }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
-  when: local_volume_size_extra is defined and local_volume_size_extra > 0
+  loop: "{{ local_volume_extra | default([]) }}"
 - name: Assign floating IP to server.
   openstack.cloud.floating_ip:
     server: "{{ inventory_hostname }}"

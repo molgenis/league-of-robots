@@ -43,7 +43,9 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: ens3
-          local_volume_size_extra: 10000
+          local_volume_extra:
+            - name: groups
+              size: 10000
 #
 # iRODS machines in Nibbler stack currently disabled as they are no longer used for the microscopy project
 # and the RUG vulnerability scanner complains about the expired certificate on "umcg-icat01.hpc.rug.nl".
@@ -113,7 +115,9 @@ all:
 #            add_hostname_to_ip_address: true
 #            nmstate_interface:
 #              name: ens3
-#        local_volume_size_extra: 20
+#        local_volume_extra:
+#          - name: irods # change to name of mountpoint when re-enabled.
+#            size: 20
 #        davrods_icat_ip: "{{ ip_addresses[inventory_hostname]['nb_internal_management']['address'] }}"
     docs:
       hosts:
@@ -177,7 +181,9 @@ all:
                 name: enp0s5
               lnet:
                 name: tcp15
-          local_volume_size_extra: 3000
+          local_volume_extra:
+            - name: apps
+              size: 3000
     user_interface:
       hosts:
         nibbler:
