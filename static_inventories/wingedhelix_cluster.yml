@@ -48,7 +48,9 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-          local_volume_size_extra: 8300
+          local_volume_extra:
+            - name: groups
+              size: 8300
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -125,7 +127,9 @@ all:
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp6s0
-          local_volume_size_extra: 3072
+          local_volume_extra:
+            - name: umcgst12
+              size: 3072
           postfix_hostname: "{{ listserv_domain_name }}"
     deploy_admin_interface:
       hosts:
@@ -147,7 +151,9 @@ all:
                 name: enp5s0
               lnet:
                 name: tcp20
-          local_volume_size_extra: 2000
+          local_volume_extra:
+            - name: apps
+              size: 2000
     ldap_server:
       hosts:
         wh-dai:
@@ -199,7 +205,9 @@ all:
                   name: enp5s0
                 lnet:
                   name: tcp20
-            local_volume_size_extra: 1
+            local_volume_extra:
+              - name: local
+                size: 1
             slurm_sockets: 63
             slurm_cores_per_socket: 1
             slurm_real_memory: 491355

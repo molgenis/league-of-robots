@@ -178,7 +178,9 @@ For example you want to add `earl5` for `research`
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
-          local_volume_size_extra: 100
+          local_volume_extra: 
+            - name: mnt 
+              size: 100
     ```
 
 2. Run the playbook to deploy the server.
