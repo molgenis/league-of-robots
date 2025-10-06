@@ -108,7 +108,9 @@ all:
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-          local_volume_size_extra: 8300
+          local_volume_extra:
+            - name: groups
+              size: 8300
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -326,7 +328,9 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
-          local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
+          local_volume_extra:
+            - name: local
+              size: 0  # No extra virtual disk present on bare metal nodes.
     smb_server:
       hosts:
         betabarrel:
