@@ -179,7 +179,7 @@ For example you want to add `earl5` for `research`
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
           local_volume_extra: 
-              name: mnt 
+            - name: mnt 
               size: 100
     ```
 
