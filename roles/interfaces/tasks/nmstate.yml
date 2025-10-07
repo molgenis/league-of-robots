@@ -9,10 +9,21 @@
     - nmstate_restart
   become: true
 
+- name: Create /etc/nmstate/ directory.
+  ansible.builtin.file:
+    name: /etc/nmstate/
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+  become: true
+
 - name: Deploy nmstate configuration file.
   ansible.builtin.template:
     src: nmstate.conf
     dest: /etc/nmstate/nmstate.conf
+    owner: root
+    group: root
     mode: '0644'
   notify:
     - nmstate_restart
@@ -64,11 +75,34 @@
   changed_when: "'nmstate changed' in interfaces_apply_nmstate.stdout"
   become: true
 
+#
+# Older nmstate on EL 8.x does not install a systemd unit file for starting nmstate in service mode.
+# Use custom service file to apply nmstate configs when the "oneshot" service is started at boot.
+#
+- name: Deploy custom systemd unit file for nmstate.service on EL 8.x.
+  ansible.builtin.template:
+    src: nmstate.service
+    dest: /usr/lib/systemd/system/nmstate.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - nmstate_restart
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] == "8"
+  become: true
+
 - name: Make sure nmstate.service is enabled at boot and started.
   ansible.builtin.systemd:
     name: nmstate.service
     enabled: true
     state: started
+  become: true
+
+- name: Gather list of installed package.
+  ansible.builtin.package_facts:
+    manager: auto
   become: true
 
 #
@@ -82,6 +116,8 @@
     owner: 'root'
     group: 'root'
     mode: '0644'
+  when:
+    - "'cloud-init' in ansible_facts.packages"
   become: true
 
 #
