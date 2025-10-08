@@ -56,8 +56,22 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
           local_volume_extra:
-            - name: groups
-              size: 8300
+            - name: groups1
+              size: 1536
+            - name: groups2
+              size: 1536
+            - name: groups3
+              size: 1536
+            - name: groups4
+              size: 1536
+            - name: groups5
+              size: 1536
+            - name: groups6
+              size: 1536
+            - name: groups7
+              size: 1536
+            - name: groups8
+              size: 1536
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
