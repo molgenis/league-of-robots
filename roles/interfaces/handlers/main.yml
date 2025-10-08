@@ -1,15 +1,37 @@
 ---
+#
+# Important: maintain correct handler order.
+# Handlers are executed in the order in which they are defined
+# and not in the order in which they are listed in a "notify: handler_name" statement!
+#
+# Restart before reload: a reload after a restart may be redundant but should not fail,
+# but the other way around may fail when the impact of changes was too large for a reload.
+#
 - name: Restart network.service
   ansible.builtin.systemd:
     name: network.service
     state: restarted
   become: true
-  listen: restart_network
+  listen: network_restart
+
+- name: Restart fix_network_interface_names.service
+  ansible.builtin.systemd:
+    name: fix_network_interface_names.service
+    state: restarted
+  become: true
+  listen: fix_network_interface_names_restart
+
+- name: Restart NetworkManager.service
+  ansible.builtin.systemd:
+    name: NetworkManager.service
+    state: restarted
+  become: true
+  listen: NetworkManager_restart
 
 - name: Restart nmstate.service
   ansible.builtin.systemd:
     name: nmstate.service
     state: restarted
   become: true
-  listen: restart_nmstate_service
+  listen: nmstate_restart
 ...

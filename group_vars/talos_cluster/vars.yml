@@ -4,7 +4,7 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'tl'
 stack_dtap_state: development
-slurm_version: '24.11.4-1.el9.umcg'
+slurm_version: '24.11.6-1.el9.umcg'
 slurm_partitions:
   - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
     default: yes
@@ -166,7 +166,6 @@ local_admin_users:
   - 'henkjan'
   - 'kim'
   - 'marieke'
-  - 'marloes'
   - 'max'
   - 'morris'
   - 'pieter'
@@ -276,8 +275,8 @@ pfs_mounts:
   - pfs: umcgst04/slice5
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -285,18 +284,18 @@ lfs_mounts:
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-atd
       - name: umcg-gcc
-        mode: '2750'
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-sysops
-        mode: '2750'
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
@@ -304,6 +303,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops

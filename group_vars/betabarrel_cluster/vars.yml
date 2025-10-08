@@ -178,7 +178,6 @@ iptables_allow_ssh_outbound:
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
-  - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
 local_admin_groups:
@@ -190,7 +189,6 @@ local_admin_users:
   - 'henkjan'
   - 'kim'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'robin'
@@ -518,17 +516,25 @@ lfs_mounts:
     pfs: local_raid
     groups:
       - name: umcg-atd
+        mode: '2770'
       - name: umcg-gap
+        mode: '2770'
       - name: umcg-gd
+        mode: '2770'
       - name: umcg-genomescan
+        mode: '2770'
       - name: umcg-gsad
+        mode: '2770'
       - name: umcg-gst
+        mode: '2770'
       - name: umcg-lab
-        mode: '2750'
       - name: umcg-labgnkbh
+        mode: '2770'
       - name: umcg-patho
+        mode: '2770'
 #     - name: umcg-pr
       - name: umcg-vipt
+        mode: '2770'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'

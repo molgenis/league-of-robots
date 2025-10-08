@@ -7,7 +7,7 @@
   become: true
   loop: "{{ interfaces }}"
   when: interfaces is defined
-  notify: restart_network
+  notify: network_restart
 
 - name: Enable network.service at boot.
   ansible.builtin.systemd:

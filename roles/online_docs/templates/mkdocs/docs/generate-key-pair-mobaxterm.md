@@ -112,7 +112,7 @@ you can copy-paste it in the email you'll send in the next step.
 ## 3. Request account and have the public key linked to your account
 
 To request an account, [contact the helpdesk via email](../contact/) and
-{% if 'gearshift' in slurm_cluster_name or 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
+{% if 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
  * Make sure you have read the [Code of Conduct](../coc_umcg_research_clusters/) and tell us you agree with it using this email
 {% endif %}
  * Paste the contents of the public key as displayed in MobaKeyGen's *Public key for pasting into OpenSSH authorized_keys file* field in the email.

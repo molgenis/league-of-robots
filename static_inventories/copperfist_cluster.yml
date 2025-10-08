@@ -55,7 +55,23 @@ all:
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-          local_volume_size_extra: 8300
+          local_volume_extra:
+            - name: groups1
+              size: 1536
+            - name: groups2
+              size: 1536
+            - name: groups3
+              size: 1536
+            - name: groups4
+              size: 1536
+            - name: groups5
+              size: 1536
+            - name: groups6
+              size: 1536
+            - name: groups7
+              size: 1536
+            - name: groups8
+              size: 1536
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -103,7 +119,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
-            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}" 
+            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
     docs:
       hosts:
@@ -170,6 +186,7 @@ all:
           hosts:
             cf-dragen:
               # ansible_host: cf-porch+copperfist+cf-dragen
+              os_distribution: 'oracle8'
               local_mounts:
                 - mount_point: '/staging'
                   device: 'LABEL=staging'
@@ -185,6 +202,7 @@ all:
                   mounted_mode: '0755'
                   mount_options: 'bind,nofail'
                   type: none
+              slurm_version: '20.11.9-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
               slurm_threads_per_core: 2
@@ -194,12 +212,10 @@ all:
               slurm_local_disk: 102400
               slurm_features: 'tmp16,dragen'
               slurm_ethernet_interfaces:
-                - enp26s0f0  # VLAN990
+                - ens3f0  # VLAN990
                 - enp5s0  # BMC
                 - ens3f0.16  # VLAN16
               slurm_weight: 10
-              slurm_version: '20.11.9-1.el8.umcg'
-              os_distribution: 'oracle8'
               local_yum_repository: true # enable local yum repository
     mit_chaperone:
       hosts:
@@ -229,7 +245,6 @@ all:
             - name: 'umcg-vipt'
           ssh_client_configs:
             - logs_library
-          local_yum_repository: true # enable local yum repository
     storage_server:
       hosts:
         cf-storage:
@@ -258,7 +273,6 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
-          local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
     smb_server:
       hosts:
         copperfist:
