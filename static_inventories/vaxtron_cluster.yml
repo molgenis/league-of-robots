@@ -38,7 +38,9 @@ all:
 #              security_group: "{{ stack_prefix }}_ds"
 #              assign_floating_ip: true
 #              add_hostname_to_ip_address: true
-#          local_volume_size_extra: 10000
+#          local_volume_extra:
+#            - name: groups
+#              size: 10000
     docs:
       hosts:
         docs-on-bateleur:
@@ -86,7 +88,9 @@ all:
                 name: ens5
               lnet:
                 name: tcp15
-          local_volume_size_extra: 1000
+          local_volume_extra:
+            - name: apps
+              size: 1000
     user_interface:
       hosts:
         vaxtron:
@@ -114,10 +118,6 @@ all:
           slurm_real_memory: 31072
           slurm_local_disk: 0
           slurm_features: 'prm02,prm03,rsc04,tmp04'
-          slurm_ethernet_interfaces:
-            - ens3
-            - ens4
-            - ens5
     compute_node:
       children:
         cpu_r750:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -154,7 +154,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 32
               slurm_real_memory: 2063196
@@ -163,9 +162,6 @@ all:
               slurm_local_disk: 3420400
               slurm_features: 'rsc04,tmp04'
               slurm_weight: 10
-              slurm_ethernet_interfaces:
-                - eno12409np1
-                - eno12399np0
         cpu_r6625:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             vt-node-b[01:06]:
@@ -200,7 +196,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 96
               slurm_real_memory: 768000
@@ -208,9 +203,6 @@ all:
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 2850100
               slurm_features: 'rsc04,tmp04'
-              slurm_ethernet_interfaces:
-                - eno12409
-                - eno12399
 administration:
   children:
     sys_admin_interface:

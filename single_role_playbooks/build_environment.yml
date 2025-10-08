@@ -1,8 +1,10 @@
 ---
 - hosts:
+    - build_server
+    - chaperone
     - deploy_admin_interface
     - user_interface
-    - chaperone
+
   roles:
     - build_environment
 ...

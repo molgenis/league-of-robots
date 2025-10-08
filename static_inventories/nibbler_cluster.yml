@@ -9,6 +9,7 @@ all:
       hosts:
         tunnel:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_jumphosts"
@@ -22,6 +23,7 @@ all:
       hosts:
         nb-repo:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_repo"
@@ -33,6 +35,7 @@ all:
       hosts:
         nb-transfer:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_ds"
@@ -40,7 +43,9 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: ens3
-          local_volume_size_extra: 10000
+          local_volume_extra:
+            - name: groups
+              size: 10000
 #
 # iRODS machines in Nibbler stack currently disabled as they are no longer used for the microscopy project
 # and the RUG vulnerability scanner complains about the expired certificate on "umcg-icat01.hpc.rug.nl".
@@ -110,7 +115,9 @@ all:
 #            add_hostname_to_ip_address: true
 #            nmstate_interface:
 #              name: ens3
-#        local_volume_size_extra: 20
+#        local_volume_extra:
+#          - name: irods # change to name of mountpoint when re-enabled.
+#            size: 20
 #        davrods_icat_ip: "{{ ip_addresses[inventory_hostname]['nb_internal_management']['address'] }}"
     docs:
       hosts:
@@ -119,6 +126,7 @@ all:
       hosts:
         nb-sai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
@@ -143,10 +151,12 @@ all:
                 name: enp0s5
               lnet:
                 name: tcp15
+          postfix_hostname: "{{ listserv_domain_name }}"
     deploy_admin_interface:
       hosts:
         nb-dai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
@@ -171,11 +181,14 @@ all:
                 name: enp0s5
               lnet:
                 name: tcp15
-          local_volume_size_extra: 3000
+          local_volume_extra:
+            - name: apps
+              size: 3000
     user_interface:
       hosts:
         nibbler:
           cloud_flavor: umcg.v1.vm.16-64
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
@@ -203,8 +216,7 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               nmstate_interface:
-                #name: enp0s7
-                name: enp0s11  # Will most likely change to enp0s7 after reboot.
+                name: enp0s7
                 ipv4:
                   auto-route-metric: 80
           slurm_sockets: 16
@@ -212,19 +224,12 @@ all:
           slurm_real_memory: 63788
           slurm_local_disk: 0
           slurm_features: 'prm02,prm03,rsc02,tmp02'
-          slurm_ethernet_interfaces:
-            - enp0s3
-            - enp0s4
-            - enp0s5
-            - enp0s6
     compute_node:
       children:
         cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-a[01:05]:
               cloud_flavor: umcg.v1.bm.64-512-0.vlan1338
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_type: baremetal
               host_networks:
                 - name: vlan1338
@@ -259,7 +264,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 1
               slurm_sockets: 1
               slurm_cores_per_socket: 64
               slurm_real_memory: 514860
@@ -268,13 +272,11 @@ all:
               slurm_local_disk: 3002000
               slurm_features: 'rsc02,tmp02'
               slurm_weight: 5
-              slurm_ethernet_interfaces:
-                - eth2
-                - eth2.1068
         gpu_a40:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-b[01:02]:
               cloud_flavor: umcg.v1.vm.31-120.8a40
+              cloud_image: RockyLinux-9.3_xfs
               gpu_count: 8
               gpu_type: 'a40'
               host_networks:
@@ -295,7 +297,9 @@ all:
                     name: enp0s4
                   lnet:
                     name: tcp20
-              local_volume_size_extra: 1
+              local_volume_extra:
+                - name: local
+                  size: 1
               slurm_sockets: 31
               slurm_cores_per_socket: 1
               slurm_real_memory: 117397
@@ -304,13 +308,6 @@ all:
               slurm_local_disk: 900
               slurm_features: 'rsc02,tmp02,gpu,A40'
               slurm_weight: 10
-              slurm_ethernet_interfaces:
-                - enp0s3
-                - enp0s4
-                - enp0s5
-                # DH4 and DH5 not used on compute nodes (yet).
-                #- ens6
-                #- ens7
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-c[01:10]:
@@ -321,16 +318,16 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: enp130s0f0
+                    name: eth2
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
                   nmstate_interface:
-                    name: enp130s0f0.1068
+                    name: eth2.1068
                     type: vlan
                     vlan:
                       id: 1068
-                      base-iface: enp130s0f0
+                      base-iface: eth2
                     ipv4:
                       dhcp: false
                   lnet:
@@ -352,7 +349,6 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 14
               slurm_real_memory: 257320
@@ -360,9 +356,6 @@ all:
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
               slurm_features: 'rsc02,tmp02'
-              slurm_ethernet_interfaces:
-                - enp130s0f0
-                - enp130s0f0.1068
 administration:
   children:
     sys_admin_interface:

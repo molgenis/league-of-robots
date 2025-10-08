@@ -1,0 +1,41 @@
+#
+# Install cvmfs_client.
+#
+---
+- name: 'Check OS version of target host.'
+  ansible.builtin.fail:
+    msg: 'This role requires RedHat/CentOS version >= 9.x'
+  when: ansible_facts['os_family'] != "RedHat" or ansible_facts['distribution_major_version'] < "9"
+
+- name: 'Install CVMFS package.'
+  ansible.builtin.package:
+    name:
+      - cvmfs
+    state: latest
+    update_cache: true
+  become: true
+
+- name: 'Configure autofs by running setup command to ensure /etc/auto.master.d/cvmfs.autofs exists.'
+  ansible.builtin.command:
+    cmd: cvmfs_config setup
+    creates: /etc/auto.master.d/cvmfs.autofs
+  become: true
+
+- name: 'Reload autofs service in order to apply the updated configuration.'
+  ansible.builtin.systemd:
+    name: autofs
+    state: reloaded
+    enabled: true
+    daemon_reload: true
+  become: true
+
+- name: 'Add repositories to cvmfs and make sure file exists.'
+  ansible.builtin.blockinfile:
+    path: /etc/cvmfs/default.local
+    block: | 
+      CVMFS_REPOSITORIES=hpc.umcg.nl
+      CVMFS_HTTP_PROXY=DIRECT
+      CVMFS_QUOTA_LIMIT=5000
+    create: true
+  become: true
+...

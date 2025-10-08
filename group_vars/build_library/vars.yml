@@ -1,8 +1,6 @@
 ---
 stack_prefix: 'build'
 stack_name: "{{ stack_prefix }}_library"  # stack_name must match the name of the folder that contains this vars.yml file.
-cloud_image: CentOS 7
-cloud_user: centos
 availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
@@ -15,14 +13,12 @@ nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
 ]
-os_distribution: 'centos7'
 local_admin_groups:
   - 'admin'
 local_admin_users:
   - 'gerben'
   - 'henkjan'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'sandi'
@@ -57,10 +53,6 @@ use_sssd: false
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
 #
 external_jumphosts:
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception
@@ -81,44 +73,4 @@ external_jumphosts:
     hosts:
       - hostname: foyer
         network: external
-cluster_common_packages:
-  RedHat7:
-    - apptainer
-    - apptainer-suid
-    - bash-completion
-    - bc
-    - bcc-tools
-    - bind-utils
-    - bzip2
-    - cargo
-    - curl
-    - dos2unix
-    - figlet
-    - git
-    - git-core
-    - gnutls
-    - libsodium
-    - lsof
-    - nano
-    - ncdu
-    - ncurses-static
-    - net-tools
-    - openssl
-    - pciutils
-    - openssl11  # Required for openldap-ltb RPMs.
-    - qt5-qtbase
-    - qt5-qtxmlpatterns
-    - readline-static
-    - rsync
-    - screen
-    - strace
-    - tcl-devel
-    - telnet
-    - tmux
-    - tree
-    - unzip
-    - urw-base35-fonts
-    - vim
-    - wget
-    - yum-utils
 ...

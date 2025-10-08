@@ -59,6 +59,8 @@
       - NetworkManager
     state: latest
     update_cache: true
+  notify:
+    - NetworkManager_restart
   become: true
 
 - name: Deploy override file to customize NetworkManager configuration.
@@ -68,6 +70,8 @@
     owner: 'root'
     group: 'root'
     mode: '0644'
+  notify:
+    - NetworkManager_restart
   become: true
 
 - name: Find old network interface configs in ifcfg script format.
@@ -84,6 +88,8 @@
   loop: "{{ interfaces_found_ifcfg_scripts.files }}"
   loop_control:
     label: "{{ item.path }}"
+  notify:
+    - NetworkManager_restart
   become: true
 
 - name: Deploy /usr/local/sbin/fix_network_interface_names to apply customised udev network device renaming.
@@ -93,6 +99,8 @@
     owner: 'root'
     group: 'root'
     mode: '0750'
+  notify:
+    - fix_network_interface_names_restart
   become: true
 
 - name: Deploy fix_network_interface_names.service for systemd.
@@ -102,6 +110,8 @@
     owner: 'root'
     group: 'root'
     mode: '0644'
+  notify:
+    - fix_network_interface_names_restart
   become: true
 
 - name: Start fix_network_interface_names.service.
@@ -112,6 +122,17 @@
     daemon_reload: true
   become: true
 
+- name: Start NetworkManager.service.
+  ansible.builtin.systemd:
+    name: NetworkManager.service
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
+
 #
 # Network Manager and its nmcli is a mess and not idempotent in most cases creating yet another config.
 # Therefore we use nmstatectl to manage profiles for NetworkManager.
@@ -121,4 +142,29 @@
     file: nmstate.yml
   when:
     - host_networks | default([]) | selectattr('nmstate_interface', 'defined') | length() >= 1
+
+- name: List all automatically created, unused NetworkManager configs.
+  ansible.builtin.shell:
+    cmd: |
+         set -u
+         set -e
+         set -o pipefail
+         nmcli --fields UUID,TIMESTAMP-REAL con show \
+           | awk '$2 ~ /never/ {print $1}'
+  register: nmcli_con_show_never_used
+  changed_when: nmcli_con_show_never_used['stdout'] | length > 1
+
+- name: Delete all automatically created, unused NetworkManager configs.
+  ansible.builtin.shell:
+    cmd: |
+         set -u
+         set -e
+         set -o pipefail
+         nmcli con delete uuid '{{ item }}'
+  register: nmcli_con_delete
+  changed_when: "'successfully deleted' in nmcli_con_delete['stdout']"
+  loop: "{{ nmcli_con_show_never_used['stdout_lines'] }}"
+  loop_control:
+    label: "{{ nmcli_con_delete['stdout'] }}"
+  become: true
 ...

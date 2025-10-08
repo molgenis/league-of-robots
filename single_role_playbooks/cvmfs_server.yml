@@ -1,0 +1,6 @@
+---
+- hosts: silo
+  roles:
+    - cvmfs_server
+...
+

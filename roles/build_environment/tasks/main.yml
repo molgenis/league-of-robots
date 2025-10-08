@@ -9,13 +9,14 @@
 # with the playbooks from the ansible-pipeline repo.
 #
 ---
-- name: Install generic build environment packages on UIs and DAIs.
+- name: Install generic build environment packages on UIs, DAIs and build servers.
   ansible.builtin.import_tasks: build_dependencies.yml
   vars:
     mandatory_deps: "{{ build_env_generic_deps }}"
     optional_deps: "{{ build_env_optional_deps }}"
   when: inventory_hostname in groups['user_interface'] | default([]) or
-        inventory_hostname in groups['deploy_admin_interface'] | default([])
+        inventory_hostname in groups['deploy_admin_interface'] | default([]) or
+        inventory_hostname in groups['build_server'] | default([])
 
 - name: Install extended build environment packages on DAIs.
   ansible.builtin.import_tasks: build_dependencies.yml

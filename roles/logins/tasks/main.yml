@@ -164,4 +164,20 @@
   when:
     - inventory_hostname not in groups['deploy_admin_interface'] | default([])
     - cluster_class | default('') != 'diagnostics'
+
+- name: 'Include/remove screen_reaper.sh from PAM session config of sudo (it is not using authselect)'
+  ansible.builtin.lineinfile:
+    path: "/etc/pam.d/sudo"
+    state: "{{ pam_state }}"
+    insertafter: 'EOF'
+    regexp: 'session.*pam_exec\.so.*screen_reaper\.sh'
+    line: 'session    optional     pam_exec.so stdout seteuid /etc/pam-script.d/screen_reaper.sh'
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    pam_state: "{% if screen_cleanup_deploy is defined and screen_cleanup_deploy %}present{% else %}absent{% endif %}"
+  when:
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
 ...

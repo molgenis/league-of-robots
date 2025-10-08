@@ -1,0 +1,36 @@
+#
+# Install cvmfs_sever.
+#
+---
+- name: 'Check OS version of target host.'
+  ansible.builtin.fail:
+    msg: 'This role requires RedHat/CentOS version >= 9.x'
+  when: ansible_facts['os_family'] != "RedHat" or ansible_facts['distribution_major_version'] < "9"
+
+- name: 'Set selinux in permissive mode.'
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+  become: true
+
+- name: 'Install CVMFS and dependencies.'
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+    name:
+      - curl
+      - cvmfs
+      - httpd
+      - nano
+      - rsync
+      - wget
+  become: true
+
+- name: Enable webserver.
+  ansible.builtin.systemd:
+    name: httpd
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+...
