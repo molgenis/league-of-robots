@@ -170,6 +170,7 @@ function nhcwrap_finalize_env() {
 	if [[ ! -d "${STATEDIR}" ]]
 	then
 		# Securely create state directory
+		mkdir -p "${TMPDIR:-${STATEDIR}}"
 		TMPDIR=$(mktemp -d "${STATEDIR}.XXXXXXXXXXX")
 		mv "${TMPDIR}" "${STATEDIR}"
 	fi
