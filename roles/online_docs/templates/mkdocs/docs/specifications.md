@@ -5,9 +5,11 @@
 
 Key ingredients of the High Performance Computing (HPC) environment of the {{ slurm_cluster_name | capitalize }} cluster
 
- * Linux OS: [{{ hostvars[groups['user_interface'][0]]['ansible_distribution'] }}]({{ external_hrefs[hostvars[groups['user_interface'][0]]['ansible_distribution']] }})
-   version {{ hostvars[groups['user_interface'][0]]['ansible_distribution_version'] }}
-   {% if repo_manager | default('none') != 'none' %}with [{{ repo_manager | capitalize }}]({{ external_hrefs[repo_manager] }}) for package distribution/management{% endif %}.
+ * Linux OS: [{{ cluster_os_name }}]({{ external_hrefs[cluster_os_name] }})
+   version {{ cluster_os_version }}
+   {% if cluster_repo_manager | default('none') != 'none' -%}
+   with [{{ cluster_repo_manager | capitalize }}]({{ external_hrefs[cluster_repo_manager] }}) for package distribution/management
+   {%- endif %}
  * Job scheduling: [Slurm Workload Manager](https://slurm.schedmd.com/) {{ slurm_version.stdout }}
  * Module system: [Lmod](https://github.com/TACC/Lmod) {{ lmod_version.stdout }}
  * Deployment of (Bioinformatics) software: [EasyBuild](https://github.com/easybuilders/easybuild)

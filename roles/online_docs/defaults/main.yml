@@ -3,6 +3,9 @@ external_hrefs:
   pulp: 'https://pulpproject.org/'
   Rocky: 'https://rockylinux.org/'
   CentOS: 'https://www.centos.org/'
+cluster_os_name: "{{ hostvars[groups['user_interface'][0]]['ansible_distribution'] }}"
+cluster_os_version: "{{ hostvars[groups['user_interface'][0]]['ansible_distribution_version'] }}"
+cluster_repo_manager: "{{ hostvars[groups['user_interface'][0]]['repo_manager'] }}"
 known_hosts_hostnames: "\
   {% for jumphost in groups['jumphost'] %}\
     {{ jumphost }}*,\
