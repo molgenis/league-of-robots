@@ -25,6 +25,22 @@
     force: true
   become: true
 
+- name: 'Deploy /etc/tmpfiles.d/nhc_standalone.conf.'
+  ansible.builtin.template:
+    src: templates/nhc_standalone.tmpfiles
+    dest: /etc/tmpfiles.d/nhc_standalone.conf
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+
+- name: 'Create tmp dirs for nhc_standalone using systemd-tmpfiles.'
+  ansible.builtin.command:
+    cmd: |
+         systemd-tmpfiles --create /etc/tmpfiles.d/nhc_standalone.conf
+    creates: /run/nhc
+  become: true
+
 - name: 'Create files & folders for NHC.'
   ansible.builtin.file:
     name: "{{ item.name }}"
@@ -38,7 +54,7 @@
       group: root
       mode: '0755'
       state: directory
-    - name: '/var/run/nhc'
+    - name: '/run/nhc'  # Should have been created by systemd-tmpfiles, but this is a sanity check.
       owner: root
       group: root
       mode: '0700'
@@ -76,6 +92,6 @@
     name: 'NHC wrapper'
     minute: '*/5'
     user: 'root'
-    job: '/usr/sbin/nhc-wrapper -N -P nhc_standalone -D /var/run/nhc/ -X 15h -A "-a"'
+    job: '/usr/sbin/nhc-wrapper -N -P nhc_standalone -D /run/nhc/ -X 15h -A "-a"'
   become: true
 ...
