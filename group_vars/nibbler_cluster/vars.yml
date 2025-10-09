@@ -85,8 +85,6 @@ additional_etc_hosts:
         network: external
   - group: build_library
     nodes:
-      - name: vip_build
-        network: vlan16
       - name: rocky9-build
         network: vlan16
   - group: donbot_azure
