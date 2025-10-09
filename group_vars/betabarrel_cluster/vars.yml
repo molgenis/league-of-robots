@@ -124,8 +124,8 @@ totp:
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
     - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['address'] }}{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['netmask'] }}"
-cloud_image: CentOS 7
-cloud_user: centos
+cloud_image: Rocky-9.5
+os_distribution: 'rocky9'
 availability_zone: nova
 stack_networks:
   - name: vlan1336  # Internal management for VMs and BMs
