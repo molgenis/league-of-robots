@@ -43,7 +43,7 @@
         | sort
         | last
         + 1 }}"
-    new_database_index_brackets: "{% raw %}{{% endraw %}{{ new_database_index }}{% raw %}}{% endraw %}" 
+    new_database_index_brackets: "{% raw %}{{% endraw %}{{ new_database_index }}{% raw %}}{% endraw %}"
   block:
     - name: 'Debug the indexes'
       ansible.builtin.debug:
