@@ -69,6 +69,10 @@ additional_etc_hosts:
     nodes:
       - name: cf-dragen
         network: vlan990
+  - group: copperfist_cluster
+    nodes:
+      - name: cf-storage
+        network: vlan990
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -124,8 +128,8 @@ totp:
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
     - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['address'] }}{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['netmask'] }}"
-cloud_image: CentOS 7
-cloud_user: centos
+cloud_image: Rocky-9.5
+os_distribution: 'rocky9'
 availability_zone: nova
 stack_networks:
   - name: vlan1336  # Internal management for VMs and BMs
@@ -147,7 +151,7 @@ stack_networks:
 security_group_mods:
   - name: "{{ stack_prefix }}_storage"
     allow_ingress:
-      - '192.168.1.0/25'
+      - '192.168.1.0/24'
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -508,6 +512,12 @@ pfs_mounts:
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
+  - pfs: umcgst15
+    source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
+    type: nfs4    # checked with cat /proc/filesystem
+    rw_options: 'defaults,_netdev,noatime,nodiratime,nofail,local_lock=flock'
+    ro_options: 'defaults,_netdev,noatime,nodiratime,nofail,ro'
+    machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
     pfs: local_raid
@@ -532,10 +542,26 @@ lfs_mounts:
         mode: '2770'
       - name: umcg-patho
         mode: '2770'
-#     - name: umcg-pr
+      # - name: umcg-pr
       - name: umcg-vipt
         mode: '2770'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+  - lfs: tmp15
+    pfs: 'umcgst15'
+    groups:
+      - name: umcg-atd
+      - name: umcg-gap
+      - name: umcg-gd
+      - name: umcg-genomescan
+      - name: umcg-gsad
+      - name: umcg-gst
+      - name: umcg-lab
+        mode: '2750'
+      - name: umcg-labgnkbh
+      - name: umcg-patho
+      # - name: umcg-pr
+      - name: umcg-vipt
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
     groups:
