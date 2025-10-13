@@ -58,16 +58,6 @@
         msg:
           - "ldap_server_existing_databases: {{ existing_databases }}"
           - "ldap_server_use_database_index: {{ use_database_index }}"
-      vars:
-        ldap_server_existing_databases: "{{ existing_databases_query['results']
-            | selectattr('olcDatabase', 'defined')
-            | map(attribute='olcDatabase') }}"
-        ldap_server_use_database_index: "{{ existing_databases
-            | regex_replace('{([1-9][0-9]*)}', '\\1')
-            | map('int')
-            | sort
-            | last
-            + 1 }}"
     - name: 'Create database for "{{ ldap_domain }}" domain in the OpenLDAP config database {{ use_database_index_brackets }}.'
       community.general.ldap_entry:
         server_uri: "ldapi://%2Fvar%2Frun%2Fslapd%2Fldapi"
