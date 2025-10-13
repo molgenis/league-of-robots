@@ -32,7 +32,7 @@
   become: true
   listen: lsaai_schema_extend
 
-- name: Modify LDAP and add voPersonExternalAffiliation attribute to lsaaiPerson 
+- name: Modify LDAP and add voPersonExternalAffiliation attribute to lsaaiPerson
   ansible.builtin.command:
     cmd: >
       /usr/local/openldap/bin/ldapmodify

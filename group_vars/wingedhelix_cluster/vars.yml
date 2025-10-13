@@ -108,7 +108,7 @@ ldap_domains:
   #  user_member_of: groupMembership
   #  group_member: member
   #  create_ldap: true
-  #  ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
+  #  # ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
   #sram:
   #  uri: "ldaps://{{ stack_prefix }}-dai"
   #  base: dc=umcg-hpc-gd,dc=services,dc=sram,dc=surf,dc=nl
@@ -120,7 +120,7 @@ ldap_domains:
   #  user_ssh_public_key: sshPublicKey
   #  user_member_of: groupMembership
   #  group_member: member
-  #  create_ldap: true
+  #  # create_ldap: true
   #  ldap_db_index: 4  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
   #  replication_provider_uri: ldaps://ldap.sram.surf.nl
   #  replication_provider_base: dc=umcg-hpc-gd,dc=services,dc=sram,dc=surf,dc=nl

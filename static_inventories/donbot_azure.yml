@@ -31,7 +31,7 @@ all:
               user_member_of: memberOf
               group_member: member
               create_ldap: true
-              ldap_db_index: 2  # Indices up to 1 are already used by default for the "config" and "monitor" databases. (Example database on "2" was removed.)
+              # ldap_db_index: 1
           regular_groups:
             - name: 'lsaai'
           regular_users:
