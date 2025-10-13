@@ -40,6 +40,7 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
+          local_yum_repository: true  # For nhc_standalone.
           local_volume_extra:
             - name: groups
               size: 100
