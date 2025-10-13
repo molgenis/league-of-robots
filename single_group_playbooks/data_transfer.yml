@@ -11,6 +11,8 @@
   roles:
     - iptables
     - grub
+    - role: yum_local
+      when: local_yum_repository is defined
     - locale
     - logrotate
     - remove
