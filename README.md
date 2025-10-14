@@ -188,26 +188,26 @@ Therefore we set ```ANSIBLE_ROLES_PATH``` and ```ANSIBLE_COLLECTIONS_PATH``` to 
 Make sure you already executed `ansible-galaxy install ... ` (see previous step).
 
 ```bash
-  $ pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
-  $ _azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt")"
-  $ pip install -r "${_azure_pip_requirements}"
+pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
+_azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt")"
+pip install -r "${_azure_pip_requirements}"
 ```
 
 See also Galaxy Ansible [Azure Azcollection > Documentation](https://galaxy.ansible.com/ui/repo/published/azure/azcollection/docs/)
 
 If there are issues, run (after ^) also
 
-```
-    $ pip install --upgrade pip   # needed to find newest packages
-    $ ansible-galaxy collection install azure.azcollection --force   # forcefully reinstall collection
-    $ pip install -r "${_azure_pip_requirements}"   # then install the rest of the dependencies
+```bash
+pip install --upgrade pip   # needed to find newest packages
+ansible-galaxy collection install azure.azcollection --force   # forcefully reinstall collection
+pip install -r "${_azure_pip_requirements}"   # then install the rest of the dependencies
 ```
 
 Login to the Azure via CLI
 
-```
-    $ az login
-    A web browser has been opened at https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize. Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `az login --use-device-code`.
+```bash
+az login
+A web browser has been opened at https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize. Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `az login --use-device-code`.
 ```
 
 more information is available in the [roles/azure_computing/README.md](roles/azure_computing/README.md).
