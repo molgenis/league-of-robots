@@ -19,7 +19,5 @@
     - update
     - sshd
     - basic_security
-    - silo_server
-   #- cluster # for installing software?
-   #- sudoers
+    - cvmfs_server
 ...

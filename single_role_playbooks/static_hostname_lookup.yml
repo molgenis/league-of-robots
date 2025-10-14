@@ -11,6 +11,7 @@
     - ldap_server
     - chaperone
     - logs
+    - silo_server
   roles:
     - static_hostname_lookup
 ...
