@@ -201,7 +201,7 @@ functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
 regular_groups:
-# Note, for chaperone machines this is controlled in the static_inventories
+  # Note, for chaperone machines this is controlled in the static_inventories
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
   - name: "{{ functional_users_group }}"
@@ -219,7 +219,7 @@ regular_groups:
   - name: 'umcg-pr'
   - name: 'umcg-vipt'
 regular_users:
-# Note, for chaperone machines this is controlled in the static_inventories
+  # Note, for chaperone machines this is controlled in the static_inventories
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
   - name: 'umcg-atd-ateambot'
