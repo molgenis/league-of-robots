@@ -22,13 +22,15 @@ trap 'logger -t "${_log_tag}" "${0##*/}  Script was interrupted by external proc
 
 # Default variables
 _debug=false
+_mtime="-21" # limit to files created in the last 21 days
 _script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 _log_file="${_script_path_dir}/${0##*/}.log"
 
 # Shell arguments
 for (( i=1; i<=$#; i++ )); do
-   [[ "${1}" == "-h" || "${1}" == "--help" ]] && echo -e "Usage\n\t${0} -d\n\t${0} -f /log/output/file" && exit
+   [[ "${1}" == "-h" || "${1}" == "--help" ]] && echo -e "Usage\n\t${0} -d\n\t${0} -f /log/output/file -A\n\t-A checkes ALL files, otherwise only files changed in last 21 days" && exit
    [[ "${1}" == "-d" ]] && _debug=true
+   [[ "${1}" == "-A" ]] && _mtime="+0" # find all files
    [[ "${1}" == "-l" ]] && shift && _log_file="${1}"
    shift
 done
@@ -51,7 +53,7 @@ function _logme(){
    echo "${@}" | { ( ${_debug} ) && tee -a "${_log_file}" || cat >> "${_log_file}"; }
 }
 
-_deduplicate_all="$(find "${_base_dir}" -path "*earl*" -type f -printf "%i %P\n" | sort -k1)"
+_deduplicate_all="$(find "${_base_dir}" -path "*earl*" -type f -mtime "${_mtime}" -printf "%i %P\n" | sort -k1)"
 _all_info_with_single_inode="$(awk '{ a[$1]++; b[$1]=$0; } END { for (i in a) { if (a[i] == "1") { print a[i]" "b[i] } } }' <<< "${_deduplicate_all}")"
 _all_paths_with_single_inode="$(cut -d' ' -f3 <<< "${_all_info_with_single_inode}")"
 _todo_count=$(wc -l <<< "${_all_paths_with_single_inode}")
