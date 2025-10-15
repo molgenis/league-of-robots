@@ -22,15 +22,15 @@ trap 'logger -t "${_log_tag}" "${0##*/}  Script was interrupted by external proc
 
 # Default variables
 _debug=false
-_mtime="-21" # limit to files created in the last 21 days
+_mtime="-21"
 _script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 _log_file="${_script_path_dir}/${0##*/}.log"
 
 # Shell arguments
-for (( i=1; i<=$#; i++ )); do
+while [[ $# -gt 0 ]]; do
    [[ "${1}" == "-h" || "${1}" == "--help" ]] && echo -e "Usage\n\t-d    # enable debug output to terminal\n\t-f /log/output/file\n\t-A    # check ALL files, default is 21 days old only" && exit
    [[ "${1}" == "-d" ]] && _debug=true
-   [[ "${1}" == "-A" ]] && _mtime="+0" # find all files
+   [[ "${1}" == "-A" ]] && _mtime="+0"
    [[ "${1}" == "-l" ]] && shift && _log_file="${1}"
    shift
 done
