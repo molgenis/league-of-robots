@@ -23,7 +23,7 @@
         public_ip_address_name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
       {% endif %}
 
-- name: Create network interface(s) for VM
+- name: Create or update network interfaces for VMs
   azure.azcollection.azure_rm_networkinterface:
     name: "{{ inventory_hostname }}-{{ item.name }}_nic"
     virtual_network: "{{ item.name }}"
