@@ -47,6 +47,10 @@ echo "------ $(date)------" > "${_log_file}"
 
 cd "${_base_dir}"
 
+function _logme(){
+   echo "${@}" | { ( ${_debug} ) && tee -a "${_log_file}" || cat >> "${_log_file}"; }
+}
+
 _deduplicate_all="$(find "${_base_dir}" -path "*earl*" -type f -printf "%i %P\n" | sort -k1)"
 _all_info_with_single_inode="$(awk '{ a[$1]++; b[$1]=$0; } END { for (i in a) { if (a[i] == "1") { print a[i]" "b[i] } } }' <<< "${_deduplicate_all}")"
 _all_paths_with_single_inode="$(cut -d' ' -f3 <<< "${_all_info_with_single_inode}")"
@@ -67,30 +71,28 @@ while IFS= read -r _path; do
       _replica_inode=$(awk -F '/' -v aearl="${_earl}" -v amachine="${_machine}" -v amonth="${_month}" -v afile="${_file}" '$3 != aearl && $4 == amachine && $7 == afile { print $2 }' <<< "${_all_info_with_single_inode}")
       echo "  ${_replica_path}" >> "${_log_file}"
       if ! diff -q ${_path} ${_replica_path} > /dev/null ; then
-         ${_debug} && echo "    different > merging into ${_path}.merged" >> "${_log_file}"
+         _logme "    ! different > merging into ${_path}.merged"
          # merge both files into one, keep only unique lines from each
          zcat ${_path} ${_replica_path} 2>/dev/null | sort -u | gzip > "${_path}.merged"
          # rm -f "${_path}"
          mv -f "${_path}.merged" "${_path}"
       else
-         ${_debug} && echo "    are same - touching date" >> "${_log_file}"
+         _logme "    are same - touching date"
          # files are the same, then only change the timestamp to right now
          # so that rsync will never overwrite it anymore
          touch ${_path}
       fi
       # now hard link them together - it does not take extra storage and it works with
       # rsync -au which does not update if newer exist
-      echo "    linking ${_path} and ${_replica_path}" >> "${_log_file}"
+      _logme "    ! deduplicating - making one file by linking ${_path} and ${_replica_path}"
       test -e ${_replica_path} && rm -f ${_replica_path}
       ln ${_path} ${_replica_path}
       _count_deduplicated=$(( _count_deduplicated + 1))
    else
-      ${_debug} && echo "    no duplicated file for ${_path}" >> "${_log_file}"
-      echo "    making a duplication of the file in the ${_path}.duplicate" >> "${_log_file}"
-      ln "${_path}" "${_path}.duplicate"
+      _logme "    no duplicated file for ${_path}"
    fi
    _index=$(( _index + 1 ))
-   ${_debug} && echo "Progress ${_index} of ${_todo_count}" >> "${_log_file}"
+   _logme "Progress ${_index} of ${_todo_count}"
    sleep 0.1  # this is needed, or the cifs get's overloaded
 done <<< "${_all_paths_with_single_inode}"
 logger -t "${_log_tag}" "${0##*/}  Successfully finished deduplicating. Deduplicated ${_count_deduplicated} files."
