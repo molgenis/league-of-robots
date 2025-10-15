@@ -25,10 +25,12 @@ _debug=false
 _mtime="-21"
 _script_path_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 _log_file="${_script_path_dir}/${0##*/}.log"
+_help='Usage\n\t-d    # enable debug output to terminal\n\t-l /log/output/file\n\t-A    # check ALL files, default is 21 days old only'
+
 
 # Shell arguments
 while [[ $# -gt 0 ]]; do
-   [[ "${1}" == "-h" || "${1}" == "--help" ]] && echo -e "Usage\n\t-d    # enable debug output to terminal\n\t-f /log/output/file\n\t-A    # check ALL files, default is 21 days old only" && exit
+   [[ "${1}" == "-h" || "${1}" == "--help" ]] && echo -e "${_help}" && exit
    [[ "${1}" == "-d" ]] && _debug=true
    [[ "${1}" == "-A" ]] && _mtime="+0"
    [[ "${1}" == "-l" ]] && shift && _log_file="${1}"
@@ -36,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Managing log history - and limit to 100k of lines of old logs
-touch "${_log_file}"
+touch "${_log_file}" && sync
 if test -e "${_log_file}"; then
    if test -e "${_log_file}.old"; then
       cat "${_log_file}.old" "${_log_file}" 2>/dev/null | tail -n 100000 > "${_log_file}.tmp"
@@ -82,7 +84,7 @@ while IFS= read -r _path; do
          _logme "    are same - touching date"
          # files are the same, then only change the timestamp to right now
          # so that rsync will never overwrite it anymore
-         touch ${_path}
+         touch ${_path} && sync
       fi
       # now hard link them together - it does not take extra storage and it works with
       # rsync -au which does not update if newer exist
