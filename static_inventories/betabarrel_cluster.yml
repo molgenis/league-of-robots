@@ -33,12 +33,12 @@ all:
               nodes:
                 - name: bb-dragen
                   network: vlan16
-            - group: betabarrel_cluster
-              nodes:
                 - name: betabarrel
                   network: vlan16
             - group: copperfist_cluster
               nodes:
+                - name: cf-dragen
+                  network: vlan16
                 - name: copperfist
                   network: vlan16
         az-porch:
@@ -149,8 +149,8 @@ all:
           os_distribution: 'centos7'
           host_networks:
             - name: vlan16
-              add_hostname_to_ip_address: true
             - name: vlan990
+              add_hostname_to_ip_address: true
           local_yum_repository: true # enable local yum repository
           local_mounts:
             - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
@@ -205,21 +205,47 @@ all:
         dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             bb-dragen:
-              ansible_host: bb-porch+betabarrel+bb-dragen
+              #ansible_host: bb-porch+betabarrel+bb-dragen
               os_distribution: 'oracle8'
               host_networks:
-                - name: vlan990
-                  add_hostname_to_ip_address: true
-                  nmstate_interface:
-                    name: enp26s0f0
-                    ipv4:
-                      dhcp: false
+                #
+                # enp5s0:
+                #   speed: 1 Gbit copper, physical connector shared with BMC.
+                #   vlans:
+                #     untagged: 990
+                #     tagged: -
+                # enp4s0:
+                #   speed: 1 Gbit copper, not connected.
+                # enp26s0f0:
+                #   speed: 10 Gbit copper, but switch max 1 Gbit.
+                #   vlans:
+                #     untagged: 990
+                # enp26s0f1:
+                #   speed: 10 Gbit copper, not connected.
+                # enp134s0f0:
+                #   speed: 10 Gbit fibre
+                #   vlans:
+                #     untagged: -
+                #     tagged: 13, 16, 985, 990
+                # enp134s0f1:
+                #   speed: 10 Gbit fibre, not connected.
+                #
                 - name: vlan16
                   nmstate_interface:
                     name: enp134s0f0.16
                     type: vlan
                     vlan:
                       id: 16
+                      base-iface: enp134s0f0  # altname ens3f0
+                    ipv4:
+                      dhcp: false
+                - name: vlan990
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp134s0f0.990
+                    type: vlan
+                    vlan:
+                      id: 990
                       base-iface: enp134s0f0  # altname ens3f0
                     ipv4:
                       dhcp: false
