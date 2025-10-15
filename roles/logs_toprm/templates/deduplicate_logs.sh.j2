@@ -28,7 +28,7 @@ _log_file="${_script_path_dir}/${0##*/}.log"
 
 # Shell arguments
 for (( i=1; i<=$#; i++ )); do
-   [[ "${1}" == "-h" || "${1}" == "--help" ]] && echo -e "Usage\n\t${0} -d\n\t${0} -f /log/output/file -A\n\t-A checkes ALL files, otherwise only files changed in last 21 days" && exit
+   [[ "${1}" == "-h" || "${1}" == "--help" ]] && echo -e "Usage\n\t-d\n\t-f /log/output/file -A\n\t-A checkes ALL files, otherwise only files changed in last 21 days" && exit
    [[ "${1}" == "-d" ]] && _debug=true
    [[ "${1}" == "-A" ]] && _mtime="+0" # find all files
    [[ "${1}" == "-l" ]] && shift && _log_file="${1}"
