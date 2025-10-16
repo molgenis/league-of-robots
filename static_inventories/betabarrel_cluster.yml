@@ -205,7 +205,7 @@ all:
         dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             bb-dragen:
-              #ansible_host: bb-porch+betabarrel+bb-dragen
+              # ansible_host: bb-porch+betabarrel+bb-dragen
               os_distribution: 'oracle8'
               host_networks:
                 #
@@ -222,12 +222,12 @@ all:
                 #     untagged: 990
                 # enp26s0f1:
                 #   speed: 10 Gbit copper, not connected.
-                # enp134s0f0:
+                # enp134s0f0 altname ens3f0:
                 #   speed: 10 Gbit fibre
                 #   vlans:
                 #     untagged: -
                 #     tagged: 13, 16, 985, 990
-                # enp134s0f1:
+                # enp134s0f1 altname ens3f1:
                 #   speed: 10 Gbit fibre, not connected.
                 #
                 - name: vlan16
