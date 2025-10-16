@@ -34,6 +34,13 @@
     mode: '0644'
   become: true
 
+- name: 'Make sure systemd-tmpfiles-setup.service is started on boot.'
+  ansible.builtin.service:
+    name: systemd-tmpfiles-setup.service
+    enabled: true
+    # state: Should only be started buring the boot sequence and NOT now / on a running system.
+  become: true
+
 - name: 'Create tmp dirs for nhc_standalone using systemd-tmpfiles.'
   ansible.builtin.command:
     cmd: |
