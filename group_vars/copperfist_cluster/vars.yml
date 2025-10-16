@@ -51,27 +51,9 @@ motd: |
 additional_etc_hosts:
   - group: betabarrel_cluster
     nodes:
-      - name: betabarrel
-        network: vlan990
-  - group: betabarrel_cluster
-    nodes:
       - name: bb-dragen
         network: vlan990
-  - group: betabarrel_cluster
-    nodes:
-      - name: bb-storage
-        network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: copperfist
-        network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: cf-dragen
-        network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: cf-storage
+      - name: betabarrel
         network: vlan990
 #
 # Jumphosts from other stack-name infra groups.

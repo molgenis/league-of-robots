@@ -5,12 +5,13 @@
     - static_hostname_lookup
 
 - hosts:
-    - repo
+    - chaperone
     - cluster
+    - data_transfer
     - irods
     - ldap_server
-    - chaperone
     - logs
+    - repo
     - silo_server
   roles:
     - static_hostname_lookup
