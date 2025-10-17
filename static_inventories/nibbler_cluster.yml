@@ -9,14 +9,13 @@ all:
       hosts:
         tunnel:
           cloud_flavor: umcg.v1.vm.1-2
-          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-              nmstate_interface:
-                name: ens3
+              #nmstate_interface:
+              #  name: ens3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
@@ -189,37 +188,36 @@ all:
       hosts:
         nibbler:
           cloud_flavor: umcg.v1.vm.16-64
-          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
-              nmstate_interface:
-                name: enp0s6
+              #nmstate_interface:
+              #  name: enp0s6
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
-              nmstate_interface:
-                name: enp0s3
-              lnet:
-                name: tcp14
+              #nmstate_interface:
+              #  name: enp0s3
+              #lnet:
+              #  name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
-              nmstate_interface:
-                name: enp0s4
-              lnet:
-                name: tcp20
+              #nmstate_interface:
+              #  name: enp0s4
+              #lnet:
+              #  name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-              nmstate_interface:
-                name: enp0s5
-              lnet:
-                name: tcp15
+              #nmstate_interface:
+              #  name: enp0s5
+              #lnet:
+              #  name: tcp15
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
-              nmstate_interface:
-                name: enp0s7
-                ipv4:
-                  auto-route-metric: 80
+              #nmstate_interface:
+              #  name: enp0s7
+              #  ipv4:
+              #    auto-route-metric: 80
           slurm_sockets: 16
           slurm_cores_per_socket: 1
           slurm_real_memory: 63788
@@ -275,43 +273,65 @@ all:
               slurm_weight: 5
         gpu_a40:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
-            nb-node-b[01:02]:
-              cloud_flavor: umcg.v1.vm.31-120.8a40
-              cloud_image: RockyLinux-9.3_xfs
-              gpu_count: 8
+            nb-node-b01:
+              cloud_flavor: umcg.v1.bm.64-512-0.vlan1338.16a40
+              gpu_count: 16
               gpu_type: 'a40'
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: enp0s5
+                    name: eth2  # altname enp65s0np0
                 - name: vlan985
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: enp0s3
+                    name: eth2.985
+                    type: vlan
+                    vlan:
+                      id: 985
+                      base-iface: eth2
+                    ipv4:
+                      dhcp: false
                   lnet:
                     name: tcp14
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: enp0s4
+                    name: eth2.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: eth2
+                    ipv4:
+                      dhcp: false
                   lnet:
                     name: tcp20
-              local_volume_extra:
-                - name: local
-                  size: 1
-              slurm_sockets: 31
-              slurm_cores_per_socket: 1
-              slurm_real_memory: 117397
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: '/dev/nvme0n1'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              slurm_sockets: 1
+              slurm_cores_per_socket: 64
+              slurm_real_memory: 514860
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
-              slurm_local_disk: 900
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
+              slurm_local_disk: 3002000
               slurm_features: 'rsc02,tmp02,gpu,A40'
               slurm_weight: 10
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
-            nb-node-c[01:10]:
+            nb-node-c[01:11]:
               cloud_flavor: umcg.v1.bm.28-256-0.vlan1338
               host_type: baremetal
               host_networks:
