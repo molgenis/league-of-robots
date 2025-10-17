@@ -243,10 +243,10 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-datateam'
     sponsor: umcg-mswertz
-  - name: 'umcg-erdera'
-    sponsor: umcg-mswertz
   - name: 'umcg-endocrinology'
     sponsor: umcg-mmvanderklauw
+  - name: 'umcg-erdera'
+    sponsor: umcg-mswertz
   - name: 'umcg-fg'
     sponsor: umcg-lfranke
   - name: 'umcg-franke-scrna'
