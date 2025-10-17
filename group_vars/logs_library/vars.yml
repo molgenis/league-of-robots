@@ -40,7 +40,7 @@ local_admin_users:
   - 'pieter'
   - 'sandi'
 regular_groups:
-  - 'umcg-logstoprm'
+  - name: 'umcg-logstoprm'
 regular_users:
   - name: "logstoprm"
     groups: "umcg-logstoprm"
