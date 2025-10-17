@@ -127,7 +127,7 @@ lfs_quota:
       umcg-gdio: 1024
       umcg-grip: 1024
       umcg-hlhs: 1024
-      umcg-lifelines: 21504
+      umcg-lifelines: 40960
       umcg-solve-rd: 5120
   rsc08:
     quota_limits:  # All values in GB.
@@ -223,7 +223,7 @@ lfs_quota:
       umcg-hlhs: 5120
       umcg-immunogenetics: 2048
       umcg-impact: 1024
-      umcg-lifelines: 20480
+      umcg-lifelines: 40960
       umcg-lld: 8192
       umcg-llnext: 2048
       umcg-mic: 2048
