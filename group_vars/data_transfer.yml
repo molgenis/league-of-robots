@@ -1,4 +1,5 @@
 ---
+additional_etc_hosts: []  # Do not add additional machines to /etc/hosts on data transfer servers.
 iptables_allow_icmp_inbound:
   - ANY
 iptables_allow_https_inbound:
