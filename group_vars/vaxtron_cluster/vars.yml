@@ -811,6 +811,7 @@ lfs_mounts:
     groups:
       - name: umcg-atd
       - name: umcg-biogen
+      - name: umcg-erdera
       - name: umcg-fg
       - name: umcg-gcc
       - name: umcg-gdio
