@@ -9,6 +9,7 @@ all:
       hosts:
         reception:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
@@ -22,6 +23,7 @@ all:
       hosts:
         tl-repo:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_repo"
@@ -33,6 +35,7 @@ all:
       hosts:
         tl-transfer:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_ds"
@@ -59,6 +62,55 @@ all:
                     - umcg-gst
                   mode: '2770'
                   owner: root
+        tl-test:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: vlan1337
+              security_group: "{{ stack_prefix }}_ds"
+              assign_floating_ip: false
+              add_hostname_to_ip_address: true
+              #nmstate_interface:
+              #  name: enp3s0
+          local_yum_repository: true  # For nhc_standalone.
+          local_volume_extra:
+            - name: groups1
+              size: 10
+            - name: groups2
+              size: 10
+            - name: groups3
+              size: 10
+          local_mounts:
+            - mount_point: '/groups'
+              device: '/dev/md0'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
+              type: xfs
+              md:
+                raid_level: 0
+                md_device: /dev/md0
+                raid_devices: 3
+                spare_devices: 0
+                component_devices:
+                  - /dev/vdb
+                  - /dev/vdc
+                  - /dev/vdd
+          local_mount_subfolders:
+            - mount_point: '/groups'
+              machines: "{{ groups['data_transfer'] }}"
+              folders:
+                - rel_paths:
+                    - "{{ data_transfer_only_group }}"
+                  mode: '2750'
+                  owner: root
+                  group: "{{ data_transfer_only_group }}"
+                - rel_paths:
+                    - umcg-atd
+                    - umcg-gsad
+                    - umcg-gst
+                  mode: '2770'
+                  owner: root
     docs:
       hosts:
         docs-on-bateleur:
@@ -66,6 +118,7 @@ all:
       hosts:
         tl-sai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -82,6 +135,7 @@ all:
       hosts:
         tl-dai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -101,6 +155,7 @@ all:
       hosts:
         talos:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -130,8 +185,6 @@ all:
           hosts:
             tl-node-a01:
               cloud_flavor: umcg.v1.bm.28-256-0.vlan1337
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -181,6 +234,7 @@ all:
           hosts:
             tl-node-b01:
               cloud_flavor: umcg.v1.bm.64-512-0
+              cloud_image: RockyLinux-9.3_xfs
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -226,8 +280,6 @@ all:
           hosts:
             tl-node-c01:
               cloud_flavor: umcg.v1.vm.4-8
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"

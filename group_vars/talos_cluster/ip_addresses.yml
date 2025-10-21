@@ -67,6 +67,11 @@ ip_addresses:
       address: 172.23.68.144
       netmask: /32
       fqdn: 'tl-transfer'  # Not really a FQDN as there is no public IP: only for internal use / testing.
+  tl-test:
+    vlan1337:
+      address: 172.23.68.170
+      netmask: /32
+      fqdn: 'tl-test'  # Not really a FQDN as there is no public IP: only for internal use / testing.
   tl_internal_management-vlan16-router:
     tl_internal_management:
       address: 10.10.1.1
