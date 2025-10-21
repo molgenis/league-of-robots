@@ -14,8 +14,8 @@ all:
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-              #nmstate_interface:
-              #  name: ens3
+              nmstate_interface:
+                name: eth0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
@@ -28,7 +28,7 @@ all:
               security_group: "{{ stack_prefix }}_repo"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
           swap_file_size: 2
     data_transfer:
       hosts:
@@ -41,7 +41,7 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
           local_yum_repository: true  # For nhc_standalone.
           local_volume_extra:
             - name: groups
@@ -132,23 +132,23 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp0s6
+                name: enp6s0
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s3
+                name: enp3s0
               lnet:
                 name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s4
+                name: enp4s0
               lnet:
                 name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s5
+                name: enp5s0
               lnet:
                 name: tcp15
           postfix_hostname: "{{ listserv_domain_name }}"
@@ -162,23 +162,23 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp0s6
+                name: enp6s0
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s3
+                name: enp3s0
               lnet:
                 name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s4
+                name: enp4s0
               lnet:
                 name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s5
+                name: enp5s0
               lnet:
                 name: tcp15
           local_volume_extra:
@@ -192,32 +192,32 @@ all:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
-              #nmstate_interface:
-              #  name: enp0s6
+              nmstate_interface:
+                name: eth0
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
-              #nmstate_interface:
-              #  name: enp0s3
-              #lnet:
-              #  name: tcp14
+              nmstate_interface:
+                name: eth1
+              lnet:
+                name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
-              #nmstate_interface:
-              #  name: enp0s4
-              #lnet:
-              #  name: tcp20
+              nmstate_interface:
+                name: eth2
+              lnet:
+                name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-              #nmstate_interface:
-              #  name: enp0s5
-              #lnet:
-              #  name: tcp15
+              nmstate_interface:
+                name: eth3
+              lnet:
+                name: tcp15
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
-              #nmstate_interface:
-              #  name: enp0s7
-              #  ipv4:
-              #    auto-route-metric: 80
+              nmstate_interface:
+                name: eth4
+                ipv4:
+                  auto-route-metric: 80
           slurm_sockets: 16
           slurm_cores_per_socket: 1
           slurm_real_memory: 63788
@@ -274,7 +274,7 @@ all:
         gpu_a40:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-b01:
-              cloud_flavor: umcg.v1.bm.64-512-0.vlan1338.16a40
+              cloud_flavor: umcg.v1.bm.64-256-440.vlan1338.16a40
               gpu_count: 16
               gpu_type: 'a40'
               host_networks:
