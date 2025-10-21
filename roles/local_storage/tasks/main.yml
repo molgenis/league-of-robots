@@ -7,6 +7,24 @@
       - util-linux  # Will also install util-linux-core
   become: true
 
+- name: Install tools to work with Multiple Devices a.k.a. software RAIDs.
+  ansible.builtin.package:
+    state: 'latest'
+    update_cache: true
+    name:
+      - mdadm
+  when: local_mounts | default([]) | selectattr('md', 'defined') | length > 0
+  become: true
+
+- name: Create Multiple Devices a.k.a. software RAIDs.
+  ansible.builtin.include_tasks:
+    file: md.yml
+  loop: "{{ local_mounts }}"
+  loop_control:
+    loop_var: volume
+    index_var: idx
+  when: volume['md'] is defined
+
 - name: Get unstable device name from perc cli utility and update facts.
   ansible.builtin.include_tasks:
     file: perc.yml

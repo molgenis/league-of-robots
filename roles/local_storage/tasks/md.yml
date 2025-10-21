@@ -1,0 +1,35 @@
+---
+- name: Create software RAID from multiple devices.
+  ansible.builtin.shell:
+    cmd: |
+         set -o pipefail
+         mdadm --create "{{ volume['md']['md_device'] }}" \
+               --level="{{ volume['md']['raid_level'] }}" \
+               --raid-devices="{{ volume['md']['raid_devices'] }}" \
+               --spare-devices="{{ volume['md']['spare_devices'] }}" \
+               {% for component_device in volume['md']['component_devices'] %}"{{ component_device }}"{% if not loop.last %} {% endif %}{% endfor %}
+  #changed_when: 
+  register: local_storage_mdadm
+  become: true
+
+- name: 'INFO: mdadm result.'
+  debug:
+    msg: "{{ local_storage_mdadm }}"
+
+#- name: Update facts.
+#  when:
+#    - perc_os_device_name['stdout'] != volume['device']
+#  block:
+#    - name: 'Set a fact, which will resolve references to other vars in the "local_mounts" variable.'
+#      ansible.builtin.set_fact:
+#        local_mounts_resolved_copy: "{{ local_mounts }}"
+#    - name: 'Append unstable device name from perc cli utility to an updated copy of "local_mounts" with references resolved.'
+#      ansible.utils.update_fact:
+#        updates:
+#          - path: "local_mounts_resolved_copy[{{ idx }}]['device']"
+#            value: "{{ perc_os_device_name['stdout'] }}"
+#      register: local_mounts_updated_copy
+#    - name: 'Replace "local_mounts" with updated copy.'
+#      ansible.builtin.set_fact:
+#        local_mounts: "{{ local_mounts_updated_copy['local_mounts_resolved_copy'] }}"
+...
