@@ -283,16 +283,16 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: eth2  # altname enp65s0np0
+                    name: eth3  # altname enp65s0f1np1 & ens3f1np1
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
                   nmstate_interface:
-                    name: eth2.1068
+                    name: eth3.1068
                     type: vlan
                     vlan:
                       id: 1068
-                      base-iface: eth2
+                      base-iface: eth3
                     ipv4:
                       dhcp: false
                   lnet:
@@ -313,7 +313,7 @@ all:
                   type: ext4
               slurm_sockets: 1
               slurm_cores_per_socket: 64
-              slurm_real_memory: 514860
+              slurm_real_memory: 256809
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
