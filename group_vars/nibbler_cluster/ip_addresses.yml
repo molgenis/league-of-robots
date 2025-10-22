@@ -57,9 +57,9 @@ ip_addresses:
     vlan1068:
       address: 172.23.60.22
       netmask: /32
-#    vlan1338:
-#      address: 172.23.69.35
-#      netmask: /32
+    vlan1338:
+      address: 172.23.69.79
+      netmask: /32
     vlan985:
       address: 172.23.59.247
       netmask: /32
