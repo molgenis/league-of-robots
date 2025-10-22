@@ -275,11 +275,7 @@ all:
           hosts:
             nb-node-b01:
               cloud_flavor: umcg.v1.bm.64-256-440.vlan1338.16a40
-<<<<<<< HEAD
-              host_type: baremetal
-=======
               host_type: baremetal 
->>>>>>> d96600c6 (Changes due to maintenance)
               gpu_count: 16
               gpu_type: 'a40'
               host_networks:
@@ -287,11 +283,7 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-<<<<<<< HEAD
                     name: eth3  # altname enp65s0f1np1 & ens3f1np1
-=======
-                    name: eth2  # altname enp65s0np0
->>>>>>> d96600c6 (Changes due to maintenance)
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
