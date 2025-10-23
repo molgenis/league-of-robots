@@ -5,7 +5,7 @@
   failed_when: 'needs_restarting.rc > 1'
   changed_when: 'needs_restarting.rc == 1'
   become: true
-    notify: 'reboot_server'
+  notify: 'reboot_server'
 
 - name: Copy blacklist-nouveau.conf file into modprobe.d to disable Nouveau drivers
   ansible.builtin.copy:
