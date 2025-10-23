@@ -25,7 +25,7 @@
   become: true
   notify: 'nvidia_service'
 
-- name: Enforce reboot, so that we can check if drivers are correctly installed
+- name: Flush handlers.
   ansible.builtin.meta: flush_handlers
 
 - name: Final check to confirm all devices are working
