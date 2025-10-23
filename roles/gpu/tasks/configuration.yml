@@ -25,16 +25,6 @@
   become: true
   notify: 'nvidia_service'
 
-- name: Copy blacklist-nouveau.conf file into modprobe.d to disable Nouveau drivers
-  ansible.builtin.copy:
-    src: blacklist-nouveau.conf
-    dest: /etc/modprobe.d/blacklist-nouveau.conf
-    owner: root
-    group: root
-    mode: '0644'
-  become: true
-  notify: 'reboot_server'
-
 - name: Enforce reboot, so that we can check if drivers are correctly installed
   ansible.builtin.meta: flush_handlers
 
