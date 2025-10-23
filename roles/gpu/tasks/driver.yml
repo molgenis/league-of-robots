@@ -5,11 +5,7 @@
   failed_when: 'needs_restarting.rc > 1'
   changed_when: 'needs_restarting.rc == 1'
   become: true
-<<<<<<< HEAD
   notify: 'reboot_server'
-=======
-    notify: 'reboot_server'
->>>>>>> 887c789a (GPU driver update, nouveau fix)
 
 - name: Copy blacklist-nouveau.conf file into modprobe.d to disable Nouveau drivers
   ansible.builtin.copy:
