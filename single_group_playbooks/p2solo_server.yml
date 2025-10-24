@@ -1,6 +1,6 @@
 ---
-- name: Import pre deploy checks.
-  ansible.builtin.import_playbook: pre_deploy_checks.yml
+#- name: Import pre deploy checks.
+#  ansible.builtin.import_playbook: pre_deploy_checks.yml
 
 #- name: Import initialization playbook for all hosts.
 #  ansible.builtin.import_playbook: init.yml
@@ -9,7 +9,7 @@
   hosts:
     - p2solo_server
   roles:
-    - iptables
+    - firewall
     - ssh
 #    - locale needed???
     - logrotate

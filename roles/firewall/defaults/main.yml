@@ -1,0 +1,11 @@
+---
+# Firewall default poorten
+firewall_allowed_ports:
+  - 22
+
+# IP dat altijd SSH mag gebruiken
+firewall_admin_ip:
+
+# interne interfaces die volledig verkeer mogen hebben
+firewall_internal_interfaces:
+  - enp0s1
