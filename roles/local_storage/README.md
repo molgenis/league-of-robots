@@ -88,7 +88,7 @@ Note:
  * Specifically for MD a.k.a software RAID: the role can only create a software RAID
    if the component devices are not already in use:
    When you accidentally list a wrong component device, which is already in use for something else, the role will fail.
-   Hence it will not destroy data on a wrongly listed device.
+   Hence, it will not destroy data on a wrongly listed device.
    Moreover the role cannot repair nor expand nor change an existing software RAID.
 
 ## Defining subfolders to be created on the mounted file systems
