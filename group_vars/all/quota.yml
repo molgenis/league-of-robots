@@ -25,7 +25,7 @@ lfs_quota:
       umcg-hematology: 5120
       umcg-hlhs: 3072
       umcg-immunogenetics: 10240
-      umcg-lifelines: 18432
+      umcg-lifelines: 28672
       umcg-lld: 15360
       umcg-llnext: 10240
       umcg-mic: 2048
