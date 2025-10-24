@@ -1,17 +1,34 @@
 ---
+- name: Check the file system type of the component devices for the software RAID.
+  ansible.builtin.command: "lsblk -n -o FSTYPE {{ item }}"
+  register: local_storage_md_component_device_status
+  changed_when: false
+  loop: "{{ volume['md']['component_devices'] }}"
+
+- name: FAIL when any of the component devices for the software RAID are neither empty nor linux_raid_member.
+  ansible.builtin.debug:
+    msg:
+      - "ERROR: Component device {{ component_device['item'] }} for the {{ volume['device'] }} software RAID is not empty and contains FSTYPE {{ component_device['stdout'] }}."
+  loop: "{{ local_storage_md_component_device_status['results'] }}"
+  loop_control:
+    loop_var: component_device
+    label: "{{ component_device['invocation']['module_args']['_raw_params'] }}"
+  when: "component_device['stdout'] != '' and 'linux_raid_member' not in component_device['stdout']"
+  failed_when: "component_device['stdout'] != '' and 'linux_raid_member' not in component_device['stdout']"
+
 - name: Create software RAID from multiple devices.
   ansible.builtin.shell:
     cmd: |
          set -o pipefail
-         mdadm --create "{{ volume['md']['md_device'] }}" \
+         mdadm --create "{{ volume['device'] }}" \
                --level="{{ volume['md']['raid_level'] }}" \
                --raid-devices="{{ volume['md']['raid_devices'] }}" \
                {% if volume['md']['spare_devices'] is defined -%}
                --spare-devices="{{ volume['md']['spare_devices'] }}" \
                {% endif -%}
                {% for component_device in volume['md']['component_devices'] %}"{{ component_device }}"{% if not loop.last %} {% endif %}{% endfor %}
-    creates: "{{ volume['md']['md_device'] }}"
-  changed_when: "'array ' + volume['md']['md_device'] + ' started' in local_storage_mdadm_result['stdout']"
+    creates: "{{ volume['device'] }}"
+  changed_when: "'array ' + volume['device'] + ' started' in local_storage_mdadm_result['stdout']"
   register: local_storage_mdadm_result
   become: true
 ...
