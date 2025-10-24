@@ -8,7 +8,8 @@
 - name: FAIL when any of the component devices for the software RAID are neither empty nor linux_raid_member.
   ansible.builtin.debug:
     msg:
-      - "ERROR: Component device {{ component_device['item'] }} for the {{ volume['device'] }} software RAID is not empty and contains FSTYPE {{ component_device['stdout'] }}."
+      - "ERROR: Component device {{ component_device['item'] }} for the {{ volume['device'] }} software RAID
+        is not empty and contains FSTYPE {{ component_device['stdout'] }}."
   loop: "{{ local_storage_md_component_device_status['results'] }}"
   loop_control:
     loop_var: component_device
