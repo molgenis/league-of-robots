@@ -91,7 +91,6 @@ all:
                 raid_level: 0
                 md_device: /dev/md0
                 raid_devices: 3
-                spare_devices: 0
                 component_devices:
                   - /dev/vdb
                   - /dev/vdc
