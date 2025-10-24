@@ -1,6 +1,6 @@
 ---
-#- name: Import pre deploy checks.
-#  ansible.builtin.import_playbook: pre_deploy_checks.yml
+- name: Import pre deploy checks.
+  ansible.builtin.import_playbook: pre_deploy_checks.yml
 
 #- name: Import initialization playbook for all hosts.
 #  ansible.builtin.import_playbook: init.yml
@@ -9,14 +9,13 @@
   hosts:
     - p2solo_server
   roles:
-#    - {role: yum_local, when: local_yum_repository is defined}
- #   - iptables
-#    - grub
-#    - locale
-  #  - logrotate
-#    - remove
-#    - update
-#    - sshd
-#    - basic_security
-    - p2solo_server
+    - iptables
+    - ssh
+#    - locale needed???
+    - logrotate
+    - remove
+#    - update aanpassen voor Debian/ubuntu
+#    - sshd update ?
+    - basic_security
+#    - p2solo_server
 ...
