@@ -37,6 +37,7 @@
 - name: Check if file system source is a device.
   ansible.builtin.stat:
     path: "{{ item.device }}"
+    follow: true
   register: local_storage_device_stat
   loop: "{{ local_mounts }}"
 
