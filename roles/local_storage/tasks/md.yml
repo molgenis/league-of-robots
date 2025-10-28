@@ -1,8 +1,16 @@
 ---
+- name: Check if the software RAID device already exists.
+  ansible.builtin.stat:
+    path: "{{ volume['device'] }}"
+    follow: true
+  register: local_storage_md_device_stat
+
 - name: Check the file system type of the component devices for the software RAID.
   ansible.builtin.command: "lsblk -n -o FSTYPE {{ item }}"
   register: local_storage_md_component_device_status
   changed_when: false
+  when:
+    - local_storage_md_device_stat['stat']['exists'] is false
   loop: "{{ volume['md']['component_devices'] }}"
 
 - name: FAIL when any of the component devices for the software RAID are neither empty nor linux_raid_member.
@@ -13,9 +21,12 @@
   loop: "{{ local_storage_md_component_device_status['results'] }}"
   loop_control:
     loop_var: component_device
-    label: "{{ component_device['invocation']['module_args']['_raw_params'] }}"
-  when: "component_device['stdout'] != '' and 'linux_raid_member' not in component_device['stdout']"
-  failed_when: "component_device['stdout'] != '' and 'linux_raid_member' not in component_device['stdout']"
+    label: "{{ component_device['invocation']['module_args']['_raw_params'] | default(component_device) }}"
+  when:
+    - local_storage_md_device_stat['stat']['exists'] is false
+    - component_device['stdout'] != ''
+  failed_when:
+    - component_device['stdout'] != ''
 
 - name: Create software RAID from multiple devices.
   ansible.builtin.shell:
