@@ -61,7 +61,6 @@ Examples below for:
       type: xfs
       md:
         raid_level: 0
-        md_device: /dev/md0
         raid_devices: 3
         #
         # (Hot) spare_devices can only be used for RAID levels which have redundancy to rebuild a broken array.
