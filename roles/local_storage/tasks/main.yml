@@ -64,23 +64,6 @@
     loop_var: volume
     label: "Mounting {{ volume['type'] }} file system from {{ volume_src }} on {{ volume['mount_point'] }} with opts: {{ volume['mount_options'] }}}"
 
-- name: Recheck the mount point.
-  ansible.builtin.command: "mountpoint {{ item.mount_point }}"
-  register: local_storage_mount_point_status
-  changed_when: false
-  loop: "{{ local_mounts }}"
-
-- name: Configure permissions for mounted file system.
-  ansible.builtin.file:
-    path: "{{ item.item.mount_point }}"
-    state: directory
-    owner: "{{ item.item.mounted_owner }}"
-    group: "{{ item.item.mounted_group }}"
-    mode: "{{ item.item.mounted_mode }}"
-  when: item.rc == 0
-  become: true
-  loop: "{{ local_storage_mount_point_status.results }}"
-
 - name: Create sub folders on local file systems.
   ansible.builtin.include_tasks:
     file: create_sub_folders.yml
