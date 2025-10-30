@@ -1,0 +1,16 @@
+---
+ssh_client_jumphosts:
+  - alias: tunnel
+    hostname: tunnel.hpc.rug.nl
+
+ssh_client_known_hosts: "\
+  @cert-authority \
+  tunnel*,\
+  *nb-transfer*,\
+  *nb-sai,\
+  *nb-dai,\
+  *nibbler,\
+  *docs-on-bateleur,\
+  *nb-* \
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOUth7HlHn/qVcSlSXFxRdNxtccKnrh0hsWuo4m3FamK UMCG HPC Development CA"
+...
