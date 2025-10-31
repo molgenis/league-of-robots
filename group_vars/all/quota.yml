@@ -5,7 +5,7 @@ lfs_quota:
     quota_limits:  # All values in GB.
       umcg-atd: 1024
       umcg-biogen: 8192
-      umcg-bios: 9216
+      umcg-bios: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
       umcg-erdera: 2048
@@ -40,7 +40,7 @@ lfs_quota:
       umcg-rehabilitation: 1024
       umcg-reki: 1024
       umcg-solve-rd: 1024
-      umcg-sommer: 1024
+      umcg-sommer: 2048
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 6144
@@ -185,7 +185,7 @@ lfs_quota:
       umcg-rehabilitation: 1024
       umcg-reki: 1024
       umcg-solve-rd: 1024
-      umcg-sommer: 1024
+      umcg-sommer: 2048
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
