@@ -9,6 +9,7 @@ all:
       hosts:
         reception:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
@@ -22,6 +23,7 @@ all:
       hosts:
         tl-repo:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_repo"
@@ -33,6 +35,7 @@ all:
       hosts:
         tl-transfer:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_ds"
@@ -66,6 +69,7 @@ all:
       hosts:
         tl-sai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -82,6 +86,7 @@ all:
       hosts:
         tl-dai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -101,6 +106,7 @@ all:
       hosts:
         talos:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -130,8 +136,6 @@ all:
           hosts:
             tl-node-a01:
               cloud_flavor: umcg.v1.bm.28-256-0.vlan1337
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -181,6 +185,7 @@ all:
           hosts:
             tl-node-b01:
               cloud_flavor: umcg.v1.bm.64-512-0
+              cloud_image: RockyLinux-9.3_xfs
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -226,8 +231,6 @@ all:
           hosts:
             tl-node-c01:
               cloud_flavor: umcg.v1.vm.4-8
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"

@@ -81,6 +81,18 @@ all:
               mounted_mode: '0755'
               mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
               type: ext4
+              md:
+                raid_level: 0
+                raid_devices: 8
+                component_devices:
+                  - /dev/vdb
+                  - /dev/vdc
+                  - /dev/vdd
+                  - /dev/vde
+                  - /dev/vdf
+                  - /dev/vdg
+                  - /dev/vdh
+                  - /dev/vdi
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
