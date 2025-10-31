@@ -76,8 +76,6 @@ additional_etc_hosts:
         network: external
   - group: build_library
     nodes:
-      - name: vip_build
-        network: vlan16
       - name: rocky9-build
         network: vlan16
 #
@@ -245,10 +243,10 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-datateam'
     sponsor: umcg-mswertz
-  - name: 'umcg-erdera'
-    sponsor: umcg-mswertz
   - name: 'umcg-endocrinology'
     sponsor: umcg-mmvanderklauw
+  - name: 'umcg-erdera'
+    sponsor: umcg-mswertz
   - name: 'umcg-fg'
     sponsor: umcg-lfranke
   - name: 'umcg-franke-scrna'
@@ -813,6 +811,7 @@ lfs_mounts:
     groups:
       - name: umcg-atd
       - name: umcg-biogen
+      - name: umcg-erdera
       - name: umcg-fg
       - name: umcg-gcc
       - name: umcg-gdio
