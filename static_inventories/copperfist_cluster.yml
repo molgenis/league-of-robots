@@ -330,7 +330,7 @@ all:
                 rw,relatime
                 {%- if ansible_facts['os_family'] == 'RedHat' and
                        ansible_facts['distribution_major_version'] >= '8' -%}
-                  ,nofail,x-systemd.device-timeout=10,x-systemd.automount
+                  ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
     smb_server:
