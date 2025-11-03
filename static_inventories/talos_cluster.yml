@@ -15,13 +15,14 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp3s0
+                name: eth0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
       hosts:
         tl-repo:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_repo"
@@ -33,6 +34,7 @@ all:
       hosts:
         tl-transfer:
           cloud_flavor: umcg.v1.vm.1-2
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_ds"
@@ -66,6 +68,7 @@ all:
       hosts:
         tl-sai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -82,6 +85,7 @@ all:
       hosts:
         tl-dai:
           cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -106,17 +110,17 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp4s0
+                name: eth0  # altname enp3s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp3s0
+                name: eth1  # altname enp4s0
               lnet:
                 name: tcp20
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               nmstate_interface:
-                name: enp5s0
+                name: eth2  # altname enp5s0
                 ipv4:
                   auto-route-metric: 80
           slurm_sockets: 4
@@ -130,8 +134,6 @@ all:
           hosts:
             tl-node-a01:
               cloud_flavor: umcg.v1.bm.28-256-0.vlan1337
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -181,6 +183,7 @@ all:
           hosts:
             tl-node-b01:
               cloud_flavor: umcg.v1.bm.64-512-0
+              cloud_image: RockyLinux-9.3_xfs
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -226,8 +229,6 @@ all:
           hosts:
             tl-node-c01:
               cloud_flavor: umcg.v1.vm.4-8
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"

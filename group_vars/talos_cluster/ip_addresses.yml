@@ -2,7 +2,7 @@
 ip_addresses:
   reception:
     vlan1337:
-      address: 172.23.68.181
+      address: 172.23.68.92
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     vlan16:
