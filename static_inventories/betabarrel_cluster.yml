@@ -329,7 +329,7 @@ all:
           perc_devices: true
           local_mounts:
             - mount_point: '/mnt/umcgst15'
-              device: '/dev/data/hdd'
+              device: '/dev/sda'
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
