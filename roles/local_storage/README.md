@@ -17,8 +17,9 @@ The `local_storage` role uses two variables that must be configured in the `grou
 Examples below for:
  * Mounting a real device first
  * Then mounting a sub folder from that device as bind mount elsewhere
- * And finally mounting a Virtual Drive (VD) from a DELL PERC RAID controller,
+ * Mounting a Virtual Drive (VD) from a DELL PERC RAID controller,
    which may be detected as a random device name after (re)boot.
+ * And finally mounting a Multiple Devices (MD) a.k.a. software RAID.
 
 ```yaml
   local_mounts:
@@ -51,6 +52,26 @@ Examples below for:
           ,nofail,x-systemd.device-timeout=10
         {%- endif -%}
       type: ext4
+    - mount_point: '/groups'
+      device: '/dev/md0'
+      mounted_owner: root
+      mounted_group: root
+      mounted_mode: '0755'
+      mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
+      type: xfs
+      md:
+        raid_level: 0
+        raid_devices: 3
+        #
+        # (Hot) spare_devices can only be used for RAID levels which have redundancy to rebuild a broken array.
+        # Hence spare_devices cannot be used with RAID level 0.
+        # spare_devices + raid_devices must match the number of component_devices listed below.
+        #
+        #spare_devices: [number]
+        component_devices:
+          - /dev/vdb
+          - /dev/vdc
+          - /dev/vdd
 ```
 
 Note:
@@ -63,6 +84,11 @@ Note:
    number must be defined; these will be used by this role to detect the `device` dynamically.
    Next that `device` can be formatted and labelled with `label`,
    which can then be used to mount the file system.
+ * Specifically for MD a.k.a software RAID: the role can only create a software RAID
+   if the component devices are not already in use:
+   When you accidentally list a wrong component device, which is already in use for something else, the role will fail.
+   Hence, it will not destroy data on a wrongly listed device.
+   Moreover the role cannot repair nor expand nor change an existing software RAID.
 
 ## Defining subfolders to be created on the mounted file systems
 

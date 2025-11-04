@@ -1,9 +1,9 @@
+---
 #
 # This Mount with "rescue" block, will retry when the first attempt to mount the file system fails.
 # When the first mount attempt fails we assume it is because of the new metadata_csum: hard to tell though.
 # So we try to remove that feature and then mount again....
 #
----
 - name: Mount the volume.
   block:
     - name: Try to mount the volume.
@@ -27,4 +27,23 @@
         opts: "{{ volume['mount_options'] }}"
         state: mounted
       become: true
+#
+# When the mount options contain 'nofail' to prevent a machine from getting stuck in the boot sequence
+# due to a missing mount, the block above will never fail even when the config was completely wrong.
+# Therefore we need to check if the mounting was successful.
+
+- name: Recheck the mount.
+  ansible.builtin.command: "findmnt --source {{ volume_src }} --target {{ volume['mount_point'] }} --types {{ volume['type'] }}"
+  register: local_storage_mount_point_status
+  changed_when: false
+
+- name: Configure permissions for mounted file system.
+  ansible.builtin.file:
+    path: "{{ volume['mount_point'] }}"
+    state: directory
+    owner: "{{ volume['mounted_owner'] }}"
+    group: "{{ volume['mounted_group'] }}"
+    mode: "{{ volume['mounted_mode'] }}"
+  when: local_storage_mount_point_status['rc'] == 0
+  become: true
 ...
