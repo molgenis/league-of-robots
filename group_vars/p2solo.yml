@@ -1,0 +1,18 @@
+---
+#
+# Firewall configuration.
+#
+iptables_allow_icmp_inbound:
+  - "{{ all.ip_addresses['umcg']['net1']['address'] }}"
+  - "{{ all.ip_addresses['umcg']['net2']['address'] }}"
+  - "{{ all.ip_addresses['umcg']['net3']['address'] }}"
+  - "{{ all.ip_addresses['umcg']['net4']['address'] }}"
+  - 127.0.0.1
+iptables_allow_ssh_inbound:
+  - "{{ all.ip_addresses['umcg']['net1']['address'] }}"
+  - "{{ all.ip_addresses['umcg']['net2']['address'] }}"
+  - "{{ all.ip_addresses['umcg']['net3']['address'] }}"
+  - "{{ all.ip_addresses['umcg']['net4']['address'] }}"
+  - 127.0.0.1
+  - 192.168.64.1
+...

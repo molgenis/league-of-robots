@@ -67,6 +67,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "8"
 
 #
@@ -81,6 +82,7 @@
   register: sshd_found_crypto_subpolicy_files
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "8"
 
 - name: Find extra config files we do not want in /etc/ssh/sshd_config.d/.
@@ -94,6 +96,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "8"
 
 #
@@ -113,6 +116,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "8"
 
 - name: Deploy main sshd config.
@@ -147,6 +151,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "9"
 
 #
@@ -206,6 +211,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "8"
 
 - name: Check if we need to update the system-wide crypto policies.
@@ -219,6 +225,7 @@
   changed_when: item not in sshd_active_crypto_policies
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "8"
     - item not in sshd_active_crypto_policies
   notify: update-crypto-policies
@@ -238,6 +245,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "8"
 
 - name: Check if the system-wide crypto policies were configured correctly.
@@ -277,5 +285,6 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['os_family'] == "Debian"
     - ansible_facts['distribution_major_version'] >= "9"
 ...

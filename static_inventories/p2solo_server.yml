@@ -3,11 +3,14 @@ all:
   children:
     openstack_api:
       hosts:
+    p2solo:
+      hosts:
         p2solo:
-          hosts: 192.168.64.11
-          ansible_host: 192.168.64.11
+          host: 192.168.64.13
+          ansible_host: 192.168.64.13
+            
 p2solo_server:
   children:
     openstack_api:
-    p2solo_server:
+    p2solo:
 ...

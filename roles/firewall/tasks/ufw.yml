@@ -23,30 +23,20 @@
     policy: allow
   become: true
 
-- name: Allow essential ports
+#- name: Allow ICMP (ping) globally
+#  command: ufw allow proto icmp
+#  become: yes
+#  changed_when: false
+
+- name: Allow tcp from specific IPs and ports
   ufw:
     rule: allow
-    port: "{{ item }}"
-  loop: "{{ firewall_allowed_ports }}"
+    port: "{{ item.1 }}"
+    from_ip: "{{ item.0 }}"
+    proto: tcp
+  loop: "{{ iptables_allow_ssh_inbound | product(firewall_allowed_ports) | list }}"
   notify: restart_ufw
   become: true
-
-#- name: Allow SSH only from admin IP
-#  ufw:
-#    rule: allow
-#    port: 22
-#    proto: tcp
-#    from_ip: "{{ firewall_admin_ip }}"
-#  become: true
-
-#- name: Allow all traffic on internal interfaces
-#  ufw:
-#    rule: allow
-#    in_interface: "{{ item }}"
-#    out_interface: "{{ item }}"
-#  loop: "{{ firewall_internal_interfaces }}"
-#  notify: restart_ufw
-#  become: true
 
 - name: Allow incoming access internal interfaces   
   community.general.ufw:
