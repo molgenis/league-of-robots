@@ -8,7 +8,7 @@ all:
     jumphost:
       hosts:
         foyer:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
@@ -21,7 +21,7 @@ all:
     repo:
       hosts:
         vt-repo:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
@@ -32,7 +32,7 @@ all:
     data_transfer:
       hosts:
 #        vt-transfer:
-#          cloud_flavor: general.v1.small
+#          cloud_flavor: umcg.v1.vm.1-2
 #          host_networks:
 #            - name: "{{ stack_prefix }}_internal_management"
 #              security_group: "{{ stack_prefix }}_ds"
@@ -47,7 +47,7 @@ all:
     sys_admin_interface:
       hosts:
         vt-sai:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
@@ -69,7 +69,7 @@ all:
     deploy_admin_interface:
       hosts:
         vt-dai:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
@@ -94,7 +94,7 @@ all:
     user_interface:
       hosts:
         vaxtron:
-          cloud_flavor: general.v1.medium
+          cloud_flavor: umcg.v1.vm.8-16
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
@@ -113,9 +113,9 @@ all:
                 name: ens5
               lnet:
                 name: tcp15
-          slurm_sockets: 7
+          slurm_sockets: 16
           slurm_cores_per_socket: 1
-          slurm_real_memory: 31072
+          slurm_real_memory: 63786
           slurm_local_disk: 0
           slurm_features: 'prm02,prm03,rsc04,tmp04'
     compute_node:
