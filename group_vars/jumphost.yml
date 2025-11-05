@@ -21,4 +21,9 @@ ssh_host_signer_hostnames: "{{ inventory_hostname }}\
 # This is enforcing that jumphosts use `yum_repos` for defining repositories,
 # since jumphosts cannot use Pulp
 repo_manager: 'none'
+user_quota_on_root_partition:
+  blocks_soft: 512K
+  blocks_hard: 1024K
+  inodes_soft: 8k
+  inodes_hard: 10k
 ...

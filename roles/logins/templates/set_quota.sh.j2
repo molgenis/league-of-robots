@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#
+# Limit disk quota for regular users, which have a home dir in /home/${PAM_USER}/.
+# The admin users and root are not affected as they have their home in /admin/${PAM_USER}/ or /root/, respectively.
+# This prevents users from accidentally filling up the small OS disk,
+# which would effectively kill the ability to login for all other users.
+#
+blocks_soft="{{ user_quota_on_root_partition['blocks_soft'] }}"
+blocks_hard="{{ user_quota_on_root_partition['blocks_hard'] }}"
+inodes_soft="{{ user_quota_on_root_partition['inodes_soft'] }}"
+inodes_hard="{{ user_quota_on_root_partition['inodes_hard'] }}"
+
+{% raw %}
+
+homedir="$(getent passwd "${PAM_USER}"| cut -d: -f6)"
+if [[ "${homedir}" =~ ^/home/* ]]; then
+	setquota -u "${PAM_USER}" "${blocks_soft}" "${blocks_hard}" "${inodes_soft}" "${inodes_hard}" -a
+fi
+
+exit 0
+
+{% endraw %}
