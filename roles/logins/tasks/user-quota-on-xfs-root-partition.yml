@@ -97,8 +97,8 @@
 # This depends on a correctly configured pam-exec PAM plugin.
 #
 - name: 'Install set_quota.sh script.'
-  ansible.builtin.copy:
-    src: 'set_quota.sh'
+  ansible.builtin.template:
+    src: 'set_quota.sh.j2'
     dest: '/etc/pam-script.d/set_quota.sh'
     owner: root
     group: root

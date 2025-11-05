@@ -59,8 +59,8 @@
     # Add the right amount of padding with spaces to keep layout in sync with the rest of the password-auth file
     logins_pam_exec_prefix: 'session     optional                                     pam_exec.so'
   when:
-    - inventory_hostname in groups['jumphost'] | default([]) or
-      inventory_hostname in groups['data_transfer'] | default([])
+    - user_quota_on_root_partition is defined
+    - user_quota_on_root_partition is not none
     - hostvars[inventory_hostname]['ansible_mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first == 'xfs'
   become: true
 
@@ -128,8 +128,8 @@
              {% if inventory_hostname in groups['data_transfer'] | default([]) %}
                  with-login_checks_chrooted_home
              {% endif %}
-             {% if inventory_hostname in groups['jumphost'] | default([]) or
-                   inventory_hostname in groups['data_transfer'] | default([]) %}
+             {% if user_quota_on_root_partition is defined and
+                   user_quota_on_root_partition is not none %}
                  {% if hostvars[inventory_hostname]['ansible_mounts']
                        | selectattr('mount', 'equalto', '/')
                        | map(attribute='fstype')
