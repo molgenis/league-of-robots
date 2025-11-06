@@ -16,7 +16,5 @@ declare -A domain_configs=(
     [{{ ldap_domain }}_user_expiration_date]='{{ ldap_config['user_expiration_date'] | default('loginExpirationTime') }}'
     [{{ ldap_domain }}_user_expiration_regex]='{{ ldap_config['user_expiration_regex'] | default('^([0-9]{4})([0-9]{2})([0-9]{2}).+Z$') }}'
     [{{ ldap_domain }}_group_object_class]='{{ ldap_config['group_object_class'] | default('posixGroup') }}'
-    [{{ ldap_domain }}_group_quota_soft_limit_template]='{{ ldap_config['group_quota_soft_limit_template'] | default('quotaLFSsoft') }}'
-    [{{ ldap_domain }}_group_quota_hard_limit_template]='{{ ldap_config['group_quota_hard_limit_template'] | default('quotaLFShard') }}'
 {% endfor %}
 )
