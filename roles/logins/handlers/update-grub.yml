@@ -8,7 +8,7 @@
   ansible.builtin.shell: |
          timestamp="$(date '+%Y-%m-%dT%H:%M:%S%z')"
          cp -v '/boot/grub2/grub.cfg' "/boot/grub2/grub.cfg.ansible_backup_${timestamp}"
-         grub2-mkconfig -o '/boot/grub2/grub.cfg'
+         grub2-mkconfig --update-bls-cmdline -o '/boot/grub2/grub.cfg'
   args:
     executable: '/bin/bash'
   changed_when: true
