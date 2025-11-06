@@ -15,7 +15,10 @@ inodes_hard="{{ user_quota_on_root_partition['inodes_hard'] }}"
 
 homedir="$(getent passwd "${PAM_USER}"| cut -d: -f6)"
 if [[ "${homedir}" =~ ^/home/* ]]; then
-	setquota -u "${PAM_USER}" "${blocks_soft}" "${blocks_hard}" "${inodes_soft}" "${inodes_hard}" -a
+	xfs_quota -x -c "limit bsoft=${blocks_soft} bhard=${blocks_hard} isoft=${inodes_soft} ihard=${inodes_hard} ${PAM_USER}" /
+	logger --tag set_quota --priority auth.info "xfs_quota -x -c \"limit bsoft=${blocks_soft} bhard=${blocks_hard} isoft=${inodes_soft} ihard=${inodes_hard} ${PAM_USER}\" /"
+else
+	logger --tag set_quota --priority auth.info "Skipping user ${PAM_USER}."
 fi
 
 exit 0
