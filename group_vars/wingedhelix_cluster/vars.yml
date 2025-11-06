@@ -137,8 +137,6 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-    group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-    group_quota_hard_limit_template: ruggroupumcgquotaLFS
     listserv_mailinglist: GD
     create_ldap: false
 totp:
