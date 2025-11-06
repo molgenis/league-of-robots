@@ -1,36 +1,46 @@
 #jinja2: trim_blocks:False
 # Generate a public/private key pair with MobaXterm on Windows
 
-## Get MobaXterm - a terminal and key generator application
+Your OS comes with a default terminal and key generator application (OpenSSH), but you can also download and install another one (we offer partial support for MobaXterm).
 
-Your OS does not come with a default terminal and key generator application, so you will need to download and install one. 
+Before you decide which client you wish to use, note that different client programs support different public/private keypairs formats - *formats are noninterchangeable between clients*, without conversion.
+
+There are two options to login to clusters from Windows
+
+ 1. Either by using [MobaXterm client](#1-mobaxterm-option) software which requires installation
+ 2. Or simply use Windows built-in [OpenSSH](#2-using-windows-openssh) software
+
+## 1. MobaXterm option
+
+### 1.1 Get MobaXterm - a terminal and key generator application
+
 There are many options all of which have their own pros and cons; we suggest you give [MobaXterm](https://mobaxterm.mobatek.net) version >= 12.3 a try 
 as it features a key generator, terminal and graphical user interface for data transfers all-in-one.
 The following steps use the *portable* version of *MobaXterm Home Edition*, which is free and does not need to be installed with an installer;
 just download, unpack and execute.
 If you want to use another terminal, key generator or data transfer app please consult their manuals...
 
-### Launch MobaXterm key pair generator
+#### 1.2 Launch MobaXterm key pair generator
 
  * 0: Check your MobaXterm version is **12.3 or newer** as older ones have a known bug and won't work.
  * 1: Launch MobaXterm and choose the ```MobaKeyGen (SSH key generator)``` from the tools as shown in the screenshot below.
 
 ![launch MobaKeyGen](img/MobaXterm1.png)
 
-### Configure key pair generator
+#### 1.3 Configure key pair generator
 
 ![Select key type](img/MobaXterm2.png)
 
  * 2: From the **parameters** section at the bottom of the window choose: ```Type of key to generate:``` **ED25519**
  * 3: Click the **Generate** button...
 
-### Generate key pair
+#### 1.4 Generate key pair
 
 ![Generate randomness and subsequently key pair](img/MobaXterm3.png)
 
  * 4: Yes you really have to move the mouse now: computers are pretty bad at generating random numbers and MobaKeyGen uses the coordinates of your mouse movement as a seed to generate a random number.
 
-### Secure private key and save pair to disk
+#### 1.5 Secure private key and save pair to disk
 
 Your key pair was generated.
 
@@ -48,7 +58,58 @@ Now make sure you:
  * 10: Select and copy all the text in the text box at the top of the window underneath **Public key for pasting into OpenSSH authorized_keys file**.
        You can paste it in the email you'll send in the next step.
 
-## Request account and have the public key linked to your account
+## 2. Using Windows OpenSSH
+
+Newer versions of Windows (10+) come with built-in OpenSSH software. The benefits of using this client software are
+
+ - you don't need to install any additional software
+ - it is open source implementation, following the OpenSSH code base that is used on Linux/Unix environments
+ - (mostly) compatible with OpenSSH command options on Linux/Unix systems
+
+The main disadvantages might be that is less user-friendly for less experienced users, as it does not offer any graphical interface. It only provides with command line interfaces.
+
+### 2.1 Creating a keypair with OpenSSH
+
+Start `PowerShell` or `cmd` (`Command prompt`) programs and run command `ssh-keygen`.
+This will save private/public keypair into the `C:\Users\[Username]\.ssh` folder.
+If you wish to create them at another another location, use
+
+```
+    C:\Users\[Username]\.ssh>ssh-keygen -f "C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key"
+    Generating public/private ed25519 key pair.
+    Enter passphrase (empty for no passphrase):
+    Enter same passphrase again:
+    Your identification has been saved in C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key
+    Your public key has been saved in C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key
+    The key fingerprint is:
+    SHA256:JvnMkEf6lrP8x4LnzMIqi48/MRbd+gSz8ab+8mFwqQQ zkh\[Username]@ctxw11mup0108
+    The key's randomart image is:
+    +--[ED25519 256]--+
+    |                 |
+    |                 |
+    |    E. ..        |
+    |    ..==..       |
+    |     .OBS        |
+    |    +.o&+.       |
+    |   . o.*@. .     |
+    |   oo o+=*o o    |
+    |  oo+=o====o     |
+    +----[SHA256]-----+
+
+    C:\Users\[Username]\.ssh>
+```
+
+then simply use the path and print the *public* key content
+
+```
+    C:\Users\[Username]\.ssh>type "C:\Users\[Username]\OneDrive - UMCG\Desktop\example_key"
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaeeGaCcRBjgwtOfQ6IKGs1GO8uT42tD3+4zZRKkMba example_key
+    C:\Users\[Username]\.ssh>
+```
+
+you can copy-paste it in the email you'll send in the next step.
+
+## 3. Request account and have the public key linked to your account
 
 To request an account, [contact the helpdesk via email](../contact/) and
 {% if 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
