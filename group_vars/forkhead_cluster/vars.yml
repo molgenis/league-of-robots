@@ -43,8 +43,6 @@ ldap_domains:
     user_member_of: groupMembership
     group_member: memberUid
     group_object_class: groupofnames
-    group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-    group_quota_hard_limit_template: ruggroupumcgquotaLFS
     create_ldap: true
     # ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
     replication_provider_uri: ldap://172.19.34.180
