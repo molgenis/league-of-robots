@@ -341,7 +341,9 @@ all:
           perc_devices: true
           local_mounts:
             - mount_point: '/mnt/umcgst15'
-              device: '/dev/sda'
+              device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+              perc_controller: 0
+              perc_virtual_drive: 239
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
