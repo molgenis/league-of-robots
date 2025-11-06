@@ -33,7 +33,9 @@
 # Therefore we need to check if the mounting was successful.
 
 - name: Recheck the mount.
-  ansible.builtin.command: "findmnt {% if 'bind' not in volume['mount_options'] %} --source {{ volume_src }} --types {{ volume['type'] }}{% endif %} --target {{ volume['mount_point'] }}"
+  ansible.builtin.command: >
+    findmnt {% if 'bind' not in volume['mount_options'] %} --source {{ volume_src }}
+    --types {{ volume['type'] }}{% endif %} --target {{ volume['mount_point'] }}
   register: local_storage_mount_point_status
   changed_when: false
 
