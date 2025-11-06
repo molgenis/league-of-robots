@@ -439,7 +439,7 @@ yum_repos:
       enabled: 0
     - file: rsyslog8.repo
       id: rsyslog
-      name: 'Rsyslog (Adiscon CentOS7 for x86_64)'
+      name: 'Rsyslog (Adiscon for x86_64)'
       baseurl: http://rpms.adiscon.com/v8-stable/epel-8/x86_64/
       enabled: 1
       gpgcheck: 0
