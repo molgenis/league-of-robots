@@ -93,6 +93,25 @@
   notify: rebuild_grub_config
   become: true
 
+- name: 'Check if GRUB configs needs to be rebuild in order to have uquota present in the list of rootflags for the running kernel.'
+  ansible.builtin.command:
+    cmd: grep uquota /proc/cmdline
+  register: logins_search_uquota_in_kernel_params
+  changed_when: logins_search_uquota_in_kernel_params['rc'] == 1
+  failed_when: logins_search_uquota_in_kernel_params['rc'] >= 2
+  notify: rebuild_grub_config
+
+- name: 'Flush handlers.'
+  ansible.builtin.meta: flush_handlers
+
+#
+# Sanity check, which will fail and stop the play when previous tasks to enable user quota did not work.
+#
+- name: 'Check if usrquota was enabled for the root XFS mount.'
+  ansible.builtin.command:
+    cmd: findmnt --notruncate --types xfs --target / --options usrquota
+  changed_when: false
+
 #
 # This depends on a correctly configured pam-exec PAM plugin.
 #
