@@ -34,4 +34,9 @@ local_mounts:
     mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
     type: ext4
 repo_manager: 'none'
+user_quota_on_root_partition:
+  blocks_soft: 512K
+  blocks_hard: 1024K
+  inodes_soft: 8k
+  inodes_hard: 10k
 ...

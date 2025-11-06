@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#
+# Limit disk quota for regular users, which have a home dir in /home/${PAM_USER}/.
+# The admin users and root are not affected as they have their home in /admin/${PAM_USER}/ or /root/, respectively.
+# This prevents users from accidentally filling up the small OS disk,
+# which would effectively kill the ability to login for all other users.
+#
+blocks_soft="{{ user_quota_on_root_partition['blocks_soft'] }}"
+blocks_hard="{{ user_quota_on_root_partition['blocks_hard'] }}"
+inodes_soft="{{ user_quota_on_root_partition['inodes_soft'] }}"
+inodes_hard="{{ user_quota_on_root_partition['inodes_hard'] }}"
+
+{% raw %}
+
+homedir="$(getent passwd "${PAM_USER}"| cut -d: -f6)"
+if [[ "${homedir}" =~ ^/home/* ]]; then
+	xfs_quota -x -c "limit bsoft=${blocks_soft} bhard=${blocks_hard} isoft=${inodes_soft} ihard=${inodes_hard} ${PAM_USER}" /
+	logger --tag set_quota --priority auth.info "xfs_quota -x -c \"limit bsoft=${blocks_soft} bhard=${blocks_hard} isoft=${inodes_soft} ihard=${inodes_hard} ${PAM_USER}\" /"
+else
+	logger --tag set_quota --priority auth.info "Skipping user ${PAM_USER}."
+fi
+
+exit 0
+
+{% endraw %}
