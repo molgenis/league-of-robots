@@ -415,6 +415,8 @@ regular_users:
     groups: ['umcg-rehabilitation']
   - name: 'umcg-reki-dm'
     groups: ['umcg-reki']
+  - name: 'umcg-respire-dm'
+    groups: ['umcg-respire']
   - name: 'umcg-solve-rd-dm'
     groups: ['umcg-solve-rd']
   - name: 'umcg-sommer-dm'
@@ -540,6 +542,8 @@ sudoers:
     become: 'umcg-rehabilitation-dm'
   - who: ['%umcg-reki-dms']
     become: 'umcg-reki-dm'
+  - who: ['%umcg-respire-dms']
+    become: 'umcg-respire-dm'
   - who: ['%umcg-solve-rd-dms']
     become: 'umcg-solve-rd-dm'
   - who: ['%umcg-sommer-dms']
@@ -770,6 +774,7 @@ lfs_mounts:
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
+      - name: umcg-respire
       - name: umcg-solve-rd
       - name: umcg-sommer
       - name: umcg-surg
