@@ -786,7 +786,6 @@ lfs_mounts:
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
-      - name: umcg-respire
       - name: umcg-solve-rd
       - name: umcg-sommer
       - name: umcg-surg
