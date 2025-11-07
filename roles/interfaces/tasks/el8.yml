@@ -63,35 +63,6 @@
     - NetworkManager_restart
   become: true
 
-- name: Deploy override file to customize NetworkManager configuration.
-  ansible.builtin.template:
-    src: 99-custom.conf
-    dest: /etc/NetworkManager/conf.d/99-custom.conf
-    owner: 'root'
-    group: 'root'
-    mode: '0644'
-  notify:
-    - NetworkManager_restart
-  become: true
-
-- name: Find old network interface configs in ifcfg script format.
-  ansible.builtin.find:
-    paths: /etc/sysconfig/network-scripts/
-    patterns: 'ifcfg-.*'
-    use_regex: true
-  register: interfaces_found_ifcfg_scripts
-
-- name: Delete any old network interface configs in ifcfg script format.
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    state: absent
-  loop: "{{ interfaces_found_ifcfg_scripts.files }}"
-  loop_control:
-    label: "{{ item.path }}"
-  notify:
-    - NetworkManager_restart
-  become: true
-
 - name: Deploy /usr/local/sbin/fix_network_interface_names to apply customised udev network device renaming.
   ansible.builtin.template:
     src: fix_network_interface_names.bash
@@ -130,8 +101,52 @@
     daemon_reload: true
   become: true
 
+- name: Find old network interface configs in ifcfg script format.
+  ansible.builtin.find:
+    paths: /etc/sysconfig/network-scripts/
+    patterns: 'ifcfg-.*'
+    use_regex: true
+  register: interfaces_found_ifcfg_scripts
+
+- name: Migrate network interface configs from ifcfg script to keyfile format.
+  ansible.builtin.command:
+    cmd: nmcli con migrate
+  register: nmcli_con_migrate
+  changed_when: ('successfully migrated' in nmcli_con_migrate['stdout'])
+  when: interfaces_found_ifcfg_scripts['files'] | length > 0
+  become: true
+
+- name: Deploy override file to customize NetworkManager configuration.
+  ansible.builtin.template:
+    src: 99-custom.conf
+    dest: /etc/NetworkManager/conf.d/99-custom.conf
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify:
+    - NetworkManager_restart
+  become: true
+
 - name: Flush handlers.
   ansible.builtin.meta: flush_handlers
+
+- name: Find old network interface configs in ifcfg script format.
+  ansible.builtin.find:
+    paths: /etc/sysconfig/network-scripts/
+    patterns: 'ifcfg-.*'
+    use_regex: true
+  register: interfaces_found_ifcfg_scripts_after_migration
+
+- name: Delete any old network interface configs in ifcfg script format.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ interfaces_found_ifcfg_scripts_after_migration['files'] }}"
+  loop_control:
+    label: "{{ item.path }}"
+  notify:
+    - NetworkManager_restart
+  become: true
 
 #
 # Network Manager and its nmcli is a mess and not idempotent in most cases creating yet another config.
