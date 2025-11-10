@@ -8,6 +8,7 @@
 - name: '###==-> Roles for repo management servers. <-==###'
   hosts: repo
   roles:
+    - interfaces
     - iptables
     - ssh  # client
     - grub

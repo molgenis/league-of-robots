@@ -8,6 +8,7 @@
 - name: 'Satisfy dependencies and install iCAT'
   hosts: irods
   roles:
+    - interfaces
     - iptables
     - ssh  # client
     - grub
