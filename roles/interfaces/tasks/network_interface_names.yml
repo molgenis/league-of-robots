@@ -1,0 +1,186 @@
+---
+- name: Create /etc/systemd/network directory.
+  ansible.builtin.file:
+    path: /etc/systemd/network
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+#
+# Slot-based naming scheme has priority over path-based naming scheme,
+# but is not stable: was introduced later and the removed again for virtual network interfaces,
+# because it can cause naming conflicts.
+#
+- name: Deploy /etc/systemd/network/99-default.link for customised udev network device renaming policy ordering.
+  ansible.builtin.template:
+    src: 99-default.link
+    dest: /etc/systemd/network/99-default.link
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+
+#
+# Remove /etc/udev/rules.d/70-persistent-net.rules to make sure our new rules apply
+# and interfaces are not stuck on an old name based on a broken rule.
+# File content example with bad slot-based interface names linked tp specific MAC addresses:
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:1d:d9:9a", NAME="ens3"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:34:33:d7", NAME="ens4"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:81:c0:bf", NAME="ens5"
+#     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:43:01:be", NAME="ens6"
+#
+- name: Delete /etc/udev/rules.d/70-persistent-net.rules.
+  ansible.builtin.file:
+    path: /etc/udev/rules.d/70-persistent-net.rules
+    state: absent
+  notify:
+    - reboot_to_activate_changed_network_config
+  become: true
+
+#
+# Remove 80-net-name-slot.rules, which is sometimes a symlink to /dev/null and used to disable the rules.
+#
+- name: Delete /etc/udev/rules.d/80-net-name-slot.rules.
+  ansible.builtin.file:
+    path: /etc/udev/rules.d/80-net-name-slot.rules
+    state: absent
+  notify:
+    - reboot_to_activate_changed_network_config
+  become: true
+
+#
+# To ensure
+#    * the custom /etc/systemd/network/99-default.link config is included in the initramfs,
+#      so it will also be applied during early boot
+#    * and that it will be included in future kernel updates,
+# we would have to
+#    * create
+#          /etc/dracut.conf.d/predictable_network_interface_naming.conf
+#      with content
+#          install_items+=" /etc/systemd/network/99-default.link " # Include custom NamePolicy
+#    * and recreate the initramfs with
+#          dracut -f /boot/initramfs-$(uname -r).img $(uname -r)
+# Unfortunately that does not work as documented due to bugs in udev and/or systemd and/or cloud init.
+# Therefore we re-apply our custom NamePolicy from /etc/systemd/network/99-default.link using udev
+# later in the boot sequence, but before we using things like shared file systems or NHC,
+# that rely on specific network interface names.
+#
+- name: Deploy /usr/local/sbin/fix_network_interface_names to apply customised udev network device renaming.
+  ansible.builtin.template:
+    src: fix_network_interface_names.bash
+    dest: /usr/local/sbin/fix_network_interface_names
+    owner: 'root'
+    group: 'root'
+    mode: '0750'
+  notify:
+    - fix_network_interface_names_restart
+  become: true
+
+- name: Deploy fix_network_interface_names.service for systemd.
+  ansible.builtin.template:
+    src: fix_network_interface_names.service
+    dest: /usr/lib/systemd/system/fix_network_interface_names.service
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify:
+    - fix_network_interface_names_restart
+  become: true
+
+- name: Start fix_network_interface_names.service.
+  ansible.builtin.systemd:
+    name: fix_network_interface_names.service
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+
+- name: Update network facts.
+  ansible.builtin.setup:
+    gather_subset: '!all,!min,network'
+
+- name: Check if GRUB_CMDLINE_LINUX is present in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX=' /etc/default/grub"
+  register: search_grub_cmdline_linux_in_grub_config
+  changed_when: false
+  failed_when: search_grub_cmdline_linux_in_grub_config['rc'] >= 2
+
+- name: Check if GRUB_CMDLINE_LINUX_DEFAULT is present in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub"
+  register: search_grub_cmdline_linux_default_in_grub_config
+  changed_when: false
+  failed_when: search_grub_cmdline_linux_default_in_grub_config['rc'] >= 2
+
+- name: Fail if Grub config is in an unsupported state.
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+                    Both GRUB_CMDLINE_LINUX and GRUB_CMDLINE_LINUX_DEFAULT are missing from /etc/default/grub
+                    Check the Grub config and documentation ...
+         ***********************************************************************************************************
+  when:
+    - "'GRUB_CMDLINE_LINUX=' not in search_grub_cmdline_linux_in_grub_config['stdout']"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in search_grub_cmdline_linux_default_in_grub_config['stdout']"
+  failed_when:
+    - "'GRUB_CMDLINE_LINUX=' not in search_grub_cmdline_linux_in_grub_config['stdout']"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in search_grub_cmdline_linux_default_in_grub_config['stdout']"
+
+- name: Check if we need to add or update "net.ifnames" for GRUB_CMDLINE_LINUX* in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: |
+         grep 'GRUB_CMDLINE_LINUX\(_DEFAULT\)\?=.*net\.ifnames.*' /etc/default/grub
+  register: search_net_ifnames_in_grub_config
+  changed_when: false
+  failed_when: search_net_ifnames_in_grub_config['rc'] >= 2
+
+- name: Update "net.ifnames" in GRUB config.'
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    backup: true
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX(_DEFAULT)?=\")([^\"]*)\s+net\.ifnames=\S+([^\"]*\")$'
+    line: '\1\3 net.ifnames={% if enable_predictable_network_interface_names | default(true) %}1{% else %}0{% endif %}\4'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - "'net.ifnames' in search_net_ifnames_in_grub_config['stdout']"
+  notify:
+    - rebuild_grub_config
+    - reboot_to_activate_changed_network_config
+  become: true
+
+- name: Add "net.ifnames" to GRUB config.
+  ansible.builtin.lineinfile:
+    path: '/etc/default/grub'
+    backup: true
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX(_DEFAULT)?=\")([^\"]*)(\")$'
+    line: '\1\3 net.ifnames={% if enable_predictable_network_interface_names | default(true) %}1{% else %}0{% endif %}\4'
+    owner: root
+    group: root
+    mode: '0644'
+  when: "'net.ifnames' not in search_net_ifnames_in_grub_config['stdout']"
+  notify:
+    - rebuild_grub_config
+    - reboot_to_activate_changed_network_config
+  become: true
+
+- name: 'Check if GRUB configs needs to be rebuild for the running kernel.'
+  ansible.builtin.command:
+    cmd: grep 'net.ifnames' /proc/cmdline
+  register: search_net_ifnames_in_kernel_params
+  changed_when: search_net_ifnames_in_kernel_params['rc'] == 1
+  failed_when: search_net_ifnames_in_kernel_params['rc'] >= 2
+  notify:
+    - rebuild_grub_config
+    - reboot_to_activate_changed_network_config
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
+...

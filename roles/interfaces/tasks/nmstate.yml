@@ -131,7 +131,7 @@
   loop_control:
     loop_var: network
   register: interfaces_active_nmstate
-  changed_when: true
+  changed_when: false
 
 - name: Fail if device specified for network has a wrong IP from another network.
   ansible.builtin.debug:

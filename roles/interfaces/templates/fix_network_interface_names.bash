@@ -30,7 +30,7 @@ set -o pipefail
 # Hence exclude for example on board and loopback devices.
 # And add them to a list sorted by network interface index.
 #
-readarray -t network_interfaces_unsorted < <(find '/sys/class/net/' -maxdepth 1 -mindepth 1 -type l -regextype posix-extended -regex '(.*enp.*)|(.*ens.*)|(.*rename.*)')
+readarray -t network_interfaces_unsorted < <(find '/sys/class/net/' -maxdepth 1 -mindepth 1 -type l -regextype posix-extended -regex '(.*eth.*)|(.*enp.*)|(.*ens.*)|(.*rename.*)')
 udevadm_version="$(udevadm --version)"
 declare -a network_interfaces_sorted
 for network_interface in "${network_interfaces_unsorted[@]}"; do
