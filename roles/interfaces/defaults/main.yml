@@ -1,3 +1,7 @@
 ---
 # device defaults
 network_device_file_prefix: 'ifcfg-'
+#
+# https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
+#
+enable_predictable_network_interface_names: true
