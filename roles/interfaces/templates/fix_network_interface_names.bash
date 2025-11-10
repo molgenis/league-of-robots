@@ -67,5 +67,5 @@ done
 #    * a new network interface appeared and will try to establish a connection.
 # Give NetworkManager some time to configure the new network interface(s) automagically.
 #
-sleep 5
+sleep 10
 {% endraw %}
