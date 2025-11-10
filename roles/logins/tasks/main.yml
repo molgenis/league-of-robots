@@ -119,12 +119,12 @@
   when: inventory_hostname in groups['data_transfer'] | default([])
   become: true
 
-- name: 'Set tiny quota for regular users on the XFS root partition.'
+- name: 'Set quota for regular users on the XFS root partition.'
   ansible.builtin.include_tasks:
-    file: tiny-user-quota-on-xfs-root-partition.yml
+    file: user-quota-on-xfs-root-partition.yml
   when:
-    - inventory_hostname in groups['jumphost'] | default([]) or
-      inventory_hostname in groups['data_transfer'] | default([])
+    - user_quota_on_root_partition is defined
+    - user_quota_on_root_partition is not none
     - hostvars[inventory_hostname]['ansible_mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first == 'xfs'
 
 - name: 'Enable services.'
