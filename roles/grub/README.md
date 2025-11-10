@@ -35,7 +35,7 @@ This role will set ```GRUB_DEFAULT=saved``` in ```/etc/default/grub```
 This role will
 
 ```
-grub2-mkconfig -o /boot/grub2/grub.cfg
+grub2-mkconfig  --update-bls-cmdline -o /boot/grub2/grub.cfg
 ```
 
 when ```/etc/default/grub``` was changed;
@@ -95,7 +95,7 @@ The default is /boot/loader/entries/cbbb383c6a61406bbc99c05e6b23dba9-5.14.0-362.
 ```
 with the correct path to the kernel listed at the end of the line. Next,
 ```
-grub2-mkconfig -o /boot/grub2/grub.cfg
+grub2-mkconfig --update-bls-cmdline -o /boot/grub2/grub.cfg
 ```
 should report something like
 ```
