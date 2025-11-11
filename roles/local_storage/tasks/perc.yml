@@ -20,13 +20,16 @@
     - name: 'Set a fact, which will resolve references to other vars in the "local_mounts" variable.'
       ansible.builtin.set_fact:
         local_mounts_resolved_copy: "{{ local_mounts }}"
+      changed_when: false
     - name: 'Append unstable device name from perc cli utility to an updated copy of "local_mounts" with references resolved.'
       ansible.utils.update_fact:
         updates:
           - path: "local_mounts_resolved_copy[{{ idx }}]['device']"
             value: "{{ perc_os_device_name['stdout'] }}"
       register: local_mounts_updated_copy
+      changed_when: false
     - name: 'Replace "local_mounts" with updated copy.'
       ansible.builtin.set_fact:
         local_mounts: "{{ local_mounts_updated_copy['local_mounts_resolved_copy'] }}"
+      changed_when: false
 ...

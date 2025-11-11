@@ -128,9 +128,10 @@
     - hostvars[inventory_hostname]['ansible_mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first == 'xfs'
 
 - name: 'Enable services.'
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
+    masked: false
     state: started
     daemon_reload: true
   with_items:
