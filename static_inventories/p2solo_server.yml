@@ -6,8 +6,8 @@ all:
     p2solo:
       hosts:
         p2solo:
-          host: 192.168.64.13
-          ansible_host: 192.168.64.13
+          host: 192.168.64.2
+          ansible_host: 192.168.64.2
             
 p2solo_server:
   children:
