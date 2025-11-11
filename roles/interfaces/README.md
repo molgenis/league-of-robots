@@ -76,7 +76,7 @@ The exec summary:
     * Firmware updates may result in presenting the hardware differently to BIOS/EFI,
       resulting in different names even when the rules have not changed.
  * Therefore every minor bugfix update can now result in changed network interface names after reboot
-   even when no interfaces were added nor removed: network interface names are now even less predictable then before.
+   even when no interfaces were added nor removed: network interface names may be even less predictable then before.
 
 We use a patched list (of precedence) of `udev` _rules_:
 ```
@@ -90,6 +90,18 @@ NamePolicy=kernel database onboard path slot
   will continue to use the old rules. This may result for example in for compute nodes of the same type.
 * `mac` is not used because it the most unpredictable making it impossible to predict the name of interfaces
   for machines of the same generation of hardware when the config for the first machine is known.
+
+This functionality to generate predictable network interface names is the future and therefore the default,
+but for the time being it can be disabled by setting
+```yaml
+enable_predictable_network_interface_names: false
+```
+for a the complete stack in `group_vars/{{ stack_name }}/vars.yml`
+or for specific machines in `static_inventory/{{ stack_name }}.yml`.
+
+Switching `enable_predictable_network_interface_names` for an already running machine from `true` to `false` or vice versa,
+will modify the `net.ifnames` kernel boot parameter in the GRUB bootloader config,
+followed by rebuilding the kernel images and rebooting the machine.
 
 ### cloud-init
 
