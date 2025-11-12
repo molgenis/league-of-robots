@@ -17,12 +17,12 @@ set -u
 # Hosts and interfaces.
 #
 TARGET_SERVER='{{ ansible_hostname }}'
-declare -a INTERNAL_INTERFACES=(
+declare -a INTERNAL_INTERFACES_PRIMARY_NAMES=(
 {% for internal_interface in internal_interfaces %}
 	'{{ internal_interface }}'
 {% endfor %}
 )
-declare -a EXTERNAL_INTERFACES=(
+declare -a EXTERNAL_INTERFACES_PRIMARY_NAMES=(
 {% for external_interface in external_interfaces %}
 	'{{ external_interface }}'
 {% endfor %}
@@ -52,6 +52,31 @@ else
 	echo 'FATAL: Cannot configure firewall on this server.'
 	exit 1
 fi
+
+#
+##
+### Get altnames for network interfaces.
+##
+#
+declare -a INTERNAL_INTERFACES=("${INTERNAL_INTERFACES_PRIMARY_NAMES[@]}")
+declare -a EXTERNAL_INTERFACES=("${EXTERNAL_INTERFACES_PRIMARY_NAMES[@]}")
+for INT_INTERFACE_PRIMARY_NAME in "${INTERNAL_INTERFACES_PRIMARY_NAMES[@]:-}"; do
+	[[ -z "${INT_INTERFACE_PRIMARY_NAME}" ]] && continue
+	readarray -t altnames< <(ip link show "${INT_INTERFACE_PRIMARY_NAME}" | awk '{ if( $1 ~ /altname/) print $2 }')
+	for altname in "${altnames[@]}"; do
+		[[ -z "${altname}" ]] && continue
+		INTERNAL_INTERFACES+=("${altname}")
+	done
+done
+
+for EXT_INTERFACE_PRIMARY_NAME in "${EXTERNAL_INTERFACES_PRIMARY_NAMES[@]:-}"; do
+	[[ -z "${EXT_INTERFACE_PRIMARY_NAME}" ]] && continue
+	readarray -t altnames< <(ip link show "${EXT_INTERFACE_PRIMARY_NAME}" | awk '{ if( $1 ~ /altname/) print $2 }')
+	for altname in "${altnames[@]}"; do
+		[[ -z "${altname}" ]] && continue
+		EXTERNAL_INTERFACES+=("${altname}")
+	done
+done
 
 #
 ##
