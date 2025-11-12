@@ -2,6 +2,7 @@
 - name: Configure network interface names.
   ansible.builtin.import_tasks:
     file: network_interface_names.yml
+  when: enable_predictable_network_interface_names is defined
 
 - name: Configure network connections with Network Manager.
   ansible.builtin.import_tasks:

@@ -113,8 +113,9 @@ pam_weblogin:
   max_uid: "{{ ldap_domains['sram']['max_id'] }}"
   retries: 3
   cache_duration: 3600  # seconds
-cloud_image: Rocky-9.5
+cloud_image: Rocky-9.6
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
