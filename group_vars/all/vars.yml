@@ -256,6 +256,203 @@ yum_repos:
       baseurl: http://rpms.adiscon.com/v8-stable/epel-7/x86_64/
       enabled: 1
       gpgcheck: 0
+  oracle8:
+    - file: oracle-linux-ol8.repo
+      id: ol8_baseos_latest
+      name: 'Oracle Linux 8 BaseOS Latest ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/baseos/latest/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: oracle-linux-ol8.repo
+      id: ol8_appstream
+      name: 'Oracle Linux 8 Application Stream ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/appstream/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: virt-ol8.repo
+      id: ol8_kvm_appstream
+      name: 'Oracle Linux $releasever KVM Application Stream ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/kvm/appstream/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_codeready_builder
+      name: 'Oracle Linux 8 CodeReady Builder ($basearch) - Unsupported'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/codeready/builder/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: oracle-linux-ol8.repo
+      id: ol8_distro_builder
+      name: 'Oracle Linux 8 Distro Builder ($basearch) - Unsupported'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/distro/builder/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u0_baseos_base
+      name: 'Oracle Linux 8 BaseOS GA ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/0/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u1_baseos_base
+      name: 'Oracle Linux 8.1 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/1/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u2_baseos_base
+      name: 'Oracle Linux 8.2 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/2/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u3_baseos_base
+      name: 'Oracle Linux 8.3 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/3/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u4_baseos_base
+      name: 'Oracle Linux 8.4 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/4/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u5_baseos_base
+      name: 'Oracle Linux 8.5 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/5/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u6_baseos_base
+      name: 'Oracle Linux 8.6 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/6/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u7_baseos_base
+      name: 'Oracle Linux 8.7 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/7/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u8_baseos_base
+      name: 'Oracle Linux 8.8 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/8/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_u9_baseos_base
+      name: 'Oracle Linux 8.9 BaseOS ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/9/baseos/base/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: oracle-linux-ol8.repo
+      id: ol8_MODRHCK
+      name: 'Latest RHCK with fixes from Oracle for Oracle Linux $releasever ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/MODRHCK/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      priority: 20
+    #
+    # EPEL
+    #
+    - file: oracle-epel-ol8.repo
+      id: ol8_developer_EPEL
+      name: 'Oracle Linux $releasever EPEL Packages for Development ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/developer/EPEL/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: oracle-epel-ol8.repo
+      id: ol8_developer_EPEL_modular
+      name: 'Oracle Linux $releasever EPEL Modular Packages for Development ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/developer/EPEL/modular/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    #
+    # Addons
+    #
+    - file: oracle-linux-ol8.repo
+      id: ol8_addons
+      name: 'Oracle Linux 8 Addons ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/addons/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    #
+    # Security
+    #
+    - file: oracle-linux-ol8.repo
+      id: ol8_u4_security_validation
+      name: 'Oracle Linux $releasever Update 4 ($basearch) Security Validations'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/4/security/validation/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    #
+    # Kernel
+    #
+    - file: uek-ol8.repo
+      id: ol8_UEKR7
+      name: 'Latest Unbreakable Enterprise Kernel Release 7 for Oracle Linux $releasever ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR7/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: uek-ol8.repo
+      id: ol8_UEKR6
+      name: 'Latest Unbreakable Enterprise Kernel Release 6 for Oracle Linux $releasever ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 1
+    - file: uek-ol8.repo
+      id: ol8_UEKR7_RDMA
+      name: 'Oracle Linux 8 UEK7 RDMA ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR7/RDMA/$basearch/
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: uek-ol8.repo
+      id: ol8_UEKR6_RDMA
+      name: 'Oracle Linux 8 UEK6 RDMA ($basearch)'
+      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/RDMA/$basearch/
+      gpgkey:file: ///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+      gpgcheck: 1
+      enabled: 0
+    - file: rsyslog8.repo
+      id: rsyslog
+      name: 'Rsyslog (Adiscon for x86_64)'
+      baseurl: http://rpms.adiscon.com/v8-stable/epel-8/x86_64/
+      enabled: 1
+      gpgcheck: 0
+    #
+    # BeeGFS
+    #
+    - file: beegfs.repo
+      id: beegfs
+      name: 'BeeGFS filesystem for Enterprise Linux 8.'
+      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel8/'
+      gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
+      gpgcheck: 1
+      enabled: 1
   rocky9:
     - file: rocky.repo
       id: baseos
@@ -523,197 +720,6 @@ yum_repos:
     #  gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
     #  gpgcheck: 1
     #  enabled: 1
-  oracle8:
-    - file: oracle-linux-ol8.repo
-      id: ol8_baseos_latest
-      name: 'Oracle Linux 8 BaseOS Latest ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/baseos/latest/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 1
-    - file: oracle-linux-ol8.repo
-      id: ol8_appstream
-      name: 'Oracle Linux 8 Application Stream ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/appstream/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 1
-    - file: virt-ol8.repo
-      id: ol8_kvm_appstream
-      name: 'Oracle Linux $releasever KVM Application Stream ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/kvm/appstream/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_codeready_builder
-      name: 'Oracle Linux 8 CodeReady Builder ($basearch) - Unsupported'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/codeready/builder/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 1
-    - file: oracle-linux-ol8.repo
-      id: ol8_distro_builder
-      name: 'Oracle Linux 8 Distro Builder ($basearch) - Unsupported'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/distro/builder/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u0_baseos_base
-      name: 'Oracle Linux 8 BaseOS GA ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/0/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u1_baseos_base
-      name: 'Oracle Linux 8.1 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/1/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u2_baseos_base
-      name: 'Oracle Linux 8.2 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/2/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u3_baseos_base
-      name: 'Oracle Linux 8.3 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/3/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u4_baseos_base
-      name: 'Oracle Linux 8.4 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/4/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u5_baseos_base
-      name: 'Oracle Linux 8.5 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/5/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u6_baseos_base
-      name: 'Oracle Linux 8.6 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/6/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u7_baseos_base
-      name: 'Oracle Linux 8.7 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/7/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u8_baseos_base
-      name: 'Oracle Linux 8.8 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/8/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_u9_baseos_base
-      name: 'Oracle Linux 8.9 BaseOS ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/9/baseos/base/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: oracle-linux-ol8.repo
-      id: ol8_MODRHCK
-      name: 'Latest RHCK with fixes from Oracle for Oracle Linux $releasever ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/MODRHCK/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      priority: 20
-    #
-    # EPEL
-    #  
-    - file: oracle-epel-ol8.repo
-      id: ol8_developer_EPEL
-      name: 'Oracle Linux $releasever EPEL Packages for Development ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/developer/EPEL/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 1
-    - file: oracle-epel-ol8.repo
-      id: ol8_developer_EPEL_modular
-      name: 'Oracle Linux $releasever EPEL Modular Packages for Development ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/developer/EPEL/modular/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 1
-    #
-    # Addons
-    #
-    - file: oracle-linux-ol8.repo
-      id: ol8_addons
-      name: 'Oracle Linux 8 Addons ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/addons/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    #
-    # Security
-    #
-    - file: oracle-linux-ol8.repo
-      id: ol8_u4_security_validation
-      name: 'Oracle Linux $releasever Update 4 ($basearch) Security Validations'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/4/security/validation/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    #
-    # Kernel
-    #
-    - file: uek-ol8.repo
-      id: ol8_UEKR7
-      name: 'Latest Unbreakable Enterprise Kernel Release 7 for Oracle Linux $releasever ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR7/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0    
-    - file: uek-ol8.repo
-      id: ol8_UEKR6
-      name: 'Latest Unbreakable Enterprise Kernel Release 6 for Oracle Linux $releasever ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 1
-    - file: uek-ol8.repo
-      id: ol8_UEKR7_RDMA
-      name: 'Oracle Linux 8 UEK7 RDMA ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR7/RDMA/$basearch/
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    - file: uek-ol8.repo
-      id: ol8_UEKR6_RDMA
-      name: 'Oracle Linux 8 UEK6 RDMA ($basearch)'
-      baseurl: https://yum$ociregion.$ocidomain/repo/OracleLinux/OL8/UEKR6/RDMA/$basearch/
-      gpgkey:file: ///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-      gpgcheck: 1
-      enabled: 0
-    #
-    # BeeGFS
-    #
-    - file: beegfs.repo
-      id: beegfs
-      name: 'BeeGFS filesystem for Enterprise Linux 8.'
-      baseurl: 'https://www.beegfs.io/release/beegfs_7.4.5/dists/rhel8/'
-      gpgkey: https://www.beegfs.io/release/beegfs_7.4.5/gpg/GPG-KEY-beegfs
-      gpgcheck: 1
-      enabled: 1
 #
 # Iptables additional configurations 
 #
