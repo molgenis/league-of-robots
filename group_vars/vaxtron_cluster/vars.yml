@@ -128,6 +128,7 @@ pam_weblogin:
   cache_duration: 3600  # seconds
 cloud_image: Rocky-9.6
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'

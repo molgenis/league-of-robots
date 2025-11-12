@@ -74,9 +74,10 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-cloud_image: RockyLinux-9.3_xfs
+cloud_image: Rocky-9.6
 local_volume_size_root: 22
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
