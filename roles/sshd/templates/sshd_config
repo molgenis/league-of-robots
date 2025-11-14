@@ -16,15 +16,15 @@ UseDNS no
 #
 Protocol 2
 
-{% if ansible_facts['os_family'] == "RedHat"
-  and ansible_facts['distribution_major_version'] >= "9" %}
+{% if ansible_facts['os_family'] in ["RedHat", "Debian", "Ubuntu"]
+  and (ansible_facts['distribution_major_version'] | int) >= 9 %}
 #
 # Minimal RSA key size
 #
 RequiredRSASize 4096
 {% endif %}
-{% if ansible_facts['os_family'] == "RedHat"
-  and ansible_facts['distribution_major_version'] >= "8" %}
+{% if ansible_facts['os_family'] in ["RedHat","Debian","Ubuntu"]
+  and (ansible_facts['distribution_major_version'] | int) >= 8 %}
 #
 # Disable printing of MOTD by sshd itself,
 # which is already printed by the pluggable authentication module (PAM) motd.so

@@ -6,10 +6,11 @@
     update_cache: yes
   become: true
 
-- name: Reset UFW configuration (safe and idempotent)
-  command: ufw --force reset
-  changed_when: false
-  become: true
+# warschijnlijk niet nodig...
+#- name: Reset UFW configuration
+#  command: ufw --force reset
+#  changed_when: false
+#  become: true
 
 - name: Set default policies
   ufw:
@@ -23,16 +24,11 @@
     policy: allow
   become: true
 
-#- name: Allow ICMP (ping) globally
-#  command: ufw allow proto icmp
-#  become: yes
-#  changed_when: false
-
 - name: Allow tcp from specific IPs and ports
   ufw:
     rule: allow
     port: "{{ item.1 }}"
-    from_ip: "{{ item.0 }}"
+    from_ip: "{{ item.0.address | regex_replace('\\d+$', '0') }}{{ item.0.netmask }}"
     proto: tcp
   loop: "{{ iptables_allow_ssh_inbound | product(firewall_allowed_ports) | list }}"
   notify: restart_ufw
@@ -43,6 +39,8 @@
     rule: allow
     interface: "{{ item }}"
     direction: in
+    proto: tcp
+    port: 22
   loop: "{{ firewall_internal_interfaces }}"
   notify: restart_ufw
   become: true

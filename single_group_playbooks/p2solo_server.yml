@@ -11,11 +11,11 @@
   roles:
     - firewall
     - ssh
-#    - locale needed???
+#    - locale needed?
     - logrotate
-    - remove
-#    - update #aanpassen voor Debian/ubuntu
-    - sshd #update ?
+#    - remove ? leave default?
+#    - update #aanpassen voor Debian/ubuntu, or manual update on machine?
+    - sshd
     - basic_security
 #    - p2solo_server
 ...
