@@ -17,5 +17,7 @@
 #    - update #aanpassen voor Debian/ubuntu, or manual update on machine?
     - sshd
     - basic_security
+#    - role: logs_client
+#      when: cluster_class is defined
 #    - p2solo_server
 ...
