@@ -9,6 +9,8 @@
   hosts:
     - p2solo_server
   roles:
+    - static_hostname_lookup
+#    - ssh_host_signer
     - firewall
     - ssh
 #    - locale needed?
