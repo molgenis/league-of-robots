@@ -13,6 +13,7 @@ stack_networks:
       next-hop-address: '10.10.1.1'
       external_network: external
     create: true
+    mtu_size: '1450'
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
