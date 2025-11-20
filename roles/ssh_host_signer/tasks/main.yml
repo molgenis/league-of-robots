@@ -19,8 +19,8 @@
     mode: "{{ item.mode }}"
   loop:
     - filename: ssh_host_rsa_key
-      group: ssh_keys
-      mode: '0640'
+      group: "{{ 'ssh_keys' if ansible_os_family == 'RedHat' else 'root' }}"
+      mode: '0600'
     - filename: ssh_host_rsa_key.pub
       group: root
       mode: '0644'

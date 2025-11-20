@@ -13,8 +13,8 @@
 - name: Configure systemd.
   ansible.builtin.include_tasks: systemd.yml
   when:
-    - ansible_facts['os_family'] in ["RedHat", "Debian"]
-    - ( ansible_facts['distribution_major_version'] | int ) >= 8
+    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 ) or
+      (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 
 - name: Configure sysctl.
   ansible.builtin.include_tasks: sysctl.yml
