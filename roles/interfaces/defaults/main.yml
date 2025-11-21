@@ -5,4 +5,4 @@ network_device_file_prefix: 'ifcfg-'
 # https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
 # Do not set a default yet as that may break older machines.
 #
-#enable_predictable_network_interface_names: true
+# enable_predictable_network_interface_names: true
