@@ -1,0 +1,10 @@
+---
+# tasks/main.yml for p2solo
+
+- name: Disable automatic updates
+  include_tasks: disable-autoupdate.yml
+
+#DISABLED
+- name: Run backup MinKNOW installation procedure
+  include_tasks: standalone-minknow.yml
+  when: minknow_backup_install | default(false)

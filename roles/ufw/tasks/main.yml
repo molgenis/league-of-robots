@@ -1,6 +1,6 @@
 ---
 - name: Ensure UFW is installed
-  apt:
+  ansible.builtin.apt:
     name: ufw
     state: present
     update_cache: yes
@@ -8,7 +8,7 @@
 
 # UFW does NOT break existing established connections.
 - name: Reset UFW configuration
-  command: ufw --force reset
+  ansible.builtin.command: ufw --force reset
   changed_when: false
   become: true
 
@@ -19,13 +19,13 @@
   become: true
 
 - name: Set outgoing policy
-  ufw:
+  community.general.ufw:
     direction: outgoing
     policy: allow
   become: true
 
 - name: Allow tcp from specific IPs and ports
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "{{ item.1 }}"
     interface: "{{ item.2 | string}}"
@@ -37,7 +37,7 @@
   become: true
 
 - name: Enable UFW (if not already)
-  ufw:
+  community.general.ufw:
     state: enabled
     logging: 'on'
   become: true

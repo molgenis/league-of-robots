@@ -7,24 +7,10 @@
     msg: 'This role requires Ubun version >= 24.x'
   when: ansible_facts['os_family'] != "Debian"
 
-- name: 'Install selinux.'
-  ansible.builtin.package:
-    state: latest
-    update_cache: true
-    name:
-      - selinux-basics
-      - apparmor-utils
-      - selinux-policy-default 
-      - auditd
-
-- name: 'Set AppArmor profiles to complain mode (like permissive)'
-  command: aa-complain /etc/apparmor.d/*
-  become: true
-  when: ansible_facts['os_family'] == "Debian"
-
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: yes
+  become: true
 
 - name: 'Install extra RPMs.'
   ansible.builtin.package:
@@ -51,10 +37,12 @@
       Components: non-free
       Signed-By: /etc/apt/keyrings/nanoporetech.asc
     mode: '0644'
+  become: true
 
 - name: Update apt cache after adding repo
   ansible.builtin.apt:
     update_cache: yes
+  become: true
 
 - name: Install ont-standalone-minknow-release
   ansible.builtin.apt:

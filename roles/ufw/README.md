@@ -1,7 +1,6 @@
-# Firewall Role (Ubuntu + optional iptables inclusion)
+# UFW Role (Ubuntu/Debian )
 
-This Ansible role secures an Ubuntu server using **UFW**.  
-It can also **include an iptables  role** when running on RedHat-based systems (e.g., Rocky 9).
+This Ansible role secures an Ubuntu/Debian server using **UFW**.  
 
 ### Features
 

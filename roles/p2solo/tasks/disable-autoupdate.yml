@@ -1,0 +1,60 @@
+---
+# Disable periodic APT tasks
+- name: Disable APT periodic automatic updates
+  copy:
+    dest: /etc/apt/apt.conf.d/10periodic
+    content: |
+      APT::Periodic::Update-Package-Lists "0";
+      APT::Periodic::Download-Upgradeable-Packages "0";
+      APT::Periodic::AutocleanInterval "0";
+      APT::Periodic::Unattended-Upgrade "0";
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - stop unattended-upgrades service
+    - stop unattended-upgrades timer
+    - stop apt-daily services
+  become: true
+
+# Mask and disable unattended-upgrades systemd units
+- name: Mask and disable unattended-upgrades services
+  systemd:
+    name: "{{ item }}"
+    enabled: false
+    masked: true
+  loop:
+    - unattended-upgrades.service
+    - unattended-upgrades.timer
+  become: true
+
+# Mask and disable apt-daily & apt-daily-upgrade units
+- name: Mask and disable apt-daily and apt-daily-upgrade timers/services
+  systemd:
+    name: "{{ item }}"
+    enabled: false
+    masked: true
+  loop:
+    - apt-daily.timer
+    - apt-daily.service
+    - apt-daily-upgrade.timer
+    - apt-daily-upgrade.service
+  notify:
+    - stop apt-daily services
+  become: true
+
+# Keep update MOTD visible
+- name: Ensure update MOTD messages remain executable
+  file:
+    path: /etc/update-motd.d/90-updates-available
+    mode: "0755"
+  become: true
+
+# Keep release notifications enabled
+- name: Ensure release notifications stay enabled
+  lineinfile:
+    path: /etc/update-manager/release-upgrades
+    regexp: '^Prompt='
+    line: 'Prompt=normal'
+    create: false
+  become: true

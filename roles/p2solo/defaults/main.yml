@@ -6,3 +6,6 @@ generic_deps:
   - wget
   - nano
   - rsync
+
+#only for testing
+minknow_backup_install: false

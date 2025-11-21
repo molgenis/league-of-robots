@@ -1,0 +1,20 @@
+---
+- name: stop unattended-upgrades service
+  systemd:
+    name: unattended-upgrades.service
+    state: stopped
+
+- name: stop unattended-upgrades timer
+  systemd:
+    name: unattended-upgrades.timer
+    state: stopped
+
+- name: stop apt-daily services
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+  loop:
+    - apt-daily.service
+    - apt-daily.timer
+    - apt-daily-upgrade.service
+    - apt-daily-upgrade.timer
