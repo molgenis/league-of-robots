@@ -131,7 +131,11 @@ stack_networks:
 security_group_mods:
   - name: "{{ stack_prefix }}_storage"
     allow_ingress:
-      - '192.168.1.0/24'
+      - '192.168.1.0/24'  # private vlan990 for lab equipment.
+  - name: "{{ stack_prefix }}_cluster"
+    allow_ingress:
+      - "{{ betabarrel_cluster.ip_addresses['bb-dragen']['vlan1336']['address'] }}{{ betabarrel_cluster.ip_addresses['bb-dragen']['vlan1336']['netmask'] }}"
+      - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['netmask'] }}"
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
