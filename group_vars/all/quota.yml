@@ -201,14 +201,14 @@ lfs_quota:
     quota_limits:  # All values in GB.
       umcg-as: 1024
       umcg-atd: 5120
-      umcg-biogen: 66560
+      umcg-biogen: 63488
       umcg-bionic-mdd-gwama: 1024
       umcg-bios: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
       umcg-endocrinology: 2048
       umcg-erdera: 11264
-      umcg-fg: 7168
+      umcg-fg: 10240
       umcg-franke-scrna: 14336
       umcg-fu: 2048
       umcg-gap: 1024
