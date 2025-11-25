@@ -1,0 +1,65 @@
+---
+- name: Create /etc/ssh/ssh_config.d/ dir.
+  ansible.builtin.file:
+    path: /etc/ssh/ssh_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - ssh_client_settings_for_external_stack['ssh_client_jumphosts'] is defined
+    - ssh_client_settings_for_external_stack['ssh_client_jumphosts'] is not none
+    - ssh_client_settings_for_external_stack['ssh_client_jumphosts'] | default('') | length >= 1
+  become: true
+
+- name: Find all stacks directories
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/group_vars/"
+    file_type: directory
+    recurse: false
+  register: all_groups_dirs
+  connection: local
+  run_once: true
+
+- set_fact:
+    all_stacks_dirs: "{{ all_groups_dirs.files | map(attribute='path') | map('basename') | reject('in', ['template', 'all']) | list }}"
+
+- name: Find all ssh_client_settings.yml files
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/group_vars/{{ item }}"
+    patterns: "ssh_client_settings.yml"
+    recurse: true
+  loop: "{{ all_stacks_dirs }}"
+  register: all_ssh_client_configs
+  connection: local
+  run_once: true
+
+- name: Extract all found file paths into a single list
+  ansible.builtin.set_fact:
+    all_found_paths: "{{ all_ssh_client_configs.results | json_query('[*].files[*].path') }}"
+
+- name: Initialize variable
+  ansible.builtin.set_fact:
+    all_CAs: []
+
+- name: Configure ssh client for all external stacks.
+  ansible.builtin.include_tasks:
+    file: collect_stack_info_create_ssh_configs.yml
+  loop: "{{ all_found_paths }}"
+  vars:
+    each_ssh_config: "{{ item | regex_search('(group_vars\/.*\\.yml)', '\\1') | first }}"
+    each_stack: "{{  item | regex_search('group_vars\/(.*)\/ssh_client_settings.yml', '\\1') | first }}"
+  when: item | length > 0
+
+- name: All public CAs into /etc/ssh/ssh_known_hosts file
+  ansible.builtin.blockinfile:
+    path: /etc/ssh/ssh_known_hosts_test
+    marker: "## {mark} ANSIBLE MANAGED BLOCK - DO NOT CHANGE IT"
+    insertafter: EOF
+    block: |
+      {%- for ca in all_CAs | sort %}
+      {{ ca }}
+      {% endfor %}
+    create: true
+  become: true
+...
