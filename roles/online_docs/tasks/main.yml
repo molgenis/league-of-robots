@@ -108,35 +108,23 @@
     - 'restart_httpd'
   become: true
 
-#
-# The *.pem file with crt as well as key must be copied to the server manually.
-#
-- name: 'Check if *.gcc.rug.nl wildcard certificate was installed on server.'
-  ansible.builtin.file:
-    path: '/etc/pki/tls/private/wildcard_crt_and_key.pem'
-    state: 'file'
-    owner: 'root'
-    group: 'root'
-    mode: '0600'
-  notify:
-    - 'restart_httpd'
-  become: true
-
-- name: 'Create symlinks for Apache httpd, so it can find the cert & key in the *.gcc.rug.nl wildcard certificate file.'
-  ansible.builtin.file:  # noqa risky-file-permissions
+- name: 'Install the private key, certificate and chain files.'
+  ansible.builtin.copy:  # noqa risky-file-permissions
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    state: 'link'
+    mode: "{{ item.mode }}"
     owner: 'root'
     group: 'root'
-    force: true
   loop:
     - dest: '/etc/pki/tls/private/localhost.key'
-      src: '/etc/pki/tls/private/wildcard_crt_and_key.pem'
+      src: "{{ https_private_key_file }}"
+      mode: '0600'
     - dest: '/etc/pki/tls/certs/localhost.crt'
-      src: '/etc/pki/tls/private/wildcard_crt_and_key.pem'
+      src: "{{ https_certificate_file }}"
+      mode: '0640'
     - dest: '/etc/pki/tls/certs/server-chain.crt'
-      src: '/etc/pki/tls/private/wildcard_crt_and_key.pem'
+      src: "{{ https_chain_file }}"
+      mode: '0640'
   loop_control:
     label: "{{ item.dest }} -> {{ item.src }}"
   notify:

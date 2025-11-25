@@ -35,4 +35,8 @@ iptables_allow_http_inbound:
   - ANY
 iptables_allow_https_inbound:
   - ANY
+fqdn: docs.gcc.rug.nl
+https_certificate_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.pem"
+https_private_key_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.key"
+https_chain_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/HARICA-GEANT-TLS-ECC-Certificate-bundle.pem"
 ...
