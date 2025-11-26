@@ -1,5 +1,5 @@
 ---
-- name: Include variable
+- name: "Collect variables from {{ playbook_dir }}/{{ each_ssh_config }}"
   ansible.builtin.include_vars:
     file: "{{ playbook_dir }}/{{ each_ssh_config }}"
     name: ssh_client_settings_for_external_stack
@@ -7,13 +7,16 @@
   connection: local
   run_once: true
 
-- name: Add this key to all_CAs
+- name: Add CA public key to list of all public CA keys
   ansible.builtin.set_fact:
     all_CAs: "{{ all_CAs | default([]) + [ ssh_client_settings_for_external_stack['ssh_client_known_hosts'] ] }}"
+  when:
+    - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] is defined
+    - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] is not none
+    - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] | default('') | length >= 1
   delegate_to: localhost
   connection: local
   run_once: true
-
 
 - name: "Create /etc/ssh/ssh_config.d/{{ each_stack }}.conf config file."
   ansible.builtin.template:
