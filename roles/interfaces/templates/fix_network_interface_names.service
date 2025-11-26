@@ -1,9 +1,9 @@
 [Unit]
 Description=Fix network interface names using udev rules.
 
-Requires=network-online.target
-After=network-online.target
-Before=lnet.service
+Wants=systemd-udevd.service network-pre.target
+After=systemd-udevd.service
+Before=network-pre.target
 
 [Service]
 Type=oneshot
@@ -11,4 +11,4 @@ RemainAfterExit=false
 ExecStart=/usr/local/sbin/fix_network_interface_names
 
 [Install]
-WantedBy=multi-user.target remote-fs-pre.target
+WantedBy=network.target
