@@ -23,7 +23,7 @@
   become: true
 
 #
-# Remove /etc/udev/rules.d/70-persistent-net.rules to make sure our new rules apply
+# Remove custom /etc/udev/rules.d/70-persistent-net.rules to make sure our new rules apply
 # and interfaces are not stuck on an old name based on a broken rule.
 # File content example with bad slot-based interface names linked tp specific MAC addresses:
 #     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fa:16:3e:1d:d9:9a", NAME="ens3"
@@ -40,12 +40,31 @@
   become: true
 
 #
-# Remove 80-net-name-slot.rules, which is sometimes a symlink to /dev/null and used to disable the rules.
+# Remove custom /etc/udev/rules.d/80-net-name-slot.rules, which is sometimes a symlink to /dev/null
+# and used to disable the rules from the standard /usr/lib/udev/rules.d/80-net-name-slot.rules.
 #
 - name: Delete /etc/udev/rules.d/80-net-name-slot.rules.
   ansible.builtin.file:
     path: /etc/udev/rules.d/80-net-name-slot.rules
     state: absent
+  notify:
+    - reboot_to_activate_changed_network_config
+  become: true
+
+#
+# Create custom /etc/udev/rules.d/60-net.rules symlink to /dev/null
+# to disable the standard /usr/lib/udev/rules.d/60-net.rules
+# and prevent fetching device names from /etc/sysconfig/network-scripts/ifcfg-* config files,
+# which may conflict withe the predictable network interface names from /lib/udev/rules.d/75-net-description.rules.
+#
+- name: 'Create /etc/udev/rules.d/60-net.rules -> /dev/null symlink to disable device names from ifcfg-* config files.'
+  ansible.builtin.file:  # noqa risky-file-permissions
+    src: /dev/null
+    dest: /etc/udev/rules.d/60-net.rules
+    state: link
+    owner: root
+    group: root
+    force: true
   notify:
     - reboot_to_activate_changed_network_config
   become: true
@@ -151,7 +170,7 @@
   when:
     - "'net.ifnames' in search_net_ifnames_in_grub_config['stdout']"
   notify:
-    - rebuild_grub_config
+    - rebuild_grub_config_by_interfaces_role
     - reboot_to_activate_changed_network_config
   become: true
 
@@ -167,7 +186,7 @@
     mode: '0644'
   when: "'net.ifnames' not in search_net_ifnames_in_grub_config['stdout']"
   notify:
-    - rebuild_grub_config
+    - rebuild_grub_config_by_interfaces_role
     - reboot_to_activate_changed_network_config
   become: true
 
@@ -178,7 +197,7 @@
   changed_when: search_net_ifnames_in_kernel_params['rc'] == 1
   failed_when: search_net_ifnames_in_kernel_params['rc'] >= 2
   notify:
-    - rebuild_grub_config
+    - rebuild_grub_config_by_interfaces_role
     - reboot_to_activate_changed_network_config
 
 - name: Flush handlers.
