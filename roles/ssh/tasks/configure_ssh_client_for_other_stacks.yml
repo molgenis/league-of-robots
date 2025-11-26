@@ -43,7 +43,7 @@
   ansible.builtin.set_fact:
     all_CAs: []
 
-- name: Configure ssh client for all external stacks
+- name: Configure ssh client configuration for every stack
   ansible.builtin.include_tasks:
     file: collect_stack_info_create_ssh_configs.yml
   loop: "{{ all_found_paths }}"
