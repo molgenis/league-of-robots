@@ -34,7 +34,5 @@
     external_stack: "{{ item }}"
   when:
     - ssh_client_configs is defined
-    - inventory_hostname in groups['jumphost'] | default([]) or
-      inventory_hostname in groups['cluster'] | default([])
   loop: "{{ ssh_client_configs }}"
 ...
