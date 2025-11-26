@@ -13,11 +13,11 @@
     executable: '/bin/bash'
   changed_when: true
   become: true
-  listen: rebuild_grub_config
+  listen: rebuild_grub_config_by_logins_role
 
 - name: 'Reboot to activate updated GRUB config.'
   ansible.builtin.reboot:
     msg: 'Reboot initiated by Ansible "logins" role from League of Robots playbook/repo.'
   become: true
-  listen: rebuild_grub_config
+  listen: rebuild_grub_config_by_logins_role
 ...
