@@ -61,8 +61,11 @@
   register: remote_ssh_conf_paths
   become: true
 
-- name: Make a filename list of remote LoR configs
-  ansible.builtin.set_fact:
+- name: Remove outdated /etc/ssh/ssh_config.d/*.LoR.conf files
+  ansible.builtin.file:
+    path: "/etc/ssh/ssh_config.d/{{ item }}"
+    state: absent
+  vars:
     remote_ssh_confs: "{{ remote_ssh_conf_paths.files | map(attribute='path') | map('basename') | list }}"
     local_ssh_configs_formatted: "{{ local_ssh_configs_paths
         | flatten
@@ -70,16 +73,7 @@
         | map('regex_replace', '/ssh_client_settings.yml$', '')
         | map('regex_replace', '$', '.LoR.conf')
         | list }}"
-
-- name: Create list of remote .LoR.conf files to be removed
-  ansible.builtin.set_fact:
-    remote_remove_ssh_confs: "{{ remote_ssh_confs | difference(local_ssh_configs_formatted) }}"
-
-- name: Remove .LoR.conf files
-  ansible.builtin.file:
-    path: "/etc/ssh/ssh_config.d/{{ item }}"
-    state: absent
-  loop: "{{ remote_remove_ssh_confs }}"
+  loop: "{{ remote_ssh_confs | difference(local_ssh_configs_formatted) }}"
   become: true
 
 - name: Deploy a block of all public CAs into /etc/ssh/ssh_known_hosts file
