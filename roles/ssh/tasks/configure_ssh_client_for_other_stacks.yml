@@ -53,7 +53,7 @@
     each_stack: "{{  item | regex_search('group_vars\/(.*)\/ssh_client_settings.yml', '\\1') | first }}"
   when: item | length > 0
 
-- name: Find matching files
+- name: Find /etc/ssh/ssh_config.d/*.LoR.conf files
   ansible.builtin.find:
     paths: "/etc/ssh/ssh_config.d/"
     file_type: file
