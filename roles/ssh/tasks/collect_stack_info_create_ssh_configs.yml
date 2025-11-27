@@ -21,7 +21,7 @@
 - name: "Create /etc/ssh/ssh_config.d/{{ each_stack }}.conf config file."
   ansible.builtin.template:
     src: ssh_client_config.j2
-    dest: "/etc/ssh/ssh_config.d/{{ each_stack }}.conf"
+    dest: "/etc/ssh/ssh_config.d/{{ each_stack }}.LoR.conf"
     owner: root
     group: root
     mode: '0644'
