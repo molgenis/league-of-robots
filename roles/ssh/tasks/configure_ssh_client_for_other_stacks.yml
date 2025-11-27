@@ -22,7 +22,7 @@
   run_once: true
 
 - name: Extract directory name, except 'all' and 'template'
-  set_fact:
+  ansible.builtin.set_fact:
     all_stacks_names: "{{ all_groups_dirs.files | map(attribute='path') | map('basename') | reject('in', ['template', 'all']) | list }}"
 
 - name: Find files names ssh_client_settings.yml inside those directories
@@ -35,15 +35,12 @@
   connection: local
   run_once: true
 
-- name: Extract all found files into a list of paths
+- name: Configure variables
   ansible.builtin.set_fact:
     local_ssh_configs_paths: "{{ local_ssh_client_configs.results | json_query('[*].files[*].path') }}"
+    public_certificate_authorities: []
 
-- name: Generate a collective variable that will hold all public CAs
-  ansible.builtin.set_fact:
-    all_CAs: []
-
-- name: Configure ssh client configuration for every stack
+- name: Iterate over every stack and configure ssh client
   ansible.builtin.include_tasks:
     file: collect_stack_info_create_ssh_configs.yml
   loop: "{{ local_ssh_configs_paths }}"
@@ -55,7 +52,7 @@
   when: item | length > 0
 
 - name: Find matching files
-  find:
+  ansible.builtin.find:
     paths: "/etc/ssh/ssh_config.d/"
     file_type: file
     patterns: "*.LoR.conf"
@@ -63,34 +60,18 @@
   become: true
 
 - name: Make a filename list of remote LoR configs
-  set_fact:
+  ansible.builtin.set_fact:
     remote_ssh_confs: "{{ remote_ssh_conf_paths.files | map(attribute='path') | map('basename') | list }}"
+    local_ssh_configs_formatted: "{{ local_ssh_configs_paths
+        | flatten
+        | map('regex_replace', '^.*group_vars/', '')
+        | map('regex_replace', '/ssh_client_settings.yml$', '')
+        | map('regex_replace', '$', '.LoR.conf')
+        | list }}"
 
-# - name: Local ssh config paths without 'group_vars' and 'ssh_client_settings.yml' plus appended .LoR.conf
-#   debug:
-#     msg: "{{ item }}"
-#   loop: "{{local_ssh_configs_paths | flatten | map('regex_replace', '^.*group_vars\/','') | map('regex_replace', '\/ssh_client_settings.yml$', '') | map('regex_replace', '$', '.LoR.conf') | list }}"
-
-- name: Create list of items to be removed
-  set_fact:
-    remote_remove_ssh_confs: "{{ remote_ssh_confs | difference(local_ssh_configs_paths | flatten | map('regex_replace', '^.*group_vars\/','') | map('regex_replace', '\/ssh_client_settings.yml$', '') | map('regex_replace', '$', '.LoR.conf') | list) }}"
-
-
-# - name: remote_ssh_confs
-#   debug:
-#     msg: "{{ item }}"
-#   loop: "{{ remote_ssh_confs }}"
-#
-# - name: Local ssh config paths
-#   debug:
-#     msg: "{{ item }}"
-#   loop: "{{ local_ssh_configs_paths | flatten | map('regex_replace', '^.*group_vars\/','') | map('regex_replace', '\/ssh_client_settings.yml$', '') | map('regex_replace', '$', '.LoR.conf') | list }}"
-#
-
-- name: Remote remove ssh confs
-  debug:
-    msg: "{{ item }}"
-  loop: "{{ remote_remove_ssh_confs }}"
+- name: Create list of remote .LoR.conf files to be removed
+  ansible.builtin.set_fact:
+    remote_remove_ssh_confs: "{{ remote_ssh_confs | difference(local_ssh_configs_formatted) }}"
 
 - name: Remove .LoR.conf files
   ansible.builtin.file:
@@ -104,8 +85,9 @@
     path: /etc/ssh/ssh_known_hosts
     marker: "## {mark} ANSIBLE MANAGED BLOCK - DO NOT CHANGE IT ##"
     insertafter: EOF
+    mode: '0644'
     block: |
-      {% for ca in all_CAs | sort %}
+      {% for ca in public_certificate_authorities | sort %}
       {{ ca }}
       {% endfor %}
     create: true

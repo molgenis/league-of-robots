@@ -9,7 +9,7 @@
 
 - name: Add CA public key to list of all public CA keys
   ansible.builtin.set_fact:
-    all_CAs: "{{ all_CAs | default([]) + [ ssh_client_settings_for_external_stack['ssh_client_known_hosts'] ] }}"
+    public_certificate_authorities: "{{ public_certificate_authorities | default([]) + [ssh_client_settings_for_external_stack['ssh_client_known_hosts']] }}"
   when:
     - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] is defined
     - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] is not none
