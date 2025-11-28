@@ -1,0 +1,18 @@
+---
+# intall generic_deps
+- name: 'Check OS version of target host.'
+  ansible.builtin.fail:
+    msg: 'This role requires Ubuntu version >= 24.x'
+  when: ansible_facts['os_family'] != "Debian"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+
+- name: 'Install extra RPMs.'
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+    name: "{{ generic_deps | default([]) }}"
+  become: true

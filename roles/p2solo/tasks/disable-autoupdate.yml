@@ -41,6 +41,7 @@
     - apt-daily-upgrade.service
   notify:
     - stop apt-daily services
+  failed_when: false
   become: true
 
 # Keep update MOTD visible

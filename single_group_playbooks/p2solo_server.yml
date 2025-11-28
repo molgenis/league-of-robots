@@ -7,12 +7,13 @@
     - p2solo_server
   roles:
     - static_hostname_lookup
+    - p2solo
     - ufw
     - ssh #is skipped
     - logrotate
     - sshd
     - basic_security
-    - p2solo
+#    - p2solo
 #    - role: logs_client of logs_toprm?
 #      when: cluster_class is defined
 ...

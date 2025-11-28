@@ -1,14 +1,4 @@
 ---
-- name: Show OS family
-  debug:
-    msg: "OS Family: {{ ansible_facts['os_family'] }}"
-
-- debug:
-    msg:
-      - "os_distribution = {{ os_distribution }}"
-      - "ansible_distribution = {{ ansible_distribution }}"
-      - "distribution_major_version = {{ ansible_facts['distribution_major_version'] }}"
-
 - name: Check if system has /etc/pam.d/sshd
   ansible.builtin.stat:
     path: /etc/pam.d/sshd
@@ -76,8 +66,8 @@
   notify: update-crypto-policies
   become: true
   when:
-    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 ) or
-      (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
+    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 )
+#    or (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 #
 # Find all subpolicy files: The result should contain all the sub policy files we just deployed,
 # but may also contain additional sub policy files added by for example a security update.

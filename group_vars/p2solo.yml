@@ -8,7 +8,9 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['umcg']['basiswerkplek'] }}"
   - "{{ all.ip_addresses['umcg']['win10vdi'] }}"
   - "{{ all.ip_addresses['umcg']['net4'] }}"
-  - { 'address': '127.0.0.1', 'netmask': '/24', 'desc': 'localhost' }
+  - "{{ talos_cluster.ip_addresses['reception']['vlan1337'] }}"
+  - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
+  - { 'address': '127.0.0.1', 'netmask': '/24', 'desc': 'admin vm' }
   - { 'address': '192.168.64.1', 'netmask': '/24', 'desc': 'admin vm' }
 
 iptables_allow_ssh_inbound:
@@ -17,5 +19,7 @@ iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['basiswerkplek'] }}"
   - "{{ all.ip_addresses['umcg']['win10vdi'] }}"
   - "{{ all.ip_addresses['umcg']['net4'] }}"
-  - { 'address': '127.0.0.1', 'netmask': '/24', 'desc': 'localhost' }
+  - "{{ talos_cluster.ip_addresses['reception']['vlan1337'] }}"
+  - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
+  - { 'address': '127.0.0.1', 'netmask': '/24', 'desc': 'admin vm' }
   - { 'address': '192.168.64.1', 'netmask': '/24', 'desc': 'admin vm' }

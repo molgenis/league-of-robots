@@ -2,7 +2,7 @@
 ip_addresses:
   p2solo_server:
     external:
-      address: 192.168.64.2
+      address: 192.168.64.7
       netmask: /32
-      fqdn: '192.168.64.2'
+      fqdn: '192.168.64.7'
 ...

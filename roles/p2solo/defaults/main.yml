@@ -6,6 +6,7 @@ generic_deps:
   - wget
   - nano
   - rsync
+  - openssh-server
 
 #only for testing
 minknow_backup_install: false

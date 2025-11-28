@@ -1,10 +1,13 @@
 ---
-# tasks/main.yml for p2solo
+# Install generic_deps
+- name: Install generic_deps
+  ansible.builtin.include_tasks: install-generic_deps.yml
 
+# disable automatic updates
 - name: Disable automatic updates
-  include_tasks: disable-autoupdate.yml
+  ansible.builtin.include_tasks: disable-autoupdate.yml
 
-#DISABLED
+#DISABLED by defeault, istall MinKNOW
 - name: Run backup MinKNOW installation procedure
-  include_tasks: standalone-minknow.yml
+  ansible.builtin.include_tasks: standalone-minknow.yml
   when: minknow_backup_install | default(false)

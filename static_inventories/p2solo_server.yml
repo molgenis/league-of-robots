@@ -3,12 +3,19 @@ all:
   children:
     openstack_api:
       hosts:
+        localhost:
+          ansible_python_interpreter: /usr/bin/env python
     p2solo:
       hosts:
         p2solo:
-          host: 192.168.64.2
-          ansible_host: 192.168.64.2
-            
+          host: 192.168.64.8
+          ansible_host: 192.168.64.8
+          cloud_flavor: hpc.v1.vm.1-2-20
+          cloud_image: ubuntu-24.04-noble
+          host_networks:
+            - name: vlan1337
+              security_group: "talos_cluster"
+              add_hostname_to_ip_address: true
 p2solo_server:
   children:
     openstack_api:
