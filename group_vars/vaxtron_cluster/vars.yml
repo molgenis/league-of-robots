@@ -204,6 +204,7 @@ remote_archive:
       - 'umcg-biogen'
       - 'umcg-bios'
       - 'umcg-fg'
+      - 'umcg-franke-scrna'
     archive_user: 'pdeelen'
     archive_system: 'archive.surfsara.nl'
     archive_system_fingerprints:
