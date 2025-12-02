@@ -55,7 +55,7 @@ nmcli device status
 nmstatectl show [device]
 ```
 
-### udev & systemd
+### udev & systemd: Predictable Network Interface Names
 
 > systemd/udev will automatically assign predictable, stable network interface names for all local Ethernet, WLAN and WWAN interfaces.
 
@@ -112,10 +112,11 @@ When `enable_predictable_network_interface_names` is undefined, this role will s
 
 Switching `enable_predictable_network_interface_names` for an already running machine from `true` to `false` or vice versa,
 will modify the `net.ifnames` kernel boot parameter in the GRUB bootloader config,
-followed by rebuilding the kernel image and rebooting the machine.
-IMPORTANT: this may break other services like `lnet` for Lustre or `iptables` to configure a firewall
-and which use network interface names in their configs. In the worst case scenario you may have locked yourself out of 
-the machine after reboot, because the firewall is not configured to allow traffic to the new network interface name.
+followed by rebuilding the kernel image and rebooting the machine.  
+**IMPORTANT: this may break other services** like `lnet` for Lustre or `iptables` to configure a firewall
+and which use network interface names in their configs.
+**In the worst case scenario you may have locked yourself out of the machine after reboot**,
+because the firewall is not configured to allow traffic to the new network interface name.
 
 ### cloud-init
 
