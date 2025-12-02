@@ -9,26 +9,33 @@ On Enterprise Linux these tools all try to fiddle with network settings and it c
 Network Manager kind of works, but do not try to use the `nmtui` text based User Interface nor any GUI.
 Use the `nmcli` command line interface instead.
 By default NetworkManager creates _connections_ for network _devices_ using problematic names.
-E.g. `System wired 1`: such _connection_ names are confusing and handling in code is problematic due to the spaces in the names. 
+E.g. `System wired 1`: such _connection_ names are confusing and handling in code is problematic due to the spaces in the names.
 Network Manager also has a habit of creating yet another _connection_ instead of modifying the existing one
 when you try to change/update something.
 
-Therefore we use [nmstate](https://nmstate.io/) and its command line tool `nmstatectl` to control Network Manager. 
+Therefore we use [nmstate](https://nmstate.io/) and its command line tool `nmstatectl` to control Network Manager.
 The network interface config files used by `nmstate` are stored in
+
 ```
 /etc/nmstate/*.yml
 ```
+
 When such a `*.yml` is deployed successfully with
+
 ```
 nmstatectl apply /etc/nmstate/natwork_name.yml
 ```
+
 it will result in a corresponding
+
 ```
 nmstatectl apply /etc/nmstate/natwork_name.applied
 ```
+
 and `nmstatectl` will refuse to apply the `*.yml` again unless the corresponding `*.applied` is removed first.
 
 To check the current state of the network connections and devices:
+
 ```
 #
 # List all network connections using Network Manager.
@@ -79,9 +86,11 @@ The exec summary:
    even when no interfaces were added nor removed: network interface names may be even less predictable then before.
 
 We use a patched list (of precedence) of `udev` _rules_:
+
 ```
 NamePolicy=kernel database onboard path slot
 ```
+
 * `slot` based naming rules changed several times and are less stable than `path` based rules.
   Therefore we prefer `path` based naming over `slot` based naming.
 * `keep` was removed, because it is problematic when trying to enforce a custom set of naming rules.
@@ -91,17 +100,22 @@ NamePolicy=kernel database onboard path slot
 * `mac` is not used because it the most unpredictable making it impossible to predict the name of interfaces
   for machines of the same generation of hardware when the config for the first machine is known.
 
-This functionality to generate predictable network interface names is the future and therefore the default,
-but for the time being it can be disabled by setting
-```yaml
-enable_predictable_network_interface_names: false
-```
-for a the complete stack in `group_vars/{{ stack_name }}/vars.yml`
-or for specific machines in `static_inventory/{{ stack_name }}.yml`.
+This functionality to generate predictable network interface names is the future,
+but to prevent breaking already deployed machines, which may or may not already use predictable network interface names,
+there is no default defined.
+In order to explicitly enable or explicitly disable predictable network interface names,
+the `enable_predictable_network_interface_names` variable must be set to either `true` or `false`
+* in `group_vars/{{ stack_name }}/vars.yml` for a the complete stack or
+* in `static_inventory/{{ stack_name }}.yml` for specific machines.
+
+When `enable_predictable_network_interface_names` is undefined, this role will skip configuration of how network interfaces should be named.
 
 Switching `enable_predictable_network_interface_names` for an already running machine from `true` to `false` or vice versa,
 will modify the `net.ifnames` kernel boot parameter in the GRUB bootloader config,
-followed by rebuilding the kernel images and rebooting the machine.
+followed by rebuilding the kernel image and rebooting the machine.
+IMPORTANT: this may break other services like `lnet` for Lustre or `iptables` to configure a firewall
+and which use network interface names in their configs. In the worst case scenario you may have locked yourself out of 
+the machine after reboot, because the firewall is not configured to allow traffic to the new network interface name.
 
 ### cloud-init
 
@@ -119,6 +133,7 @@ and once we can deploy this role we use it to disable network configuration by _
 
 Configure all networks used by the stack in `group_vars/{{ stack_name }}/vars.yml`;
 Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here:
+
 ```yaml
 stack_networks:
   - name: string
@@ -135,7 +150,9 @@ security_group_mods:
       - ip/mask  # External machines not part of this stack that need to communicate with machines in this stack
                  # and which need to be added to the OpenStack security group rules for this network to allow network traffic.
 ```
+
 Example for the Talos test cluster:
+
 ```yaml
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
@@ -163,6 +180,7 @@ security_group_mods:
 ```
 
 Configure which network to use and on which interface per machine in `static_inventory/{{ stack_name }}.yml`:
+
 ```yaml
 ---
 all:
@@ -228,6 +246,7 @@ all:
 ```
 
 Example with subset of machines for the Talos test cluster:
+
 ```yaml
 ---
 all:
