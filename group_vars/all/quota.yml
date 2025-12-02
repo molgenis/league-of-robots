@@ -9,7 +9,7 @@ lfs_quota:
       umcg-dag3: 1024
       umcg-datateam: 1024
       umcg-erdera: 2048
-      umcg-fg: 11264
+      umcg-fg: 2048
       umcg-franke-scrna: 1024
       umcg-fu: 2048
       umcg-gaf: 22528
@@ -59,7 +59,7 @@ lfs_quota:
       umcg-dag3: 3072
       umcg-datateam: 1024
       umcg-endocrinology: 1024
-      umcg-fg: 3072
+      umcg-fg: 4096
       umcg-franke-scrna: 1024
       umcg-fu: 2048
       umcg-gaf: 15360
