@@ -57,10 +57,10 @@ ldap_domains:
     group_member: member
     create_ldap: true
     # ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
-cloud_image: RockyLinux-9.3_xfs 
+cloud_image: Rocky-9.6
 local_volume_size_root: 22
-cloud_user: centos
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
