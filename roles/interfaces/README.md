@@ -112,7 +112,7 @@ When `enable_predictable_network_interface_names` is undefined, this role will s
 
 Switching `enable_predictable_network_interface_names` for an already running machine from `true` to `false` or vice versa,
 will modify the `net.ifnames` kernel boot parameter in the GRUB bootloader config,
-followed by rebuilding the kernel image and rebooting the machine.  
+followed by rebuilding the GRUB bootloader entries and rebooting the machine.  
 **IMPORTANT: this may break other services** like `lnet` for Lustre or `iptables` to configure a firewall
 and which use network interface names in their configs.
 **In the worst case scenario you may have locked yourself out of the machine after reboot**,
