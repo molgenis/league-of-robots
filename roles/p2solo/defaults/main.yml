@@ -10,3 +10,4 @@ generic_deps:
 
 #only for testing
 minknow_backup_install: false
+...

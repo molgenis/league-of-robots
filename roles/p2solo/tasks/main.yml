@@ -11,3 +11,4 @@
 - name: Run backup MinKNOW installation procedure
   ansible.builtin.include_tasks: standalone-minknow.yml
   when: minknow_backup_install | default(false)
+...
