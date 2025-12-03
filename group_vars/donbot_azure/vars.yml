@@ -5,8 +5,8 @@ stack_name: "{{ stack_domain }}_azure"  # stack_name must match the name of the 
 repo_manager: 'none'
 os_distribution: 'rocky9'
 azure_networks:
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.10.1.0/24'
+  - name: "{{ stack_prefix }}_external"
+    cidr: '6.6.6.0/24'
     create: true
 azure_image:
   rocky9:

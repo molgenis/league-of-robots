@@ -56,14 +56,29 @@ all:
           iptables_allow_ldap_inbound: "{{ iptables_allow_ssh_inbound }}"
           perun_facility_name: "umcg-gcc"
           perun_service_whitelist: "ldap_lsaai"
+    repo:
+      hosts:
+        repo1:
+          cluster_class: 'development'
+          azure_flavor: "Standard_DS1_v2"
+          host_networks:
+            - name: "{{ stack_prefix }}_external"
+              security_group: "{{ stack_prefix }}_repository"
+              assign_floating_ip: true
+              add_hostname_to_ip_address: true
+          local_volume_extra:
+            - name: mnt
+              size: 500
 administration:
 cluster:
   children:
     compute_node:
     administration:
+    repo:
 donbot_azure:
   children:
     openstack_api:
     cluster:
     ldap_server:
+    repo:
 ...
