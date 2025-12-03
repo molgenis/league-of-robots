@@ -76,7 +76,7 @@
   when:
     - "'rootflags' in grub_config_grep_rootflags.stdout"
     - "'uquota' not in grub_config_grep_rootflags.stdout"
-  notify: rebuild_grub_config
+  notify: rebuild_grub_config_by_logins_role
   become: true
 
 - name: 'Add rootflags to enable user quota for XFS / in GRUB config.'
@@ -90,7 +90,7 @@
     group: root
     mode: '0644'
   when: "'rootflags' not in grub_config_grep_rootflags.stdout"
-  notify: rebuild_grub_config
+  notify: rebuild_grub_config_by_logins_role
   become: true
 
 - name: 'Check if GRUB configs needs to be rebuild in order to have uquota present in the list of rootflags for the running kernel.'
@@ -99,7 +99,7 @@
   register: logins_search_uquota_in_kernel_params
   changed_when: logins_search_uquota_in_kernel_params['rc'] == 1
   failed_when: logins_search_uquota_in_kernel_params['rc'] >= 2
-  notify: rebuild_grub_config
+  notify: rebuild_grub_config_by_logins_role
 
 - name: 'Flush handlers.'
   ansible.builtin.meta: flush_handlers
