@@ -1,6 +1,7 @@
 ---
 ssh_client_known_hosts: "\
   @cert-authority \
+  *db-* \
   *ladap,\
   *ladap.westeurope.cloudapp.azure.com,\
   172.201.133.1 \
