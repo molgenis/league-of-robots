@@ -320,7 +320,54 @@ all:
               slurm_weight: 10
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
-            nb-node-c[01:11]:
+            nb-node-c[01:06]:
+              cloud_flavor: umcg.v1.bm.28-256-0.vlan1338
+              host_type: baremetal
+              enable_predictable_network_interface_names: true
+              host_networks:
+                - name: vlan1338
+                  security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp130s0f0
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: enp130s0f0.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: enp130s0f0
+                    ipv4:
+                      dhcp: false
+                  lnet:
+                    name: tcp20
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+                  label: local
+                  perc_controller: 0
+                  perc_virtual_drive: 1
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              slurm_sockets: 2
+              slurm_cores_per_socket: 14
+              slurm_real_memory: 257317
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
+              slurm_local_disk: 3002000
+              slurm_features: 'rsc02,tmp02'
+            nb-node-c[07:11]:
               cloud_flavor: umcg.v1.bm.28-256-0.vlan1338
               host_type: baremetal
               enable_predictable_network_interface_names: false
