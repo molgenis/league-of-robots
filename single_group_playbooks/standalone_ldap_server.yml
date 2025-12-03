@@ -9,6 +9,7 @@
   hosts:
     - ldap_server
   roles:
+    - interfaces
     - iptables
     - grub
     - ssh             # client

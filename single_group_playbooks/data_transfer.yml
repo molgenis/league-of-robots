@@ -9,6 +9,7 @@
   hosts:
     - data_transfer
   roles:
+    - interfaces
     - iptables
     - grub
     - role: yum_local

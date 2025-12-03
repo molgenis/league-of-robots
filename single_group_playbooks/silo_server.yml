@@ -10,7 +10,7 @@
     - silo-01
   roles:
     - {role: yum_local, when: local_yum_repository is defined}
-    - epel
+    - interfaces
     - iptables
     - grub
     - locale

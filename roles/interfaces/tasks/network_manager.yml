@@ -1,0 +1,101 @@
+---
+- name: Install NetworkManager.
+  ansible.builtin.package:
+    name:
+      - NetworkManager
+    state: latest
+    update_cache: true
+  notify:
+    - NetworkManager_restart
+  become: true
+
+- name: Start NetworkManager.service.
+  ansible.builtin.systemd:
+    name: NetworkManager.service
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+
+- name: Find old network interface configs in ifcfg script format.
+  ansible.builtin.find:
+    paths: /etc/sysconfig/network-scripts/
+    patterns: 'ifcfg-.*'
+    use_regex: true
+  register: interfaces_found_ifcfg_scripts
+
+- name: Migrate network interface configs from ifcfg script to keyfile format.
+  ansible.builtin.command:
+    cmd: nmcli con migrate
+  register: nmcli_con_migrate
+  changed_when: ('successfully migrated' in nmcli_con_migrate['stdout'])
+  when: interfaces_found_ifcfg_scripts['files'] | length > 0
+  become: true
+
+- name: Deploy override file to customize NetworkManager configuration.
+  ansible.builtin.template:
+    src: 99-custom.conf
+    dest: /etc/NetworkManager/conf.d/99-custom.conf
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify:
+    - NetworkManager_restart
+  become: true
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
+
+- name: Find old network interface configs in ifcfg script format.
+  ansible.builtin.find:
+    paths: /etc/sysconfig/network-scripts/
+    patterns: 'ifcfg-.*'
+    use_regex: true
+  register: interfaces_found_ifcfg_scripts_after_migration
+
+- name: Delete any old network interface configs in ifcfg script format.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ interfaces_found_ifcfg_scripts_after_migration['files'] }}"
+  loop_control:
+    label: "{{ item.path }}"
+  notify:
+    - NetworkManager_restart
+  become: true
+
+#
+# Network Manager and its nmcli is a mess and not idempotent in most cases creating yet another config.
+# Therefore we use nmstatectl to manage profiles for NetworkManager.
+#
+- name: Configure network with nmstatectl.
+  ansible.builtin.import_tasks:
+    file: nmstate.yml
+  when:
+    - host_networks | default([]) | selectattr('nmstate_interface', 'defined') | length() >= 1
+
+- name: List all automatically created, unused NetworkManager configs.
+  ansible.builtin.shell:
+    cmd: |
+         set -u
+         set -e
+         set -o pipefail
+         nmcli --fields UUID,TIMESTAMP-REAL con show \
+           | awk '$2 ~ /never/ {print $1}'
+  register: nmcli_con_show_never_used
+  changed_when: nmcli_con_show_never_used['stdout'] | length > 1
+
+- name: Delete all automatically created, unused NetworkManager configs.
+  ansible.builtin.shell:
+    cmd: |
+         set -u
+         set -e
+         set -o pipefail
+         nmcli con delete uuid '{{ item }}'
+  register: nmcli_con_delete
+  changed_when: "'successfully deleted' in nmcli_con_delete['stdout']"
+  loop: "{{ nmcli_con_show_never_used['stdout_lines'] }}"
+  loop_control:
+    label: "{{ nmcli_con_delete['stdout'] }}"
+  become: true
+...

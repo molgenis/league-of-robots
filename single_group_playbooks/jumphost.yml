@@ -9,6 +9,7 @@
   hosts:
     - jumphost
   roles:
+    - interfaces
     - iptables
     - grub
     - ssh  # client

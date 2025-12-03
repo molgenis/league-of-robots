@@ -1,6 +1,6 @@
 ---
 - name: Reconfigure grub
-  ansible.builtin.command: 'grub2-mkconfig --output /boot/grub2/grub.cfg'
+  ansible.builtin.command: 'grub2-mkconfig --update-bls-cmdline --output /boot/grub2/grub.cfg'
   register: grub2_result
   changed_when: grub2_result.rc == 0
   listen: grub2mkconfig
