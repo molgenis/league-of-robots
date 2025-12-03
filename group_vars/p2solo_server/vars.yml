@@ -16,3 +16,5 @@ use_ldap: false
 create_ldap: false
 use_sssd: false
 autoupdate_enabled: false
+ssh_daemon_name: ssh
+basic_security_sshd_name: "{{ ssh_daemon_name }}"

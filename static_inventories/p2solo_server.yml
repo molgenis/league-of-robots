@@ -8,8 +8,8 @@ all:
     p2solo:
       hosts:
         p2solo:
-          host: 192.168.64.8
-          ansible_host: 192.168.64.8
+          host: reception+172.23.68.26
+          ansible_host: reception+172.23.68.26
           cloud_flavor: hpc.v1.vm.1-2-20
           cloud_image: ubuntu-24.04-noble
           host_networks:

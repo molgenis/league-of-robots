@@ -24,13 +24,33 @@
     policy: allow
   become: true
 
+# - name: Allow tcp from specific IPs and ports
+#   community.general.ufw:
+#     rule: allow
+#     port: "{{ item.1 }}"
+#     interface: "{{ item.2 | string}}"
+#     direction: in
+#     from_ip: "{{ item.0.address | regex_replace('\\d+$', '0') }}{{ item.0.netmask }}"
+#     proto: tcp
+#   loop: "{{ iptables_allow_ssh_inbound | product(firewall_allowed_ports) | product(firewall_internal_interfaces) | map('flatten') | list }}"
+#   notify: restart_ufw
+#   become: true
+
 - name: Allow tcp from specific IPs and ports
   community.general.ufw:
     rule: allow
     port: "{{ item.1 }}"
-    interface: "{{ item.2 | string}}"
+    interface: "{{ item.2 }}"
     direction: in
-    from_ip: "{{ item.0.address | regex_replace('\\d+$', '0') }}{{ item.0.netmask }}"
+    from_ip: >-
+      {{
+        item.0.publicly_exposed
+          | default(false)
+          | ternary(
+              item.0.address,
+              item.0.address | regex_replace('\\d+$', '0') ~ item.0.netmask
+            )
+      }}
     proto: tcp
   loop: "{{ iptables_allow_ssh_inbound | product(firewall_allowed_ports) | product(firewall_internal_interfaces) | map('flatten') | list }}"
   notify: restart_ufw
