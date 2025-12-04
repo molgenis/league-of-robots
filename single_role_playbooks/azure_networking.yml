@@ -1,6 +1,6 @@
 ---
 - name: Create network components using Azure API.
-  hosts: localhost
+  hosts: all
   connection: local
   gather_facts: false
   vars:
