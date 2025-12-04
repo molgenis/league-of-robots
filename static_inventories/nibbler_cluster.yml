@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -375,7 +375,7 @@ cluster:
     #irods:
 nibbler_cluster:
   children:
-    openstack_api:
+    controller_api:
     #irods:
     jumphost:
     repo:

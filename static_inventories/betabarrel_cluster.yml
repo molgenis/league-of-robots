@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -345,7 +345,7 @@ cluster:
     administration:
 betabarrel_cluster:
   children:
-    openstack_api:
+    controller_api:
     jumphost:
     cluster:
     chaperone:
