@@ -1,12 +1,11 @@
 ---
 ssh_client_jumphosts:
   - alias: portal
-    hostname: 45.88.81.146
+    hostname: 
 
 ssh_client_known_hosts: "\
   @cert-authority \
   portal*,\
-  45.88.81.146,\
   *hc-sai,\
   *hc-dai,\
   *hyperchicken,\

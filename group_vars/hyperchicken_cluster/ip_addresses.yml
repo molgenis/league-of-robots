@@ -4,15 +4,9 @@ ip_addresses:
     hc_internal_management:
       address: 10.10.1.252
       netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.105
-      netmask: /32
   hc-node-a01:
     hc_internal_management:
       address: 10.10.1.18
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.125
       netmask: /32
   hc-repo:
     hc_internal_management:
@@ -22,31 +16,13 @@ ip_addresses:
     hc_internal_management:
       address: 10.10.1.111
       netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.41
-      netmask: /32
   hyperchicken:
     hc_internal_management:
       address: 10.10.1.54
-      netmask: /32
-    subnet-nfs-data-2541:
-      address: 10.35.141.70
       netmask: /32
   portal:
     hc_internal_management:
       address: 10.10.1.37
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    public:
-      address: 45.88.81.146
-      netmask: /32
-      fqdn: 'NXDOMAIN'
-  hc_internal_management-public-router:
-    hc_internal_management:
-      address: 10.10.1.1
-      netmask: /32
-    public:
-      address: 45.88.81.169
-      netmask: /32
-      fqdn: 'NXDOMAIN'
 ...

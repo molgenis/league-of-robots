@@ -1,19 +1,19 @@
 ---
 slurm_cluster_name: 'hyperchicken'
-stack_domain: ''
+stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'hc'
 stack_dtap_state: development
 slurm_version: '24.11.6-1.el9.umcg'
 slurm_partitions:
-  - name: regular  # Must be in sync with group listed in Ansible inventory.
+  - name: cpu_vm  # Must be in sync with group listed in Ansible inventory.
     default: yes
-    nodes: "{{ stack_prefix }}-node-a[01]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['regular']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    nodes: "{{ stack_prefix }}-node-a01"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_vm']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['cpu_vm'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
@@ -59,7 +59,6 @@ ldap_domains:
     user_member_of: memberOf
     group_member: member
     create_ldap: true
-    # ldap_db_index: 3  # Indices up to 2 are already used by default for the "config", "monitor" and "example" databases.
   ladap:
     uri: ldaps://ladap.westeurope.cloudapp.azure.com
     base: dc=donbot_azure,dc=local
@@ -75,7 +74,6 @@ ldap_domains:
     group_member: memberUid
     group_object_class: groupofnames
 cloud_image: Rocky-9.6
-local_volume_size_root: 22
 availability_zone: nova
 enable_predictable_network_interface_names: true
 stack_networks:
@@ -83,16 +81,16 @@ stack_networks:
     cidr: '10.10.1.0/24'
     router:
       next-hop-address: '10.10.1.1'
-      external_network: public
+      external_network: external_unfiltered
     create: true
-  - name: subnet-nfs-data-2541
-    cidr: '10.35.141.0/24'
+    mtu_size: '1450'
+  - name: lustre  # DH5
+    cidr: '172.23.12.0/22'
 security_group_mods:
   - name: "{{ stack_prefix }}_storage"
     allow_ingress:
-      - 10.35.141.251/32  # NFS server
-      - 10.35.141.252/32  # NFS server
-      - 10.35.141.253/32  # NFS server
+      - 172.23.15.186/32  # Lustre server
+      - 172.23.15.187/32  # Lustre server
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -109,18 +107,16 @@ envsync_group: 'depad'
 functional_admin_group: 'funad'
 hpc_env_prefix: '/apps'
 sponsors:
-  - name: umcg-erdera
+  - name: umcg-research-it
     slurm_shares: 100
 regular_groups:
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
   - name: 'users'
-  - name: 'solve-rd'
-    sponsor: umcg-erdera
   - name: 'umcg-atd'
-    sponsor: umcg-erdera
+    sponsor: umcg-research-it
   - name: 'umcg-gsad'
-    sponsor: umcg-erdera
+    sponsor: umcg-research-it
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
@@ -147,8 +143,6 @@ regular_users:
   - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
-  - who: ['%solve-rd']
-    become: 'solve-rd-dm'
   - who: ['%umcg-atd']
     become: 'umcg-atd-dm'
   - who: ['%umcg-gsad']
@@ -159,7 +153,6 @@ remote_archive:
     local_top_level_mount: '/groups'
     groups:
       - 'umcg-atd'
-      - 'solve-rd'
     archive_user: 'umcg-atd-dm'
     archive_system: 'archive.surfsara.nl'
     archive_system_fingerprints:
@@ -171,46 +164,31 @@ remote_archive:
 # Shared storage related variables
 #
 pfs_mounts:
-  - pfs: ecst01
-    source: '10.35.141.253:/solve-rd-98599485'
-    type: nfs4
-    #
-    # Mounting NFS fails with mount system call failed error on RHEL 9.6
-    # https://access.redhat.com/solutions/7121615
-    # Workaround for NFSv4.2:
-    #  * upgrade the kernel to at least kernel-5.14.0-570.25.1.el9_6
-    #  * and downgrade to NFSv4.1
-    #
-    rw_options: 'defaults,_netdev,noatime,nodiratime,rw,vers=4.1'
-    ro_options: 'defaults,_netdev,noatime,nodiratime,ro,vers=4.1'
+  - pfs: umcgst07
+    source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
+    type: lustre
+    rw_options: 'defaults,_netdev,flock'
+    ro_options: 'defaults,_netdev,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
-    check_fs_free: '8%'
+    check_fs_free: '10%'
 lfs_mounts:
   - lfs: home
-    pfs: ecst01
+    pfs: umcgst07
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp09
-    pfs: ecst01
+    pfs: umcgst07
     groups:
       - name: umcg-atd
-      - name: solve-rd
       - name: umcg-gsad
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm09
-    pfs: ecst01
+    pfs: umcgst07
     groups:
       - name: umcg-atd
-      - name: solve-rd
       - name: umcg-gsad
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env09
-    pfs: ecst01
+    pfs: umcgst07
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
-#
-# EGA Fuse client RPMs not updated for Rocky 9 yet.
-#
-# ega_fuse_client_mounts:
-#   solve_rd: '/groups/solve-rd/prm09/ega-fuse-client'
-# ega_fuse_client_java_home: '/etc/alternatives/jre_11_openjdk'
 ...
