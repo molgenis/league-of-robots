@@ -1,6 +1,6 @@
 ---
 - hosts:
-    - all,!openstack_api
+    - all,!controller_api
   roles:
     - role: locale
 ...
