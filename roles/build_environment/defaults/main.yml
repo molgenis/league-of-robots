@@ -9,6 +9,7 @@ build_env_generic_deps:
   - 'kernel-devel'
   - 'libselinux-devel'
   - 'libsodium-devel'
+  - 'libwebp-devel'
   - 'openssl-devel'
   - 'patch'
   - 'qt5-qtbase-devel'

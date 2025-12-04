@@ -18,6 +18,10 @@ ip_addresses:
       address: 195.169.22.69
       netmask: /32
       fqdn: 'NXDOMAIN'
+  silo-repo:
+    silo_internal_management:
+      address: 10.10.1.76
+      netmask: /32
   silo_internal_management-vlan16-router:
     silo_internal_management:
       address: 10.10.1.1

@@ -23,7 +23,7 @@
         public_ip_address_name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
       {% endif %}
 
-- name: Create network interface(s) for VM
+- name: Create or update network interfaces for VMs
   azure.azcollection.azure_rm_networkinterface:
     name: "{{ inventory_hostname }}-{{ item.name }}_nic"
     virtual_network: "{{ item.name }}"
@@ -105,11 +105,11 @@
 
 - name: Mount the managed disk to VM
   azure.azcollection.azure_rm_manageddisk:
-    name: "{{ inventory_hostname }}_managed_disk_{{ local_volume_size_extra }}g"
+    name: "{{ inventory_hostname }}_managed_disk_{{ item['name'] }}"
     location: "{{ azure_location }}"
     resource_group: "{{ azure_resource_group }}"
-    disk_size_gb: "{{ local_volume_size_extra }}"
+    disk_size_gb: "{{ item['size'] }}"
     managed_by: "{{ inventory_hostname }}"
     attach_caching: read_only
-  when: local_volume_size_extra is defined and local_volume_size_extra > 0
+  loop: "{{ local_volume_extra | default([]) }}"
 ...

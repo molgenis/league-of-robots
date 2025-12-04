@@ -1,0 +1,56 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
+#!/bin/bash
+
+set -ue
+
+# It starts both at opening and closing of the session, line is simply limiting
+# it to run only at the open session
+[ "$PAM_TYPE" != "open_session" ] && exit
+
+_days_warning="{{ screen_warning | default('7') }}"
+_days_kill="{{ screen_kill | default('21') }}"
+
+[[ -n "${PAM_USER}" ]] && USER="${PAM_USER}"
+
+logger -t screen_reaper "[$0] $(date +%D" "%T): executing by user=$(id -un) for the user=${USER}"
+
+if test -d /run/screen/S-"${USER}"; then
+   _warn_screens="$(find /run/screen/S-${USER} \( -atime +"${_days_warning}" -a -atime -"${_days_kill}" \) -type s)"
+   _kill_screens="$(find /run/screen/S-${USER} -atime +"${_days_kill}" -type s)"
+fi
+
+if [[ -n "${_warn_screens:-}" ]] || [[ -n "${_kill_screens:-}" ]]; then
+   echo "################################################################################"
+   echo "#"
+   echo "#"
+   echo "#"
+   echo "#                 Warning: abandoned screen sessions found!"
+   echo "#"
+   echo "#  You see this warning because you have screen sessions unused for more than ${_days_warning}"
+   echo "#  days. If they are not used for more than ${_days_kill} days, they will be killed."
+
+   if [[ -n "${_warn_screens}" ]]; then
+      echo "#"
+      echo "#  This is a list of unused screen sessions running more than ${_days_warning} days:"
+      echo "#    ${_warn_screens}" | sed "s|/run/screen/S-${USER}/||g"
+      logger -t "screen_reaper" "user ${USER} WARNED about unused screens for more than ${_days_warning} days: ${_warn_screens:-}"
+   fi
+
+   if [[ -n "${_kill_screens}" ]]; then
+      echo "#"
+      echo "#  This is a list of screen sessions that were automatically CLEANED (because"
+      echo "#  they have been unused for more than ${_days_kill} days:"
+      for _screen in ${_kill_screens}; do
+         if test -e "${_screen:-/path/error}"; then
+           echo -n "#      ${_screen}" | sed "s|/run/screen/S-${USER}/||g"
+           rm -f "${_screen-:/path/error}" && echo "      (cleaned)"
+         fi
+      done
+      logger -t "screen_reaper" "screens from user ${USER} were KILLED as they have been unused for more than ${_days_kill} days: ${_kill_screens:-}"
+   fi
+
+   echo "#"
+   echo "#"
+   echo "#"
+   echo "################################################################################"
+fi

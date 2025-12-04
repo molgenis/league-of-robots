@@ -7,9 +7,12 @@ all:
           ansible_python_interpreter: /usr/bin/env python
     build_server:
       hosts:
-        vip_build:
-          cloud_flavor: m1.large
-          ansible_host: tunnel+vip_build
+        rocky9-build:
+          cloud_flavor: umcg.v1.vm.4-8
+          cloud_image: Rocky-9.5
+          cloud_user: rocky
+          os_distribution: 'rocky9'
+          ansible_host: tunnel+rocky9-build
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_webservers"

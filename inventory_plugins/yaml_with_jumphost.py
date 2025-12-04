@@ -83,6 +83,10 @@ class InventoryModule(BaseFileInventoryPlugin):
 
 	def __init__(self):
 		super(InventoryModule, self).__init__()
+		self.ai_proxy = None
+		if ('AI_PROXY' in os.environ and
+				os.getenv('AI_PROXY') != ''):
+			self.ai_proxy = os.getenv('AI_PROXY')
 
 	def verify_file(self, path):
 		valid = False
@@ -174,10 +178,18 @@ class InventoryModule(BaseFileInventoryPlugin):
 			 * AI_PROXY was configured and
 			 * ansible_host was not already configured in the static_inventory for a stack.
 			'''
-			if ('AI_PROXY' in os.environ and
-					os.getenv('AI_PROXY') is not None and
-					os.getenv('AI_PROXY') != '' and
-					os.getenv('AI_PROXY') != host and
-					'ansible_host' not in variables):
-				self.inventory.set_variable(host, 'ansible_host', os.getenv('AI_PROXY') + '+' + host)
-
+			already_parsed_vars = self.inventory.get_host(host).get_vars()
+			if ('ansible_host' in already_parsed_vars):
+				self.display.v("Inventory plugin:: Keeping previously parsed ansible_host: %s" % already_parsed_vars['ansible_host'])
+			elif ('ansible_host' in variables):
+				self.display.v("Inventory plugin:: Setting ansible_host explicitly to %s for inventory_hostname %s" % (variables['ansible_host'], host))
+				self.inventory.set_variable(host, 'ansible_host', variables['ansible_host'])
+			elif (self.ai_proxy is not None and
+					'ansible_host' not in variables and
+					'ansible_host' not in already_parsed_vars and
+					host != self.ai_proxy and
+					host != 'localhost'):
+				self.display.v("Inventory plugin:: Setting ansible_host implicitly to %s for inventory_hostname %s" % (self.ai_proxy + '+' + host, host))
+				self.inventory.set_variable(host, 'ansible_host', self.ai_proxy + '+' + host)
+			else:
+				self.display.v("Inventory plugin:: No explicit nor implicit ansible_host specified for inventory_hostname %s" % host)

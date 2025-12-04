@@ -36,12 +36,11 @@ local_admin_groups:
 local_admin_users:
   - 'gerben'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'sandi'
 regular_groups:
-  - 'umcg-logstoprm'
+  - name: 'umcg-logstoprm'
 regular_users:
   - name: "logstoprm"
     groups: "umcg-logstoprm"
@@ -65,10 +64,6 @@ use_sssd: false
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
 #
 external_jumphosts:
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception
@@ -85,6 +80,10 @@ external_jumphosts:
     hosts:
       - hostname: tunnel
         network: vlan16
+  - group: vaxtron_cluster
+    hosts:
+      - hostname: foyer
+        network: external
   - group: wingedhelix_cluster
     hosts:
       - hostname: wh-porch

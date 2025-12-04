@@ -1,5 +1,23 @@
 ---
-- name: Enable fail2ban.
+# First install postfix to avoid issues with esmtp package
+- name: Install postfix (needed by fail2ban)
+  ansible.builtin.package:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { name: "postfix", state: "latest" }
+    - { name: "esmtp", state: "absent" }
+  become: true
+
+- name: Ensure that postfix is running and enabled on boot
+  ansible.builtin.service:
+    name: postfix
+    state: started
+    enabled: true
+    daemon_reload: true
+  become: true
+
+- name: Install fail2ban.
   ansible.builtin.package:
     name: fail2ban
     state: present

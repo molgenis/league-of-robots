@@ -15,6 +15,17 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
           local_yum_repository: true
+    repo:
+      hosts:
+        silo-repo:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_repo"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: eth0
+          swap_file_size: 2
     silo:
       hosts:
         silo-01:
@@ -22,10 +33,42 @@ all:
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_webservers"
+              add_hostname_to_ip_address: true
               assign_floating_ip: true
+          local_volume_extra:
+            - name: cvmfs-spool
+              size: 300
+            - name: cvmfs-srv
+              size: 1000
+          local_mounts:
+            - mount_point: '/var/spool/cvmfs'
+              device: '/dev/vdb'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: >-
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
+              type: ext4
+            - mount_point: '/srv/cvmfs'
+              device: '/dev/vdc'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: >-   
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
+              type: ext4
 silo_server:
   children:
     controller_api:
     jumphost:
+    repo:
     silo:
 ...

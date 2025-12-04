@@ -15,7 +15,6 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['rug']['operator'] }}"
   - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
   - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
-  - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
@@ -25,7 +24,6 @@ iptables_allow_icmp_inbound:
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_inbound:
   - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
-  - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
@@ -37,4 +35,8 @@ iptables_allow_http_inbound:
   - ANY
 iptables_allow_https_inbound:
   - ANY
+fqdn: docs.gcc.rug.nl
+https_certificate_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.pem"
+https_private_key_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.key"
+https_chain_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/HARICA-GEANT-TLS-ECC-Certificate-bundle.pem"
 ...

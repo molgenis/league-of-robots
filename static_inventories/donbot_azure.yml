@@ -31,7 +31,7 @@ all:
               user_member_of: memberOf
               group_member: member
               create_ldap: true
-              ldap_db_index: 2  # Indices up to 1 are already used by default for the "config" and "monitor" databases. (Example database on "2" was removed.)
+              # ldap_db_index: 1
           regular_groups:
             - name: 'lsaai'
           regular_users:
@@ -42,7 +42,6 @@ all:
             - "{{ all.ip_addresses['lsaai']['perun'] }}"
             - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
             - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
-            - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
             - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
             - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
             - "{{ all.ip_addresses['umcg']['net1'] }}"

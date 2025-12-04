@@ -1,0 +1,5 @@
+---
+- hosts: sys_admin_interface
+  roles:
+    - quota_reports
+...

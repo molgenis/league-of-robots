@@ -10,7 +10,7 @@
     - silo-01
   roles:
     - {role: yum_local, when: local_yum_repository is defined}
-    - epel
+    - interfaces
     - iptables
     - grub
     - locale
@@ -19,7 +19,7 @@
     - update
     - sshd
     - basic_security
-    - silo_server
-   #- cluster # for installing software?
-   #- sudoers
+    - role: local_storage
+      when: local_mounts is defined and local_mounts | length > 0
+    - cvmfs_server
 ...

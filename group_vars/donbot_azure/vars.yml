@@ -24,7 +24,6 @@ local_admin_groups:
 local_admin_users:
   - 'gerben'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'sandi'
@@ -40,10 +39,6 @@ external_jumphosts:
     hosts:
       - hostname: tunnel
         network: vlan16
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception

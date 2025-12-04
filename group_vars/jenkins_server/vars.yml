@@ -13,6 +13,7 @@ stack_networks:
       next-hop-address: '10.10.1.1'
       external_network: external
     create: true
+    mtu_size: '1450'
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -23,7 +24,6 @@ local_admin_users:
   - 'gerben'
   - 'henkjan'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'sandi'
@@ -40,10 +40,6 @@ external_jumphosts:
     hosts:
     - hostname: foyer
       network: external
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception

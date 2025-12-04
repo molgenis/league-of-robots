@@ -9,6 +9,7 @@
   hosts:
     - build_server
   roles:
+    - interfaces
     - iptables
     - grub
     - locale
@@ -20,4 +21,5 @@
     - regular_users
     - cluster       # installing software
     - sudoers
+    - build_environment
 ...

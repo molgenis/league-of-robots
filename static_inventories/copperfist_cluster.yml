@@ -32,16 +32,16 @@ all:
               nodes:
                 - name: docs-on-bateleur
                   network: external
-            - group: copperfist_cluster
-              nodes:
-                - name: cf-dragen
-                  network: vlan16
             - group: betabarrel_cluster
               nodes:
+                - name: bb-dragen
+                  network: vlan16
                 - name: betabarrel
                   network: vlan16
             - group: copperfist_cluster
               nodes:
+                - name: cf-dragen
+                  network: vlan16
                 - name: copperfist
                   network: vlan16
     data_transfer:
@@ -55,7 +55,44 @@ all:
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-          local_volume_size_extra: 8300
+          local_yum_repository: true  # For nhc_standalone.
+          local_volume_extra:
+            - name: groups1
+              size: 1536
+            - name: groups2
+              size: 1536
+            - name: groups3
+              size: 1536
+            - name: groups4
+              size: 1536
+            - name: groups5
+              size: 1536
+            - name: groups6
+              size: 1536
+            - name: groups7
+              size: 1536
+            - name: groups8
+              size: 1536
+          local_mounts:
+            - mount_point: '/groups'
+              device: '/dev/md0'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
+              type: ext4
+              md:
+                raid_level: 0
+                raid_devices: 8
+                component_devices:
+                  - /dev/vdb
+                  - /dev/vdc
+                  - /dev/vdd
+                  - /dev/vde
+                  - /dev/vdf
+                  - /dev/vdg
+                  - /dev/vdh
+                  - /dev/vdi
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -66,8 +103,8 @@ all:
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
@@ -83,8 +120,8 @@ all:
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
@@ -99,11 +136,11 @@ all:
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
-            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}" 
+            - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
     docs:
       hosts:
@@ -111,10 +148,11 @@ all:
     sys_admin_interface:
       hosts:
         copperfist:
+          os_distribution: 'centos7'
           host_networks:
             - name: vlan16
-              add_hostname_to_ip_address: true
             - name: vlan990
+              add_hostname_to_ip_address: true
           local_yum_repository: true # enable local yum repository
           local_mounts:
             - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
@@ -170,6 +208,45 @@ all:
           hosts:
             cf-dragen:
               # ansible_host: cf-porch+copperfist+cf-dragen
+              os_distribution: 'oracle8'
+              host_networks:
+                #
+                # enp5s0:
+                #   speed: 1 Gbit copper, physical connector shared with BMC.
+                #   vlans:
+                #     untagged: 990
+                #     tagged: -
+                # enp4s0:
+                #   speed: 1 Gbit copper, not connected.
+                # enp26s0f0:
+                #   speed: 10 Gbit copper, but switch max 1 Gbit.
+                #   vlans:
+                #     untagged: 990
+                # enp26s0f1:
+                #   speed: 10 Gbit copper, not connected.
+                # ens3f0 altname enp134s0f0:
+                #   speed: 10 Gbit fibre
+                #   vlans:
+                #     untagged: 16
+                #     tagged: 13, 16, 985, 990
+                # ens3f1 altname enp134s0f1:
+                #   speed: 10 Gbit fibre, not connected.
+                #
+                - name: vlan16
+                  nmstate_interface:
+                    name: ens3f0.16
+                    type: vlan
+                    vlan:
+                      id: 16
+                      base-iface: ens3f0  # altname enp134s0f0
+                    ipv4:
+                      dhcp: false
+                - name: vlan990
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: ens3f0  # altname enp134s0f0
+                    ipv4:
+                      dhcp: false
               local_mounts:
                 - mount_point: '/staging'
                   device: 'LABEL=staging'
@@ -185,6 +262,7 @@ all:
                   mounted_mode: '0755'
                   mount_options: 'bind,nofail'
                   type: none
+              slurm_version: '20.11.9-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
               slurm_threads_per_core: 2
@@ -193,13 +271,7 @@ all:
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 102400
               slurm_features: 'tmp16,dragen'
-              slurm_ethernet_interfaces:
-                - enp26s0f0  # VLAN990
-                - enp5s0  # BMC
-                - ens3f0.16  # VLAN16
               slurm_weight: 10
-              slurm_version: '20.11.9-1.el8.umcg'
-              os_distribution: 'oracle8'
               local_yum_repository: true # enable local yum repository
     mit_chaperone:
       hosts:
@@ -229,7 +301,6 @@ all:
             - name: 'umcg-vipt'
           ssh_client_configs:
             - logs_library
-          local_yum_repository: true # enable local yum repository
     storage_server:
       hosts:
         cf-storage:
@@ -241,13 +312,19 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: ens2f1np1
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: ens2f0np0
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
           local_mounts:
             - mount_point: '/mnt/umcgst16'
-              device: '/dev/data/hdd'
+              device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+              perc_controller: 0
+              perc_virtual_drive: 238
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
@@ -258,7 +335,6 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
-          local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
     smb_server:
       hosts:
         copperfist:
