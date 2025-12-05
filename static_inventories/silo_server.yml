@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -67,7 +67,7 @@ all:
               type: ext4
 silo_server:
   children:
-    openstack_api:
+    controller_api:
     jumphost:
     repo:
     silo:

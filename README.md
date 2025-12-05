@@ -185,11 +185,12 @@ Therefore we set ```ANSIBLE_ROLES_PATH``` and ```ANSIBLE_COLLECTIONS_PATH``` to 
 
 #### 3. Python virtual environment: install packages to manage Azure environment
 
-Make sure you already executed `ansible-galaxy install ... ` (see previous step).
+**Make sure you already executed `ansible-galaxy install -r requirements.yml`** (see previous step), because it installs the `requirements.txt` file required by `pip` in this step.
 
 ```bash
 pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
-_azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt")"
+# requirements.txt is provided from ansible-galaxy
+_azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" 2>/dev/null)"
 pip install -r "${_azure_pip_requirements}"
 ```
 

@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -20,7 +20,7 @@ all:
               add_hostname_to_ip_address: true
 build_library:
   children:
-    openstack_api:
+    controller_api:
     build_server:
 cluster:
   children:

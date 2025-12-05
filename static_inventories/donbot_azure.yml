@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -77,7 +77,7 @@ cluster:
     repo:
 donbot_azure:
   children:
-    openstack_api:
+    controller_api:
     cluster:
     ldap_server:
     repo:

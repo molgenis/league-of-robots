@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -17,6 +17,6 @@ all:
               add_hostname_to_ip_address: true
 jenkins_server:
   children:
-    openstack_api:
+    controller_api:
     jenkins:
 ...
