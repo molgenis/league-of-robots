@@ -51,7 +51,7 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-            - name: subnet-nfs-data-2541
+            - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
@@ -68,7 +68,7 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-            - name: subnet-nfs-data-2541
+            - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
@@ -89,7 +89,7 @@ all:
                   add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp3s0
-                - name: subnet-nfs-data-2541
+                - name: lustre
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
                     name: enp4s0
