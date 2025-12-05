@@ -26,6 +26,7 @@ slurm_partitions:
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
+rocky_vault_minorversion: '.6'
 figlet_font: 'lockergnome'
 motd: "To solve or not to solve, that's the question."
 additional_etc_hosts:
@@ -47,32 +48,56 @@ cluster_class: 'development'
 use_ldap: true
 use_sssd: true
 ldap_domains:
-  stack:
-    uri: "ldaps://{{ stack_prefix }}-dai"
-    base: "dc={{ stack_name }},dc=local"
+#  stack:
+#    uri: "ldaps://{{ stack_prefix }}-dai"
+#    base: "dc={{ stack_name }},dc=local"
+#    schema: rfc2307bis
+#    min_id: 1000
+#    max_id: 21999
+#    user_object_class: posixAccount
+#    user_name: uid
+#    user_ssh_public_key: sshPublicKey
+#    user_member_of: memberOf
+#    group_member: member
+#    create_ldap: true
+  sram:
+    uri: ldaps://sv-sram.id.rug.nl
+    base: ou=sram-umcg,ou=users,o=id
     schema: rfc2307bis
-    min_id: 1000
-    max_id: 21999
+    min_id: 70000000
+    max_id: 72999999
     user_object_class: posixAccount
     user_name: uid
     user_ssh_public_key: sshPublicKey
-    user_member_of: memberOf
+    user_member_of: groupMembership
     group_member: member
-    create_ldap: true
-  ladap:
-    uri: ldaps://ladap.westeurope.cloudapp.azure.com
-    base: dc=donbot_azure,dc=local
+  idvault:
+    uri: ldaps://svrs.id.rug.nl
+    base: ou=umcg,o=asds
     schema: rfc2307
-    min_id: 37800000
-    max_id: 37899999
+    min_id: 50100000
+    max_id: 55999999
     user_object_class: posixAccount
-    #user_name: uid
-    user_name: mail
+    user_name: uid
     user_ssh_public_key: sshPublicKey
     user_member_of: groupMembership
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
+#  ladap:
+#    uri: ldaps://ladap.westeurope.cloudapp.azure.com
+#    base: dc=donbot_azure,dc=local
+#    schema: rfc2307
+#    min_id: 37800000
+#    max_id: 37899999
+#    user_object_class: posixAccount
+#    #user_name: uid
+#    user_name: mail
+#    user_ssh_public_key: sshPublicKey
+#    user_member_of: groupMembership
+#    user_expiration_date: loginExpirationTime
+#    group_member: memberUid
+#    group_object_class: groupofnames
 cloud_image: Rocky-9.6
 availability_zone: nova
 enable_predictable_network_interface_names: true
@@ -102,9 +127,9 @@ local_admin_users:
   - 'marieke'
   - 'pieter'
   - 'sandi'
-envsync_user: 'envsync'
-envsync_group: 'depad'
-functional_admin_group: 'funad'
+envsync_user: 'umcg-envsync'
+envsync_group: 'umcg-depad'
+functional_admin_group: 'umcg-funad'
 hpc_env_prefix: '/apps'
 sponsors:
   - name: umcg-research-it
@@ -112,7 +137,6 @@ sponsors:
 regular_groups:
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
-  - name: 'users'
   - name: 'umcg-atd'
     sponsor: umcg-research-it
   - name: 'umcg-gsad'
