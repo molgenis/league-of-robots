@@ -26,4 +26,23 @@ user_quota_on_root_partition:
   blocks_hard: 1024K
   inodes_soft: 8k
   inodes_hard: 10k
+#
+# Configure limited subset of repos for jumphosts.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9:
+    - baseos
+    - baseos-debug
+    - baseos-source
+    - appstream
+    - appstream-debug
+    - appstream-source
+    - epel
+    - epel-debuginfo
+    - epel-source
+    - rsyslog
 ...
