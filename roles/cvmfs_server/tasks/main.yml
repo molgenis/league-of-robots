@@ -20,17 +20,82 @@
     name:
       - curl
       - cvmfs
+      - cvmfs-server
       - httpd
       - nano
       - rsync
       - wget
   become: true
 
-- name: Enable webserver.
+- name: 'Disable autofs on stratum 0. This is required to work with /cvmfs mount.'
+  ansible.builtin.systemd_service:
+    name: autofs
+    enabled: false
+    masked: yes
+
+- name: 'Add minimal config options to cvmfs and make sure file exists.'
+  ansible.builtin.blockinfile:
+    path: /etc/cvmfs/default.local
+    block: | 
+      CVMFS_HTTP_PROXY=DIRECT
+      CVMFS_QUOTA_LIMIT=20000
+    create: true
+  become: true
+
+- name: 'Reload configuration to get it applied.'
+  ansible.builtin.command:
+    cmd: cvmfs_config reload
+  become: true
+
+- name: 'Enable webserver.'
   ansible.builtin.systemd:
     name: httpd
     enabled: true
     state: started
     daemon_reload: true
   become: true
+
+- name: 'Get list of exsiting repo(s).'
+  ansible.builtin.shell:
+    cmd: ls /cvmfs/
+  register: existing_cvmfs_repos
+  tags:
+    - configure_cvmfs_repos
+
+- name: 'Create CVM-FS repo(s).'
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+         cvmfs_server mkfs -o root {{ item }}
+         cvmfs_server transaction {{ item }}
+         cvmfs_server publish -a $(date '+%y%m%d') {{ item }}
+  loop: "{{ cvmfs_repos }}"
+  when: item not in existing_cvmfs_repos.stdout_lines
+  tags:
+    - configure_cvmfs_repos
+
+- name: 'Create cron for resigning of key(s) every 1st and 15th of the month.'
+  ansible.builtin.cron:
+    name: "resign_{{ item }}"
+    hour: "9"
+    minute: "0"
+    day: "1,15"
+    job: /usr/bin/cvmfs_server resign {{ item }}
+    user: root
+  become: true
+  loop: "{{ cvmfs_repos }}"
+  tags:
+    - configure_cvmfs_repo
+
+- name: 'Fetch repo key files and store in tmp dir.'
+  ansible.builtin.fetch:
+    src: /etc/cvmfs/keys/{{ item }}.pub
+    dest: "{{ playbook_dir }}/files/silo_server/{{ item }}.pub"
+    flat: true
+    fail_on_missing: true
+    validate_checksum: true
+  become: true
+  loop: "{{ cvmfs_repos }}"
+  tags:
+    - configure_cvmfs_repos
 ...
