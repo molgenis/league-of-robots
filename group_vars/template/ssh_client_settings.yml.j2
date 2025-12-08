@@ -2,17 +2,17 @@
 ---
 ssh_client_jumphosts:
 {% for jumphost in groups['jumphost'] | default([]) %}
-  {% set network_id = ip_addresses[jumphost]
-           | dict2items
-           | json_query('[?value.fqdn].key')
-           | first -%}
-  {% if ip_addresses[jumphost][network_id]['fqdn'] == 'NXDOMAIN' %}
-    {% set ssh_hostname = ip_addresses[jumphost][network_id]['address'] %}
-  {% else %}
-    {% set ssh_hostname = ip_addresses[jumphost][network_id]['fqdn'] %}
-  {% endif %}
+  {% for network_id in ip_addresses[jumphost] %}
+    {% if ip_addresses[jumphost][network_id]['fqdn'] is defined  %}
+      {% if ip_addresses[jumphost][network_id]['fqdn'] == 'NXDOMAIN' %}
+        {% set ssh_hostname = ip_addresses[jumphost][network_id]['address'] %}
+      {% else %}
+        {% set ssh_hostname = ip_addresses[jumphost][network_id]['fqdn'] %}
+      {% endif %}
   - alias: {{ jumphost }}
     hostname: {{ ssh_hostname }}
+    {% endif %}
+  {% endfor %}
 {% endfor %}
 
 ssh_client_known_hosts: "\
