@@ -41,6 +41,10 @@ managed_yum_repos:
     - appstream
     - appstream-debug
     - appstream-source
+    - crb
+    - crb-debug
+    - crb-source
+    - rocky-release-security
     - epel
     - epel-debuginfo
     - epel-source
