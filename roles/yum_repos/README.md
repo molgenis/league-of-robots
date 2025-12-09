@@ -15,8 +15,12 @@ This role will manage all `yum` / `dnf` repos on hosts; This means:
  * The repo ID listed in `managed_yum_repos` is used to lookup the config for the repo listed in the `yum_repos` variable.  
    See ```group_vars/all/vars.yml``` for defaults.  
    This allows setting `managed_yum_repos` to a subset of all repos from `yum_repos` for specific machines.
- * **Delete** the config for any repo not listed in the `managed_yum_repos` variable.
  * Unspecified options for repos listed in the `managed_yum_repos` variable will be left untouched.
+ * **Delete** the `/etc/yum.repos.d/*.repo` repo config file on a machine,
+   when not a single repo listed in that file is listed in the `managed_yum_repos` variable.
+   (Except for repos in the `local_yum.repo` file, which may be created by the `yum_local` role and which is skipped by this role.)
+ * Repos will remain untouched/preserved "as is", when at least one other repo listed in the same `*.repo` config file
+   is listed in `managed_yum_repos` and therefore managed by this role.
 
 Note:
 * We do NOT use `ansible.builtin.yum_repository` any longer as there is no `ansible.builtin.dnf_repository` equivalent for newer distros.
