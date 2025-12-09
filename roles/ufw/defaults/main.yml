@@ -8,5 +8,6 @@ firewall_admin_ip:
 
 # interne interfaces die volledig verkeer mogen hebben
 firewall_internal_interfaces:
-  #- enywhere
+  - enp0s1
   - enp3s0
+  #- any
