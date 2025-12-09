@@ -8,8 +8,8 @@ all:
     development:
       hosts:
         p2solo:
-          host: reception+172.23.68.26
-          ansible_host: reception+172.23.68.26
+          host: reception+172.23.68.168
+          ansible_host: reception+172.23.68.168
           cloud_flavor: hpc.v1.vm.1-2-20
           cloud_image: ubuntu-24.04-noble
           host_networks:
@@ -36,6 +36,10 @@ all:
           - "{{ all.ip_addresses['umcg']['net4'] }}"
           - "{{ talos_cluster.ip_addresses['reception']['vlan1337'] }}"
           - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
+
+          firewall_internal_interfaces:
+          - enp3s0
+
     production:
       hosts:  
         p2solo-local:
@@ -58,7 +62,6 @@ all:
           - "{{ all.ip_addresses['umcg']['net4'] }}"
           - "{{ talos_cluster.ip_addresses['reception']['vlan1337'] }}"
           - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
-          - { 'address': '127.0.0.1', 'netmask': '/24', 'desc': 'local vm' }
           - { 'address': '192.168.64.1', 'netmask': '/24', 'desc': 'local vm' }
 
           iptables_allow_ssh_inbound:
@@ -69,8 +72,11 @@ all:
           - "{{ all.ip_addresses['umcg']['net4'] }}"
           - "{{ talos_cluster.ip_addresses['reception']['vlan1337'] }}"
           - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
-          - { 'address': '127.0.0.1', 'netmask': '/24', 'desc': 'local vm' }
           - { 'address': '192.168.64.1', 'netmask': '/24', 'desc': 'local vm' }
+
+          firewall_internal_interfaces:
+          - enp0s1
+
 p2solo_server:
   children:
     openstack_api:
