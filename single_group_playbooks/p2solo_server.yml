@@ -1,4 +1,15 @@
 ---
+- hosts: p2solo_server
+  pre_tasks:
+    - name: Fail when no limit was provided
+      fail:
+        msg: |
+          You must explicitly choose a target group using --limit.
+          Examples:
+            ansible-playbook p2solo_server.yml --limit/-l production
+            ansible-playbook p2solo_server.yml --limit/-l development
+      when: ansible_limit is not defined
+
 - name: Import pre deploy checks.
   ansible.builtin.import_playbook: pre_deploy_checks.yml
 
