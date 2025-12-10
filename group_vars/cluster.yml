@@ -6,4 +6,26 @@ autoupdate_enabled: false
 # We already have fail2ban on the jumphost to block external IPs the produce too many failed logins.
 #
 basic_security_fail2ban_enabled: false
+#
+# Configure limited subset of repos: Only relevant for cluster machines that do not use Pulp for repo management:
+# E.g. they must have
+#      repo_manager: 'none'
+# configured for the list below to have any affect.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  centos7: "{{ yum_repos['centos7']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'distro')
+              | map(attribute='id')
+              | union(['epel7', 'rsyslog7', 'irods7']) }}"
+  oracle8: "{{ yum_repos['oracle8'] | map(attribute='id') }}"  # Only for Dragen machines.
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(['security', 'epel', 'rsyslog', 'irods']) }}"
 ...

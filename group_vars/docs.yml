@@ -1,8 +1,22 @@
 ---
 os_distribution: 'rocky9'
-# This is enforcing that docs server uses `yum_repos` to create
-# yum repositories, since docs servers do not use Pulp.
+#
+# Enforce that docs servers use `yum_repos` for defining repositories, since they cannot use Pulp.
+#
 repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(['security', 'epel', 'rsyslog']) }}"
 #
 # Firewall configuration.
 #
@@ -39,4 +53,5 @@ fqdn: docs.gcc.rug.nl
 https_certificate_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.pem"
 https_private_key_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.key"
 https_chain_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/HARICA-GEANT-TLS-ECC-Certificate-bundle.pem"
+
 ...

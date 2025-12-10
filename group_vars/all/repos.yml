@@ -101,6 +101,9 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
+      tags:
+        - distro
+        - core
     - file: centos7-updates.repo
       id: centos7-updates
       name: 'CentOS-7 - Updates.'
@@ -108,6 +111,9 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
+      tags:
+        - distro
+        - core
     - file: centos7-extras.repo
       id: centos7-extras
       name: 'CentOS-7 - Extras.'
@@ -115,6 +121,9 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
+      tags:
+        - distro
+        - extras
     - file: epel7.repo
       id: epel7
       name: 'Extra Packages for Enterprise Linux 7 (EPEL).'
@@ -122,6 +131,8 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7'
+      tags:
+        - epel
     - file: irods7.repo
       id: irods7
       name: 'RENCI iRODS Repository for Enterprise Linux 7.'
@@ -346,40 +357,67 @@ yum_repos:
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-9
       enabled: 1
       gpgcheck: 1
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: baseos-debug
       name: Rocky Linux 9 - BaseOS Debug
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: baseos-source
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: appstream
       name: Rocky Linux 9 - AppStream
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-9
       enabled: 1
       gpgcheck: 1
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: appstream-debug
       name: Rocky Linux 9 - AppStream Debug
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: appstream-source
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: crb
       name: Rocky Linux 9 - CRB
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-9
       enabled: 1
       gpgcheck: 1
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: crb-debug
       name: Rocky Linux 9 - CRB Debug
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: crb-source
       name: Rocky Linux 9 - CRB Source
       enabled: 0
+      tags:
+        - distro
+        - core
     #
     # Rocky Security
     #
@@ -390,6 +428,9 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://rocky-linux-europe-west1.production.gcp.mirrors.ctrliq.cloud/pub/sig/9/security/x86_64/security-common/RPM-GPG-KEY-Rocky-SIG-Security'
+      tags:
+        - distro
+        - security
     #
     # Rocky Addons
     #
@@ -397,74 +438,128 @@ yum_repos:
       id: highavailability
       name: Rocky Linux 9 - Addons High Availability
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: highavailability-debug
       name: Rocky Linux 9 - Addons High Availability Debug
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: highavailability-source
       name: Rocky Linux 9 - Addons High Availability Source
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: resilientstorage
       name: Rocky Linux 9 - Addons Resilient Storage
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: resilientstorage-debug
       name: Rocky Linux 9 - Addons Resilient Storage Debug
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: resilientstorage-source
       name: Rocky Linux 9 - Addons Resilient Storage Source
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: nfv
       name: Rocky Linux 9 - Addons NFV
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: nfv-debug
       name: Rocky Linux 9 - Addons NFV Debug
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: nfv-source
       name: Rocky Linux 9 - Addons NFV Source
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: rt
       name: Rocky Linux 9 - Addons RT
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: rt-debug
       name: Rocky Linux 9 - Addons RT Debug
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: rt-source
       name: Rocky Linux 9 - Addons RT Source
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: sap
       name: Rocky Linux 9 - Addons SAP
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: sap-debug
       name: Rocky Linux 9 - Addons SAP Debug
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: sap-source
       name: Rocky Linux 9 - Addons SAP source
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: saphana
       name: Rocky Linux 9 - Addons Saphana
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: saphana-debug
       name: Rocky Linux 9 - Addons Saphana Debug
       enabled: 0
+      tags:
+        - distro
+        - addons
     - file: rocky-addons.repo
       id: saphana-source
       name: Rocky Linux 9 - Addons Saphana Source
       enabled: 0
+      tags:
+        - distro
+        - addons
     #
     # Rocky Devel
     #
@@ -472,14 +567,23 @@ yum_repos:
       id: devel
       name: Rocky Linux 9 - Development
       enabled: 0
+      tags:
+        - distro
+        - devel
     - file: rocky-devel.repo
       id: devel-debug
       name: Rocky Linux 9 - Development Debug
       enabled: 0
+      tags:
+        - distro
+        - devel
     - file: rocky-devel.repo
       id: devel-source
       name: Rocky Linux 9 - Development Source
       enabled: 0
+      tags:
+        - distro
+        - devel
     #
     # Rocky Extras
     #
@@ -489,26 +593,44 @@ yum_repos:
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-9
       enabled: 1
       gpgcheck: 1
+      tags:
+        - distro
+        - extras
     - file: rocky-extras.repo
       id: extras-debug
       name: Rocky Linux 9 - Extras Debug
       enabled: 0
+      tags:
+        - distro
+        - extras
     - file: rocky-extras.repo
       id: extras-source
       name: Rocky Linux 9 - Extras Source
       enabled: 0
+      tags:
+        - distro
+        - extras
     - file: rocky-extras.repo
       id: plus
       name: Rocky Linux 9 - Extras Plus
       enabled: 0
+      tags:
+        - distro
+        - extras
     - file: rocky-extras.repo
       id: plus-debug
       name: Rocky Linux 9 - Extras Plus Debug
       enabled: 0
+      tags:
+        - distro
+        - extras
     - file: rocky-extras.repo
       id: plus-source
       name: Rocky Linux 9 - Extras Plus Source
       enabled: 0
+      tags:
+        - distro
+        - extras
     #
     # EPEL
     #
@@ -519,6 +641,8 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     - file: epel.repo
       id: epel-debuginfo
       name: 'Extra Packages for Enterprise Linux 9 - $basearch - Debug'
@@ -526,6 +650,8 @@ yum_repos:
       enabled: 0
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     - file: epel.repo
       id: epel-source
       name: 'Extra Packages for Enterprise Linux 9 - $basearch - Source'
@@ -533,6 +659,8 @@ yum_repos:
       enabled: 0
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     #
     # EPEL Testing
     #
@@ -543,6 +671,8 @@ yum_repos:
       enabled: 0
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     - file: epel-testing.repo
       id: epel-testing-debuginfo
       name: 'Extra Packages for Enterprise Linux $releasever - Testing - $basearch - Debug'
@@ -550,6 +680,8 @@ yum_repos:
       enabled: 0
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     - file: epel-testing.repo
       id: epel-testing-source
       name: 'Extra Packages for Enterprise Linux $releasever - Testing - $basearch - Source'
@@ -557,6 +689,8 @@ yum_repos:
       enabled: 0
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     #
     # LTB
     #
@@ -596,16 +730,33 @@ yum_repos:
       baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
       enabled: 1
       gpgcheck: 0
+    #
+    # Jenkins
+    #
+    - file: jenkins.repo
+      id: jenkins
+      name: "Jenkins{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
+      baseurl: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
+      enabled: 1
+      gpgcheck: 1
+      gpgkeysource: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/jenkins.io-2023.key"
 #
 # Default list of yum repos that will be managed by Ansible on a machine.
 # The items listed here must match 'id' attributes for repos in the 'yum_repos' variable listed above.
-# This default list must/should include all items from 'yum_repos';
-# If you only need a subset of the repos, then you can override 'managed_yum_repos' for a subset of machines
+# If you need a different (sub)set of the repos, then you can override 'managed_yum_repos' for a subset of machines
 # either in the group_vars for the stack, the group_vars for a specific inventory group,
 # the host_vars for a specific host or the static_inventory for a stack.
 #
 managed_yum_repos:
-  centos7: "{{ yum_repos['centos7'] | map(attribute='id') }}"
+  centos7: "{{ yum_repos['centos7']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(['rsyslog7']) }}"
   oracle8: "{{ yum_repos['oracle8'] | map(attribute='id') }}"
-  rocky9: "{{ yum_repos['rocky9'] | map(attribute='id') }}"
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(['security', 'rsyslog']) }}"
 ...

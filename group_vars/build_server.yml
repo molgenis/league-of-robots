@@ -27,5 +27,24 @@ iptables_allow_ssh_outbound:
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
+#
+# Enforce that build servers use `yum_repos` for defining repositories, since they cannot use Pulp.
+#
 repo_manager: 'none'
+#
+# Configure limited subset of repos: Only relevant for cluster machines that do not use Pulp for repo management:
+# E.g. they must have
+#      repo_manager: 'none'
+# configured for the list below to have any affect.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(['security', 'epel', 'rsyslog', 'irods']) }}"
 ...

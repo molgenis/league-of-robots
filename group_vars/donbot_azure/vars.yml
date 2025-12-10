@@ -2,8 +2,21 @@
 stack_prefix: 'db'
 stack_domain: 'donbot'
 stack_name: "{{ stack_domain }}_azure"  # stack_name must match the name of the folder that contains this vars.yml file.
-repo_manager: 'none'
 os_distribution: 'rocky9'
+repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(['security', 'epel', 'rsyslog', 'ltb', 'perun']) }}"
 azure_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'

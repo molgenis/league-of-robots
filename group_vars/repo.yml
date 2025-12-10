@@ -1,10 +1,24 @@
 ---
-# This is enforcing that repo server uses `yum_repos` to create
-# yum repositories, since repo servers cannot use Pulp
-repo_manager: 'none'
 #
 # Local volume size (root partition) for repo machines: use larger than default volume,
 # because we need to cache/freeze packages.
 #
 local_volume_size_root: 42
+#
+# Enforce that repo servers use `yum_repos` for defining repositories, since they cannot use Pulp.
+#
+repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(['security', 'epel', 'rsyslog']) }}"
 ...
