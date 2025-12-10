@@ -27,7 +27,7 @@ Note:
 * We do NOT install the _EPEL_ repo using the `epel-release` RPM with `ansible.builtin.package`,
   because on RedHat >= 8.x it will install `*.repo` files with broken links and broken paths to GPG key files.
 
-#### Example code snippet for the ```yum_repos``` variable:
+#### Example code snippets for the `managed_yum_repos` and `yum_repos` variables:
 
 In the example below
 * The dict key `rocky9` must match the value of `os_distribution` in `group_vars/{{ stack_name }}/vars.yml`.  
@@ -38,6 +38,9 @@ In the example below
   and for which the GPG key file will be downloaded from `gpgkeysource` and imported with `ansible.builtin.rpm_key`.
 
 ```
+#
+# Example to list which repos should be managed by this role on machines by listing all repo IDs explicitly.
+#
 managed_yum_repos:
   rocky9:
     - baseos
@@ -46,18 +49,43 @@ managed_yum_repos:
     - epel
     - epel-debuginfo
     - epel-source
+    - rsyslog
+#
+# Same as above, but instead of listing all repo IDs explicitly,
+# we now use tags to select 2 groups/collections of repos that share the same tag
+# and append 1 explicit repo ID to that list.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'contains', 'core')
+              | map(attribute='id')
+              | union(yum_repos['rocky9']
+                      | selectattr('tags', 'defined')
+                      | selectattr('tags', 'contains', 'epel')
+                      | map(attribute='id'))
+              | union(['rsyslog']) }}"
 yum_repos:
   rocky9:
     - file: rocky.repo
       id: baseos
       enabled: 1
       gpgcheck: 1
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: baseos-debug
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: rocky.repo
       id: baseos-source
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: epel.repo
       id: epel
       name: 'Extra Packages for Enterprise Linux 9 - $basearch'
@@ -65,6 +93,8 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     - file: epel.repo
       id: epel-debuginfo
       name: 'Extra Packages for Enterprise Linux 9 - $basearch - Debug'
@@ -72,6 +102,8 @@ yum_repos:
       enabled: 0
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
     - file: epel.repo
       id: epel-source
       name: 'Extra Packages for Enterprise Linux 9 - $basearch - Source'
@@ -79,4 +111,13 @@ yum_repos:
       enabled: 0
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
+    - file: rsyslog.repo
+      id: rsyslog
+      name: 'rsyslog v8 (from Adiscon) for EPEL 9.'
+      baseurl: 'https://rpms.adiscon.com/v8-stable/epel-9/$basearch'
+      enabled: 1
+      gpgcheck: 1
+      gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
 ```

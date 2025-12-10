@@ -27,5 +27,9 @@ managed_yum_repos:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'contains', 'core')
               | map(attribute='id')
-              | union(['security', 'epel', 'rsyslog', 'irods']) }}"
+              | union(yum_repos['rocky9']
+                      | selectattr('tags', 'defined')
+                      | selectattr('tags', 'contains', 'epel')
+                      | map(attribute='id'))
+              | union(['security', 'rsyslog', 'irods']) }}"
 ...
