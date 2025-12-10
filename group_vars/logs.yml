@@ -53,5 +53,5 @@ managed_yum_repos:
                       | selectattr('tags', 'defined')
                       | selectattr('tags', 'contains', 'epel')
                       | map(attribute='id'))
-              | union(['security', 'rsyslog']) }}"
+              | union(['rocky-release-security', 'rsyslog']) }}"
 ...

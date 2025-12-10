@@ -31,5 +31,5 @@ managed_yum_repos:
                       | selectattr('tags', 'defined')
                       | selectattr('tags', 'contains', 'epel')
                       | map(attribute='id'))
-              | union(['security', 'rsyslog', 'irods']) }}"
+              | union(['rocky-release-security', 'rsyslog', 'irods']) }}"
 ...

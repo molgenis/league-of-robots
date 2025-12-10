@@ -38,7 +38,7 @@ managed_yum_repos:
                       | selectattr('tags', 'defined')
                       | selectattr('tags', 'contains', 'epel')
                       | map(attribute='id'))
-              | union(['security', 'rsyslog']) }}"
+              | union(['rocky-release-security', 'rsyslog']) }}"
 user_quota_on_root_partition:
   blocks_soft: 512K
   blocks_hard: 1024K

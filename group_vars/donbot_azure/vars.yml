@@ -20,7 +20,7 @@ managed_yum_repos:
                       | selectattr('tags', 'defined')
                       | selectattr('tags', 'contains', 'epel')
                       | map(attribute='id'))
-              | union(['security', 'rsyslog', 'ltb', 'perun']) }}"
+              | union(['rocky-release-security', 'rsyslog', 'ltb', 'perun']) }}"
 azure_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'

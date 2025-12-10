@@ -19,7 +19,7 @@ managed_yum_repos:
                       | selectattr('tags', 'defined')
                       | selectattr('tags', 'contains', 'epel')
                       | map(attribute='id'))
-              | union(['security', 'rsyslog']) }}"
+              | union(['rocky-release-security', 'rsyslog']) }}"
 additional_etc_hosts: []  # Do not add additional machines to /etc/hosts on data transfer servers.
 iptables_allow_icmp_inbound:
   - ANY
