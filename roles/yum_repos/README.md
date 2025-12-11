@@ -52,7 +52,7 @@ managed_yum_repos:
     - rsyslog
 #
 # Same as above, but instead of listing all repo IDs explicitly,
-# we now use tags to select 2 groups/collections of repos that share the same tag
+# we now use a standard filter and tags to select 2 groups/collections of repos that share the same tag
 # and append 1 explicit repo ID to that list.
 #
 managed_yum_repos:
@@ -65,6 +65,15 @@ managed_yum_repos:
                       | selectattr('tags', 'contains', 'epel')
                       | map(attribute='id'))
               | union(['rsyslog']) }}"
+#
+# Same as above, but with shorter syntax, which reguires our custom 'intersect' test filter.
+#
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog'])
+              | map(attribute='id') }}"
+
+
 yum_repos:
   rocky9:
     - file: rocky.repo

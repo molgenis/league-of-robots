@@ -139,12 +139,16 @@ yum_repos:
       baseurl: https://packages.irods.org/yum/pool/centos7/x86_64/
       enabled: 1
       gpgcheck: 0
+      tags:
+        - irods
     - file: lustre7.repo
       id: lustre7
       name: 'Lustre client Long Term Support (LTS) releases for Enterprise Linux 7.'
       baseurl: https://downloads.whamcloud.com/public/lustre/latest-2.12-release/el7/client/
       enabled: 1
       gpgcheck: 0
+      tags:
+        - lustre
     - file: e2fsprogs7.repo
       id: e2fsprogs7  # Dependency for Lustre project quota.
       name: 'Ext filesystem utility releases for Enterprise Linux 7.'
@@ -157,12 +161,16 @@ yum_repos:
       baseurl: https://ltb-project.org/rpm/openldap25/7/x86_64/
       enabled: 1
       gpgcheck: 0
+      tags:
+        - ltb
     - file: rsyslog7.repo
       id: rsyslog7
       name: 'Rsyslog (Adiscon CentOS7 for x86_64)'
       baseurl: http://rpms.adiscon.com/v8-stable/epel-7/x86_64/
       enabled: 1
       gpgcheck: 0
+      tags:
+        - rsyslog
   oracle8:
     - file: oracle-linux-ol8.repo
       id: ol8_baseos_latest
@@ -171,6 +179,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_appstream
       name: 'Oracle Linux 8 Application Stream ($basearch)'
@@ -178,6 +189,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      tags:
+        - distro
+        - core
     - file: virt-ol8.repo
       id: ol8_kvm_appstream
       name: 'Oracle Linux $releasever KVM Application Stream ($basearch)'
@@ -185,6 +199,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_codeready_builder
       name: 'Oracle Linux 8 CodeReady Builder ($basearch) - Unsupported'
@@ -192,6 +209,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_distro_builder
       name: 'Oracle Linux 8 Distro Builder ($basearch) - Unsupported'
@@ -199,6 +219,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u0_baseos_base
       name: 'Oracle Linux 8 BaseOS GA ($basearch)'
@@ -206,6 +229,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u1_baseos_base
       name: 'Oracle Linux 8.1 BaseOS ($basearch)'
@@ -213,6 +239,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u2_baseos_base
       name: 'Oracle Linux 8.2 BaseOS ($basearch)'
@@ -220,6 +249,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u3_baseos_base
       name: 'Oracle Linux 8.3 BaseOS ($basearch)'
@@ -227,6 +259,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u4_baseos_base
       name: 'Oracle Linux 8.4 BaseOS ($basearch)'
@@ -234,6 +269,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u5_baseos_base
       name: 'Oracle Linux 8.5 BaseOS ($basearch)'
@@ -241,6 +279,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u6_baseos_base
       name: 'Oracle Linux 8.6 BaseOS ($basearch)'
@@ -248,6 +289,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u7_baseos_base
       name: 'Oracle Linux 8.7 BaseOS ($basearch)'
@@ -255,6 +299,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u8_baseos_base
       name: 'Oracle Linux 8.8 BaseOS ($basearch)'
@@ -262,6 +309,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_u9_baseos_base
       name: 'Oracle Linux 8.9 BaseOS ($basearch)'
@@ -269,6 +319,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - core
     - file: oracle-linux-ol8.repo
       id: ol8_MODRHCK
       name: 'Latest RHCK with fixes from Oracle for Oracle Linux $releasever ($basearch)'
@@ -276,6 +329,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       priority: 20
+      tags:
+        - distro
+        - core
     #
     # EPEL
     #
@@ -286,6 +342,8 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      tags:
+        - epel
     - file: oracle-epel-ol8.repo
       id: ol8_developer_EPEL_modular
       name: 'Oracle Linux $releasever EPEL Modular Packages for Development ($basearch)'
@@ -293,6 +351,8 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      tags:
+        - epel
     #
     # Addons
     #
@@ -303,6 +363,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - addons
     #
     # Security
     #
@@ -313,6 +376,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - security
     #
     # Kernel
     #
@@ -323,6 +389,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - uek
     - file: uek-ol8.repo
       id: ol8_UEKR6
       name: 'Latest Unbreakable Enterprise Kernel Release 6 for Oracle Linux $releasever ($basearch)'
@@ -330,6 +399,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      tags:
+        - distro
+        - uek
     - file: uek-ol8.repo
       id: ol8_UEKR7_RDMA
       name: 'Oracle Linux 8 UEK7 RDMA ($basearch)'
@@ -337,6 +409,9 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - uek
     - file: uek-ol8.repo
       id: ol8_UEKR6_RDMA
       name: 'Oracle Linux 8 UEK6 RDMA ($basearch)'
@@ -344,12 +419,17 @@ yum_repos:
       gpgkey:file: ///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 0
+      tags:
+        - distro
+        - uek
     - file: rsyslog8.repo
       id: rsyslog
       name: 'Rsyslog (Adiscon for x86_64)'
       baseurl: http://rpms.adiscon.com/v8-stable/epel-8/x86_64/
       enabled: 1
       gpgcheck: 0
+      tags:
+        - rsyslog
   rocky9:
     - file: rocky.repo
       id: baseos
@@ -701,6 +781,8 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://ltb-project.org/documentation/_static/RPM-GPG-KEY-LTB-PROJECT-SECURITY'
+      tags:
+        - ltb
     #
     # rsyslog
     #
@@ -711,6 +793,8 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
+      tags:
+        - rsyslog
     #
     # perun
     #
@@ -721,6 +805,8 @@ yum_repos:
       gpgkey: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
       gpgcheck: 1
       enabled: 1
+      tags:
+        - perun
     #
     # iRODS
     #
@@ -730,6 +816,8 @@ yum_repos:
       baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
       enabled: 1
       gpgcheck: 0
+      tags:
+        - irods
     #
     # Jenkins
     #
@@ -740,6 +828,8 @@ yum_repos:
       enabled: 1
       gpgcheck: 1
       gpgkeysource: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/jenkins.io-2023.key"
+      tags:
+        - jenkins
 #
 # Default list of yum repos that will be managed by Ansible on a machine.
 # The items listed here must match 'id' attributes for repos in the 'yum_repos' variable listed above.
@@ -750,13 +840,15 @@ yum_repos:
 managed_yum_repos:
   centos7: "{{ yum_repos['centos7']
               | selectattr('tags', 'defined')
-              | selectattr('tags', 'contains', 'core')
-              | map(attribute='id')
-              | union(['rsyslog7']) }}"
-  oracle8: "{{ yum_repos['oracle8'] | map(attribute='id') }}"
+              | selectattr('tags', 'intersect', ['core', 'rsyslog'])
+              | map(attribute='id') }}"
+  oracle8: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'uek', 'rsyslog'])
+              | map(attribute='id') }}"
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')
-              | selectattr('tags', 'contains', 'core')
-              | map(attribute='id')
-              | union(['security', 'rsyslog']) }}"
+              | selectattr('tags', 'intersect', ['core', 'security', 'rsyslog'])
+              | map(attribute='id') }}"
+
 ...

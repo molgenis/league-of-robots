@@ -56,11 +56,7 @@ repo_manager: 'none'
 managed_yum_repos:
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')
-              | selectattr('tags', 'contains', 'core')
-              | map(attribute='id')
-              | union(yum_repos['rocky9']
-                      | selectattr('tags', 'defined')
-                      | selectattr('tags', 'contains', 'epel')
-                      | map(attribute='id'))
-              | union(['rocky-release-security', 'rsyslog', 'jenkins']) }}"
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog', 'jenkins'])
+              | map(attribute='id') }}"
+
 ...

@@ -19,17 +19,14 @@ basic_security_fail2ban_enabled: false
 managed_yum_repos:
   centos7: "{{ yum_repos['centos7']
               | selectattr('tags', 'defined')
-              | selectattr('tags', 'contains', 'distro')
-              | map(attribute='id')
-              | union(['epel7', 'rsyslog7', 'irods7']) }}"
-  oracle8: "{{ yum_repos['oracle8'] | map(attribute='id') }}"  # Only for Dragen machines.
+              | selectattr('tags', 'intersect', ['distro', 'epel', 'rsyslog', 'irods'])
+              | map(attribute='id') }}"
+  oracle8: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'uek', 'rsyslog'])
+              | map(attribute='id') }}"
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')
-              | selectattr('tags', 'contains', 'core')
-              | map(attribute='id')
-              | union(yum_repos['rocky9']
-                      | selectattr('tags', 'defined')
-                      | selectattr('tags', 'contains', 'epel')
-                      | map(attribute='id'))
-              | union(['rocky-release-security', 'rsyslog', 'irods']) }}"
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog', 'irods'])
+              | map(attribute='id') }}"
 ...
