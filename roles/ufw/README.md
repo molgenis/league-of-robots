@@ -14,7 +14,7 @@ This Ansible role secures an Ubuntu/Debian server using **UFW**.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `firewall_allowed_ports` | `[22,80,443]` | Ports that should be allowed |
-| `firewall_internal_interfaces` | `[eth0, eth1 etc...]` | Interfaces where all internal traffic is allowed |
+| `firewall_allowed_ports` | `[22]` | Ports that should be allowed |
+| `firewall_internal_interfaces` | `[enp0s1, enp3s0 etc...]` | Interfaces where all internal traffic is allowed |
 
 ---
