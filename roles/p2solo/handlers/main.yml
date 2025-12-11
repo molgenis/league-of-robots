@@ -1,16 +1,16 @@
 ---
 - name: stop unattended-upgrades service
-  systemd:
+  ansible.builtin.systemd:
     name: unattended-upgrades.service
     state: stopped
 
 - name: stop unattended-upgrades timer
-  systemd:
+  ansible.builtin.systemd:
     name: unattended-upgrades.timer
     state: stopped
 
 - name: stop apt-daily services
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: stopped
   loop:
