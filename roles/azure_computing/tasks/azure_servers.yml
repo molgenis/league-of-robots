@@ -9,58 +9,6 @@
       {% endif %}
       {% endfor %}
 
-- name: Print IPs for each VM
-  ansible.builtin.debug:
-    msg: "{{ vm_ip_configs | from_yaml }}"
-  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
-  vars:
-    vm_ip_configs: |
-      - name: "{{ inventory_hostname }}-{{ item.name }}"
-      {% if ip_addresses[inventory_hostname][item.name]['address'] is defined %}
-        private_ip_address: {{ ip_addresses[inventory_hostname][item.name]['address'] }}
-      {% endif %}
-      {% if item.assign_floating_ip is defined %}
-        public_ip_address_name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
-      {% endif %}
-
-- name: Create or update network interfaces for VMs
-  azure.azcollection.azure_rm_networkinterface:
-    name: "{{ inventory_hostname }}-{{ item.name }}_nic"
-    virtual_network: "{{ item.name }}"
-    subnet_name: "{{ item.name }}_subnet"
-    ip_configurations: "{{ vm_ip_configs | from_yaml }}"
-    enable_accelerated_networking: true
-    create_with_security_group: true
-    security_group: "{{ item.security_group }}"
-    resource_group: "{{ azure_resource_group }}"
-    location: "{{ azure_location }}"
-  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
-  vars:
-    vm_ip_configs: |
-      - name: "{{ inventory_hostname }}-{{ item.name }}"
-      {% if ip_addresses[inventory_hostname][item.name]['address'] is defined %}
-        private_ip_address: {{ ip_addresses[inventory_hostname][item.name]['address'] }}
-        private_ip_allocation_method: "Static"
-      {% endif %}
-      {% if item.assign_floating_ip is defined and item.assign_floating_ip is true %}
-        public_ip_address_name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
-        public_ip_allocation_method: "Static"
-      {% endif %}
-  register: nic
-
-- name: Assign FQDN to all the public IPs
-  azure.azcollection.azure_rm_publicipaddress:
-    resource_group: "{{ azure_resource_group }}"
-    name: "{{ inventory_hostname }}-{{ item.name }}_public_ip"
-    allocation_method: static
-    domain_name_label: "{{ stack_prefix }}-{{ inventory_hostname }}-{{ (item.name | ansible.builtin.hash('sha1'))[:4] }}"
-    # idle_timeout is in minutes, default is set to 4, (currently) maximum is set to 30
-    idle_timeout: 30
-  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
-  when:
-    - item.assign_floating_ip is defined
-    - item.assign_floating_ip is true
-
 - name: Create an Azure VM
   azure.azcollection.azure_rm_virtualmachine:
     resource_group: "{{ azure_resource_group }}"

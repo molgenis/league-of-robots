@@ -1,6 +1,6 @@
 ---
 # Create the servers.
-- name: Create network ports, volumes and servers.
+- name: Create volumes and servers.
   ansible.builtin.include_tasks:
     file: azure_servers.yml
   when:

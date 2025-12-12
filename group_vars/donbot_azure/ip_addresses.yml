@@ -10,13 +10,13 @@ ip_addresses:
       address: 172.201.133.1
       netmask: /32
       fqdn: 'ladap.westeurope.cloudapp.azure.com'
-  repo1:
+  repo_primary:
     db_external:
       address: 6.6.6.4
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     db_external_public:
-      address: 52.174.39.127
+      address: 52.174.107.6
       netmask: /32
-      fqdn: 'db-repo1-dec6.westeurope.cloudapp.azure.com'
+      fqdn: 'db-repo-primary-dec6.westeurope.cloudapp.azure.com'
 ...

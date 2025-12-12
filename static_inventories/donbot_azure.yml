@@ -58,7 +58,7 @@ all:
           perun_service_whitelist: "ldap_lsaai"
     repo:
       hosts:
-        repo1:
+        repo-primary:
           cluster_class: 'development'
           azure_flavor: "Standard_DS1_v2"
           host_networks:
