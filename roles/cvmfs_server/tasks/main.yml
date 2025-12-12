@@ -46,7 +46,7 @@
 - name: 'Reload configuration to get it applied.'
   ansible.builtin.command:
     cmd: cvmfs_config reload
-  changed_when: True
+  changed_when: true
   become: true
 
 - name: 'Enable webserver.'
