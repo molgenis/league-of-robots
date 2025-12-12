@@ -32,6 +32,7 @@
     name: autofs
     enabled: false
     masked: yes
+  become: true
 
 - name: 'Add minimal config options to cvmfs and make sure file exists.'
   ansible.builtin.blockinfile:
@@ -45,6 +46,7 @@
 - name: 'Reload configuration to get it applied.'
   ansible.builtin.command:
     cmd: cvmfs_config reload
+  changed_when: true
   become: true
 
 - name: 'Enable webserver.'
@@ -57,7 +59,7 @@
 
 - name: 'Get list of exsiting repo(s).'
   ansible.builtin.shell:
-    cmd: ls /cvmfs/
+    cmd: ls -1 /cvmfs/
   register: existing_cvmfs_repos
   tags:
     - configure_cvmfs_repos
