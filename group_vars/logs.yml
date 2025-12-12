@@ -33,6 +33,8 @@ iptables_allow_ssh_inbound:
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_logs_inbound:
   - ANY
+iptables_allow_repository_inbound:
+  - ANY
 # This is enforcing that log servers uses `yum_repos` to create
 # yum repositories, since repo servers cannot use Pulp
 repo_manager: 'none'

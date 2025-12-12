@@ -50,6 +50,7 @@
   ansible.builtin.set_fact:
     instance_nics: "{{ instance_nics | default([]) + [{'port-name': inventory_hostname + '-' + item}] }}"
   with_items: "{{ hostvars[inventory_hostname]['host_networks']
+                  | selectattr('attach_port_on_instance_launch', 'defined')
                   | selectattr('attach_port_on_instance_launch', 'true')
                   | map(attribute='name')
                   | list

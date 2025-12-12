@@ -9,7 +9,7 @@ all:
       hosts:
         earl1:
           cluster_class: 'development'
-          cloud_flavor: m1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_logservers"
@@ -36,7 +36,7 @@ all:
               add_hostname_to_ip_address: true
         earl4:
           cluster_class: 'diagnostics'
-          cloud_flavor: m1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_logservers"
@@ -47,7 +47,7 @@ all:
               size: 100 
         earl5:
           cluster_class: 'research'
-          cloud_flavor: m1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_logservers"
@@ -64,8 +64,37 @@ all:
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
+    repo:
+      hosts:
+        repo-primary:
+          cluster_class: 'development'
+          azure_flavor: "Standard_DS1_v2"
+          host_networks:
+            - name: "{{ stack_prefix }}_external"
+              security_group: "{{ stack_prefix }}_repository"
+              assign_floating_ip: true
+              add_hostname_to_ip_address: true
+          local_volume_extra:
+            - name: mnt
+              size: 500
+        repo-secondary:
+          cluster_class: 'development'
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_repository"
+              assign_floating_ip: true
+              add_hostname_to_ip_address: true
+          local_volume_extra:
+            - name: mnt
+              size: 500
+cluster:
+  children:
+    logs:
+    repo:
 logs_library:
   children:
     controller_api:
     logs:
+    repo:
 ...

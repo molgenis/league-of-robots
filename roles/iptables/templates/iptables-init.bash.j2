@@ -499,6 +499,27 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 	done
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 41514 -m state --state ESTABLISHED -j ACCEPT
 {% endif%}
+{% if iptables_allow_repository_inbound is defined and iptables_allow_repository_inbound | length > 0 %}
+	#
+	# Allow inbound logs.
+	#
+	# logs requires:
+	#  * TCP port 41514: to receive syslogs
+	#
+	declare -a ALLOW_REPOSITORY_INBOUND=(
+	{% for ip in iptables_allow_repository_inbound %}
+		{% if ip == 'ANY'%}
+		'0.0.0.0/0'
+		{% else %}
+		'{{ ip.address }}{{ ip.netmask }}'{% if ip.fqdn is defined and ip.fqdn != "NXDOMAIN" %}	# {{ ip.fqdn }}{% elif ip.desc is defined %}	# {{ ip.desc }}{% endif +%}
+		{% endif %}
+	{% endfor %}
+	)
+	for IP_ADDRESS in "${ALLOW_REPOSITORY_INBOUND[@]}"; do
+		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 41514 -m state --state NEW,ESTABLISHED -j ACCEPT
+	done
+	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 41514 -m state --state ESTABLISHED -j ACCEPT
+{% endif%}
 {% if iptables_allow_ldap_inbound is defined and iptables_allow_ldap_inbound | length > 0 %}
 	#
 	# Allow inbound ldap.
