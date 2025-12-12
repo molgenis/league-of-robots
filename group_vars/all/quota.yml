@@ -10,7 +10,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-erdera: 2048
       umcg-fg: 2048
-      umcg-franke-scrna: 1024
+      umcg-franke-scrna: 21504
       umcg-fu: 2048
       umcg-gaf: 22528
       umcg-gap: 1024
@@ -60,7 +60,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-endocrinology: 1024
       umcg-fg: 4096
-      umcg-franke-scrna: 1024
+      umcg-franke-scrna: 27648
       umcg-fu: 2048
       umcg-gaf: 15360
       umcg-gap: 1024
@@ -110,7 +110,7 @@ lfs_quota:
     quota_limits:  # All values in GB.
       umcg-atd: 1024
       umcg-fg: 1024
-      umcg-gcc: 1024
+      umcg-gcc: 3072
       umcg-gdio: 1024
       umcg-grip: 1024
       umcg-hlhs: 1024
@@ -155,7 +155,7 @@ lfs_quota:
       umcg-gaf: 2048
       umcg-gap: 1024
       umcg-gastrocol: 10240
-      umcg-gcc: 8192
+      umcg-gcc: 9216
       umcg-gdi: 1024
       umcg-gdio: 14336
       umcg-gonl: 3072
@@ -209,7 +209,7 @@ lfs_quota:
       umcg-endocrinology: 2048
       umcg-erdera: 11264
       umcg-fg: 10240
-      umcg-franke-scrna: 14336
+      umcg-franke-scrna: 15360
       umcg-fu: 2048
       umcg-gap: 1024
       umcg-gastrocol: 10240
