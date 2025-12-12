@@ -100,7 +100,7 @@ all:
 #          ir_local_perm_res_fol: '/tmp/irods/{{ ir_local_perm_res }}' # test! iRODS permanent resource folder path
 #        irods-test-db:
 #          fqdn: irods-test-db.hpc.rug.nl
-#          cloud_flavor: m1.small                            # test-db CPU:1 MEM:2GB ROOTDISK:20GB
+#          cloud_flavor: umcg.v1.vm.1-2                      # test-db CPU:1 MEM:2GB ROOTDISK:20GB
 #          pgsql_server: "local"                             # test-db iRODS PostgreSQL "local" or "remote" server
 #          ir_db_pwd: '{{ icatV_test_db_pwd }}'              # test-db iRODS Vaulted pgsql password
 #          ir_db_user: '{{ ir_service_account }}'            # test-db iRODS postgres user
