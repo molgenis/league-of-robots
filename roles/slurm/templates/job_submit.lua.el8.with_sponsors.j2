@@ -365,7 +365,7 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
                 slurm.log_debug("QoS %s listed in AllowQos %s: Assigned partition %s to job.", tostring(job_desc.qos), tostring(part.allow_qos), tostring(name))
             end
         elseif part.deny_qos ~= nil then
-            if not string.find(string(part.deny_qos), string(job_desc.qos), 1, true) then
+            if not string.find(tostring(part.deny_qos), tostring(job_desc.qos), 1, true) then
                 part_names[#part_names+1] = tostring(name)
                 slurm.log_debug("QoS %s not listed in DenyQos %s: Assigned partition %s to job.", tostring(job_desc.qos), tostring(part.deny_qos), tostring(name))
             end
