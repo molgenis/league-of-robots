@@ -228,11 +228,11 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: eth0
+                    name: enp3s0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: eth1
+                    name: enp4s0
                   lnet:
                     name: tcp20
               local_volume_extra:
