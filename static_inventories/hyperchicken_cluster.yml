@@ -55,6 +55,8 @@ all:
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
+              lnet:
+                name: tcp15
           local_volume_extra:
             - name: apps
               size: 300
@@ -72,9 +74,11 @@ all:
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
+              lnet:
+                name: tcp15
           slurm_sockets: 4
           slurm_cores_per_socket: 1
-          slurm_real_memory: 7681
+          slurm_real_memory: 7680
           slurm_local_disk: 0
           slurm_features: 'prm09,tmp09'
     compute_node:
@@ -93,12 +97,14 @@ all:
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
                     name: enp4s0
+                  lnet:
+                    name: tcp15
               local_volume_extra:
                 - name: local
                   size: 1
-              slurm_sockets: 16
+              slurm_sockets: 4
               slurm_cores_per_socket: 1
-              slurm_real_memory: 63786
+              slurm_real_memory: 7680
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 900
