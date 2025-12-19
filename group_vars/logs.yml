@@ -31,7 +31,20 @@ iptables_allow_ssh_inbound:
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_logs_inbound:
   - ANY
-# This is enforcing that log servers uses `yum_repos` to create
-# yum repositories, since repo servers cannot use Pulp
+#
+# Enforce that logs servers use `yum_repos` for defining repositories, since they cannot use Pulp.
+#
 repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
+              | map(attribute='id') }}"
 ...

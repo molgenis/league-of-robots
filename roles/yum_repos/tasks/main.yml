@@ -17,7 +17,11 @@
   loop_control:
     label: "{{ item | basename }}"
   loop: "{{ yum_repos_find_result.files | map(attribute='path') | list }}"
-  when: item | basename not in yum_repos[os_distribution] | map(attribute='file') | list
+  when: item | basename not in yum_repos[os_distribution]
+                               | selectattr('id', 'in', managed_yum_repos[os_distribution])
+                               | map(attribute='file')
+                               | sort
+                               | unique
   become: true
 
 - name: Fetch GPG repo keys.
@@ -29,7 +33,9 @@
     mode: '0644'
   loop_control:
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
-  loop: "{{ yum_repos[os_distribution] | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
+  loop: "{{ yum_repos[os_distribution]
+            | selectattr('id', 'in', managed_yum_repos[os_distribution])
+            | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
   become: true
 
 - name: Import fetched GPG repo keys.
@@ -38,7 +44,9 @@
     key: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }}"
   loop_control:
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
-  loop: "{{ yum_repos[os_distribution] | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
+  loop: "{{ yum_repos[os_distribution]
+            | selectattr('id', 'in', managed_yum_repos[os_distribution])
+            | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
   become: true
 
 - name: "Configure {{ yum_repos_repo_config_dir }}/*.repo files."
@@ -46,5 +54,7 @@
   loop_control:
     label: "{{ yum_repo.id }}"
     loop_var: yum_repo
-  loop: "{{ yum_repos[os_distribution] | flatten(levels=1) }}"
+  loop: "{{ yum_repos[os_distribution]
+            | selectattr('id', 'in', managed_yum_repos[os_distribution])
+            | flatten(levels=1) }}"
 ...
