@@ -8,7 +8,7 @@ all:
     jumphost:
       hosts:
         portal:
-          cloud_flavor: 1c2m20d
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
@@ -17,7 +17,7 @@ all:
     repo:
       hosts:
         hc-repo:
-          cloud_flavor: 4c4m60d
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
@@ -28,79 +28,83 @@ all:
     sys_admin_interface:
       hosts:
         hc-sai:
-          cloud_flavor: 4c4m60d
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-            - name: subnet-nfs-data-2541
+            - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
+              lnet:
+                name: tcp15
     deploy_admin_interface:
       hosts:
         hc-dai:
-          cloud_flavor: 4c4m60d
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-            - name: subnet-nfs-data-2541
+            - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
+              lnet:
+                name: tcp15
           local_volume_extra:
             - name: apps
-              size: 400
-    ldap_server:
-      hosts:
-        hc-dai:
+              size: 300
     user_interface:
       hosts:
         hyperchicken:
-          cloud_flavor: 4c8m80d
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-            - name: subnet-nfs-data-2541
+            - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
+              lnet:
+                name: tcp15
           slurm_sockets: 4
           slurm_cores_per_socket: 1
-          slurm_real_memory: 7681
+          slurm_real_memory: 7680
           slurm_local_disk: 0
           slurm_features: 'prm09,tmp09'
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             hc-node-a01:
-              # flavor_vcompute: htc-node # Quota currently too small for 40 core compute nodes.
-              cloud_flavor: 16c64m100d
+              cloud_flavor: umcg.v1.vm.4-8
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp3s0
-                - name: subnet-nfs-data-2541
+                - name: lustre
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
                     name: enp4s0
+                  lnet:
+                    name: tcp15
               local_volume_extra:
                 - name: local
                   size: 1
-              slurm_sockets: 16
+              slurm_sockets: 4
               slurm_cores_per_socket: 1
-              slurm_real_memory: 63786
+              slurm_real_memory: 7680
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 900
@@ -110,7 +114,6 @@ administration:
     sys_admin_interface:
     deploy_admin_interface:
     user_interface:
-    ldap_server:
 cluster:
   children:
     compute_node:
