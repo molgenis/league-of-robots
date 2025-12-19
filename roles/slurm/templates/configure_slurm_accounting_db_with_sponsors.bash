@@ -229,23 +229,9 @@ printf -- "${section_header}"
 #
 # Assign QoS to the root account.
 #
-sacctmgr -i modify account root set \
-	QOS=priority,priority-short,priority-medium,priority-long
 
-sacctmgr -i modify account root set \
-	QOS+=leftover,leftover-short,leftover-medium,leftover-long
-
-sacctmgr -i modify account root set \
-	QOS+=regular,regular-short,regular-medium,regular-long
-
-sacctmgr -i modify account root set \
-	QOS+=ds,ds-short,ds-medium,ds-long
-
-sacctmgr -i modify account root set \
-	QOS+=interactive,interactive-short
-
-sacctmgr -i modify account root set \
-	DefaultQOS=priority
+sacctmgr -i modify account root set QOS="$(IFS=,; printf '%s' "${qos_levels[*]}")"
+sacctmgr -i modify account root set DefaultQOS=priority
 printf -- "${item_separator}"
 #
 # Create 'users' account in addition to the default 'root' account.
@@ -259,23 +245,8 @@ fi
 #
 # Assign QoS to the users account.
 #
-sacctmgr -i modify account users set \
-	QOS=regular,regular-short,regular-medium,regular-long
-
-sacctmgr -i modify account users set \
-	QOS+=priority,priority-short,priority-medium,priority-long
-
-sacctmgr -i modify account users set \
-	QOS+=leftover,leftover-short,leftover-medium,leftover-long
-
-sacctmgr -i modify account users set \
-	QOS+=ds,ds-short,ds-medium,ds-long
-
-sacctmgr -i modify account users set \
-	QOS+=interactive,interactive-short
-
-sacctmgr -i modify account users set \
-	DefaultQOS=regular
+sacctmgr -i modify account users set QOS="$(IFS=,; printf '%s' "${qos_levels[*]}")"
+sacctmgr -i modify account users set DefaultQOS=regular
 printf -- "${item_separator}"
 #
 # Create/update sponsor accounts.
