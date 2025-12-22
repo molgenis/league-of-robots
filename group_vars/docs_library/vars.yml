@@ -36,11 +36,7 @@ external_jumphosts:
   - group: hyperchicken_cluster
     hosts:
       - hostname: portal
-        network: public
-  - group: fender_cluster
-    hosts:
-      - hostname: corridor
-        network: public
+        network:  external_unfiltered
   - group: nibbler_cluster
     hosts:
       - hostname: tunnel

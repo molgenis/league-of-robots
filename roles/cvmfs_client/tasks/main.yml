@@ -29,13 +29,50 @@
     daemon_reload: true
   become: true
 
-- name: 'Add repositories to cvmfs and make sure file exists.'
+- name: 'Include group_vars/silo_server/vars.yml to get list of repos.'
+  ansible.builtin.include_vars:
+    dir: "{{ playbook_dir }}/group_vars/silo_server/"
+    ignore_files:
+      - 'secrets.yml'
+    name: silo_server_vars
+  tags:
+    - configure_cvmfs_repos
+
+- name: 'Add default CVM-FS config to the client.'
   ansible.builtin.blockinfile:
     path: /etc/cvmfs/default.local
-    block: | 
-      CVMFS_REPOSITORIES=hpc.umcg.nl
+    block: |
+      CVMFS_REPOSITORIES='{{ silo_server_vars['cvmfs_repos'] | join(',') }}'
       CVMFS_HTTP_PROXY=DIRECT
       CVMFS_QUOTA_LIMIT=5000
     create: true
   become: true
+  tags:
+    - configure_cvmfs_repos
+
+- name: 'Add repo-specific CVM-FS config to the client.'
+  ansible.builtin.blockinfile:
+    path: /etc/cvmfs/config.d/{{ item }}.conf
+    block: | 
+      CVMFS_REPOSITORIES={{ item }}
+      CVMFS_SERVER_URL=http://{{ silo_server_vars['ip_addresses']['silo-01']['vlan16']['address'] }}/cvmfs/{{ item }}
+      CVMFS_PUBLIC_KEY=/etc/cvmfs/keys/{{ item }}.pub
+    create: true
+  become: true
+  with_items: "{{ silo_server_vars['cvmfs_repos'] }}"
+  tags:
+    - configure_cvmfs_repos
+
+- name: 'Copy CVM-FS repo key(s) to the client.'
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/silo_server/{{ item }}.pub"
+    dest: "/etc/cvmfs/keys/{{ item }}.pub"
+    owner: cvmfs
+    group: cvmfs
+    mode: '0600'
+    force: true
+  become: true
+  with_items: "{{ silo_server_vars['cvmfs_repos'] }}"
+  tags:
+    - configure_cvmfs_repos
 ...
