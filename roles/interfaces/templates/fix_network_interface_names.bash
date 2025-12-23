@@ -3,6 +3,23 @@
 set -u
 set -e
 set -o pipefail
+
+#
+# Disable the no-auto-default.state file.
+# By default NetworkManager adds MAC addresses for interfaces to this file,
+# when an automatically created network connection profile (e.g. "Wired connection 1") is modified or deleted.
+# When the MAC address is added to this no-auto-default.state file
+# and the interface does not have a valid NetworkManager connnection profile / config file,
+# NetworkManager will not automatically create a new profile with the interface configured to use DHCP.
+# This is problematic when
+#   1. The network interface was properly configured,
+#   2. The network interface name changes due to updated BIOS, updated firmware or changed udev rules,
+#   3. The config file no longer machtes the new network interface name,
+#   4. The machine or network is restarted -> interface is not autmaticaly configurted for DHCP
+#   5. We got locked out.
+#
+rm -fv /var/lib/NetworkManager/no-auto-default.state
+
 #
 # Our custom NamePolicy in /etc/systemd/network/99-default.link
 # (to prevent problematic slot-based network interface names)

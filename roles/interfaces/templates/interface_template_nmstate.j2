@@ -1,29 +1,17 @@
 #jinja2: trim_blocks:True, lstrip_blocks:True
 ---
 interfaces:
-{% if ansible_facts['os_family'] == "RedHat" and
-      ansible_facts['distribution_major_version'] <= "8" %}
-  #
-  # nmstate on EL <= 8.x
-  #  * Does not support settting/changing profile names,
-  #    so the name of the NetworkManager config file will be whatever NetworkManager dreamed up.
-  #  * Does not support using the MAC address to identify interfaces.
-  # Therefore we must use the correct network interface name as 'name' attribute.
-  #
   - name: {{ network['nmstate_interface']['name'] }}
-{% else %}
-  #
-  # Use the MAC address to identify correct the network interface,
-  # so we do not get into trouble when the network interface name changed due to changed udev rules.
-  # When matching interfaces based on MAC address, the 'name' attribute
-  #  * is not used to find the correct network interface and 
-  #  * is used to define the name of the network manager profile:
-  #    do not add a redundant 'profile-name' atrribute as that will cause nmstate to fail.
-  #
-  - name: {{ network['name'] }}
-    identifier: mac-address
-    mac-address: {{ ansible_facts[network['nmstate_interface']['name']]['macaddress'] }}
-  {% endif %}
+    {% if ansible_facts['os_family'] == "RedHat" and
+        ansible_facts['distribution_major_version'] <= "8" %}
+    #
+    # nmstate on EL <= 8.x does not support settting/changing profile names,
+    # so the name of the NetworkManager config file will be whatever NetworkManager dreamed up.
+    #
+    #profile-name: ???
+    {% else %}
+    profile-name: {{ network['name'] }}
+    {% endif %}
     state: {{ network['nmstate_interface']['state'] | default('up') }}
     {% if network['nmstate_interface']['type'] is defined %}
     type: {{ network['nmstate_interface']['type'] }}
@@ -39,11 +27,6 @@ interfaces:
       dhcp: true
       {% else %}
       dhcp: false
-      {% endif %}
-      {% if network['nmstate_interface']['ipv4']['auto-route-metric'] is defined %}
-      auto-route-metric: {{ network['nmstate_interface']['ipv4']['auto-route-metric'] }}
-      {% endif %}
-      {% if network['nmstate_interface']['ipv4']['dhcp'] | default(true) is false %}
       address:
         - ip: {{ ip_addresses[inventory_hostname][network['name']]['address'] }}
           prefix-length: {{ stack_networks
@@ -51,6 +34,9 @@ interfaces:
                             | map(attribute='cidr')
                             | first
                             | regex_replace('^[^/]+/([0-9]+)$', '\\1') }}
+      {% endif %}
+      {% if network['nmstate_interface']['ipv4']['auto-route-metric'] is defined %}
+      auto-route-metric: {{ network['nmstate_interface']['ipv4']['auto-route-metric'] }}
       {% endif %}
     ipv6:
       enabled: {{ network['nmstate_interface']['ipv6']['enabled'] | default('false') }}
