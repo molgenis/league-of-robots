@@ -23,13 +23,13 @@ The network interface config files used by `nmstate` are stored in
 When such a `*.yml` is deployed successfully with
 
 ```
-nmstatectl apply /etc/nmstate/natwork_name.yml
+nmstatectl apply /etc/nmstate/network_name.yml
 ```
 
 it will result in a corresponding
 
 ```
-nmstatectl apply /etc/nmstate/natwork_name.applied
+nmstatectl apply /etc/nmstate/network_name.applied
 ```
 
 and `nmstatectl` will refuse to apply the `*.yml` again unless the corresponding `*.applied` is removed first.

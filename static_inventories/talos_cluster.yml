@@ -228,11 +228,11 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: eth0
+                    name: enp3s0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: eth1
+                    name: enp4s0
                   lnet:
                     name: tcp20
               local_volume_extra:
@@ -240,7 +240,7 @@ all:
                   size: 1
               slurm_sockets: 4
               slurm_cores_per_socket: 1
-              slurm_real_memory: 7681
+              slurm_real_memory: 7680
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 900
