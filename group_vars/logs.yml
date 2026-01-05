@@ -10,8 +10,7 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['rug']['bwp_net'] }}"
   - "{{ all.ip_addresses['rug']['operator'] }}"
   - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
-  - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
-  - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
+  - "{{ hyperchicken_cluster.ip_addresses['portal']['external_unfiltered'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
@@ -23,8 +22,7 @@ iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net2'] }}"
   - "{{ all.ip_addresses['umcg']['net3'] }}"
   - "{{ all.ip_addresses['umcg']['net4'] }}"
-  - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
-  - "{{ hyperchicken_cluster.ip_addresses['portal']['public'] }}"
+  - "{{ hyperchicken_cluster.ip_addresses['portal']['external_unfiltered'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
@@ -38,4 +36,16 @@ iptables_allow_repository_inbound:
 # This is enforcing that log servers uses `yum_repos` to create
 # yum repositories, since repo servers cannot use Pulp
 repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
+              | map(attribute='id') }}"
 ...

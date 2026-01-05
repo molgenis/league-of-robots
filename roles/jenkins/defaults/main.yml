@@ -1,8 +1,5 @@
 ---
 jenkins_prefer_lts: true
-jenkins_repo_url: https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | bool) else '' }}/jenkins.repo
-jenkins_repo_key_url: https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | bool) else '' }}/jenkins.io-2023.key
-jenkins_pkg_url: https://pkg.jenkins.io/redhat
 jenkins_package_state: latest  # Change to `latest` to update Jenkins if a newer release is available.
 jenkins_connection_delay: 5
 jenkins_connection_retries: 60

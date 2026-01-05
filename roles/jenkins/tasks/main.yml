@@ -57,20 +57,6 @@
          cp "/opt/shellcheck-v${SC_VERSION}/shellcheck" /usr/local/bin/
   become: true
 
-- name: 'Ensure Jenkins repo is installed.'
-  ansible.builtin.get_url:
-    url: "{{ jenkins_repo_url }}"
-    dest: /etc/yum.repos.d/jenkins.repo
-  when: jenkins_repo_url | default(false)
-  become: true
-
-- name: 'Add Jenkins repo GPG key.'
-  ansible.builtin.rpm_key:
-    state: present
-    key: "{{ jenkins_repo_key_url }}"
-  when: jenkins_repo_url | default(false)
-  become: true
-
 - name: 'Install Jenkins.'
   ansible.builtin.package:
     name: jenkins
