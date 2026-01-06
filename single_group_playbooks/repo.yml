@@ -6,7 +6,9 @@
   ansible.builtin.import_playbook: init.yml
 
 - name: '###==-> Roles for repo management servers. <-==###'
-  hosts: repo
+  hosts:
+    - repo
+    - repo_servers
   roles:
     - interfaces
     - iptables
@@ -18,6 +20,7 @@
     - logins
     - sshd
     - basic_security
+    - local_storage
     - remove
     - update
     - role: logs_client
@@ -38,4 +41,9 @@
   strategy: linear
   roles:
     - pulp_server
+
+- name: '###==-> Roles for centrally managed repository servers. <-==###'
+  hosts: repo_servers
+  roles:
+    - repo_server
 ...

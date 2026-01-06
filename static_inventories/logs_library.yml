@@ -64,7 +64,7 @@ all:
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-    repo:
+    repo_servers:
       hosts:
         repo-primary:
           cluster_class: 'development'
@@ -77,6 +77,19 @@ all:
           local_volume_extra:
             - name: mnt
               size: 500
+          local_mounts:
+            - mount_point: '/mnt/repos'
+              device: /dev/sdc # A value must be present in order to update it on-the-fly during role execution.
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: >-
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
+              type: xfs
         repo-secondary:
           cluster_class: 'development'
           cloud_flavor: umcg.v1.vm.1-2
@@ -88,13 +101,26 @@ all:
           local_volume_extra:
             - name: mnt
               size: 500
+          local_mounts:
+            - mount_point: '/mnt/repos'
+              device: /dev/vdb # A value must be present in order to update it on-the-fly during role execution.
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: >-
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
+              type: xfs
 cluster:
   children:
     logs:
-    repo:
+    repo_servers:
 logs_library:
   children:
     controller_api:
     logs:
-    repo:
+    repo_servers:
 ...
