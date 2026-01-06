@@ -92,6 +92,14 @@ additional_etc_hosts:
     nodes:
       - name: ladap
         network: donbot_external_network
+  - group: logs_library
+    nodes:
+      - name: repo-primary
+        network: logs_external_public
+  - group: logs_library
+    nodes:
+      - name: repo-secondary
+        network: vlan16
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
