@@ -37,6 +37,6 @@ managed_yum_repos:
 user_quota_on_root_partition:
   blocks_soft: 512K
   blocks_hard: 1024K
-  inodes_soft: 8k
-  inodes_hard: 10k
+  inodes_soft: 500
+  inodes_hard: 1000
 ...
