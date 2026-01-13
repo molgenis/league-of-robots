@@ -80,4 +80,8 @@ external_jumphosts:
     hosts:
       - hostname: cf-porch
         network: external
+  - group: logs_library
+    hosts:
+      - hostname: hatch
+        network: logs_external_public
 ...
