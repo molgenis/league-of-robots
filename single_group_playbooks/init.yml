@@ -1,7 +1,5 @@
 ---
 - name: Initialization roles for most hosts.
-  vars:
-    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
   hosts:
     - jumphost
     - repo
