@@ -501,10 +501,10 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 {% endif%}
 {% if iptables_allow_repository_inbound is defined and iptables_allow_repository_inbound | length > 0 %}
 	#
-	# Allow inbound logs.
+	# Allow inbound repositories
 	#
 	# logs requires:
-	#  * TCP port 41514: to receive syslogs
+	#  * TCP port 8443: to receive syslogs
 	#
 	declare -a ALLOW_REPOSITORY_INBOUND=(
 	{% for ip in iptables_allow_repository_inbound %}
@@ -516,9 +516,9 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 	{% endfor %}
 	)
 	for IP_ADDRESS in "${ALLOW_REPOSITORY_INBOUND[@]}"; do
-		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 41514 -m state --state NEW,ESTABLISHED -j ACCEPT
+		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 8443 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
-	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 41514 -m state --state ESTABLISHED -j ACCEPT
+	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 8443 -m state --state ESTABLISHED -j ACCEPT
 {% endif%}
 {% if iptables_allow_ldap_inbound is defined and iptables_allow_ldap_inbound | length > 0 %}
 	#
