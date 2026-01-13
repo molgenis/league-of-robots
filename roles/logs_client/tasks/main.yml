@@ -33,7 +33,7 @@
     - test
 
 - name: "Set proxy host (jumphost or AI_PROXY)"
-  set_fact:
+  ansible.builtin.set_fact:
     proxy_host: >-
       {{
         (groups.jumphost | default([]) | first)
