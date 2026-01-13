@@ -3,6 +3,7 @@ ssh_client_jumphosts:
 
 ssh_client_known_hosts: "\
   @cert-authority \
+  hatch*,\
   *earl1,\
   *earl2,\
   *earl3,\

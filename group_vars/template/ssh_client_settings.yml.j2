@@ -44,7 +44,7 @@ ssh_client_known_hosts: "\
   {% for logshost in groups['logs'] | default([]) %}
   *{{ logshost }},\
   {% endfor %}
-  {% for repohost in groups['repo'] | default([]) %}
+  {% for repohost in groups['repo_servers'] | default([]) %}
   *{{ repohost }},\
   {% endfor %}
   *{{ stack_prefix }}-* \

@@ -1,5 +1,14 @@
 ---
 ip_addresses:
+  hatch:
+    logs_external:
+      address: 10.10.1.8
+      netmask: /32
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
+    logs_external_public:
+      address: 13.73.229.123
+      netmask: /32
+      fqdn: 'logs-hatch-ad5f.westeurope.cloudapp.azure.com'
   earl1:
     logs_internal_management:
       address: 10.10.1.158
@@ -60,7 +69,7 @@ ip_addresses:
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     logs_external_public:
-      address: 51.144.115.241
+      address: 52.174.107.242
       netmask: /32
       fqdn: 'logs-repo-primary-ad5f.westeurope.cloudapp.azure.com'
   repo-secondary:

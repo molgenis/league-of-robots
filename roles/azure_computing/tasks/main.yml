@@ -44,6 +44,7 @@
     dest: "{{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new"
     mode: '0644'
   run_once: true
+  when: inventory_hostname != 'localhost'
 
 - name: "ToDo"
   ansible.builtin.debug:

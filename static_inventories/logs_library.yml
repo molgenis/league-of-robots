@@ -5,6 +5,18 @@ all:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
+    jumphost:
+      hosts:
+        hatch:
+          cluster_class: 'research'
+          azure_flavor: "Standard_DS1_v2"
+          host_networks:
+            - name: "{{ stack_prefix }}_external"
+              security_group: "{{ stack_prefix }}_logservers"
+              assign_floating_ip: true
+              add_hostname_to_ip_address: true
+          basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
+          local_yum_repository: true
     logs:
       hosts:
         earl1:
@@ -79,7 +91,7 @@ all:
               size: 500
           local_mounts:
             - mount_point: '/mnt/repos'
-              device: /dev/sdc # A value must be present in order to update it on-the-fly during role execution.
+              device: /dev/sda # A value must be present in order to update it on-the-fly during role execution.
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
@@ -123,4 +135,5 @@ logs_library:
     controller_api:
     logs:
     repo_servers:
+    jumphost:
 ...
