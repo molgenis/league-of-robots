@@ -73,7 +73,14 @@ from ansible.module_utils.common._collections_compat import Mapping
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.plugins.inventory import BaseFileInventoryPlugin
 from ansible.module_utils.common._collections_compat import Mapping
-from ansible.template import trust_as_template
+#
+# trust_as_template is only available in and required by ansible-core 2.19 and later.
+#
+try:
+	from ansible.template import trust_as_template
+except ImportError:
+	def trust_as_template(s):
+		return s
 
 def trust_all(data):
 	if isinstance(data, str):
