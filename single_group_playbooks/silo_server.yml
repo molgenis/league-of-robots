@@ -12,6 +12,7 @@
     - {role: yum_local, when: local_yum_repository is defined}
     - interfaces
     - iptables
+    - ssh
     - grub
     - locale
     - logrotate
