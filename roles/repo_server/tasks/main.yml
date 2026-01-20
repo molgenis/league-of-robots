@@ -37,7 +37,6 @@
     dest: "/mnt/repos/dnf.repos.d/{{ os_distribution }}.conf"
     force: true
     mode: '0644'
-  become: true
   loop: "{{ yum_repos | list }}"
   loop_control:
     loop_var: os_distribution
