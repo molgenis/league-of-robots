@@ -1,0 +1,68 @@
+---
+- name: Deploy repository management scripts to /mnt/repos
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/mnt/repos/"
+    owner: root
+    group: root
+    mode: '0750'
+  with_items:
+    - 0_cleanup.sh
+    - 1_sync_repo_to_new_version.sh
+    - 2_new_repo_distribution.sh
+  become: true
+
+- name: Create the folder structure for the repository configuration files
+  ansible.builtin.file:
+    path: /mnt/repos/dnf.repos.d
+    state: directory
+    mode: '0750'
+    owner: 'root'
+    group: 'root'
+  become: true
+
+- name: Create the folder structure for the repository configuration files
+  ansible.builtin.file:
+    path: "/mnt/repos/dnf.repos.d/{{ item }}"
+    state: directory
+    mode: '0750'
+    owner: 'root'
+    group: 'root'
+  loop: "{{ yum_repos | list }}"
+  become: true
+
+- name: Configure all options for all repos in {{ yum_repo }}
+  ansible.builtin.template:
+    src: templates/dnf.conf.j2
+    dest: "/mnt/repos/dnf.repos.d/{{ os_distribution }}.conf"
+    force: true
+    mode: '0644'
+  become: true
+  loop: "{{ yum_repos | list }}"
+  loop_control:
+    loop_var: os_distribution
+  become: true
+
+- name: "Configure /mnt/repos/dnf.repos.d/ *.repo files."
+  ansible.builtin.include_tasks: configure_repo_options.yml
+  loop_control:
+    loop_var: yum_repo
+#    label: "{{ item.id }}"
+  loop: "{{ yum_repos | list }}"
+
+# - name: Create repo files
+#   ansible.builtin.copy:
+#     dest: "/mnt/repos/dnf.repos.d/{{ item.file }}"
+#     content: |
+#       [{{ item.id }}]
+#       name={{ item.name }}
+#       {% if item.metalink is defined %}metalink={{ item.metalink }}
+#       {% elif item.mirrorlist is defined %}mirrorlist={{ item.mirrorlist }}
+#       {% else %}
+#       baseurl={{ item.baseurl }}
+#       {% endif %}
+#   loop: "{{ yum_repos | dict2items | map(attribute='value') | flatten(levels=1) }}"
+#   loop_control:
+#     label: "{{ item.file }}"
+#   become: true
+...
