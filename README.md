@@ -44,10 +44,9 @@ We follow the [Python PEP8 naming conventions](https://www.python.org/dev/peps/p
 This repo currently contains code and configs for the following clusters:
 
  * Talos: Development cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
- * Gearshift: [UMCG](https://www.umcg.nl) Research IT production cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
+ * Hyperchicken: Development cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
+ * Vaxtron: [UMCG](https://www.umcg.nl) Research IT production cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
  * Nibbler: [UMCG](https://www.umcg.nl) Research IT production cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
- * Hyperchicken: Development cluster hosted by [The European Bioinformatics Institute (EMBL-EBI)](https://www.ebi.ac.uk/) in the [Embassy Cloud](https://www.embassycloud.org/).
- * Fender: [Solve-RD](solve-rd.eu/) production cluster hosted by [The European Bioinformatics Institute (EMBL-EBI)](https://www.ebi.ac.uk/) in the [Embassy Cloud](https://www.embassycloud.org/).
 
 Deployment and functional administration of all clusters is a joined effort of the
 [Genomics Coordination Center (GCC)](http://wiki.gcc.rug.nl/)
@@ -97,10 +96,7 @@ Deploying a fully functional stack of virtual machines from scratch involves the
     * Off topic for this repo.
  2. Deploy OpenStack virtualization layer on physical machines to create an OpenStack cluster.
     * Off topic for this repo.
-    * For the _Shikra_ cloud, which hosts the _Talos_ and _Gearshift_ HPC clusters
-      we use the ansible playbooks from the [hpc-cloud](https://git.webhosting.rug.nl/HPC/hpc-cloud) repository
-      to create the OpenStack cluster.
-    * For other HPC clusters we use OpenStack clouds from other service providers _as is_.
+    * For our HPC clusters we use OpenStack clouds from other service providers _as is_.
  3. Create, start and configure virtual networks and machines on an OpenStack cluster.
     * This repo.
  4. Deploy bioinformatics software and reference datasets.
