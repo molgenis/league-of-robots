@@ -7,7 +7,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.14
     working_directory: ~/repo
     resource_class: small
     steps:
@@ -45,7 +45,7 @@ jobs:
             source python.venv/bin/activate
             export ANSIBLE_ROLES_PATH="${VIRTUAL_ENV}/ansible/ansible_roles/:"
             export ANSIBLE_COLLECTIONS_PATH="${VIRTUAL_ENV}/ansible/:"
-            if ansible-lint -p --nocolor --offline *.yml > lint_results 2>&1; then
+            if ansible-lint --format=pep8 --nocolor --offline *.yml > lint_results 2>&1; then
               lint_errors=0
             else
               cat lint_results
