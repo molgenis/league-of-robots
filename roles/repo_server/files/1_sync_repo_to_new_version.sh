@@ -9,27 +9,22 @@ print_all_repos() {
    echo ""
    echo "All available repositories are"
    cd ${_main}/dnf.repos.d/
-   find . -name "*.repo" -type f -printf '    %P\n'
+   grep -o '\[[^]]*\]' */*.repo | tr ':' '/' | tr -d '[]' | cut -d'/' -f 1,3 | sort -u
 }
 
 if [[ -z "${1:-}" ]]; then
-      echo "Error, you did not provide repo!"
+      echo "Error, you did not provide distribution!"
       print_all_repos
       echo ""
-      echo "Correct syntax is"
-      echo "  ${0} os_distribution/repository"
+      echo "Correct syntax for downloading the specific repository is"
+      echo "  ${0} [os_distribution] [repository]"
+      echo "or to download ALL repositories of a specific OS distribution"
+      echo "  ${0} [os_distribution]"
       exit
 fi
 
+_repo=${1##*/}
 _os_distribution=${1%%/*}
-
-_repo_file=${1##*/}
-_repo=${_repo_file//.repo}
-
-
-echo _os_distribution=$_os_distribution
-echo _repo_file=$_repo_file
-echo _repo=$_repo
 
 _time="$(date +%Y%m%d-%H%M%S)"
 dnf reposync --conf ${_main}/dnf.repos.d/${_os_distribution}.conf --repo ${_repo} --downloaddir=${_main}/0cache/${_os_distribution}/ && \

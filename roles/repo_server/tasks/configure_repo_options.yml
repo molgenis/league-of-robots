@@ -1,5 +1,12 @@
 ---
-- name: Configure all options for all repos in {{ yum_repo }}
+- debug:
+    msg: "{{ item }}"
+  loop: "{{ yum_repo }}"
+
+#- meta: end_play
+
+
+- name: "Configure all options for all repos in {{ yum_repo }}"
   community.general.ini_file:
     path: "/mnt/repos/dnf.repos.d/{{ yum_repo }}/{{ repo.file }}"
     section: "{{ repo.id }}"
@@ -10,7 +17,13 @@
     owner: root
     group: root
     mode: '0644'
-  loop: "{{ yum_repos[yum_repo] | product(options) | list }}"
+  loop:
+    - "{{ yum_repos[item]
+          | selectattr('enabled', 'defined')
+          | selectattr('enabled', 'equalto', 1)
+          | map(attribute='id')
+          | list }}"
+    - "{{ yum_repos[item] | product(options) | list }}"
   loop_control:
     label: "{{ repo.file }}:{{ opt }}"
   vars:
@@ -23,46 +36,6 @@
       - countme
     repo: "{{ item.0 }}"
     opt: "{{ item.1 }}"
-  when: repo[opt] is defined
+#  when: repo[opt] is defined
   become: true
-
-
-# - name: "Configure options for {{ yum_repos[yum_repo]['id'] }} in /mnt/repos/dnf.repos.d/{{ yum_repos[yum_repo]['file'] }}."
-#   community.general.ini_file:
-#     path: "/mnt/repos/dnf.repos.d/yum_repo/{{ yum_repos[yum_repo]['file'] }}"
-#     section: "{{ yum_repos[yum_repo]['id'] }}"
-#     no_extra_spaces: true
-#     create: true
-#     option: "{{ item }}"
-#     value: "{{ yum_repos[yum_repo][item] }}"
-#     owner: root
-#     group: root
-#     mode: '0644'
-#   when: yum_repos[yum_repo][item] is defined
-#   loop_control:
-#     label: "{{ item }}={{ yum_repos[yum_repo][item] | default('undefined') }}"
-#   loop:
-#     - name
-#     - baseurl
-#     - mirrorlist
-#     - metalink
-#     - enabled
-#     - countme
-# #    - gpgcheck
-# #    - gpgkey
-#   become: true
-
-# - name: "Configure gpgkey option for {{ yum_repo['id'] }} in {{ yum_repos_repo_config_dir }}/{{ yum_repo['file'] }} if we downloaded the GPG key."
-#   community.general.ini_file:
-#     path: "{{ yum_repos_repo_config_dir }}/{{ yum_repo['file'] }}"
-#     section: "{{ yum_repo['id'] }}"
-#     no_extra_spaces: true
-#     create: true
-#     option: gpgkey
-#     value: "file://{{ yum_repos_gpgkeys_dir }}/{{ yum_repo['gpgkeysource'] | basename }}"
-#     owner: root
-#     group: root
-#     mode: '0644'
-#   when: yum_repo['gpgkeysource'] is defined
-#   become: true
 ...
