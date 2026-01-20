@@ -934,7 +934,7 @@ pulp rpm distribution update --name ? --publication /pulp/api/v3/publications/rp
 With correct distribution name, like **nb-cpel9** or **vt-cpel9**. Then check if distribution is now linked to the new publication (f.e. for nb--cpel9 repository on nibbler)
 
 ```
-pulp rpm distribution show --name nb-cpel7
+pulp rpm distribution show --name nb-cpel9
 ```
 
 
