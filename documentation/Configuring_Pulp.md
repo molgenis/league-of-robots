@@ -931,7 +931,7 @@ pulp rpm publication create --repository /pulp/api/v3/repositories/rpm/rpm/b7180
 pulp rpm distribution update --name ? --publication /pulp/api/v3/publications/rpm/rpm/98300791-39cb-4918-b613-7c8f481a8ffd/
 ```
 
-With correct distribution name, like **nb-cpel7** or **vt-cpel7**. Then check if distribution is now linked to the new publication (f.e. for nb--cpel7 repository on nibbler)
+With correct distribution name, like **nb-cpel9** or **vt-cpel9**. Then check if distribution is now linked to the new publication (f.e. for nb--cpel9 repository on nibbler)
 
 ```
 pulp rpm distribution show --name nb-cpel7
