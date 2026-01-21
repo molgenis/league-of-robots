@@ -354,8 +354,8 @@ done
 set -e
 set -u
 
-stack_prefix='' # Must be filled in; check group_vars (f.e. 'fd').
-stack_name=''   # Must be filled in; check group_vars (f.e. 'fender_cluster').
+stack_prefix='' # Must be filled in; check group_vars (f.e. 'nb').
+stack_name=''   # Must be filled in; check group_vars (f.e. 'nibbler_cluster').
 #
 # Make sure you already declared the ${all_pulp_repos[@]} array: see above.
 #
@@ -931,10 +931,10 @@ pulp rpm publication create --repository /pulp/api/v3/repositories/rpm/rpm/b7180
 pulp rpm distribution update --name ? --publication /pulp/api/v3/publications/rpm/rpm/98300791-39cb-4918-b613-7c8f481a8ffd/
 ```
 
-With correct distribution name, like **nb-cpel7** or **fd-cpel7**. Then check if distribution is now linked to the new publication (f.e. for fd--cpel7 repository on fender)
+With correct distribution name, like **nb-cpel9** or **vt-cpel9**. Then check if distribution is now linked to the new publication (f.e. for nb--cpel9 repository on nibbler)
 
 ```
-pulp rpm distribution show --name fd-cpel7
+pulp rpm distribution show --name nb-cpel9
 ```
 
 
