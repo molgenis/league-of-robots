@@ -73,6 +73,23 @@ from ansible.module_utils.common._collections_compat import Mapping
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.plugins.inventory import BaseFileInventoryPlugin
 from ansible.module_utils.common._collections_compat import Mapping
+#
+# trust_as_template is only available in and required by ansible-core 2.19 and later.
+#
+try:
+	from ansible.template import trust_as_template
+except ImportError:
+	def trust_as_template(s):
+		return s
+
+def trust_all(data):
+	if isinstance(data, str):
+		return trust_as_template(data)
+	if isinstance(data, dict):
+		return {k: trust_all(v) for k,v in data.items()}
+	if isinstance(data, list):
+		return [trust_all(i) for i in data]
+	return data
 
 NoneType = type(None)
 
@@ -100,6 +117,7 @@ class InventoryModule(BaseFileInventoryPlugin):
 		''' parses the inventory file '''
 		super(InventoryModule, self).parse(inventory, loader, path)
 		self.set_options()
+
 		try:
 			data = self.loader.load_from_file(path, cache=False)
 		except Exception as e:
@@ -172,7 +190,7 @@ class InventoryModule(BaseFileInventoryPlugin):
 		for host in hosts:
 			self.inventory.add_host(host, group=group, port=port)
 			for k in variables:
-				self.inventory.set_variable(host, k, variables[k])
+				self.inventory.set_variable(host, k, trust_all(variables[k]))
 			'''
 			Set ansible_host to jumphost+target only when
 			 * AI_PROXY was configured and
