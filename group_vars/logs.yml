@@ -29,11 +29,13 @@ iptables_allow_ssh_inbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
+  - "{{ logs_library.ip_addresses['hatch']['logs_external_public'] }}"
 iptables_allow_logs_inbound:
   - ANY
-#
-# Enforce that logs servers use `yum_repos` for defining repositories, since they cannot use Pulp.
-#
+iptables_allow_repository_inbound:
+  - ANY
+# This is enforcing that log servers uses `yum_repos` to create
+# yum repositories, since repo servers cannot use Pulp
 repo_manager: 'none'
 #
 # Configure limited subset of repos.

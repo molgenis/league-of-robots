@@ -9,6 +9,7 @@ ip_addresses:
   {% if hostvars[each_hostname]['azure_flavor'] is defined %}
   {{ each_hostname }}:
   {% for each_network in hostvars[each_hostname]['host_networks'] | default([]) | sort %}
+    {% if hostvars[each_hostname]['nic_info'] is defined %}
     {% for private_ip_results in hostvars[each_hostname]['nic_info']['results'] %}
     {% if private_ip_results['item']['name'] == each_network.name %}
     {{ each_network.name }}:
@@ -19,6 +20,8 @@ ip_addresses:
       {% endif %}
     {% endif %}
     {% endfor %}
+    {% endif %}
+    {% if hostvars[each_hostname]['public_ips'] is defined %}
     {% for public_ip_results in hostvars[each_hostname]['public_ips']['results'] %}
     {% if public_ip_results['item']['name'] == each_network.name and public_ip_results['publicipaddresses']|length > 0 %}
     {{ each_network.name }}_public:
@@ -32,6 +35,7 @@ ip_addresses:
       {% endif %}
     {% endif %}
     {% endfor %}
+    {% endif %}
   {% endfor %}
   {% endif %}
 {% endfor %}
