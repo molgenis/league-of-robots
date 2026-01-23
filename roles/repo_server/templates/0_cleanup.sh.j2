@@ -1,7 +1,9 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
 #!/bin/bash
 
-_main="/mnt/repos"
+_main="{{ main_repo_path }}"
 
+{% raw %}
 echo "  Checking which deployments are not linked correctly ..."
 for _link in $(find ${_main} -type l ! -exec test -e {} \; -print); do
    read -p "> ${_link} is dead - (r)emove is or re(L)ink [r/L]? " _confirm
@@ -15,3 +17,4 @@ for _link in $(find ${_main} -type l ! -exec test -e {} \; -print); do
       fi
    fi
 done
+{% endraw %}

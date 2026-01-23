@@ -1,8 +1,11 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
 #!/bin/bash
 
 set -ueo pipefail
 
-_main="/mnt/repos"
+_main="{{ main_repo_path }}"
+
+{% raw %}
 for _dir in ${_main} ${_main}/1versions ${_main}/2deploy; do
    test -d ${_dir} || { echo "creating ${_dir}" && mkdir "${_dir}"; }
 done
@@ -87,3 +90,4 @@ else
    ln -f -s "1versions/${_distroselect}/${_reposelect}/${_versionselect}" "2deploy/${_stack}/${_reposelect}"
    echo ""
 fi
+{% endraw %}

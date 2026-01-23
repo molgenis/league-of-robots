@@ -1,8 +1,12 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
 #!/bin/bash
 
 set -ueo pipefail
 
-_main="/mnt/repos"
+_main="{{ main_repo_path }}"
+
+
+{% raw %}
 ! test -d "${_main}/0cache" && mkdir "${_main}/0cache"
 
 print_all_repos() {
@@ -33,3 +37,4 @@ cp -a --reflink=always ${_main}/0cache/${_os_distribution}/${_repo}/ "${_main}/1
 echo ""
 echo ""
 echo "New version created:   ${_main}/1versions/${_os_distribution}/${_repo}/${_time}"
+{% endraw %}

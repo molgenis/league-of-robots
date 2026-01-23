@@ -1,8 +1,8 @@
 ---
-- name: Deploy repository management scripts to /mnt/repos
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "/mnt/repos/"
+- name: "Deploy repository management scripts to {{ main_repo_path }}"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ main_repo_path }}/{{ item }}"
     owner: root
     group: root
     mode: '0750'
@@ -12,9 +12,9 @@
     - 2_new_repo_distribution.sh
   become: true
 
-- name: Create the folder structure for the repository configuration files
+- name: "Create the folder structure for the repository configuration files"
   ansible.builtin.file:
-    path: /mnt/repos/dnf.repos.d
+    path: "{{ main_repo_path }}/dnf.repos.d"
     state: directory
     mode: '0750'
     owner: 'root'
@@ -23,7 +23,7 @@
 
 - name: "Create the folder structure for all distributions"
   ansible.builtin.file:
-    path: "/mnt/repos/dnf.repos.d/{{ item }}"
+    path: "{{ main_repo_path }}/dnf.repos.d/{{ item }}"
     state: directory
     mode: '0750'
     owner: 'root'
@@ -34,16 +34,15 @@
 - name: "Configure all configurations for all distributions"
   ansible.builtin.template:
     src: templates/dnf.conf.j2
-    dest: "/mnt/repos/dnf.repos.d/{{ item }}.conf"
+    dest: "{{ main_repo_path }}/dnf.repos.d/{{ item }}.conf"
     force: true
     mode: '0644'
   loop: "{{ yum_repos | list }}"
   become: true
 
-- name: "Configure /mnt/repos/dnf.repos.d/ *.repo files."
+- name: "Configure repo for each distribution"
   ansible.builtin.include_tasks: configure_repo_options.yml
+  loop: "{{ yum_repos | list }}"
   loop_control:
-    loop_var: yum_repo
-  loop:
-    - "{{ yum_repos | list }}"
+    loop_var: this_distribution
 ...
