@@ -12,10 +12,6 @@ external_jumphosts:
     hosts:
       - hostname: portal
         network: public
-  - group: fender_cluster
-    hosts:
-      - hostname: corridor
-        network: public
   - group: nibbler_cluster
     hosts:
       - hostname: tunnel
