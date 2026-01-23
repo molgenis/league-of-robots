@@ -79,7 +79,7 @@ lfs_quota:
       umcg-intercept: 2048
       umcg-lifelines: 17408
       umcg-lld: 3072
-      umcg-llnext: 10240
+      umcg-llnext: 18432
       umcg-mic: 2048
       umcg-micompany: 512
       umcg-muhas: 1024
