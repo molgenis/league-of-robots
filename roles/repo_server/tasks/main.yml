@@ -21,25 +21,6 @@
     group: 'root'
   become: true
 
-- name: "Create the folder structure for all distributions"
-  ansible.builtin.file:
-    path: "{{ main_repo_path }}/dnf.repos.d/{{ item }}"
-    state: directory
-    mode: '0750'
-    owner: 'root'
-    group: 'root'
-  loop: "{{ yum_repos | list }}"
-  become: true
-
-- name: "Configure all configurations for all distributions"
-  ansible.builtin.template:
-    src: templates/dnf.conf.j2
-    dest: "{{ main_repo_path }}/dnf.repos.d/{{ item }}.conf"
-    force: true
-    mode: '0644'
-  loop: "{{ yum_repos | list }}"
-  become: true
-
 - name: "Configure repo for each distribution"
   ansible.builtin.include_tasks: configure_repo_options.yml
   loop: "{{ yum_repos | list }}"

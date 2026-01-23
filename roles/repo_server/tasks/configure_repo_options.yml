@@ -1,4 +1,21 @@
 ---
+- name: "Create the repo folder structure for {{ this_distribution }}"
+  ansible.builtin.file:
+    path: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}"
+    state: directory
+    mode: '0750'
+    owner: 'root'
+    group: 'root'
+  become: true
+
+- name: "Configure main configurations for /{{ this_distribution }}"
+  ansible.builtin.template:
+    src: templates/dnf.conf.j2
+    dest: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}.conf"
+    force: true
+    mode: '0644'
+  become: true
+
 - name: "Create local_temp_repo_dir variable"
   ansible.builtin.set_fact:
     local_temp_repo_dir: "{{ playbook_dir }}/temp_repo_{{ this_distribution }}"
