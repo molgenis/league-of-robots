@@ -329,6 +329,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       priority: 20
+#      enabled: 0 # is this correct?
       tags:
         - distro
         - core
