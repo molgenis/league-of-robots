@@ -29,7 +29,7 @@
   connection: local
 
 - name: "Create the {{ local_temp_repo_dir }} if missing"
-  file:
+  ansible.builtin.file:
     path: "{{ local_temp_repo_dir }}"
     state: directory
     mode: '0755'
@@ -75,7 +75,7 @@
   become: true
 
 - name: Get list of local files
-  set_fact:
+  ansible.builtin.set_fact:
     local_files: "{{ lookup('fileglob', local_temp_repo_dir + '/*', wantlist=True) | map('basename') | list }}"
   delegate_to: localhost
   connection: local
