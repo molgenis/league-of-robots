@@ -1,6 +1,6 @@
 ---
-gpu_cuda_version: '13.1.1'
-gpu_driver_version: '590.48.01'
+gpu_cuda_version: '13.0.2'
+gpu_driver_version: '580.95.05'
 gpu_url_dir: 'https://developer.download.nvidia.com/compute/cuda/{{ gpu_cuda_version }}/local_installers/'
 gpu_runfile: 'cuda_{{ gpu_cuda_version }}_{{ gpu_driver_version }}_linux.run'
 nvidia_user: nvidia
