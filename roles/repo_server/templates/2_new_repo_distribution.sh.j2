@@ -6,11 +6,6 @@ set -ueo pipefail
 _main="{{ main_repo_path }}"
 
 {% raw %}
-print_all_stacks() {
-   cd ${_main}/2deploy/
-   echo "Available stacks are: "
-   find . -mindepth 1 -maxdepth 1 -type d -printf ' %P\n'
-}
 _prompt=false
 OPTSTRING=":s:d:r:v:p"
 while getopts ${OPTSTRING} opt; do
@@ -30,7 +25,10 @@ while getopts ${OPTSTRING} opt; do
        echo "   -v string       in case of specific repository, this is a specific version to be used for a stack"
        echo "                   Note: if no version is selected, then the last one will be used!"
        echo ""
-       print_all_stacks
+       cd ${_main}/2deploy/
+       echo "Available stacks are: "
+       find . -mindepth 1 -maxdepth 1 -type d -printf ' %P\n'
+       cd ${_main}
        exit 1
        ;;
   esac
@@ -72,8 +70,7 @@ for _dir in ${_main} ${_main}/1versions ${_main}/2deploy; do
 done
 
 if ! test -d ${_main}/2deploy/${_stack}; then
-   echo "Warningn: new stack, not part of existing ones."
-   print_all_stacks
+   echo "Warning: new stack, not part of existing ones."
    if ${_prompt}; then
       read -n1 -p "> you want to ADD this stack as NEW stack? [enter]: " _confirm
    fi
@@ -122,7 +119,9 @@ for _each_repo in ${_reposelect}; do
          echo ""
       done
    else # no prompt needed
-      test -d "1versions/${_distroselect}/${_each_repo}" || { echo "Error, no repository (1versions/${_distroselect}/${_each_repo}) found"; exit; }
+      cd "${_main}"
+      echo "test -d 1versions/${_distroselect}/${_each_repo}"
+      test -d "1versions/${_distroselect}/${_each_repo}" || { echo "Error, no repository found at 1versions/${_distroselect}/${_each_repo}"; exit; }
       if [[ -z "${_versionarg:-}" ]]; then        # no version was PROVIDED, selecting LATEST version
          _versionselect="$(find 1versions/${_distroselect}/${_each_repo} -maxdepth 1 -mindepth 1 -type d -printf '%T@ %p\n' | sort -nr | head -1 | cut -d' ' -f2-)" || \
            { echo "Error finding latest version."; exit; }
