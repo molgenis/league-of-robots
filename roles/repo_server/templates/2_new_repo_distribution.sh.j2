@@ -6,88 +6,147 @@ set -ueo pipefail
 _main="{{ main_repo_path }}"
 
 {% raw %}
-for _dir in ${_main} ${_main}/1versions ${_main}/2deploy; do
-   test -d ${_dir} || { echo "creating ${_dir}" && mkdir "${_dir}"; }
-done
-
 print_all_stacks() {
    cd ${_main}/2deploy/
    echo "Available stacks are: "
    find . -mindepth 1 -maxdepth 1 -type d -printf ' %P\n'
 }
+_prompt=false
+OPTSTRING=":s:d:r:v:p"
+while getopts ${OPTSTRING} opt; do
+  case ${opt} in
+    s) _stack=${OPTARG} && echo "_stack=${_stack}" ;;
+    d) _distroselect=${OPTARG} && echo "_distroselect=${_distroselect}" ;;
+    r) _repoarg=${OPTARG} && echo "_repoarg=${_repoarg}" ;;
+    v) _versionarg=${OPTARG} && echo "_versionarg=${_versionarg}" ;;
+    p) _prompt=true ;;
+    *)
+       echo "Error, at least [stack_prefix] is missing. Use"
+       echo "  ${0} -s stack [-o string] [-r string|ALL] [-v string] [-p]"
+       echo " where"
+       echo "   -s string       is a name of the stack abbrevation, e.g. 'nb'"
+       echo "   -d string       is distribution, e.g. 'rocky9'"
+       echo "   -r string|ALL   is name of specific repository, e.g. 'ryslog7' or 'ALL' for all repositories"
+       echo "   -v string       in case of specific repository, this is a specific version to be used for a stack"
+       echo "                   Note: if no version is selected, then the last one will be used!"
+       echo ""
+       print_all_stacks
+       exit 1
+       ;;
+  esac
+done
 
-if [[ -z "${1:-}" ]]; then
-   echo "Error, at least [stack_prefix] is missing. Use either"
-   echo "   ${0} [stack]"
-   echo "or"
-   echo "   ${0} [stack] [OS_distribution] [repository] [version]"
-   print_all_stacks
-   exit
+if [[ -z "${_stack:-}" ]]; then
+   echo "Stack missing, exiting ..." && exit 1
 fi
-
-if ! test -d ${_main}/2deploy/${1}; then
-   echo "Error: this stack not part of the"
-   print_all_stacks
-   read -n1 -p "> you want to ADD this stack as NEW stack? [Y/n]: " _confirm
-   if [[ "${_confirm}" == "" ]] || [[ "${_confirm}" == "Y" ]] || [[ "${_confirm}" == "y" ]]; then
-      unset _confirm
-      mkdir "${_main}/2deploy/${1}"
-   else
-      exit
+if [[ -n "${_distroselect:-}" ]]; then
+   ! test -d "${_main}/1versions/${_distroselect}" && echo "Error, wrong distribution" && exit
+   if [[ -z "${_repoarg:-}" || -z "${_stack:-}" ]]; then
+      echo "Stack or repository missing" && exit 1
+   fi
+fi
+if [[ -n "${_repoarg:-}" ]]; then
+   if [[ -z "${_distroselect:-}" || -z "${_stack:-}" ]]; then
+      echo "Stack or distribution missing" && exit 1
+   fi
+   if [[ "${_repoarg:-}" == "ALL" ]]; then
+      _reposelect="$(find ${_main}/1versions/${_distroselect}/ -mindepth 1 -maxdepth 1 -type d -printf ' %P\n' 2>/dev/null)" || \
+      { echo "Error, could not find versions in the ${_main}/1versions/${_distroselect}"; exit; }
+   else # check that selected repository exists
+      if ! test -d "${_main}/1versions/${_distroselect}/${_repoarg}"; then
+         echo "Error, repository does not exist for this distribution"
+         exit
+      else
+	 _reposelect="${_repoarg}"
+      fi
+   fi
+fi
+if [[ -n "${_versionselarg:-}" ]]; then
+   if [[ -z "${_stack:-}" || -z "${_distroselect:-}" || -z "${_reposelect:-}" ]]; then
+      echo "Stack, distribution or repository missing" && exit 1
    fi
 fi
 
-_stack=${1}
+for _dir in ${_main} ${_main}/1versions ${_main}/2deploy; do
+   test -d ${_dir} || { echo "creating ${_dir}" && mkdir "${_dir}"; }
+done
 
-if [[ "${#}" -eq "4" ]]; then   # if all four variables were provided from command line
-   _distroselect="${2}"
-   _reposelect="${3}"
-   _versionselect="${4}"
-else                            # if not, then prompt for them
-   echo "________ OS distributions available __________"
-   _distroselect="error"
-   while true; do
-      test -d "${_main}/1versions/${_distroselect}" 2>/dev/null && break
-      find "${_main}/1versions/" -mindepth 1 -maxdepth 1 -type d -printf '    %P\n'
-      read -p "> select: " _distroselect
-      echo ""
-      echo "  You picked:   ${_distroselect}"
-      test -d "${_main}/1versions/${_distroselect}" || echo "Wrong distribution, try again!"
-   done
-
-   echo "________ Select repository from the ${_distroselect} __________"
-   _reposelect="error"
-   while true ; do
-      test -d "${_main}/1versions/${_distroselect}/${_reposelect}" 2>/dev/null && break
-      find "${_main}/1versions/${_distroselect}" -mindepth 1 -maxdepth 1 -type d -printf '    %P\n'
-      read -p "> select: " _reposelect
-      echo "  You picked:   ${_reposelect}"
-      test -d "${_main}/1versions/${_distroselect}/${_reposelect}" || echo "Wrong repository, try again!"
-      echo ""
-   done
-
-   echo "________ Select versions from the ${_distroselect}/${_reposelect} ____________"
-   _versionselect="error"
-   while true; do
-      test -d "${_main}/1versions/${_distroselect}/${_reposelect}/${_versionselect}" 2>/dev/null && break
-      find "${_main}/1versions/${_distroselect}/${_reposelect}" -mindepth 1 -maxdepth 1 -type d -printf '    %P\n'
-      read -p "> select: " _versionselect
-      echo "  You picked:   ${_versionselect}"
-      test -d "${_main}/1versions/${_distroselect}/${_reposelect}/${_versionselect}" || echo "Wrong version, try again!"
-      echo ""
-   done
-fi
-
-cd "${_main}"
-if ! test -d "1versions/${_distroselect}/${_reposelect}/${_versionselect}"; then
-   echo "Error, 1versions/${_distroselect}/${_reposelect}/${_versionselect} does not exist!"
-   exit
-else
-   echo "---------- Confirm ---------"
-   echo " The link will be created between"
-   echo "   2deploy/${_stack}/${_reposelect}  ->  1versions/${_distroselect}/${_reposelect}/${_versionselect}"
-   read -p "> press [enter] to confirm"
-   ln -f -s "1versions/${_distroselect}/${_reposelect}/${_versionselect}" "2deploy/${_stack}/${_reposelect}"
+if ! test -d ${_main}/2deploy/${_stack}; then
+   echo "Warningn: new stack, not part of existing ones."
+   print_all_stacks
+   if ${_prompt}; then
+      read -n1 -p "> you want to ADD this stack as NEW stack? [enter]: " _confirm
+   fi
+   if ! ${_prompt} || [[ ${_prompt} && "${_confirm}" == "" ]]; then
+      unset _confirm
+      mkdir "${_main}/2deploy/${_stack}"
+   else
+      exit
+   fi
    echo ""
 fi
+
+for _each_repo in ${_reposelect}; do
+   if "${_prompt}"; then
+      echo "________ OS distributions available __________"
+      _distroselect="error"
+      while true; do
+         test -d "${_main}/1versions/${_distroselect}" 2>/dev/null && break
+         find "${_main}/1versions/" -mindepth 1 -maxdepth 1 -type d -printf '    %P\n'
+         read -p "> select: " _distroselect
+         echo ""
+         echo "  You picked:   ${_distroselect}"
+         test -d "${_main}/1versions/${_distroselect}" || echo "Wrong distribution, try again!"
+      done
+
+      echo "________ Select repository from the ${_distroselect} __________"
+      _reposelect="error"
+      while true ; do
+         test -d "${_main}/1versions/${_distroselect}/${_reposelect}" 2>/dev/null && break
+         find "${_main}/1versions/${_distroselect}" -mindepth 1 -maxdepth 1 -type d -printf '    %P\n'
+         read -p "> select: " _reposelect
+         echo "  You picked:   ${_reposelect}"
+         test -d "${_main}/1versions/${_distroselect}/${_reposelect}" || echo "Wrong repository, try again!"
+         echo ""
+      done
+
+      echo "________ Select versions from the ${_distroselect}/${_reposelect} ____________"
+      _versionselect="error"
+      while true; do
+         test -d "${_versionselect}" 2>/dev/null && break
+         find "${_main}/1versions/${_distroselect}/${_reposelect}" -mindepth 1 -maxdepth 1 -type d -printf '    %P\n'
+         read -p "> select: " _versionselect
+         echo "  You picked:   ${_versionselect}"
+         test -d "${_main}/1versions/${_distroselect}/${_reposelect}/${_versionselect}" || echo "Wrong version, try again!"
+	 _versionselect="1versions/${_distroselect}/${_reposelect}/${_versionselect}"
+         echo ""
+      done
+   else # no prompt needed
+      test -d "1versions/${_distroselect}/${_each_repo}" || { echo "Error, no repository (1versions/${_distroselect}/${_each_repo}) found"; exit; }
+      if [[ -z "${_versionarg:-}" ]]; then        # no version was PROVIDED, selecting LATEST version
+         _versionselect="$(find 1versions/${_distroselect}/${_each_repo} -maxdepth 1 -mindepth 1 -type d -printf '%T@ %p\n' | sort -nr | head -1 | cut -d' ' -f2-)" || \
+           { echo "Error finding latest version."; exit; }
+      fi
+      if [[ -z "${_versionselect:-}" ]]; then     # no version was FOUND
+         echo "No version was found in the 1versions/${_distroselect}/${_each_repo}."; exit;
+      else
+         echo "  picked version ${_versionselect}"
+      fi
+   fi
+
+   if ! test -d "${_versionselect}"; then
+      echo "Error, ${_versionselect} does not exist!"
+      exit
+   else
+      if "${_prompt}"; then
+         echo "---------- Confirm ---------"
+         echo " The link will be created between"
+         echo "   2deploy/${_stack}/${_each_repo}  ->  ${_versionselect}"
+         read -p "> press [enter] to confirm"
+      fi
+      echo ">>>>> ln -f -s "${_versionselect}" "2deploy/${_stack}/${_each_repo}""
+      echo ""
+   fi
+done
+
 {% endraw %}
