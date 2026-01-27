@@ -154,7 +154,7 @@ See [instructions how to generate keypair](../generate-key-pair-mobaxterm).
 ### 3.1 Install WSL
 
 To install WSL follow the instructions provided by [Microsoft](https://learn.microsoft.com/en-us/windows/wsl/install).
-Open your favorite Linux distribution and follow the login instruction for [Linux/Unix clients](../logins-linux-config/).
+Any WSL Linux distribution can be used. Start it, and follow the login instruction for [Linux/Unix clients](../logins-linux-config/).
 
 ## 4. Converting keypair from Putty .ppk to OpenSSH format
 
