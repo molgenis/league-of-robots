@@ -5,7 +5,6 @@ set -ueo pipefail
 _main="{{ main_repo_path }}"
 
 {% raw %}
-
 ! test -d "${_main}/0cache" && mkdir "${_main}/0cache"
 
 print_all_repos() {
@@ -35,16 +34,19 @@ if [[ -z "${_do_repos:-}" ]]; then
 fi
 
 for _repo in ${_do_repos}; do
+   echo ""
    _repo_log_dir="${_main}/reposync.logs/${_os_distribution}/${_repo}"
    ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
    _repo_log="${_repo_log_dir}/${_time}"
-   echo "Log file: ${_repo_log}"
-   dnf reposync --conf "${_main}/dnf.repos.d/${_os_distribution}.conf" --repo "${_repo}" --downloaddir="${_main}/0cache/${_os_distribution}/" 1>"${_repo_log}" 2>&1 && \
-   mkdir -p "${_main}/1versions/${_os_distribution}/${_repo}/" && \
+   echo "  Log file: ${_repo_log}"
+   if ! dnf reposync --conf "${_main}/dnf.repos.d/${_os_distribution}.conf" --repo "${_repo}" --downloaddir="${_main}/0cache/${_os_distribution}/" 1>"${_repo_log}" 2>&1; then
+      echo "Error, unsuccessfull"
+      continue
+   fi
+   mkdir -p "${_main}/1versions/${_os_distribution}/${_repo}/"
    cp -a --reflink=always "${_main}/0cache/${_os_distribution}/${_repo}/" "${_main}/1versions/${_os_distribution}/${_repo}/${_time}/" || exit
    echo "New version created:   ${_main}/1versions/${_os_distribution}/${_repo}/${_time}"
-   echo ""
-   echo ""
 done
 
+echo "done"
 {% endraw %}
