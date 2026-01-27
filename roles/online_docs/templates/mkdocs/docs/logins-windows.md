@@ -5,7 +5,7 @@ There are two options to login to clusters from Windows
 
  1. (preferred) Either by using [MobaXterm client](#11-launch-mobaxterm-and-create-a-new-session) software which requires installation
  2. alternative option is to use built-in [OpenSSH software](#2-using-windows-openssh) that comes pre-installed with newer versions of Windows (10+)
-
+ 3. alternative option two, is to use WSL [Windows Subsystem for Linux](#3-using-WSL). Only if you are the administrator of your machine. 
 
 ## 1. MobaXterm option
 
@@ -149,7 +149,14 @@ More information about `ssh` options can be find on the [ssh man pages](https://
 
 See [instructions how to generate keypair](../generate-key-pair-mobaxterm).
 
-## 3. Converting keypair from Putty .ppk to OpenSSH format
+## 3. Using WSL
+
+### 3.1 Install WSL
+
+To install WSL follow the instructions provided by [Microsoft](https://learn.microsoft.com/en-us/windows/wsl/install).
+Any WSL Linux distribution can be used. Start it, and follow the login instruction for [Linux/Unix clients](../logins-linux-config/).
+
+## 4. Converting keypair from Putty .ppk to OpenSSH format
 
 Public/private keypair created with `Putty` are by default stored in the **P**utty **p**rivate **k**ey (ppk) format. The private keys files also have `.ppk` ending. The file format is not compatible with generic `OpenSSH` format (which most of ssh client programs use) and the key must either be recreated (and public part sent to helpdesk) or existing private key must be converted into more usable OpenSSH format.
 
