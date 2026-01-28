@@ -1,0 +1,23 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
+#!/bin/bash
+
+_main="{{ main_repo_path }}"
+_debug=false
+[[ "${1:-}" == '-d' ]] && _debug=true
+{% raw %}
+echo "  Checking which deployments are not linked correctly ..."
+for _link in $(find ${_main}/2deploy -type l); do #! -exec test -e {} \; -print); do
+   ${_debug} && echo "    (debug) Checking link: ${_link}"
+   test -e "${_link}" && continue
+   read -p "> ${_link} is dead - (r)emove is or re(L)ink [r/L]? " _confirm
+   if [[ "${_confirm:-}" == "L" ]] || [[ "${_confirm:-err}" == "" ]]; then
+      read -p "> write path to relink: " _path
+      ln -s -f "${_path}" "${_link}" && echo "  done"
+   elif [[ "${_confirm}" == "r" ]]; then
+      read -p "> removing ${_link}, confirm [enter]" _remove
+      rm "${_link}" && echo "  removed"
+   fi
+done
+
+echo done
+{% endraw %}

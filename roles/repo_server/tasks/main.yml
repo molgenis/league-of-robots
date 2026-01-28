@@ -7,9 +7,9 @@
     group: root
     mode: '0750'
   with_items:
-    - 0_cleanup.sh
     - 1_sync_repo_to_new_version.sh
     - 2_new_repo_distribution.sh
+    - 3_cleanup.sh
   become: true
 
 - name: "Create the folder structure for the repository configuration files"

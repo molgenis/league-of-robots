@@ -59,6 +59,7 @@ if [[ -n "${_distroarg:-}" ]]; then
       echo "Stack or repository missing" && exit 1
    fi
 fi
+_distroselect="${_distroarg:-error}"
 
 if [[ -n "${_repoarg:-}" ]]; then
    if [[ -z "${_distroarg:-}" || -z "${_stack:-}" ]]; then
@@ -103,7 +104,6 @@ fi
 
 if "${_prompt}"; then
    echo "________ OS distributions available __________"
-   _distroselect="${_distroarg:-error}"
    while true; do
       test -d "${_main}/1versions/${_distroselect}" 2>/dev/null && break
       find "${_main}/1versions/" -mindepth 1 -maxdepth 1 -type d -printf '    %P\n'
@@ -167,5 +167,12 @@ for _each_repo in ${_reposelect:-error}; do
       echo ""
    fi
 done
+
+if ! test -e "2deploy/all"; then
+   echo "Creating missing link to all repositories ..."
+   ln -s "../1versions/" "2deploy/all"
+fi
+
+
 echo "done"
 {% endraw %}

@@ -38,14 +38,14 @@ for _repo in ${_do_repos}; do
    _repo_log_dir="${_main}/reposync.logs/${_os_distribution}/${_repo}"
    ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
    _repo_log="${_repo_log_dir}/${_time}"
-   echo "  Log file: ${_repo_log}"
+   echo "- Log file: ${_repo_log}"
    if ! dnf reposync --conf "${_main}/dnf.repos.d/${_os_distribution}.conf" --repo "${_repo}" --downloaddir="${_main}/0cache/${_os_distribution}/" 1>"${_repo_log}" 2>&1; then
-      echo "Error, unsuccessfull"
+      echo "  Error, unsuccessfull"
       continue
    fi
    mkdir -p "${_main}/1versions/${_os_distribution}/${_repo}/"
    cp -a --reflink=always "${_main}/0cache/${_os_distribution}/${_repo}/" "${_main}/1versions/${_os_distribution}/${_repo}/${_time}/" || exit
-   echo "New version created:   ${_main}/1versions/${_os_distribution}/${_repo}/${_time}"
+   echo "  New version created:   ${_main}/1versions/${_os_distribution}/${_repo}/${_time}"
 done
 
 echo "done"
