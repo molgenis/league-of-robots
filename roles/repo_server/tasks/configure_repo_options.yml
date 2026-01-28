@@ -1,7 +1,7 @@
 ---
 - name: "Create the repo folder structure for {{ this_distribution }}"
   ansible.builtin.file:
-    path: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}"
+    path: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}"
     state: directory
     mode: '0750'
     owner: 'root'
@@ -11,7 +11,7 @@
 - name: "Configure main configurations for /{{ this_distribution }}"
   ansible.builtin.template:
     src: templates/dnf.conf.j2
-    dest: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}.conf"
+    dest: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}.conf"
     force: true
     mode: '0644'
   become: true
@@ -67,7 +67,7 @@
 - name: "Copy repo files to repo_server"
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}/"
+    dest: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
     owner: root
     group: root
     mode: '0644'
@@ -82,7 +82,7 @@
 
 - name: "Get list of remote repo files"
   ansible.builtin.find:
-    paths: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}/"
+    paths: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
     patterns: "*.repo"
   register: remote_repos
   become: true
