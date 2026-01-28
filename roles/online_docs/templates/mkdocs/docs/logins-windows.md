@@ -5,7 +5,7 @@ There are two options to login to clusters from Windows
 
  1. (preferred) Either by using [MobaXterm client](#11-launch-mobaxterm-and-create-a-new-session) software which requires installation
  2. alternative option is to use built-in [OpenSSH software](#2-using-windows-openssh) that comes pre-installed with newer versions of Windows (10+)
- 3. alternative option two, is to use WSL [Windows Subsystem for Linux](#3-using-WSL). Only if you are the administrator of your machine. 
+ 3. alternative option two, is to use WSL [Windows Subsystem for Linux](#3-using-wsl). Only if you are the administrator of your machine. 
 
 ## 1. MobaXterm option
 
