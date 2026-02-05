@@ -67,7 +67,7 @@
 - name: Disable NVIDIA GSP firmware
   ansible.builtin.copy:
     dest: /etc/modprobe.d/nvidia-gsp.conf
-    content: "options nvidia NVreg_EnableGpuFirmware=0\n"
+    content: "options nvidia NVreg_EnableGpuFirmware=0"
     owner: root
     group: root
     mode: '0644'
