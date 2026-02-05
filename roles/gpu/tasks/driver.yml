@@ -51,10 +51,11 @@
   become: true
 
 - name: Install driver from .run file
-  ansible.builtin.command: '/root/{{ gpu_runfile }} --silent --driver'
+  ansible.builtin.command: '/root/{{ gpu_runfile }} --silent --kernel-module-type=proprietary'
   register: install_result
   failed_when: install_result.rc != 0
   changed_when: true
+  notify: reboot_server
   become: true
 
 - name: Remove installation file
@@ -63,4 +64,20 @@
     state: absent
   become: true
 
+- name: Disable NVIDIA GSP firmware
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/nvidia-gsp.conf
+    content: "options nvidia NVreg_EnableGpuFirmware=0\n"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Rebuild initramfs
+  ansible.builtin.command: dracut -f
+  notify: reboot_server
+  become: true
+
+- name: Reboot system if needed
+  ansible.builtin.meta: flush_handlers
 ...
