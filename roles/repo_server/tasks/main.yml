@@ -1,15 +1,17 @@
 ---
-- name: "Deploy repository management scripts to {{ main_repo_path }}"
-  ansible.builtin.template:
-    src: "{{ item }}.j2"
-    dest: "{{ main_repo_path }}/{{ item }}"
-    owner: root
-    group: root
-    mode: '0750'
-  with_items:
-    - 1_sync_repo_to_new_version.sh
-    - 2_new_repo_distribution.sh
-    - 3_cleanup.sh
+- name: Create repo group
+  ansible.builtin.group:
+    name: "{{ repo_group }}"
+    system: true
+  become: true
+
+- name: Create repo user
+  ansible.builtin.user:
+    name: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    system: true
+    shell: /sbin/nologin
+    create_home: false
   become: true
 
 - name: "Create the folder structure for the repository configuration files"
@@ -17,13 +19,29 @@
     path: "{{ item }}"
     state: directory
     mode: '0750'
-    owner: 'root'
-    group: 'root'
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
   loop:
+     - "{{ main_repo_path }}"
+     - "{{ main_repo_path }}/dnf"
      - "{{ main_repo_path }}/dnf/repos.d"
      - "{{ main_repo_path }}/dnf/cache"
+     - "{{ main_repo_path }}/logs"
      - "{{ main_repo_path }}/logs/dnf"
      - "{{ main_repo_path }}/logs/scripts"
+  become: true
+
+- name: "Deploy repository management scripts to {{ main_repo_path }}"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ main_repo_path }}/{{ item }}"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0750'
+  with_items:
+    - 1_sync_repo_to_new_version.sh
+    - 2_new_repo_distribution.sh
+    - 3_cleanup.sh
   become: true
 
 - name: "Configure repo for each distribution"
@@ -31,4 +49,7 @@
   loop: "{{ yum_repos | list }}"
   loop_control:
     loop_var: this_distribution
+
+- name: "Configure repo for each distribution"
+  ansible.builtin.include_tasks: nginx.yml
 ...

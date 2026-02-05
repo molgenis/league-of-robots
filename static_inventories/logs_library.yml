@@ -76,7 +76,7 @@ all:
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-    repo_servers:
+    repo_server:
       hosts:
         repo-primary:
           cluster_class: 'development'
@@ -88,7 +88,7 @@ all:
               add_hostname_to_ip_address: true
           local_volume_extra:
             - name: mnt
-              size: 500
+              size: 1024
           local_mounts:
             - mount_point: '/mnt/repos'
               device: /dev/sda # A value must be present in order to update it on-the-fly during role execution.
@@ -129,11 +129,11 @@ all:
 cluster:
   children:
     logs:
-    repo_servers:
+    repo_server:
 logs_library:
   children:
     controller_api:
     logs:
-    repo_servers:
+    repo_server:
     jumphost:
 ...

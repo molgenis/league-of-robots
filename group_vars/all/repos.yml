@@ -99,6 +99,7 @@ yum_repos:
       name: 'CentOS-7 - Base.'
       baseurl: http://vault.centos.org/centos/7/os/x86_64/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
       tags:
@@ -109,6 +110,7 @@ yum_repos:
       name: 'CentOS-7 - Updates.'
       baseurl: http://vault.centos.org/centos/7/updates/x86_64/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
       tags:
@@ -119,6 +121,7 @@ yum_repos:
       name: 'CentOS-7 - Extras.'
       baseurl: http://vault.centos.org/centos/7/extras/x86_64/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
       tags:
@@ -129,6 +132,7 @@ yum_repos:
       name: 'Extra Packages for Enterprise Linux 7 (EPEL).'
       baseurl: https://download.fedoraproject.org/pub/epel/7/x86_64/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7'
       tags:
@@ -138,6 +142,7 @@ yum_repos:
       name: 'RENCI iRODS Repository for Enterprise Linux 7.'
       baseurl: https://packages.irods.org/yum/pool/centos7/x86_64/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 0
       tags:
         - irods
@@ -146,6 +151,7 @@ yum_repos:
       name: 'Lustre client Long Term Support (LTS) releases for Enterprise Linux 7.'
       baseurl: https://downloads.whamcloud.com/public/lustre/latest-2.12-release/el7/client/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 0
       tags:
         - lustre
@@ -154,12 +160,14 @@ yum_repos:
       name: 'Ext filesystem utility releases for Enterprise Linux 7.'
       baseurl: https://downloads.whamcloud.com/public/e2fsprogs/latest/el7/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 0
     - file: ltb7.repo
       id: ltb7
       name: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 7.'
       baseurl: https://ltb-project.org/rpm/openldap25/7/x86_64/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 0
       tags:
         - ltb
@@ -168,6 +176,7 @@ yum_repos:
       name: 'Rsyslog (Adiscon CentOS7 for x86_64)'
       baseurl: http://rpms.adiscon.com/v8-stable/epel-7/x86_64/
       enabled: 1
+      repo_server_download: True
       gpgcheck: 0
       tags:
         - rsyslog
@@ -179,6 +188,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      repo_server_download: True # important, manageable 110 G
       tags:
         - distro
         - core
@@ -189,6 +199,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      repo_server_download: 0 # too big and not important, 562 G
       tags:
         - distro
         - core
@@ -209,6 +220,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      repo_server_download: 0 # too big and not important, 317 G
       tags:
         - distro
         - core
@@ -342,6 +354,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      repo_server_download: 0 # too big, would be nice to have, but not urgent, 381 GB
       tags:
         - epel
     - file: oracle-epel-ol8.repo
@@ -351,6 +364,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      repo_server_download: True # not important, < 1 G
       tags:
         - epel
     #
@@ -399,6 +413,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      repo_server_download: True # important, 70 G
       tags:
         - distro
         - uek
@@ -427,6 +442,7 @@ yum_repos:
       name: 'Rsyslog (Adiscon for x86_64)'
       baseurl: http://rpms.adiscon.com/v8-stable/epel-8/x86_64/
       enabled: 1
+      repo_server_download: True # important, < 1 G
       gpgcheck: 0
       tags:
         - rsyslog
@@ -436,6 +452,7 @@ yum_repos:
       name: Rocky Linux 9 - BaseOS
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-9
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       tags:
         - distro
@@ -458,6 +475,7 @@ yum_repos:
       name: Rocky Linux 9 - AppStream
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-9
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       tags:
         - distro
@@ -480,6 +498,7 @@ yum_repos:
       name: Rocky Linux 9 - CRB
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-9
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       tags:
         - distro
@@ -506,6 +525,7 @@ yum_repos:
       id: rocky-release-security
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=rocky-sig-security-common-9
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://rocky-linux-europe-west1.production.gcp.mirrors.ctrliq.cloud/pub/sig/9/security/x86_64/security-common/RPM-GPG-KEY-Rocky-SIG-Security'
       tags:
@@ -672,6 +692,7 @@ yum_repos:
       name: Rocky Linux 9 - Extras
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-9
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       tags:
         - distro
@@ -719,6 +740,7 @@ yum_repos:
       name: 'Extra Packages for Enterprise Linux 9 - $basearch'
       metalink: 'https://mirrors.fedoraproject.org/metalink?repo=epel-9&arch=$basearch&infra=$infra&content=$contentdir'
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
       tags:
@@ -779,6 +801,7 @@ yum_repos:
       name: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 9.'
       baseurl: 'https://ltb-project.org/rpm/openldap25/9/$basearch'
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://ltb-project.org/documentation/_static/RPM-GPG-KEY-LTB-PROJECT-SECURITY'
       tags:
@@ -791,6 +814,7 @@ yum_repos:
       name: 'rsyslog v8 (from Adiscon) for EPEL 9.'
       baseurl: 'https://rpms.adiscon.com/v8-stable/epel-9/$basearch'
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
       tags:
@@ -805,6 +829,7 @@ yum_repos:
       gpgkey: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
       gpgcheck: 1
       enabled: 1
+      repo_server_download: True
       tags:
         - perun
     #
@@ -815,6 +840,7 @@ yum_repos:
       name: 'RENCI iRODS for Enterprise Linux 9.'
       baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
       enabled: 1
+      repo_server_download: True
       gpgcheck: 0
       tags:
         - irods
@@ -826,6 +852,7 @@ yum_repos:
       name: "Jenkins{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
       baseurl: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
       enabled: 1
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/jenkins.io-2023.key"
       tags:

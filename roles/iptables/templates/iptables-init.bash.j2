@@ -208,7 +208,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p icmp --icmp-type 8  -s "${IP_ADDRESS}" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p icmp --icmp-type 11 -s "${IP_ADDRESS}" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 	done
-{% endif%}
+{% endif %}
 	#
 	# Allow outbound NTP.
 	#
@@ -253,7 +253,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 	#
 	# Allow outbound HTTPS.
 	#
@@ -276,7 +276,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 443 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 443 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_ssh_inbound is defined and iptables_allow_ssh_inbound | length > 0 %}
 	#
 	# Allow SSH inbound.
@@ -294,7 +294,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_ssh_outbound is defined and iptables_allow_ssh_outbound | length > 0 %}
 	#
 	# Allow SSH outbound.
@@ -312,7 +312,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp -d "${IP_ADDRESS}" --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_ebi_mysql_outbound is defined and iptables_allow_ebi_mysql_outbound | length > 0 %}
 	#
 	# Allow MySQL outbound.
@@ -332,7 +332,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp -d "${IP_ADDRESS}" -m multiport --dports 3306,5306,5316 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A INPUT -i "${EXT_INTERFACE}" -p tcp -m multiport --sports 3306,5306,5316 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_postgresql_outbound is defined and iptables_allow_postgresql_outbound | length > 0 %}
 	#
 	# Allow PostgreSQL outbound.
@@ -350,7 +350,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp -d "${IP_ADDRESS}" --dport 5432 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A INPUT -i "${EXT_INTERFACE}" -p tcp --sport 5432 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_ftp_outbound is defined and iptables_allow_ftp_outbound | length > 0 %}
 	#
 	# Allow FTP outbound.
@@ -391,7 +391,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --dport 20                  -m state --state ESTABLISHED         -j ACCEPT # Active Mode
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 1024: --dport 1024: -m state --state ESTABLISHED,RELATED -j ACCEPT # Passive Mode
 	iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp --sport 1024: --dport 1024: -m state --state ESTABLISHED         -j ACCEPT # Passive Mode
-{% endif%}
+{% endif %}
 {% if iptables_allow_aspera_outbound is defined and iptables_allow_aspera_outbound | length > 0 %}
 	#
 	# Allow Aspera outbound.
@@ -417,7 +417,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 	done
 	iptables -A INPUT -i "${EXT_INTERFACE}" -p tcp -m multiport --sports 22,33001    -m state --state ESTABLISHED -j ACCEPT
 	iptables -A INPUT -i "${EXT_INTERFACE}" -p udp -m multiport --sports 33001:33100 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_globus_outbound is defined and iptables_allow_globus_outbound | length > 0 %}
 	#
 	# Allow Globus outbound.
@@ -448,7 +448,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp -d "${IP_ADDRESS}" -m multiport --dports 50000:51000 -m state --state NEW,ESTABLISHED -j ACCEPT
 		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p udp -d "${IP_ADDRESS}" -m multiport --dports 32678:65535 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
-{% endif%}
+{% endif %}
 {% if iptables_allow_irods is defined and iptables_allow_irods | length > 0 %}
 	#
 	# Allow iRODS both inbound and outbound.
@@ -472,7 +472,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" -m multiport --ports 1247,1248,20000:20199 -m state --state NEW,ESTABLISHED -j ACCEPT
 		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp -d "${IP_ADDRESS}" -m multiport --ports 1247,1248,20000:20199 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
-{% endif%}
+{% endif %}
 	#
 	# Allow outbound logs.
 	#
@@ -498,7 +498,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 41514 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 41514 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_repository_inbound is defined and iptables_allow_repository_inbound | length > 0 %}
 	#
 	# Allow inbound repositories
@@ -519,7 +519,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 8443 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 8443 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 {% if iptables_allow_ldap_inbound is defined and iptables_allow_ldap_inbound | length > 0 %}
 	#
 	# Allow inbound ldap.
@@ -540,7 +540,7 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" --dport 636 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 	iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp --sport 636 -m state --state ESTABLISHED -j ACCEPT
-{% endif%}
+{% endif %}
 done
 
 #

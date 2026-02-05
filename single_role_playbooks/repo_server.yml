@@ -1,5 +1,5 @@
 ---
-- hosts: repo_servers
+- hosts: repo_server
   roles:
     - role: repo_server
 ...

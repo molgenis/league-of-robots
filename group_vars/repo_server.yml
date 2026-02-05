@@ -31,7 +31,7 @@ iptables_allow_ssh_inbound:
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
   - "{{ logs_library.ip_addresses['hatch']['logs_external'] }}"   # this is needed, because it is external AND internal ip interface on Azure
   - "{{ logs_library.ip_addresses['hatch']['logs_external_public'] }}"
-iptables_allow_logs_inbound:
+iptables_allow_repository_inbound:
   - ANY
 # This is enforcing that log servers uses `yum_repos` to create
 # yum repositories, since repo servers cannot use Pulp
