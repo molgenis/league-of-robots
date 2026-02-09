@@ -44,10 +44,9 @@ We follow the [Python PEP8 naming conventions](https://www.python.org/dev/peps/p
 This repo currently contains code and configs for the following clusters:
 
  * Talos: Development cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
- * Gearshift: [UMCG](https://www.umcg.nl) Research IT production cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
+ * Hyperchicken: Development cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
+ * Vaxtron: [UMCG](https://www.umcg.nl) Research IT production cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
  * Nibbler: [UMCG](https://www.umcg.nl) Research IT production cluster hosted by the [Center for Information Technology (CIT) at the University of Groningen](https://www.rug.nl/society-business/centre-for-information-technology/).
- * Hyperchicken: Development cluster hosted by [The European Bioinformatics Institute (EMBL-EBI)](https://www.ebi.ac.uk/) in the [Embassy Cloud](https://www.embassycloud.org/).
- * Fender: [Solve-RD](solve-rd.eu/) production cluster hosted by [The European Bioinformatics Institute (EMBL-EBI)](https://www.ebi.ac.uk/) in the [Embassy Cloud](https://www.embassycloud.org/).
 
 Deployment and functional administration of all clusters is a joined effort of the
 [Genomics Coordination Center (GCC)](http://wiki.gcc.rug.nl/)
@@ -97,10 +96,7 @@ Deploying a fully functional stack of virtual machines from scratch involves the
     * Off topic for this repo.
  2. Deploy OpenStack virtualization layer on physical machines to create an OpenStack cluster.
     * Off topic for this repo.
-    * For the _Shikra_ cloud, which hosts the _Talos_ and _Gearshift_ HPC clusters
-      we use the ansible playbooks from the [hpc-cloud](https://git.webhosting.rug.nl/HPC/hpc-cloud) repository
-      to create the OpenStack cluster.
-    * For other HPC clusters we use OpenStack clouds from other service providers _as is_.
+    * For our HPC clusters we use OpenStack clouds from other service providers _as is_.
  3. Create, start and configure virtual networks and machines on an OpenStack cluster.
     * This repo.
  4. Deploy bioinformatics software and reference datasets.
@@ -185,15 +181,33 @@ Therefore we set ```ANSIBLE_ROLES_PATH``` and ```ANSIBLE_COLLECTIONS_PATH``` to 
 
 #### 3. Python virtual environment: install packages to manage Azure environment
 
-Make sure you already executed `ansible-galaxy install ... ` (see previous step).
+**Make sure you already executed `ansible-galaxy install -r requirements.yml`** (see previous step), because it installs the `requirements.txt` file required by `pip` in this step.
 
 ```bash
-  pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
-  _azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt")"
-  pip install -r "${_azure_pip_requirements}"
+pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
+# requirements.txt is provided from ansible-galaxy
+_azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" 2>/dev/null)"
+pip install -r "${_azure_pip_requirements}"
 ```
 
 See also Galaxy Ansible [Azure Azcollection > Documentation](https://galaxy.ansible.com/ui/repo/published/azure/azcollection/docs/)
+
+If there are issues, run (after ^) also
+
+```bash
+pip install --upgrade pip   # needed to find newest packages
+ansible-galaxy collection install azure.azcollection --force   # forcefully reinstall collection
+pip install -r "${_azure_pip_requirements}"   # then install the rest of the dependencies
+```
+
+Login to the Azure via CLI
+
+```bash
+az login
+A web browser has been opened at https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize. Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `az login --use-device-code`.
+```
+
+more information is available in the [roles/azure_computing/README.md](roles/azure_computing/README.md).
 
 #### 4. Create a `vault_pass.txt`.
 
@@ -525,10 +539,9 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
 * Define accounts used to deploy playbooks
   ```bash
   #
-  # CentOS 7.x default_cloud_image_user = centos
-  # Rocky 9.x default_cloud_image_user = cloud-user
+  # Rocky 9.x default_cloud_image_user = rocky
   #
-  default_cloud_image_user='centos|cloud-user'
+  default_cloud_image_user='rocky'
   lor_admin_user='your_admin_account'
   ```
 * Firstly, create the jumphost, which is required to access the other machines.  

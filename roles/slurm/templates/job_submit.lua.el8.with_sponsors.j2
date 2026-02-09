@@ -167,9 +167,13 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
     --
     submit_user = posix.getpasswd(submit_uid)
     --
-    -- Force jobs to share nodes when they don't consume all resources on a node.
+    -- Check if job can share resources on a node.
     --
-    if job_desc.shared == 0 then
+    if string.match(tostring(job_desc.features), 'dragen') then
+        slurm.log_debug("Detected 'dragen' in features requested for job and will disable sharing of resources as dragen needs whole node exclusively.")
+        job_desc.shared = 0
+    else
+        slurm.log_debug("Forcing job to share node when it does not need all resources.")
         job_desc.shared = 1
     end
     --
@@ -356,12 +360,12 @@ function slurm_job_submit(job_desc, part_list, submit_uid)
     for name, part in pairs(part_list) do
         slurm.log_debug("Parsed partition %s with AllowQos %s and DenyQos %s.", tostring(name), tostring(part.allow_qos), tostring(part.deny_qos))
         if part.allow_qos ~= nil then
-            if string.match(part.allow_qos, job_desc.qos) then
+            if string.find(tostring(part.allow_qos), tostring(job_desc.qos), 1, true) then
                 part_names[#part_names+1] = tostring(name)
                 slurm.log_debug("QoS %s listed in AllowQos %s: Assigned partition %s to job.", tostring(job_desc.qos), tostring(part.allow_qos), tostring(name))
             end
         elseif part.deny_qos ~= nil then
-            if not string.match(part.deny_qos, job_desc.qos) then
+            if not string.find(tostring(part.deny_qos), tostring(job_desc.qos), 1, true) then
                 part_names[#part_names+1] = tostring(name)
                 slurm.log_debug("QoS %s not listed in DenyQos %s: Assigned partition %s to job.", tostring(job_desc.qos), tostring(part.deny_qos), tostring(name))
             end

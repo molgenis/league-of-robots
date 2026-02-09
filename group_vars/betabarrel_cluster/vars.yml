@@ -49,21 +49,11 @@ motd: |
           Welcome to {{ slurm_cluster_name | capitalize }}
       =========================================================
 additional_etc_hosts:
-  - group: betabarrel_cluster
-    nodes:
-      - name: betabarrel
-        network: vlan990
-  - group: betabarrel_cluster
-    nodes:
-      - name: bb-dragen
-        network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: copperfist
-        network: vlan990
   - group: copperfist_cluster
     nodes:
       - name: cf-dragen
+        network: vlan990
+      - name: copperfist
         network: vlan990
 #
 # Jumphosts from other stack-name infra groups.
@@ -108,8 +98,6 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-    group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-    group_quota_hard_limit_template: ruggroupumcgquotaLFS
     create_ldap: false
 totp:
   machines: "{{ groups['jumphost'] }}"
@@ -120,26 +108,30 @@ totp:
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
     - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['address'] }}{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['netmask'] }}"
-cloud_image: CentOS 7
-cloud_user: centos
+cloud_image: Rocky-9.5
+os_distribution: 'rocky9'
 availability_zone: nova
 stack_networks:
+  - name: vlan1336  # Internal management for VMs and BMs
+    cidr: '172.23.77.0/24'
+    router:
+      next-hop-address: '172.23.77.1'
+      external_network: vlan16
+      name: vlan1336
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
   - name: vlan16
     cidr: '195.169.22.0/23'
-    type: management
-    external: true
   - name: vlan990
     cidr: '192.168.1.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
-      - '192.168.1.0/25'
-    type: storage
-    external: true
+      - '192.168.1.0/24'
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -170,7 +162,6 @@ iptables_allow_ssh_outbound:
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
-  - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
 local_admin_groups:
@@ -182,7 +173,6 @@ local_admin_users:
   - 'henkjan'
   - 'kim'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'robin'
@@ -226,7 +216,7 @@ regular_users:
   - name: 'umcg-gap-dm'
     groups: ['umcg-gap', "{{ functional_users_group }}"]
   - name: 'umcg-gd-ateambot'
-    groups: ['umcg-gd', 'umcg-gap', "{{ functional_users_group }}"]
+    groups: ['umcg-gd', 'umcg-gap', 'umcg-ogm', "{{ functional_users_group }}"]
   - name: 'umcg-gd-dm'
     groups: ['umcg-gd', "{{ functional_users_group }}"]
   - name: 'umcg-genomescan-ateambot'
@@ -311,59 +301,59 @@ sudoers:
   - who: ['%umcg-vipt']
     become: 'umcg-vipt-dm'
 remote_users_in_local_groups:
-  - user: 'benjaminsm'
+  - name: 'benjaminsm'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'bijlsmam'
+  - name: 'bijlsmam'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'charbonb'
+  - name: 'charbonb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
         'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
-  - user: 'cimermans'
+  - name: 'cimermans'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'hendriksend'
+  - name: 'hendriksend'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
         'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
-  - user: 'langek'
+  - name: 'langek'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'kanningaroj'
+  - name: 'kanningaroj'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'neerincxp'
+  - name: 'neerincxp'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
         'umcg-pr', 'umcg-vipt',
     ]
-  - user: 'vriesgb'
+  - name: 'vriesgb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
@@ -382,6 +372,38 @@ soft_partitions:
     group: umcg-lab
     mode: 2770
     hostname: betabarrel
+#
+## Optical genome mapping
+#
+ogm_servers:
+  - server: bas1.umcg.nl  # FQDN of OGM machine to backup.
+    user: ADMINIT
+    prm_location: /groups/umcg-ogm/prm67
+    backup_source_dirs:
+      - /home/bionano/access/web/Server/databaseFiles/molecules_files
+      - /var/log
+      - /home/bionano/access/web/Server/Log
+      - /home/bionano/access/web/Server/anchorFiles
+      - /home/ADMINIT/pg_dump
+    psql_dump_location: /home/ADMINIT/pg_dump
+  - server: bas3.umcg.nl  # FQDN of OGM machine to backup.
+    user: ADMINIT
+    prm_location: /groups/umcg-ogm/prm67
+    backup_source_dirs:
+      - /home/bionano/access/web/Server/databaseFiles/molecules_files
+      - /var/log
+      - /home/bionano/access/web/Server/Log
+      - /home/bionano/access/web/Server/anchorFiles
+      - /home/ADMINIT/pg_dump
+    psql_dump_location: /home/ADMINIT/pg_dump
+    trendanalysis_api_username: 'umcg-ogm-dm'
+    trendanalysis_cron_disabled: false
+    trendanalysis_cron_command: "curl -s -k -H 'Cookie: token='\"$(curl -s \"https://${ogm_server}\
+      :3005/administration/api/userLogin?deviceFingerprint=chaperone&userna\
+      me=${trendanalysis_api_username}&password={{ ogm_api_password }}\" | grep -oP '\"to\
+      ken\":\\s*\"\\K[^\"]+')\"'; userrole=3; userpk=24' https://${ogm_server}:3005/proje\
+      ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?period=90 > ${prm_location}/TrendAnalysis/${ogm_server}-$(date +%F)-${stack_prefix}.csv"
+
 #
 # Local storage variables.
 #
@@ -470,12 +492,42 @@ pfs_mounts:
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
+  - pfs: umcgst15
+    source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
+    type: nfs4    # checked with cat /proc/filesystem
+    rw_options: 'defaults,_netdev,noatime,nodiratime,nofail,local_lock=flock'
+    ro_options: 'defaults,_netdev,noatime,nodiratime,nofail,ro'
+    machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
     pfs: local_raid
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: tmp05
     pfs: local_raid
+    groups:
+      - name: umcg-atd
+        mode: '2770'
+      - name: umcg-gap
+        mode: '2770'
+      - name: umcg-gd
+        mode: '2770'
+      - name: umcg-genomescan
+        mode: '2770'
+      - name: umcg-gsad
+        mode: '2770'
+      - name: umcg-gst
+        mode: '2770'
+      - name: umcg-lab
+      - name: umcg-labgnkbh
+        mode: '2770'
+      - name: umcg-patho
+        mode: '2770'
+      # - name: umcg-pr
+      - name: umcg-vipt
+        mode: '2770'
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+  - lfs: tmp15
+    pfs: 'umcgst15'
     groups:
       - name: umcg-atd
       - name: umcg-gap
@@ -487,9 +539,9 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
-#     - name: umcg-pr
+      # - name: umcg-pr
       - name: umcg-vipt
-    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
     groups:

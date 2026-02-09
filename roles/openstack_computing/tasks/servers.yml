@@ -4,10 +4,10 @@
     - name: "Use pre-defined address from group_vars/{{ stack_name }}/ip_addresses.yml."
       openstack.cloud.port:
         state: present
-        name: "{{ inventory_hostname }}-{{ item.name }}"
-        network: "{{ item.name }}"
-        security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ item.vnic_type
+        name: "{{ inventory_hostname }}-{{ item['name'] }}"
+        network: "{{ item['name'] }}"
+        security_groups: "{{ item['security_group'] }}"
+        binding_vnic_type: "{{ item['vnic_type']
             | default(hostvars[inventory_hostname]['host_type'])
             | default('normal') }}"
         fixed_ips:
@@ -18,8 +18,8 @@
           # Theoretically a network can have multiple subnets in OpenStack,
           # but we do not have/use any networks with multiple subnets yet and simply use the first subnet for the required network.
           #
-          - ip_address: "{{ ip_addresses[inventory_hostname][item.name]['address'] }}"
-            subnet_id: "{{ api_network_info['networks'] | selectattr('name', 'equalto', item.name) | map(attribute='subnet_ids') | first | first }}"
+          - ip_address: "{{ ip_addresses[inventory_hostname][item['name']]['address'] }}"
+            subnet_id: "{{ api_network_info['networks'] | selectattr('name', 'equalto', item['name']) | map(attribute='subnet_ids') | first | first }}"
         wait: true
         timeout: "{{ openstack_api_timeout }}"
       with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
@@ -27,10 +27,10 @@
     - name: "Use new random address from defined subnet."
       openstack.cloud.port:
         state: present
-        name: "{{ inventory_hostname }}-{{ item.name }}"
-        network: "{{ item.name }}"
-        security_groups: "{{ item.security_group }}"
-        binding_vnic_type: "{{ item.vnic_type
+        name: "{{ inventory_hostname }}-{{ item['name'] }}"
+        network: "{{ item['name'] }}"
+        security_groups: "{{ item['security_group'] }}"
+        binding_vnic_type: "{{ item['vnic_type']
             | default(hostvars[inventory_hostname]['host_type'])
             | default('normal') }}"
         wait: true
@@ -39,17 +39,18 @@
       when: ip_addresses[inventory_hostname][item.name]['address'] is not defined
 - name: Create persistent storage volume.
   openstack.cloud.volume:
-    display_name: "{{ inventory_hostname }}-volume"
-    size: "{{ local_volume_size_extra }}"
+    display_name: "{{ inventory_hostname }}-volume-{{ item['name'] }}"
+    size: "{{ item['size'] }}"
     state: present
     availability_zone: "{{ storage_availability_zone | default('nova') }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
-  when: local_volume_size_extra is defined and local_volume_size_extra > 0
+  loop: "{{ local_volume_extra | default([]) }}"
 - name: Create list of network port names for servers.
   ansible.builtin.set_fact:
     instance_nics: "{{ instance_nics | default([]) + [{'port-name': inventory_hostname + '-' + item}] }}"
   with_items: "{{ hostvars[inventory_hostname]['host_networks']
+                  | selectattr('attach_port_on_instance_launch', 'defined')
                   | selectattr('attach_port_on_instance_launch', 'true')
                   | map(attribute='name')
                   | list
@@ -134,35 +135,30 @@
 - name: Attach persistent storage volume to servers.
   openstack.cloud.server_volume:
     server: "{{ inventory_hostname }}"
-    volume: "{{ inventory_hostname }}-volume"
+    volume: "{{ inventory_hostname }}-volume-{{ item['name'] }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
-  when: local_volume_size_extra is defined and local_volume_size_extra > 0
+  loop: "{{ local_volume_extra | default([]) }}"
 - name: Assign floating IP to server.
   openstack.cloud.floating_ip:
     server: "{{ inventory_hostname }}"
     state: present
     reuse: true
-    network: "{{ stack_networks | selectattr('name', 'equalto', item.name) | map(attribute='router_network') | first }}"
-    nat_destination: "{{ item.name }}"
+    network: "{{ public_network }}"
+    nat_destination: "{{ private_network }}"
+    floating_ip_address: "{{ ip_addresses[inventory_hostname][public_network]['address'] | default(omit) }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
-  #
-  # Known bug https://github.com/ansible/ansible/issues/57451
-  # openstack.cloud.floating_ip is not idempotent:
-  # Succeeds only the first time and throws error on any subsequent calls.
-  # Therefore we use a "when" with a silly complex jinja filter including a JMESpath query
-  # to check if the VM already has a floating IP linked to an interface in the correct VXLAN.
-  #
-  # Note: this check currently works for VMs and will fail for baremetal servers.
-  #
-  when:
-    - item.assign_floating_ip is defined
-    - item.assign_floating_ip is true
-    - item.name not in (create_instance_result.server.addresses | dict2items(key_name='vlan', value_name='specs') | json_query(floating_ip_vlan_query))
   vars:
-    floating_ip_vlan_query: '[?specs[?"OS-EXT-IPS:type"==`floating`]].vlan'
-  with_items: "{{ hostvars[inventory_hostname]['host_networks'] }}"
+    private_network: "{{ item['name'] }}"
+    public_network: "{{ stack_networks
+        | selectattr('name', 'equalto', private_network)
+        | map(attribute='router')
+        | map(attribute='external_network') | first }}"
+  when:
+    - item['assign_floating_ip'] is defined
+    - item['assign_floating_ip'] is true
+  loop: "{{ hostvars[inventory_hostname]['host_networks'] }}"
 - name: Make sure servers are started.
   openstack.cloud.server_action:
     action: start

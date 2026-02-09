@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -14,7 +14,10 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
-          local_volume_size_extra: 100
+              add_hostname_to_ip_address: true
+          local_volume_extra:
+            - name: mnt
+              size: 100
         earl2:
           cluster_class: 'development'
           azure_flavor: "Standard_DS1_v2"
@@ -22,6 +25,7 @@ all:
             - name: "{{ stack_prefix }}_external"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
         earl3:
           cluster_class: 'diagnostics'
           azure_flavor: "Standard_DS1_v2"
@@ -29,6 +33,7 @@ all:
             - name: "{{ stack_prefix }}_external"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
         earl4:
           cluster_class: 'diagnostics'
           cloud_flavor: m1.small
@@ -36,7 +41,10 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
-          local_volume_size_extra: 100
+              add_hostname_to_ip_address: true
+          local_volume_extra:
+            - name: mnt
+              size: 100 
         earl5:
           cluster_class: 'research'
           cloud_flavor: m1.small
@@ -44,7 +52,10 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
-          local_volume_size_extra: 100
+              add_hostname_to_ip_address: true
+          local_volume_extra:
+            - name: mnt
+              size: 100 
         earl6:
           cluster_class: 'research'
           azure_flavor: "Standard_DS1_v2"
@@ -52,8 +63,9 @@ all:
             - name: "{{ stack_prefix }}_external"
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
 logs_library:
   children:
-    openstack_api:
+    controller_api:
     logs:
 ...

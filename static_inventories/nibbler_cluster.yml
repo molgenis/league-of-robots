@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -9,10 +9,14 @@ all:
       hosts:
         tunnel:
           cloud_flavor: umcg.v1.vm.1-2
+          enable_predictable_network_interface_names: false
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: eth0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
@@ -22,6 +26,9 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_repo"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
           swap_file_size: 2
     data_transfer:
       hosts:
@@ -31,7 +38,13 @@ all:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
-          local_volume_size_extra: 10000
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
+          local_yum_repository: true  # For nhc_standalone.
+          local_volume_extra:
+            - name: groups
+              size: 10000
 #
 # iRODS machines in Nibbler stack currently disabled as they are no longer used for the microscopy project
 # and the RUG vulnerability scanner complains about the expired certificate on "umcg-icat01.hpc.rug.nl".
@@ -98,7 +111,12 @@ all:
 #          - name: "{{ stack_prefix }}_internal_management"
 #            security_group: "{{ stack_prefix }}_irods"
 #            assign_floating_ip: false  # Floating IP is used from this network, but assigned manually to be able to switch from production to test and back.
-#        local_volume_size_extra: 20
+#            add_hostname_to_ip_address: true
+#            nmstate_interface:
+#              name: ens3
+#        local_volume_extra:
+#          - name: irods # change to name of mountpoint when re-enabled.
+#            size: 20
 #        davrods_icat_ip: "{{ ip_addresses[inventory_hostname]['nb_internal_management']['address'] }}"
     docs:
       hosts:
@@ -110,13 +128,28 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp6s0
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
+              lnet:
+                name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp4s0
+              lnet:
+                name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
+              nmstate_interface:
+                name: enp5s0
+              lnet:
+                name: tcp15
+          postfix_hostname: "{{ listserv_domain_name }}"
     deploy_admin_interface:
       hosts:
         nb-dai:
@@ -124,140 +157,177 @@ all:
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp6s0
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
+              lnet:
+                name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp4s0
+              lnet:
+                name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
-          local_volume_size_extra: 3000
+              nmstate_interface:
+                name: enp5s0
+              lnet:
+                name: tcp15
+          local_volume_extra:
+            - name: apps
+              size: 3000
     user_interface:
       hosts:
         nibbler:
           cloud_flavor: umcg.v1.vm.16-64
+          enable_predictable_network_interface_names: false
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp0s6
+                name: eth0
             - name: vlan985
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s3
+                name: eth1
+              lnet:
+                name: tcp14
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s4
+                name: eth2
+              lnet:
+                name: tcp20
             - name: vlan1073
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp0s5
+                name: eth3
+              lnet:
+                name: tcp15
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               nmstate_interface:
-                #name: enp0s7
-                name: enp0s11  # Will most likely change to enp0s7 after reboot.
+                name: eth4
                 ipv4:
                   auto-route-metric: 80
-          lustre_client_networks: "{{ lustre_client_networks_vm }}"
           slurm_sockets: 16
           slurm_cores_per_socket: 1
-          slurm_real_memory: 63788
+          slurm_real_memory: 63786
           slurm_local_disk: 0
           slurm_features: 'prm02,prm03,rsc02,tmp02'
-          slurm_ethernet_interfaces:
-            - enp0s3
-            - enp0s4
-            - enp0s5
-            - enp0s6
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-a[01:05]:
-              cloud_flavor: umcg.v1.vm.63-500
-              host_networks:
-                - name: vlan1338
-                  security_group: "{{ stack_prefix }}_cluster"
-                - name: vlan985
-                  security_group: "{{ stack_prefix }}_storage"
-                - name: vlan1068
-                  security_group: "{{ stack_prefix }}_storage"
-                # DH5 not used on compute nodes (yet).
-                #- name: vlan1073
-                #  security_group: "{{ stack_prefix }}_storage"
-              lustre_client_networks:
-                - name: tcp14
-                  interface: enp0s3
-                - name: tcp20
-                  interface: enp0s4
-                # DH5 not used on compute nodes (yet).
-                #- name: tcp15
-                #  interface: ens7
-              local_volume_size_extra: 1
-              slurm_sockets: 63
-              slurm_cores_per_socket: 1
-              slurm_real_memory: 491354
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
-              slurm_local_disk: 900
-              slurm_features: 'rsc02,tmp02'
-              slurm_ethernet_interfaces:
-                - enp0s3
-                - enp0s4
-                - enp0s5
-                # DH4 and DH5 not used on compute nodes (yet).
-                #- ens6
-                #- ens7
-        gpu_a40:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
-          hosts:
-            nb-node-b[01:02]:
-              cloud_flavor: umcg.v1.vm.31-120.8a40
-              gpu_count: 8
-              gpu_type: 'a40'
-              host_networks:
-                - name: vlan1338
-                  security_group: "{{ stack_prefix }}_cluster"
-                - name: vlan985
-                  security_group: "{{ stack_prefix }}_storage"
-                - name: vlan1068
-                  security_group: "{{ stack_prefix }}_storage"
-                # DH5 not used on compute nodes (yet).
-                #- name: vlan1073
-                #  security_group: "{{ stack_prefix }}_storage"
-              lustre_client_networks:
-                - name: tcp14
-                  interface: enp0s3
-                - name: tcp20
-                  interface: enp0s4
-                # DH5 not used on compute nodes (yet).
-                #- name: tcp15
-                #  interface: ens7
-              local_volume_size_extra: 1
-              slurm_sockets: 31
-              slurm_cores_per_socket: 1
-              slurm_real_memory: 117397
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
-              slurm_local_disk: 900
-              slurm_features: 'rsc02,tmp02,gpu,A40'
-              slurm_weight: 10
-              slurm_ethernet_interfaces:
-                - enp0s3
-                - enp0s4
-                - enp0s5
-                # DH4 and DH5 not used on compute nodes (yet).
-                #- ens6
-                #- ens7
-        cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
-          hosts:
-            nb-node-c[01:10]:
-              cloud_flavor: umcg.v1.bm.28-256-0.vlan1338
+              cloud_flavor: umcg.v1.bm.64-512-0.vlan1338
               host_type: baremetal
               host_networks:
                 - name: vlan1338
                   security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp65s0np0
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: enp65s0np0.1068
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: enp65s0np0
+                    ipv4:
+                      dhcp: false
+                  lnet:
+                    name: tcp20
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: '/dev/nvme0n1'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              slurm_sockets: 1
+              slurm_cores_per_socket: 64
+              slurm_real_memory: 514857
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
+              slurm_local_disk: 3002000
+              slurm_features: 'rsc02,tmp02'
+              slurm_weight: 5
+        gpu_a40:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            nb-node-b01:
+              cloud_flavor: umcg.v1.bm.64-256-440.vlan1338.16a40
+              host_type: baremetal
+              gpu_count: 16
+              gpu_type: 'a40'
+              enable_predictable_network_interface_names: true
+              host_networks:
+                - name: vlan1338
+                  security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp65s0f1np1  # altname ens3f1np1
+                - name: vlan1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+                  nmstate_interface:
+                    name: ens3f1np1.1068  # Use short altname here, because primary parent interface name + VLAN ID is too long (> 15 characters).
+                    type: vlan
+                    vlan:
+                      id: 1068
+                      base-iface: enp65s0f1np1  # Parent interface name.
+                    ipv4:
+                      dhcp: false
+                  lnet:
+                    name: tcp20
+              perc_devices: false
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: '/dev/nvme0n1'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              slurm_sockets: 1
+              slurm_cores_per_socket: 64
+              slurm_real_memory: 256809
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
+              slurm_local_disk: 1420000
+              slurm_features: 'rsc02,tmp02,gpu,A40'
+              slurm_weight: 10
+        cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            nb-node-c[01:11]:
+              cloud_flavor: umcg.v1.bm.28-256-0.vlan1338
+              host_type: baremetal
+              enable_predictable_network_interface_names: true
+              host_networks:
+                - name: vlan1338
+                  security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp130s0f0
                 - name: vlan1068
@@ -271,9 +341,8 @@ all:
                       base-iface: enp130s0f0
                     ipv4:
                       dhcp: false
-              lustre_client_networks:
-                - name: tcp20
-                  interface: enp130s0f0.1068
+                  lnet:
+                    name: tcp20
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
@@ -291,17 +360,13 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 14
-              slurm_real_memory: 257320
+              slurm_real_memory: 257317
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
               slurm_features: 'rsc02,tmp02'
-              slurm_ethernet_interfaces:
-                - enp130s0f0
-                - enp130s0f0.1068
 administration:
   children:
     sys_admin_interface:
@@ -314,7 +379,7 @@ cluster:
     #irods:
 nibbler_cluster:
   children:
-    openstack_api:
+    controller_api:
     #irods:
     jumphost:
     repo:

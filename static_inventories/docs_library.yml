@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -14,8 +14,9 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_webservers"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
 docs_library:
   children:
-    openstack_api:
+    controller_api:
     docs:
 ...

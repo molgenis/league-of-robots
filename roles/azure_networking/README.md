@@ -19,26 +19,24 @@ Note the _CIDR_ for each public network is defined for internal IPs and not for 
 
 Explaining security groups on the case of Azure.
 
-The network `type` variable is needed for non-external networks, like `management`
-and (not yet written) `storage` network.
-
-When `azure.yml` playbook is deployed, it creates a
+When `azure.yml` playbook is deployed, it creates
  - security group(s)
  - network and
  - subnetwork
+using this role and in the specified order.
 
-When external: true
-
-`group_vars/vars`
+In order to create a network it must have `create: true`, which defaults to false.
+E.g. in `group_vars/{{ stack_name }}/vars.yml`:
 ```
 azure_networks:
   - name: "{{ stack_prefix }}_external"
     cidr: '10.10.1.0/24'
-    external: true
-    security_group: "{{ stack_prefix }}_public"
+    create: true
 ```
+When the `create` attribute is `false` or omitted, the network must have been pre-created by an admin on the Azure cloud.
 
-`static_inventory/stack`
+In `static_inventory/{{ stack_name }}.yml` individual hosts can specify which of the networks they use
+and which `security_group` must be applied to the corresponding network interface/port:
 
 ```
 azure_flavor: "Standard_DS1_v2"
@@ -50,28 +48,25 @@ host_networks:
 
 ## Different security groups
 
- - For internal management networks, we use variables:
-
-    ```
-    azure_networks:
-       name: "{{ stack_prefix }}_internal_management"
-       security_group: "{{ stack_prefix }}_cluster"
-       type: "management"
-       cidr: 10.10.1.0/24
-    ```
-
-   make sure you define correct CIDR.
+ - For internal management networks we use variables:
+   ```
+   azure_networks:
+     name: "{{ stack_prefix }}_internal_management"
+     cidr: 10.10.1.0/24
+     create: true
+   ```
+   and `security_group: "{{ stack_prefix }}_cluster` for the individual host network ports/interfaces. 
+   Make sure you define correct CIDR.
 
  - For `logservers` security groups we must define network
-
-    ```
-    azure_networks:
-       name: "{{ stack_prefix }}_external"
-       security_group: "{{ stack_prefix }}_logservers"
-       type: "logservers"
-       cidr: 10.10.1.0/24
-    ```
-    Log servers are publicly available, so no CIDR needed.
+   ```
+   azure_networks:
+     name: "{{ stack_prefix }}_external"
+     cidr: 10.10.1.0/24
+     create: true
+   ```
+   and `security_group: "{{ stack_prefix }}_logserver` for the individual host network ports/interfaces. 
+   Log servers are publicly available, so no CIDR needed: why is it specified in the example above???.
 
 ## Security groups working together
 

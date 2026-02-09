@@ -6,7 +6,81 @@
 ### Functions to manage Pulp repos.
 ##
 #
+function _check-env() {
+	#
+	# Check if Python venv was initialized.
+	#
+	if [[ -z "${VIRTUAL_ENV:-}" ]]; then
+		echo 'ERROR: ${VIRTUAL_ENV} is empty.'
+		echo 'FATAL: This code requires the pulp-cli and its dependencies installed in a Python virtual environment.'
+		echo '       Try:'
+		echo "           source /admin/${_pulp_repo_management_user}/pulp-cli.venv/bin/activate"
+		echo '       to load the Python virtual environment.'
+		echo 'FATAL: See https://github.com/rug-cit-hpc/league-of-robots/blob/develop/documentation/Configuring_Pulp.md for additional instructions.'
+		return 1
+	fi
+	return
+}
 
+function pulp-refresh-acs() {
+	#
+	# Configure variables.
+	#
+	declare -a _pulp_alternate_content_sources
+	local      _pulp_repo_management_user='{{ repo_management_user }}'
+	local      _pulp_acs
+	_pulp_alternate_content_sources=(
+		{% for pulp_repo in pulp_repos[os_distribution] | selectattr('acs', 'defined') %}
+			{% for pulp_acs in pulp_repo['acs'] %}
+		{{ pulp_repo['name'] }}-{{ pulp_acs['name'] }}-acs
+			{% endfor %}
+		{% endfor %}
+	)
+	{% raw %}
+	#
+	# Check and modify env.
+	#
+	local _opt_nounset_was_enabled
+	if [[ -o nounset ]]; then
+		_opt_nounset_was_enabled='true'
+	else
+		_opt_nounset_was_enabled='false'
+		set -u
+	fi
+	_check-env || return
+	echo '######################################################################################'
+	echo '# Create/update alternate content sources (acs).'
+	echo '######################################################################################'
+	for _pulp_acs in "${_pulp_alternate_content_sources[@]}"; do
+		local _acs_action
+		if pulp rpm acs show --name "${_pulp_acs}" >/dev/null 2>&1; then
+			_acs_action='update'
+			echo "INFO: Updating ${_pulp_acs} alternate content source ..."
+		else
+			_acs_action='create'
+			echo "INFO: Creating ${_pulp_acs} alternate content source ..."
+		fi
+		pulp rpm acs "${_acs_action}" \
+			--name "${_pulp_acs}" \
+			--remote "${_pulp_acs}-remote"
+		echo '======================================================================================'
+	done
+	echo '######################################################################################'
+	echo '# Refresh alternate content sources.'
+	echo '######################################################################################'
+	for _pulp_acs in "${_pulp_alternate_content_sources[@]}"; do
+		echo "INFO: Refreshing ${_pulp_acs} using its remote ..."
+		pulp rpm acs refresh --name "${_pulp_acs}"
+		echo '======================================================================================'
+	done
+	#
+	# Reset env.
+	#
+	if [[ "${_opt_nounset_was_enabled}" == 'false' ]]; then
+		set +u
+	fi
+}
+{% endraw %}
 function pulp-sync-publish-distribute() {
 	#
 	# Configure variables.
@@ -35,159 +109,184 @@ function pulp-sync-publish-distribute() {
 		{% endfor %}
 	)
 	{% raw %}
+	local      _to_be_updated="${1:-}"
+	if [[ -z "${_to_be_updated:-}" ]]; then
+		echo "FATAL: Must specify a repo name or 'all'."
+		echo "INFO: E.g.: "
+		echo "INFO:     pulp-sync-publish-distribute all"
+		echo "INFO:   or "
+		echo "INFO:     pulp-sync-publish-distribute epel"
+		echo "INFO: Known repos on this server are: ${_all_pulp_repos[*]:-}"
+		return 1
+	elif [[ "${_to_be_updated}" == 'all' ]]; then
+		echo "INFO: Will process repos: ${_to_be_updated}."
+	else
+		local _repo_exists='unknown'
+		for _pulp_repo in "${_all_pulp_repos[@]}"; do
+			if [[ "${_to_be_updated}" == "${_pulp_repo}" ]]; then
+				echo "INFO: Will process repo: ${_to_be_updated}."
+				_repo_exists='yes'
+				continue
+			fi
+		done
+		if [[ "${_repo_exists}" != 'yes' ]]; then
+			echo "FATAL: Unknown repo ${_to_be_updated} specified."
+			return 1
+		fi
+	fi
 	#
 	# Check and modify env.
 	#
-	local _opt_nounset_was_enbled
+	local _opt_nounset_was_enabled
 	if [[ -o nounset ]]; then
-		_opt_nounset_was_enbled='true'
+		_opt_nounset_was_enabled='true'
 	else
-		_opt_nounset_was_enbled='false'
+		_opt_nounset_was_enabled='false'
 		set -u
 	fi
-	#
-	# Check if Python venv was initialized.
-	#
-	if [[ -z "${VIRTUAL_ENV:-}" ]]; then
-		echo 'ERROR: ${VIRTUAL_ENV} is empty.'
-		echo 'FATAL: This code requires the pulp-cli and its dependencies installed in a Python virtual environment.'
-		echo '       Try:'
-		echo "           source /admin/${_pulp_repo_management_user}/pulp-cli.venv/bin/activate"
-		echo '       to load the Python virtual environment.'
-		echo 'FATAL: See https://github.com/rug-cit-hpc/league-of-robots/blob/develop/documentation/Configuring_Pulp.md for additional instructions.'
-		return 1
-	fi
-	echo '######################################################################################'
-	echo '# Upload custom RPM files to create Pulp RPMs'
-	echo '# and add them to our Custom Packages for Enterprise Linux (cpel) repo.'
-	echo '######################################################################################'
-	local _rpm_path
-	while IFS= read -r -d '' _rpm_path; do
-		local _rpm_file
-		_rpm_file="$(basename "${_rpm_path}")"
-		#
-		# Get package name from RPM file name.
-		# This is a bit risky regex matching,
-		# but we can only use the package name and cannot use the file name
-		# to check if it was already uploaded to Pulp.
-		#
-		local _package_name
-		_package_name="${_rpm_file%%-[vr0-9][0-9.-]*}"
-		echo "INFO: Processing RPM ${_rpm_file} with package name ${_package_name} ..."
-		#
-		# Check if the package was already uploaded to Pulp.
-		#
-		local _rpm_pulp_href
-		_rpm_pulp_href=$(pulp --format json rpm content list \
-				--name "${_package_name}" \
-				| jq -r ".[] | select(.location_href? | match(\"${_rpm_file}\")) | .pulp_href" \
-				| tr -d '"' \
-				)
-		if [[ "${_rpm_pulp_href:-}" != '' ]]; then
-			echo "INFO: Get sha256 checksum for ${_rpm_file} already uploaded to Pulp and compare that to the checksum for ${_rpm_path} on disk ..."
-			local _rpm_sha256
-			_rpm_sha256=$(pulp --format json rpm content show \
-					--href "${_rpm_pulp_href}" \
-					| jq -r '.sha256')
-			if [[ "${_rpm_sha256:-}" != "$(sha256sum "${_rpm_path}" | cut -d ' ' -f 1)" ]]; then
-				echo "ERROR: sha256 checksum for ${_rpm_path} on disk does not match with the checksum for the previously uploaded RPM."
-				echo 'ERROR: This code will not replace an RPM with a newer one.'
-				echo 'ERROR: If you really need to replace the existing RPM, you must delete the old one manually first.'
+	_check-env || return
+	if [[ "${_to_be_updated}" == 'all' || "${_to_be_updated}" == "${_cpel_repo}" ]]; then
+		echo '######################################################################################'
+		echo '# Upload custom RPM files to create Pulp RPMs'
+		echo '# and add them to our Custom Packages for Enterprise Linux (cpel) repo.'
+		echo '######################################################################################'
+		local _rpm_path
+		while IFS= read -r -d '' _rpm_path; do
+			local _rpm_file
+			_rpm_file="$(basename "${_rpm_path}")"
+			#
+			# Get package name from RPM file name.
+			# This is a bit risky regex matching,
+			# but we can only use the package name and cannot use the file name
+			# to check if it was already uploaded to Pulp.
+			#
+			local _package_name
+			_package_name="${_rpm_file%%-[vr0-9][0-9.-]*}"
+			echo "INFO: Processing RPM ${_rpm_file} with package name ${_package_name} ..."
+			#
+			# Check if the package was already uploaded to Pulp.
+			#
+			local _rpm_pulp_href
+			_rpm_pulp_href=$(pulp --format json rpm content list \
+					--name "${_package_name}" \
+					| jq -r ".[] | select(.location_href? | match(\"${_rpm_file}\")) | .pulp_href" \
+					| tr -d '"' \
+					)
+			if [[ "${_rpm_pulp_href:-}" != '' ]]; then
+				echo "INFO: Get sha256 checksum for ${_rpm_file} already uploaded to Pulp and compare that to the checksum for ${_rpm_path} on disk ..."
+				local _rpm_sha256
+				_rpm_sha256=$(pulp --format json rpm content show \
+						--href "${_rpm_pulp_href}" \
+						| jq -r '.sha256')
+				if [[ "${_rpm_sha256:-}" != "$(sha256sum "${_rpm_path}" | cut -d ' ' -f 1)" ]]; then
+					echo "ERROR: sha256 checksum for ${_rpm_path} on disk does not match with the checksum for the previously uploaded RPM."
+					echo 'ERROR: This code will not replace an RPM with a newer one.'
+					echo 'ERROR: If you really need to replace the existing RPM, you must delete the old one manually first.'
+					return 1
+				fi
+			else
+				echo "INFO: Uploading ${_rpm_path} to Pulp ..."
+				_rpm_pulp_href=$(pulp --format json rpm content upload \
+						--file "${_rpm_path}" \
+						--relative-path "${_rpm_file}" \
+						| jq -r '.pulp_href')
+			fi
+			if [[ -z "${_rpm_pulp_href:-}" || "${_rpm_pulp_href:-}" == 'null' ]]; then
+				echo "ERROR: failed to get pulp_href for RPM, Cannot add ${_rpm_file} to ${_cpel_repo} repo."
 				return 1
 			fi
-		else
-			echo "INFO: Uploading ${_rpm_path} to Pulp ..."
-			_rpm_pulp_href=$(pulp --format json rpm content upload \
-					--file "${_rpm_path}" \
-					--relative-path "${_rpm_file}" \
-					| jq -r '.pulp_href')
-		fi
-		if [[ -z "${_rpm_pulp_href:-}" || "${_rpm_pulp_href:-}" == 'null' ]]; then
-			echo "ERROR: failed to get pulp_href for RPM, Cannot add ${_rpm_file} to ${_cpel_repo} repo."
-			return 1
-		fi
-		if [[ "$(pulp --format json rpm repository content list \
-				--repository "${_cpel_repo}" \
-				--all-types \
-				| jq ".[] | select(.pulp_href==\"${_rpm_pulp_href}\").pulp_href" \
-				| tr -d '"' \
-				)" != "${_rpm_pulp_href}" ]]; then
-			echo "INFO: Adding ${_rpm_file} with pulp_href ${_rpm_pulp_href} to ${_cpel_repo} repo ..."
-			pulp rpm repository content add \
+			if [[ "$(pulp --format json rpm repository content list \
 					--repository "${_cpel_repo}" \
-					--package-href "${_rpm_pulp_href}"
-		else
-			echo "INFO: Skipping ${_rpm_path}, which was already added to the ${_cpel_repo} repo."
-		fi
-		echo '======================================================================================'
-	done< <(find "umcg-${_distro}" -name '*.rpm' -print0)
-	echo '######################################################################################'
-	echo '# Add remotes to repos.'
-	echo '######################################################################################'
-	for _pulp_repo in "${_pulp_repos_with_remotes[@]}"; do
-		echo "INFO: Adding ${_pulp_repo}-remote to ${_pulp_repo} repo..."
-		pulp rpm repository update --name "${_pulp_repo}" --remote "${_pulp_repo}-remote"
-		echo '======================================================================================'
-	done
-	echo '######################################################################################'
-	echo '# Sync repos with remotes creating new repository versions.'
-	echo '######################################################################################'
-	for _pulp_repo in "${_pulp_repos_with_remotes[@]}"; do
-		echo "INFO: Syncing ${_pulp_repo} repo with remote ..."
-		pulp rpm repository sync --name "${_pulp_repo}"
-		echo '======================================================================================'
-	done
+					--all-types \
+					| jq ".[] | select(.pulp_href==\"${_rpm_pulp_href}\").pulp_href" \
+					| tr -d '"' \
+					)" != "${_rpm_pulp_href}" ]]; then
+				echo "INFO: Adding ${_rpm_file} with pulp_href ${_rpm_pulp_href} to ${_cpel_repo} repo ..."
+				pulp rpm repository content add \
+						--repository "${_cpel_repo}" \
+						--package-href "${_rpm_pulp_href}"
+			else
+				echo "INFO: Skipping ${_rpm_path}, which was already added to the ${_cpel_repo} repo."
+			fi
+			echo '======================================================================================'
+		done< <(find "umcg-${_distro}" -name '*.rpm' -print0)
+	fi
+	if [[ "${_to_be_updated}" == 'all' || "${_to_be_updated}" != "${_cpel_repo}" ]]; then
+		echo '######################################################################################'
+		echo '# Add remotes to repos.'
+		echo '######################################################################################'
+		for _pulp_repo in "${_pulp_repos_with_remotes[@]}"; do
+			if [[ "${_to_be_updated}" == 'all' || "${_to_be_updated}" == "${_pulp_repo}" ]]; then
+				echo "INFO: Adding ${_pulp_repo}-remote to ${_pulp_repo} repo..."
+				pulp rpm repository update --name "${_pulp_repo}" --remote "${_pulp_repo}-remote"
+				echo '======================================================================================'
+			fi
+		done
+		echo '######################################################################################'
+		echo '# Sync repos with remotes creating new repository versions.'
+		echo '######################################################################################'
+		for _pulp_repo in "${_pulp_repos_with_remotes[@]}"; do
+			if [[ "${_to_be_updated}" == 'all' || "${_to_be_updated}" == "${_pulp_repo}" ]]; then
+				echo "INFO: Syncing ${_pulp_repo} repo with remote ..."
+				pulp rpm repository sync --name "${_pulp_repo}"
+				echo '======================================================================================'
+			fi
+		done
+	fi
 	echo '######################################################################################'
 	echo '# Create/update distributions based on publications using latest repository versions.'
 	echo '######################################################################################'
 	for _pulp_repo in "${_all_pulp_repos[@]}"; do
-		echo "INFO: Processing distribution name ${_stack_prefix}-${_pulp_repo} with base path ${_stack_name}/${_pulp_repo} ..."
-		#
-		# Get latest repository version href for this repo.
-		#
-		local _latest_version_href
-		_latest_version_href="$(pulp --format json rpm repository show --name "${_pulp_repo}" | jq -r '.latest_version_href')"
-		#
-		# Check if we already have a publication for the latest repository version.
-		#
-		local _publication_href
-		if [[ $(pulp --format json rpm publication list --repository-version "${_latest_version_href}" 2>/dev/null \
-				| jq -r 'first.pulp_href') =~ /pulp/api/ ]]; then
-			echo "INFO:    Using existing publication for latest version of ${_pulp_repo} repository ..."
-			_publication_href=$(pulp --format json \
-				rpm publication list --repository-version "${_latest_version_href}" \
-				| jq -r 'first.pulp_href')
-		else
-			echo "INFO:    Creating new publication for latest version of ${_pulp_repo} repository ..."
-			_publication_href=$(pulp --format json \
-				rpm publication create --repository "${_pulp_repo}" \
-				| jq -r '.pulp_href')
+		if [[ "${_to_be_updated}" == 'all' || "${_to_be_updated}" == "${_pulp_repo}" ]]; then
+			echo "INFO: Processing distribution name ${_stack_prefix}-${_pulp_repo} with base path ${_stack_name}/${_pulp_repo} ..."
+			#
+			# Get latest repository version href for this repo.
+			#
+			local _latest_version_href
+			_latest_version_href="$(pulp --format json rpm repository show --name "${_pulp_repo}" | jq -r '.latest_version_href')"
+			#
+			# Check if we already have a publication for the latest repository version.
+			#
+			local _publication_href
+			if [[ $(pulp --format json rpm publication list --repository-version "${_latest_version_href}" 2>/dev/null \
+					| jq -r 'first.pulp_href') =~ /pulp/api/ ]]; then
+				echo "INFO:    Using existing publication for latest version of ${_pulp_repo} repository ..."
+				_publication_href=$(pulp --format json \
+					rpm publication list --repository-version "${_latest_version_href}" \
+					| jq -r 'first.pulp_href')
+			else
+				echo "INFO:    Creating new publication for latest version of ${_pulp_repo} repository ..."
+				_publication_href=$(pulp --format json \
+					rpm publication create --repository "${_pulp_repo}" \
+					| jq -r '.pulp_href')
+			fi
+			#
+			# Check if we already have a distribution for this repo.
+			#
+			local _distribution_action
+			if pulp rpm distribution show --name "${_stack_prefix}-${_pulp_repo}" >/dev/null 2>&1; then
+				_distribution_action='update'
+				echo "INFO:    Updating distribution ..."
+			else
+				_distribution_action='create'
+				echo "INFO:    Creating distribution ..."
+			fi
+			pulp rpm distribution "${_distribution_action}" \
+				--name "${_stack_prefix}-${_pulp_repo}" \
+				--base-path "${_stack_name}/${_pulp_repo}" \
+				--publication "${_publication_href}"
+			echo '======================================================================================'
 		fi
-		#
-		# Check if we already have a distribution for this repo.
-		#
-		local _distribution_action
-		if pulp rpm distribution show --name "${_stack_prefix}-${_pulp_repo}" >/dev/null 2>&1; then
-			_distribution_action='update'
-			echo "INFO:    Updating distribution ..."
-		else
-			_distribution_action='create'
-			echo "INFO:    Creating distribution ..."
-		fi
-		pulp rpm distribution "${_distribution_action}" \
-			--name "${_stack_prefix}-${_pulp_repo}" \
-			--base-path "${_stack_name}/${_pulp_repo}" \
-			--publication "${_publication_href}"
-		echo '======================================================================================'
 	done
 	#
 	# Reset env.
 	#
-	if [[ "${_opt_nounset_was_enbled}" == 'false' ]]; then
+	if [[ "${_opt_nounset_was_enabled}" == 'false' ]]; then
 		set +u
 	fi
 }
 
+echo 'INFO: Added "pulp-refresh-acs" function/command to environment.'
 echo 'INFO: Added "pulp-sync-publish-distribute" function/command to environment.'
 
 {% endraw %}

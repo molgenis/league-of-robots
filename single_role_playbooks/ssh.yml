@@ -16,6 +16,7 @@
     - jenkins
     - repo
     - logs
+    - silo
   roles:
     - ssh
 ...

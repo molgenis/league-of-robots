@@ -121,7 +121,7 @@ function lor-config() {
 		printf 'INFO: Found Mitogen strategy plugin in:  %s\n' "${ANSIBLE_STRATEGY_PLUGINS}"
 		printf 'INFO: Using Ansible strategy:            %s.\n' "${ANSIBLE_STRATEGY}"
 	else
-		printf 'WARNING: Could not find Mitogen strategy plugin in %s\n' "${_ansible_mitogen_search_path}"
+		printf 'WARNING: Could not find Mitogen strategy plugin in %s\n' "${_ansible_mitogen_path}"
 		printf 'INFO: Mitogen strategy plugin is:        %s.\n' 'disabled (default)'
 	fi
 	if [[ -n "${OS_AUTH_URL:-}" ]]; then

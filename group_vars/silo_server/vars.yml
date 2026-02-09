@@ -22,14 +22,14 @@ cloud_image: Rocky-9.5
 cloud_user: rocky
 availability_zone: nova
 os_distribution: 'rocky9'
-repo_manager: 'none'
+repo_manager: 'pulp'
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -48,4 +48,7 @@ local_admin_users:
   - 'sandi'
   - 'wim'
   - 'wouter'
+cvmfs_repos: 
+  - 'hpc.umcg.nl'
+  - 'test.talos'
 ...

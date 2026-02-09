@@ -3,58 +3,20 @@
   ansible.builtin.include_tasks:
     file: automounts.yml
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
 
 - name: Configure ssh and sshfs
   ansible.builtin.include_tasks:
     file: sshfs.yml
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
-
-- name: Create mount files from templates
-  ansible.builtin.template:
-    src: archive_mount.j2
-    dest: "/etc/systemd/system/groups-{{ item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.mount"
-    owner: root
-    group: root
-    mode: "0644"
-  with_subelements:
-    - "{{ archive_groups | list }}"
-    - 'groups'
-  notify:
-    - 'archive_systemd_reload'
-    - 'archive_mount_stop'
-    - 'archive_automount_enable'
-  when:
-    - archive_groups is defined
-    - inventory_hostname in groups['user_interface'] | default([])
-  become: true
-
-- name: Create automount files from templates
-  ansible.builtin.template:
-    src: archive_automount.j2
-    dest: "/etc/systemd/system/groups-{{ item.1 | regex_replace('-', '\\\\x2d') }}-{{ item.0.name }}.automount"
-    owner: root
-    group: root
-    mode: "0644"
-  with_subelements:
-    - "{{ archive_groups | list }}"
-    - 'groups'
-  notify:
-    - 'archive_systemd_reload'
-    - 'archive_mount_stop'
-    - 'archive_automount_enable'
-  when:
-    - archive_groups is defined
-    - inventory_hostname in groups['user_interface'] | default([])
-  become: true
 
 - name: Configure file recall (staging) from remote system
   ansible.builtin.include_tasks:
     file: recall.yml
   when:
-    - archive_groups is defined
+    - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
 ...

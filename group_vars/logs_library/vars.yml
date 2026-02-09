@@ -10,17 +10,15 @@ availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
     mtu_size: '1450'
-# Azure
 azure_networks:
-  # types: management, logservers
   - name: "{{ stack_prefix }}_external"
-    type: logservers
     cidr: '10.10.1.0/24'
+    create: true
 azure_image:
   rocky9:
     offer: 'rockylinux-x86_64'
@@ -34,17 +32,15 @@ nameservers: [
 ]
 local_admin_groups:
   - 'admin'
-
 # To limit access to sensitive logs, access is limited to: NEED-TO-HAVE personnel
 local_admin_users:
   - 'gerben'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'sandi'
 regular_groups:
-  - 'umcg-logstoprm'
+  - name: 'umcg-logstoprm'
 regular_users:
   - name: "logstoprm"
     groups: "umcg-logstoprm"
@@ -68,10 +64,6 @@ use_sssd: false
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
 #
 external_jumphosts:
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception
@@ -79,15 +71,15 @@ external_jumphosts:
   - group: hyperchicken_cluster
     hosts:
       - hostname: portal
-        network: public
-  - group: fender_cluster
-    hosts:
-      - hostname: corridor
-        network: public
+        network: external_unfiltered
   - group: nibbler_cluster
     hosts:
       - hostname: tunnel
         network: vlan16
+  - group: vaxtron_cluster
+    hosts:
+      - hostname: foyer
+        network: external
   - group: wingedhelix_cluster
     hosts:
       - hostname: wh-porch

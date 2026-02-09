@@ -1,0 +1,15 @@
+---
+#
+# Firewall configuration.
+#
+iptables_allow_http_inbound:
+  - "{{ hyperchicken_cluster.ip_addresses['hc_internal_management-public-router']['external_unfiltered'] }}"
+  - "{{ nibbler_cluster.ip_addresses['nb_internal_management-vlan16-router']['vlan16'] }}"
+  - "{{ talos_cluster.ip_addresses['tl_internal_management-vlan16-router']['vlan16'] }}"
+  - "{{ vaxtron_cluster.ip_addresses['vt_internal_management-external-router']['external'] }}"
+iptables_allow_https_inbound:
+  - "{{ hyperchicken_cluster.ip_addresses['hc_internal_management-public-router']['external_unfiltered'] }}"
+  - "{{ nibbler_cluster.ip_addresses['nb_internal_management-vlan16-router']['vlan16'] }}"
+  - "{{ talos_cluster.ip_addresses['tl_internal_management-vlan16-router']['vlan16'] }}"
+  - "{{ vaxtron_cluster.ip_addresses['vt_internal_management-external-router']['external'] }}"
+...

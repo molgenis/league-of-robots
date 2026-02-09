@@ -9,26 +9,33 @@ On Enterprise Linux these tools all try to fiddle with network settings and it c
 Network Manager kind of works, but do not try to use the `nmtui` text based User Interface nor any GUI.
 Use the `nmcli` command line interface instead.
 By default NetworkManager creates _connections_ for network _devices_ using problematic names.
-E.g. `System wired 1`: such _connection_ names are confusing and handling in code is problematic due to the spaces in the names. 
+E.g. `System wired 1`: such _connection_ names are confusing and handling in code is problematic due to the spaces in the names.
 Network Manager also has a habit of creating yet another _connection_ instead of modifying the existing one
 when you try to change/update something.
 
-Therefore we use [nmstate](https://nmstate.io/) and its command line tool `nmstatectl` to control Network Manager. 
+Therefore we use [nmstate](https://nmstate.io/) and its command line tool `nmstatectl` to control Network Manager.
 The network interface config files used by `nmstate` are stored in
+
 ```
 /etc/nmstate/*.yml
 ```
+
 When such a `*.yml` is deployed successfully with
+
 ```
-nmstatectl apply /etc/nmstate/natwork_name.yml
+nmstatectl apply /etc/nmstate/network_name.yml
 ```
+
 it will result in a corresponding
+
 ```
-nmstatectl apply /etc/nmstate/natwork_name.applied
+nmstatectl apply /etc/nmstate/network_name.applied
 ```
+
 and `nmstatectl` will refuse to apply the `*.yml` again unless the corresponding `*.applied` is removed first.
 
 To check the current state of the network connections and devices:
+
 ```
 #
 # List all network connections using Network Manager.
@@ -48,7 +55,7 @@ nmcli device status
 nmstatectl show [device]
 ```
 
-### udev & systemd
+### udev & systemd: Predictable Network Interface Names
 
 > systemd/udev will automatically assign predictable, stable network interface names for all local Ethernet, WLAN and WWAN interfaces.
 
@@ -76,12 +83,14 @@ The exec summary:
     * Firmware updates may result in presenting the hardware differently to BIOS/EFI,
       resulting in different names even when the rules have not changed.
  * Therefore every minor bugfix update can now result in changed network interface names after reboot
-   even when no interfaces were added nor removed: network interface names are now even less predictable then before.
+   even when no interfaces were added nor removed: network interface names may be even less predictable then before.
 
 We use a patched list (of precedence) of `udev` _rules_:
+
 ```
 NamePolicy=kernel database onboard path slot
 ```
+
 * `slot` based naming rules changed several times and are less stable than `path` based rules.
   Therefore we prefer `path` based naming over `slot` based naming.
 * `keep` was removed, because it is problematic when trying to enforce a custom set of naming rules.
@@ -90,6 +99,24 @@ NamePolicy=kernel database onboard path slot
   will continue to use the old rules. This may result for example in for compute nodes of the same type.
 * `mac` is not used because it the most unpredictable making it impossible to predict the name of interfaces
   for machines of the same generation of hardware when the config for the first machine is known.
+
+This functionality to generate predictable network interface names is the future,
+but to prevent breaking already deployed machines, which may or may not already use predictable network interface names,
+there is no default defined.
+In order to explicitly enable or explicitly disable predictable network interface names,
+the `enable_predictable_network_interface_names` variable must be set to either `true` or `false`
+* in `group_vars/{{ stack_name }}/vars.yml` for a the complete stack or
+* in `static_inventory/{{ stack_name }}.yml` for specific machines.
+
+When `enable_predictable_network_interface_names` is undefined, this role will skip configuration of how network interfaces should be named.
+
+Switching `enable_predictable_network_interface_names` for an already running machine from `true` to `false` or vice versa,
+will modify the `net.ifnames` kernel boot parameter in the GRUB bootloader config,
+followed by rebuilding the GRUB bootloader entries and rebooting the machine.  
+**IMPORTANT: this may break other services** like `lnet` for Lustre or `iptables` to configure a firewall
+and which use network interface names in their configs.
+**In the worst case scenario you may have locked yourself out of the machine after reboot**,
+because the firewall is not configured to allow traffic to the new network interface name.
 
 ### cloud-init
 
@@ -105,52 +132,56 @@ and once we can deploy this role we use it to disable network configuration by _
 
 ## Configuring network settings using this interfaces role
 
-Configure all networks used by the stack in `group_vars/[stack-name]/vars.yml`;
+Configure all networks used by the stack in `group_vars/{{ stack_name }}/vars.yml`;
 Not all networks must be used by all machines, but all networks used by any machine of the stack must be listed here:
+
 ```yaml
 stack_networks:
   - name: string
     cidr: 'ip/mask'
-    gateway: ip
-    router_network: string
-    router_name: string
-    type: [management|storage]  # Effects security group applied to network by openstack_networking role.
-    external: [true|false]      # Default is false when omitted and means network is created by code from this repo.
-                                # True means network is created by cloud admin before running any code from this repo.
+    router:
+      next-hop-address: ip
+      external_network: string
+      name: string
+    create: [true|false]
     mtu_size: integer
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - ip/mask  # External machines not part of this stack that need to communicate with machines in this stack
                  # and which need to be added to the OpenStack security group rules for this network to allow network traffic.
 ```
+
 Example for the Talos test cluster:
+
 ```yaml
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
-    gateway: '172.23.68.1'
-    router_network: vlan16
-    router_name: vlan1337
-    type: management
-    external: true
+    router:
+      next-hop-address: '172.23.68.1'
+      external_network: vlan16
+      name: vlan1337
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
-    gateway: '10.10.1.1'
-    router_network: vlan16
-    type: management
-    external: false
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: vlan16
+    create: true
     mtu_size: '1450'
   - name: vlan1068  # Private Lustre
     cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
     allow_ingress:
       - 172.23.60.161/32  # Lustre server
       - 172.23.60.162/32  # Lustre server
       - 172.23.60.163/32  # Lustre server
       - 172.23.60.164/32  # Lustre server
-    type: storage
-    external: true
 ```
 
-Configure which network to use and on which interface per machine in `static_inventory/[stack-name].yml`:
+Configure which network to use and on which interface per machine in `static_inventory/{{ stack_name }}.yml`:
+
 ```yaml
 ---
 all:
@@ -162,6 +193,7 @@ all:
             - name: string
               security_group: string
               assign_floating_ip: [true|false]  # Default is false when omitted.
+              add_hostname_to_ip_address: [true|false]  # Default is false when omitted; see static_hostname_lookup role.
               #
               # Details for nmstate in the same YAML syntax/structure as for a single item from the
               # "interfaces" key in the YAML output from nmstatectl or as listed in nmstate config files; See
@@ -202,7 +234,7 @@ all:
               # which may use an untagged VLAN, after initial provisioning of the machine.
               # In this case DHCP is disabled and a specific IP is configured: this IP
               # must not be specified here as it will get looked up automagically from:
-              #     group_vars/[stack-name]/ip_addresses.yml.
+              #     group_vars/{{ stack_name }}/ip_addresses.yml.
               #
               nmstate_interface:
                 name: base_interface_name.vlan_ID  # Must use this format. E.g. enp4s0.1068
@@ -215,6 +247,7 @@ all:
 ```
 
 Example with subset of machines for the Talos test cluster:
+
 ```yaml
 ---
 all:
@@ -226,6 +259,7 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
     user_interface:
@@ -234,6 +268,7 @@ all:
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
             - name: vlan1068
@@ -254,6 +289,7 @@ all:
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp65s0np0
                 - name: vlan1068

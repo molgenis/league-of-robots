@@ -35,7 +35,7 @@ nav:
 {% if groups['data_transfer'] is defined and groups['data_transfer'] | length >= 1 %}
     - 'Data transfers - Using a dedicated data transfer server': 'dedicated-dt-server-overview.md'
 {% endif %}
-{% if archive_groups is defined and archive_groups | length >= 1 %}
+{% if remote_archive is defined and remote_archive | length >= 1 %}
     - 'Archive - Using a remote archive storage': 'archive.md'
 {% endif %}
   - Compute:
@@ -57,7 +57,7 @@ nav:
   - Group Specific Documentation:
     - 'Solve-RD - How to find and work with Solve-RD data': 'solve-rd.md'
 {% endif %}
-{% if 'gearshift' in slurm_cluster_name or 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
+{% if 'nibbler' in slurm_cluster_name or 'talos' in slurm_cluster_name or 'vaxtron' in slurm_cluster_name %}
   - Group Specific Documentation:
     - 'UMCG research - Code of Conduct': 'coc_umcg_research_clusters.md'
 {% endif %}

@@ -34,7 +34,7 @@
 
 - name: Set list of unique ssh hosts
   ansible.builtin.set_fact:
-    archive_unique_hosts: "{{ archive_groups | map(attribute='archive_system', default='') | unique }}"
+    archive_unique_hosts: "{{ remote_archive | map(attribute='archive_system', default='') | unique }}"
 
 - name: Deploy ssh configuration settings for accessing archive
   ansible.builtin.template:
@@ -49,7 +49,7 @@
   ansible.builtin.set_fact:
     archive_all_fingerprints: "{{ archive_all_fingerprints | default([]) + [item.0.archive_system + ' ' + item.1] }}"
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'archive_system_fingerprints'
 
 - name: Write public keys into known_hosts
@@ -77,12 +77,13 @@
   become: true
 
 - name: Check connection and ensure that group folder on remote archive system exists
-  ansible.builtin.command: |
-    ssh -i {{ archive_ssh_key_location }} {{ archive_user }}@{{ archive_system }} "mkdir -p /home/{{ archive_user }}/{{ item.0.name }}/{{ item.1 }}"
+  ansible.builtin.command: >
+    ssh -i {{ archive_ssh_key_location }} {{ item.0.archive_user }}@{{ item.0.archive_system }}
+    "mkdir -p {{ item.0.archive_remote_top_dir }}/{{ item.0.local_top_level_mount }}/{{ item.1 }}/{{ item.0.name }}"
   register: archive_dir_test
   changed_when: false
   with_subelements:
-    - "{{ archive_groups | list }}"
+    - "{{ remote_archive | default([], true) | list }}"
     - 'groups'
   become: true
 ...

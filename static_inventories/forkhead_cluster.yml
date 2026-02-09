@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -14,6 +14,7 @@ all:
           ansible_host: 10.96.52.12
           host_networks:
             - name: vnet-medgen-t
+              add_hostname_to_ip_address: true
           local_yum_repository: true # enable local yum repository
     deploy_admin_interface:
       hosts:
@@ -69,7 +70,7 @@ cluster:
     administration:
 forkhead_cluster:
   children:
-    openstack_api:
+    controller_api:
     jumphost:
     cluster:
     chaperone:

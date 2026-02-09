@@ -2,6 +2,7 @@
 - hosts:
     - cluster
     - chaperone,!mit_chaperone
+    - silo_server
   roles:
     - role: pulp_client
       when:

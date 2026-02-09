@@ -8,6 +8,7 @@
 - name: '###==-> Roles only for completely managed chaperones <-==###'
   hosts: chaperone,!mit_chaperone
   roles:
+    - interfaces
     - iptables
     - grub
     - swap
@@ -38,6 +39,7 @@
     - shared_storage
     - build_environment
     - envsync
+    - parallax
 
 - name: '###==-> Roles only for partially managed chaperones <-==###'
   hosts: mit_chaperone

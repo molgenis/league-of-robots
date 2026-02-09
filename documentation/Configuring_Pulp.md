@@ -5,7 +5,7 @@ Table of Contents:
 * [Intro](#-intro): About Pulp, concepts and documentation.
 * [Create Server](#-create-server): Create VM for Pulp with Ansible.
 * [Install and configure with Ansible](#-install-and-configure-with-ansible): Deploy Pulp & configure repositories both with Ansible.
-* [Maintenance): Various manual Pulp maintenance tasks.
+* [Maintenance](#-various-manual-pulp-maintenance-tasks): Various manual Pulp maintenance tasks.
 * [Configure manually with API](#-configure-manually-with-api): configure repositories manually using the Pulp API.
 
 ---
@@ -27,16 +27,19 @@ Pulp uses the following concepts:
 
 1. _**Repository**_:
    A collection of _artifacts_.
-2. _**Remote**_:
-   A repository can be synced with an upstream _remote_
-3. _**Repository Version**_:
+2. _**Alternate Content Source (ACS)**_:
+   A preferred location to fetch _artifacts_ from.
+3. _**Remote**_:
+   A repository can be _synced_ with an upstream _remote_.
+   An ACS can be _refreshed_ using an upstream _remote_.
+4. _**Repository Version**_:
    A new immutable version is created ach time a _repo_ gets modified.
    (E.g. add content / delete content / sync with a _remote_)
-4. _**Publication**_:
+5. _**Publication**_:
    A _publication_ is a _repository version_ + metadata required by clients
    in order to be able to consume the content from that _repo version_.
    E.g. manifest files, indices, etc.
-5. _**Distribution**_:
+6. _**Distribution**_:
    Is a location/URL where a _publication_ is served to clients usually over HTTP(S).
 
 ### Pulp Components
@@ -88,8 +91,19 @@ it has enough dependencies already.
  * Multiple _distributions_ and _publications_ and _repository versions_ may have the same version of an _artifact_,
    which is stored only once.
  * You can save on storage by using `policy='on_demand'` for remotes.
-   This means that Pulp will only fetch the meta-data for artifacts when a repository is synchronized with that remote.
-   The artifacts themselves will only get fetched from the remote when a client requests them.
+   This means that Pulp will only fetch the meta-data for _artifacts_ when a _repository_ is synchronized with that _remote_.
+   The _artifacts_ themselves will only get fetched from the _remote_ when a client requests them.
+
+##### Using Alternate Content Sources as fallback locations to fetch data when policy=on_demand
+
+Some _remotes_ remove older versions of packages. When we use the `on_demand` policy,
+this can result in a situation where the older version of the package is in the index / meta-data fetched during the last sync
+and hence in the _publication_ served to the Pulp clients, but that this package cannot be fetched _on demand_ anymore.
+In that case, you could sync the repository again with the remote to update the meta-data, create a new _publication_ and update the _distribution_
+hoping that all the updates for all packages from that repository do not introduce new bugs.
+The better option is the use or add an _Alternate Content Source (ACS)_, that does still have the older version of the package.
+Pulp will automatically search all _ACSs_ and match _artifacts_ based on checksums.
+You can _refresh_ an _ACS_ without affecting the _publications_ served to Pulp clients.
 
 ### Additional tooling
 
@@ -99,21 +113,21 @@ it has enough dependencies already.
 
 ### Documentation
 
- * Pulp core docs https://docs.pulpproject.org/pulpcore/index.html
- * Pulp RPM docs  https://docs.pulpproject.org/pulp_rpm/index.html
- * Pulp core API  https://docs.pulpproject.org/pulpcore/restapi.html
- * Pulp RPM API   https://docs.pulpproject.org/pulp_rpm/restapi.html
- * Pulp RPM API example scripts: https://github.com/pulp/pulp_rpm/tree/master/docs/_scripts
- * Pulp Installer docs https://pulp-installer.readthedocs.io/en/latest/
+ * [Pulp core docs](https://docs.pulpproject.org/pulpcore/index.html)
+ * [Pulp RPM docs](https://docs.pulpproject.org/pulp_rpm/index.html)
+ * [Pulp core API](https://docs.pulpproject.org/pulpcore/restapi.html)
+ * [Pulp RPM API](https://docs.pulpproject.org/pulp_rpm/restapi.html)
+ * [Pulp RPM API example scripts](https://github.com/pulp/pulp_rpm/tree/master/docs/_scripts)
+ * [Pulp Installer docs](https://pulp-installer.readthedocs.io/en/latest/)
  * Pulp Squeezer docs are not online (yet). You will need to look at the code
    either in GitHub: https://github.com/pulp/squeezer
    or once you have this Ansible collection installed from the commandline using: `ansible-doc pulp.squeezer.<module_name>`
 
 # <a name="Create-Server"/> Create Server
 
-### Use deploy-os_server.yml playbook
+### Use openstack.yml playbook
 
-The `deploy-os_server.yml` playbook can be used to create all VMs for a cluster including a repo server.
+The `openstack.yml` playbook can be used to create all VMs for a cluster including a repo server.
 This playbook requires the _OpenStack SDK_ to be installed and configured on your _Ansible control host_;
 See the `README.md` in the root of this repo for details.
 
@@ -131,12 +145,11 @@ Next you can use
 ```bash
 . ./lor-init
 lor-config [stack_prefix]
-ansible-playbook -u [admin_account] single_role_playbooks/pulp_server.yml
+ansible-playbook -u [admin_account] single_role_playbooks/repo.yml
 ```
 This will install Pulp, create an admin account to manage Pulp and install the Pulp CLI in a Python virtual environment
 for that admin account. It will also do part of the initial configuration, but this is incomplete due to missing features in _Pulp Squeezer_;
-the *pulp_server* role can create _remotes_ and _repositories_, but it cannot associate a _remote_ with a _repository_ yet.
-Furthermore the role cannot know when you want to sync a _repo_ with a _remote_ to update content.
+the *pulp_server* role can only create _remotes_, _repositories_ and associate a _remote_ with a _repository_.
 
 ### Manual work following the pulp_server role
 
@@ -145,11 +158,12 @@ The following steps must be performed manually for now:
  * Upload custom RPMs to the Pulp server.
  * Manual work on the Pulp server:
    * Add content (RPMs) to a _repository_ for the ones without _remote_.
-   * Add a _remote_ to a _repository_.
-   * Sync a _repository_ with a _remote_.
+   * Create an _Alternate Content Source (ACS)_.
+   * Refresh an _Alternate Content Source (ACS)_ using its _remote_.
+   * Sync a _repository_ with its _remote_, which creates a new _repository version_.
    * Create a new _publication_ for a _repository version_.
-   * Create a new _distribution_ for a _publication_.
-   * Update the _publication_ for an existing _distribution_.
+   * Create a new _distribution_ to serve a _publication_.
+   * Update an existing _distribution_ to serve another _publication_.
 
 #### Manual work - Upload custom RPMs to Pulp server.
 
@@ -165,8 +179,16 @@ rsync -av --rsync-path 'sudo -u repoadmin rsync' [os_distribution] [admin]@[jump
 
 #### Manual work - on the Pulp server
 
-The remaining tasks can be performed on the Pulp server in one go with the idempotent function named ```pulp-sync-publish-distribute```,
-which was deployed by the ```pulp_server``` role:
+The remaining tasks can be performed on the Pulp server in one go with the functions
+ * ```pulp-refresh-acs```
+ * ```pulp-sync-publish-distribute [all|single_repo]```
+which were deployed on the repo server by the ```pulp_server``` role.
+
+#### Manual work - on the Pulp server: pulp-refresh-acs
+
+The `pulp-refresh-acs` function is used to fetch updated meta-data from the _remote_ linked to each _ACS_.
+This procedure is *safe* with regard to _repository versions_, _publications_ and _distributions_ as it does not touch any of those:
+hence the "frozen repo" which is offered to Pulp clients will not change. 
 
 ```bash
 ssh [admin]@[jumphost]+[stack_prefix]-repo
@@ -176,7 +198,30 @@ source ./pulp-cli.venv/bin/activate
 set -u
 pulp status
 source ./pulp-init.bash
-pulp-sync-publish-distribute
+pulp-refresh-acs
+```
+
+#### Manual work - on the Pulp server: pulp-sync-publish-distribute
+
+The `pulp-sync-publish-distribute` function is used to
+ * Add new content (RPMs) to our `cpel` _repository_, which does not have a _remote_.
+ * Sync all or a single _repository_ with their _remotes_ for the ones that do have _remotes_.
+ * This creates new _repository versions_ for all or a single _repository_.
+ * Create new _publications_ for all or a single _repository version_.
+ * Create new _distributions_ to serve the latest _publications_ if the _distributions_ did not exist yet.
+ * Update all or a single existing _distribution_ to serve the latest _publication_.
+
+Hence this procedure changes what will be served to Pulp clients if any _repository_ had changed content since the previous sync.
+
+```bash
+ssh [admin]@[jumphost]+[stack_prefix]-repo
+sudo -u repoadmin bash
+cd
+source ./pulp-cli.venv/bin/activate
+set -u
+pulp status
+source ./pulp-init.bash
+pulp-sync-publish-distribute [all|single_repo]
 ```
 
 Alternatively or for debugging issues with ```pulp-sync-publish-distribute``` you can also perform these tasks manually using:
@@ -309,8 +354,8 @@ done
 set -e
 set -u
 
-stack_prefix='' # Must be filled in; check group_vars (f.e. 'fd').
-stack_name=''   # Must be filled in; check group_vars (f.e. 'fender_cluster').
+stack_prefix='' # Must be filled in; check group_vars (f.e. 'nb').
+stack_name=''   # Must be filled in; check group_vars (f.e. 'nibbler_cluster').
 #
 # Make sure you already declared the ${all_pulp_repos[@]} array: see above.
 #
@@ -886,10 +931,10 @@ pulp rpm publication create --repository /pulp/api/v3/repositories/rpm/rpm/b7180
 pulp rpm distribution update --name ? --publication /pulp/api/v3/publications/rpm/rpm/98300791-39cb-4918-b613-7c8f481a8ffd/
 ```
 
-With correct distribution name, like **nb-cpel7** or **fd-cpel7**. Then check if distribution is now linked to the new publication (f.e. for fd--cpel7 repository on fender)
+With correct distribution name, like **nb-cpel9** or **vt-cpel9**. Then check if distribution is now linked to the new publication (f.e. for nb--cpel9 repository on nibbler)
 
 ```
-pulp rpm distribution show --name fd-cpel7
+pulp rpm distribution show --name nb-cpel9
 ```
 
 
