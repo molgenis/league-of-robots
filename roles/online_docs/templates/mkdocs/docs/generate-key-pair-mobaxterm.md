@@ -71,15 +71,15 @@ To request an account, [contact the helpdesk via email](../contact/) and
           Dear groupowner/helpdesk,
           I want to have access to the cluster, below is all the information needed.
           @the groupowners can you approve my access to your group by replying to this email.
-          | Term:                 | Information|
-          |-----------------------|--------------------------------------------------------|
-          | First Name            |          |
-          | Last Name     | |
-          | Email address     | |
-          | Public key    | |
-          | End date contract   | |
-          | Groups to access     | |
-          | Read and understand the UMCG HPC Code of Conduct | yes/no |
+| Term:                 | Information|
+|-----------------------|--------------------------------------------------------|
+| First Name            |          |
+| Last Name     | |
+| Email address     | |
+| Public key    | |
+| End date contract   | |
+| Groups to access     | |
+| I have read, understood and I agree to the UMCG HPC Code of Conduct | yes/no |
 
           Best,
           NAME
