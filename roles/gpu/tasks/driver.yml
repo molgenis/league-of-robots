@@ -70,6 +70,8 @@
 - name: Rebuild initramfs
   ansible.builtin.command: dracut -f
   notify: reboot_server
+  register: dracut_reg
+  changed_when: dracut_reg.rc == 0
   become: true
 
 - name: Reboot system if needed
