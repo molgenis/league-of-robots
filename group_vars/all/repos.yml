@@ -364,7 +364,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
-      repo_server_download: True # not important, < 1 G
+      repo_server_download: False # not important, < 1 G
       tags:
         - epel
     #
