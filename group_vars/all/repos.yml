@@ -354,7 +354,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
-      repo_server_download: True # too big, would be nice to have, but not urgent, 381 GB
+      repo_server_download: False # too big, would be nice to have, but not urgent, 381 GB
       tags:
         - epel
     - file: oracle-epel-ol8.repo
