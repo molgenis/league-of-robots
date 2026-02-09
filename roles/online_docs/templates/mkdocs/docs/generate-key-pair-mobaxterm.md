@@ -59,7 +59,7 @@ To request an account, [contact the helpdesk via email](../contact/) and
      * For **guest** accounts to access only a data transfer machine associated with the cluster:
          * Specify the project your are working on and add your collaborators on CC.
      * For **regular** accounts to access the cluster:
-         Copy the template mail below and fill all the fields (the yes/no field should have yes OR no).
+         **Copy the template mail below and fill all the fields** (the yes/no field should have yes OR no).
          If everything is filled, please send it back to the HPC helpdesk and request access of the group owners (preferably in the same email by cc'ing (all) the group owner(s).<br>
          NOTE:<br>
           **[1] Make sure you include all group owners in the CC of the request - it will be approved only after the group owners approve access to their own group(s)**<br>
