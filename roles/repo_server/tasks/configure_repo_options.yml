@@ -60,7 +60,7 @@
       - mirrorlist
       - metalink
   when:
-    - item.0.repo_server_download | default(False)
+    - item.0.repo_server_download | bool | default(False)
     - item.0[item.1] is defined
   delegate_to: localhost
   connection: local
