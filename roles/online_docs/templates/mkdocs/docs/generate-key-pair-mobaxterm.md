@@ -68,7 +68,7 @@ To request an account, [contact the helpdesk via email](../contact/) and
           **[4] Code Of Conduct (COC) is available at the https://docs.gcc.rug.nl/nibbler/coc_umcg_research_clusters/**<br>
           template email:
 ---
-          Dear groupowner/helpdesk,
+          Dear groupowner and helpdesk,
           I want to have access to the cluster, below is all the information needed.
           @the groupowners can you approve my access to your group by replying to this email.
 | Term:                 | Information|
