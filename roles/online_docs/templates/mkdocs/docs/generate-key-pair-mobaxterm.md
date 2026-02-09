@@ -69,7 +69,7 @@ To request an account, [contact the helpdesk via email](../contact/) and
           template email:
 ---
           Dear groupowner and helpdesk,
-          I want to have access to the cluster, below is all the information needed.
+          I would like to request an access account to the cluster.
           @the groupowners can you approve my access to your group by replying to this email.
 | Term:                 | Information|
 |-----------------------|--------------------------------------------------------|
