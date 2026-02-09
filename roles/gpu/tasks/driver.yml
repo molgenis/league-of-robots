@@ -58,12 +58,6 @@
   notify: reboot_server
   become: true
 
-- name: Remove installation file
-  ansible.builtin.file:
-    path: '/root/{{ gpu_runfile }}'
-    state: absent
-  become: true
-
 - name: Disable NVIDIA GSP firmware
   ansible.builtin.copy:
     dest: /etc/modprobe.d/nvidia-gsp.conf
@@ -80,4 +74,10 @@
 
 - name: Reboot system if needed
   ansible.builtin.meta: flush_handlers
+
+- name: Remove installation file
+  ansible.builtin.file:
+    path: '/root/{{ gpu_runfile }}'
+    state: absent
+  become: true
 ...
