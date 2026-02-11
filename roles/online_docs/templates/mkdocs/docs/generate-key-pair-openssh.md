@@ -68,13 +68,32 @@ To request an account, [contact the helpdesk via email](../contact/) and
      * For **guest** accounts to access only a data transfer machine associated with the cluster:
          * Specify the project your are working on and add your collaborators on CC.
      * For **regular** accounts to access the cluster:
-         * Specify the groups you want to become a member of in order to access specific data sets. 
-           Put all group owners of the corresponding groups on CC and ask them to approve your request in a reply to the helpdesk. 
-           If you do not know who the group owners are, please consult a colleague or your boss / P.I. / team lead / project lead / etc.
-         * Please add a staff member of the department/group where you are appointed or the project you are involved in on CC and 
-           ask him/her to confirm your appointment/involvement and the expiration date of your contract in a reply to the helpdesk. 
-           We will then setup your cluster account with the same expiration date.  
-           (A staff member can be the secretary of your department or your boss / P.I. / team lead / project lead / etc.)  
+         Copy the template mail below and fill all the fields (the yes/no field should have yes OR no).
+         If everything is filled, please send it back to the HPC helpdesk and request access of the group owners (preferably in the same email by cc'ing (all) the group owner(s).<br>
+         NOTE:<br>
+          **[1] Make sure you include all group owners in the CC of the request - it will be approved only after the group owners approve access to their own group(s)**<br>
+          **[2] All of the fields are mandatory for the account creation, failing to provide any of them will result in account not being created**<br>
+          **[3] End date is valid if it is requested/confirmed by group owner (or department's secretary by sending email directly to the hpc.helpdesk@umcg.nl**<br>
+          **[4] Code Of Conduct (COC) is available at the https://docs.gcc.rug.nl/nibbler/coc_umcg_research_clusters/**<br>
+          template email:
+---
+          Dear groupowner/helpdesk,
+          I want to have access to the cluster, below is all the information needed.
+          @the groupowners can you approve my access to your group by replying to this email.
+          | Term:                 | Information|
+          |-----------------------|--------------------------------------------------------|
+          | First Name            |          |
+          | Last Name     | |
+          | Email address     | |
+          | Public key    | |
+          | End date contract   | |
+          | Groups to access     | |
+          | Read and understand the UMCG HPC Code of Conduct | yes/no |
+
+          Best,
+          NAME
+---
+
        Please note: we cannot give you access until we have received both approval from at least one group owner and a confirmation for the expiration date of your contract/collaboration.
  * Never ever email/give anyone your private key! If you do, the key is no longer *private* and useless for security: trash the key pair and start over by generating a new pair.
  * If you ever suspect that your private key may have been compromised (laptop got stolen, computer got infected with a virus/trojan/malware, etc.): 
