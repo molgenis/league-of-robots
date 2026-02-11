@@ -103,6 +103,7 @@ for _file in ${_queue_files}; do
       dafind-stg) _state="STG" ;;
       daget)      _command="daget ${_archive_remote_top_dir}/${_path}" ;;
       dals)       _command="dals -lq ${_archive_remote_top_dir}/${_path}" ;;
+      budget)     _command="dsbudgetinfo" ;;
       darelease)  _command="darelease ${_archive_remote_top_dir}/${_path}" ;;
       sha256sum)  _command="sha256sum ${_archive_remote_top_dir}/${_path}" ;;
       *)          echo "Unsupported argument provided (${_argument})! Use '--help' and try again." > "${_stdout}"
