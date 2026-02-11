@@ -19,7 +19,6 @@
     - logrotate
     - logins
     - sshd
-    - epel
     - basic_security
     - local_storage
     - remove
