@@ -188,7 +188,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
-      repo_server_download: True # important, manageable 110 G
+      repo_server_download: False # _could_ be downloaded, 110 G
       tags:
         - distro
         - core
@@ -199,7 +199,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
-      repo_server_download: True # too big and not important, 562 G
+      repo_server_download: False # too big (and unimportant), 562 G
       tags:
         - distro
         - core
@@ -220,7 +220,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
-      repo_server_download: True # too big and not important, 317 G
+      repo_server_download: False # too big (and unimportant), 317 G
       tags:
         - distro
         - core
@@ -364,7 +364,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
-      repo_server_download: False # not important, < 1 G
+      repo_server_download: False # unimportant, small < 1 G
       tags:
         - epel
     #
@@ -413,7 +413,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
-      repo_server_download: True # important, 70 G
+      repo_server_download: False # _could_ be downloaded, 70 G
       tags:
         - distro
         - uek
