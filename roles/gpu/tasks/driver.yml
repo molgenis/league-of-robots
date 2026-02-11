@@ -29,7 +29,7 @@
     state: 'installed'
     update_cache: true
     name:
-      - 'kernel-devel-{{ ansible_kernel }}'
+      - 'kernel-devel-{{ ansible_facts.kernel }}'
       - tar
       - bzip2
       - make
@@ -65,6 +65,7 @@
     owner: root
     group: root
     mode: '0644'
+  when: gpu_type == 'a40'
   become: true
 
 - name: Rebuild initramfs
