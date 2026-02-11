@@ -18,7 +18,7 @@ Therefore, [contact us](../contact/) immediately if you ever suspect your privat
 
 For additional details and background see [WikiPedia: Asymmetric Key Cryptography](http://en.wikipedia.org/wiki/Public-key_cryptography).
 
-When you try to login you use the private key on the client side to encrypt a small piece of data containing a request to login.<>
+When you try to login you use the private key on the client side to encrypt a small piece of data containing a request to login.
 The cluster uses your public key on the server side to decrypt the login request: if this was successful the server has verified that you have the private key corresponding to the public key and will let you in.
 
 The benefit of using key pairs as opposed to passwords is that the secret used to login can remain private if you create the key pair yourself and send _**only**_ the public key to the helpdesk.
