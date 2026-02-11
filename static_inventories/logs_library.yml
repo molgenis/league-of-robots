@@ -126,10 +126,6 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
-cluster:
-  children:
-    logs:
-    repo_servers:
 logs_library:
   children:
     controller_api:
