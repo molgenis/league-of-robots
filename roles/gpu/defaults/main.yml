@@ -1,8 +1,7 @@
 ---
-gpu_cuda_version: '13.0.2'
-gpu_driver_version: '580.95.05'
-gpu_url_dir: 'https://developer.download.nvidia.com/compute/cuda/{{ gpu_cuda_version }}/local_installers/'
-gpu_runfile: 'cuda_{{ gpu_cuda_version }}_{{ gpu_driver_version }}_linux.run'
+gpu_driver_version: '590.48.01'
+gpu_url_dir: 'https://download.nvidia.com/XFree86/Linux-x86_64/{{ gpu_driver_version }}/'
+gpu_runfile: 'NVIDIA-Linux-x86_64-{{ gpu_driver_version }}.run'
 nvidia_user: nvidia
 nvidia_uid: 601       # a regular user with UID >500 and <1000, but no login
 nvidia_group: nvidia
