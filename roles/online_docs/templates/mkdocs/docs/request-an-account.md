@@ -35,4 +35,3 @@ Best regards,
 [NAME]
 ```
 
-and send to helpdesk and group owner(s)
