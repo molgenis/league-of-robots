@@ -10,7 +10,7 @@ If everything is filled, please send it back to the HPC helpdesk and request acc
 **NOTE**
 
  - Make sure you include all group owners in the CC of the request - it will be approved only after the group owners approve access to their own group(s)
- - All of the fields are mandatory for the account creation, failing to provide any of them will result in account not being created<br>
+ - All of the fields are mandatory for the account creation, failing to provide any of them will result in account not being created
  - End date is valid if it is requested/confirmed by group owner (or department's secretary by sending email directly to the hpc.helpdesk@umcg.nl
  - Code Of Conduct (COC) is available at the [https://docs.gcc.rug.nl/nibbler/coc_umcg_research_clusters/](https://docs.gcc.rug.nl/nibbler/coc_umcg_research_clusters/)
 
