@@ -4,9 +4,9 @@ Before=slurmd.service
 
 [Service]
 ExecStart=/usr/bin/nvidia-persistenced --verbose --user {{ nvidia_user }}
-ExecStopPost=/bin/rm -rf /var/run/nvidia-persistenced
+ExecStopPost=/bin/rm -rf /run/nvidia-persistenced
 Type=forking
-PIDFile=/var/run/nvidia-persistenced/nvidia-persistenced.pid
+PIDFile=/run/nvidia-persistenced/nvidia-persistenced.pid
 RestartSec=15
 Restart=always
 
