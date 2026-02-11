@@ -10,7 +10,7 @@
     update_cache: yes
   become: true
 
-- name: 'Install extra RPMs.'
+- name: 'Install extra DEBs.'
   ansible.builtin.package:
     state: latest
     update_cache: true
