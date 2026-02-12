@@ -12,6 +12,7 @@
     - ldap_server
     - logs
     - repo
+    - repo_servers
     - silo_server
   roles:
     - static_hostname_lookup
