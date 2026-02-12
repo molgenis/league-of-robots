@@ -55,6 +55,15 @@
     file: enable_pam_weblogin.yml
   when: inventory_hostname in pam_weblogin.machines | default([])
 
+- name: 'Update crypto-policies packages'
+  ansible.builtin.package:
+    name:
+      - 'crypto-policies'
+      - 'crypto-policies-scripts'
+    state: latest
+    update_cache: true
+  become: true
+
 - name: Deploy config files for patched system wide crypto policies.
   ansible.builtin.template:
     src: "{{ item }}.pmod"

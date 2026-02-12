@@ -10,10 +10,11 @@
   become: true
 
 - name: Disable systemd ctrl-alt-del.target
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: ctrl-alt-del.target
     enabled: false
     masked: true
     daemon_reload: true
+    force: true
   become: true
 ...

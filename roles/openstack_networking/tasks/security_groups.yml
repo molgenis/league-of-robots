@@ -18,6 +18,7 @@
       - "{{ stack_prefix }}_irods"
       - "{{ stack_prefix }}_repo"
       - "{{ stack_prefix }}_webservers"
+      - "{{ stack_prefix }}_repository"
       - "{{ stack_prefix }}_logservers"
   loop: "{{ security_group_names_of_all_hosts_created_in_openstack }}"
   when: item not in supported_security_groups
@@ -479,6 +480,60 @@
           port: 443  # SSH fallback
         - protocol: tcp
           port: 41514  # Rsyslog
+        - protocol: icmp
+          port: -1  # ICMP protocol does not have any ports.
+    - name: "Add rules to {{ security_group_name }} security group: allow inbound SSH from external jumphosts."
+      openstack.cloud.security_group_rule:
+        security_group: "{{ security_group_name }}"
+        direction: ingress
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+        remote_ip_prefix: "{{ remote_ip_address }}{{ remote_ip_netmask }}"
+        wait: true
+        timeout: "{{ openstack_api_timeout }}"
+      vars:
+        remote_ip_address: "{{ lookup('vars', item.0.group)['ip_addresses'][item.1.hostname][item.1.network]['address'] }}"
+        remote_ip_netmask: "{{ lookup('vars', item.0.group)['ip_addresses'][item.1.hostname][item.1.network]['netmask'] }}"
+      with_subelements:
+        - "{{ external_jumphosts }}"
+        - hosts
+      when: external_jumphosts | default([]) | length >= 1
+#
+# Repository security groups.
+#
+- name: "Create security groups for machines in 'repository' inventory group."
+  vars:
+    security_group_name: "{{ stack_prefix }}_repository"
+  when: security_group_name in security_group_names_of_all_hosts_created_in_openstack
+  block:
+    - name: "Create security group {{ stack_name }} repository."
+      openstack.cloud.security_group:
+        state: present
+        name: "{{ security_group_name }}"
+        description: |
+                     Security group for security hardened repository servers.
+                     Allows SSH inbound on both port 22 and 443.
+                     Allows repository inbound connection on port 8443.
+                     Allows ICMP inbound.
+                     Allows all outbound traffic.
+        wait: true
+        timeout: "{{ openstack_api_timeout }}"
+    - name: "Add rules to {{ security_group_name }} security group: 443, 8443 and ICMP"
+      openstack.cloud.security_group_rule:
+        security_group: "{{ security_group_name }}"
+        direction: ingress
+        protocol: "{{ item.protocol }}"
+        port_range_min: "{{ item.port }}"
+        port_range_max: "{{ item.port }}"
+        remote_ip_prefix: 0.0.0.0/0
+        wait: true
+        timeout: "{{ openstack_api_timeout }}"
+      with_items:
+        - protocol: tcp
+          port: 443  # SSH fallback
+        - protocol: tcp
+          port: 8443  # Repository over HTTPS
         - protocol: icmp
           port: -1  # ICMP protocol does not have any ports.
     - name: "Add rules to {{ security_group_name }} security group: allow inbound SSH from external jumphosts."

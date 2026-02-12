@@ -39,18 +39,15 @@ local_admin_users:
   - 'morris'
   - 'pieter'
   - 'sandi'
-use_sssd: true
 use_ldap: false
 create_ldap: false
+use_sssd: true
+
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
 #
 external_jumphosts:
-  - group: nibbler_cluster
-    hosts:
-      - hostname: tunnel
-        network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception
@@ -58,7 +55,19 @@ external_jumphosts:
   - group: hyperchicken_cluster
     hosts:
       - hostname: portal
-        network:  external_unfiltered
+        network: public
+  - group: fender_cluster
+    hosts:
+      - hostname: corridor
+        network: public
+  - group: nibbler_cluster
+    hosts:
+      - hostname: tunnel
+        network: vlan16
+  - group: vaxtron_cluster
+    hosts:
+      - hostname: foyer
+        network: external
   - group: wingedhelix_cluster
     hosts:
       - hostname: wh-porch
@@ -71,4 +80,8 @@ external_jumphosts:
     hosts:
       - hostname: cf-porch
         network: external
+  - group: logs_library
+    hosts:
+      - hostname: hatch
+        network: logs_external_public
 ...
