@@ -66,7 +66,7 @@
   connection: local
   changed_when: false # local files are only temporary, the actual change occurs in next task
 
-- name: "Copy repo files to repo_server"
+- name: "Copy repo files to repo_servers"
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"

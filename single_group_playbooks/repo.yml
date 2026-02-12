@@ -8,7 +8,7 @@
 - name: '###==-> Roles for repo management servers. <-==###'
   hosts:
     - repo
-    - repo_server
+    - repo_servers
   roles:
     - interfaces
     - iptables
@@ -43,7 +43,7 @@
     - pulp_server
 
 - name: '###==-> Roles for centrally managed repository servers. <-==###'
-  hosts: repo_server
+  hosts: repo_servers
   roles:
     - repo_server
 ...

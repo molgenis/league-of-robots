@@ -76,7 +76,7 @@ all:
               security_group: "{{ stack_prefix }}_logservers"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
-    repo_server:
+    repo_servers:
       hosts:
         repo-primary:
           cluster_class: 'development'
@@ -130,6 +130,6 @@ logs_library:
   children:
     controller_api:
     logs:
-    repo_server:
+    repo_servers:
     jumphost:
 ...
