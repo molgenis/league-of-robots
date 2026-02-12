@@ -17,7 +17,6 @@
 - name: Initialization roles for most hosts.
   hosts: all,!controller_api,!mit_chaperone
   roles:
-    - ssh_host_signer
     #
     # Either pulp_client or yum_repos must be deployed first
     # before any other role that installs/updates RPMs.
@@ -27,5 +26,6 @@
       when: repo_manager == 'pulp'
     - role: yum_repos
       when: repo_manager == 'none'
+    - ssh_host_signer # update in the tasks needs this role after the repo
     - admin_users
 ...

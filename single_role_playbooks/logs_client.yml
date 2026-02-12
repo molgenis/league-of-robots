@@ -6,6 +6,7 @@
     - cluster
     - chaperone,!mit_chaperone
     - repo
+    - repo_servers
     - logs
   roles:
     - role: logs_client

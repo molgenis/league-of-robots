@@ -1,14 +1,15 @@
 ---
 - name: Running > yum_repos < role
   hosts:
-   - jumphost
-   - cluster
-   - build_server
-   - chaperone,!mit_chaperone
-   - data_transfer
-   - docs
-   - logs
-   - repo
+    - jumphost
+    - cluster
+    - build_server
+    - chaperone,!mit_chaperone
+    - data_transfer
+    - docs
+    - logs
+    - repo
+    - repo_servers
   roles:
    - role: yum_repos
      when:

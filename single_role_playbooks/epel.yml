@@ -6,6 +6,7 @@
     - jumphost
     - logs
     - repo
+    - repo_servers
   roles:
     - role: epel
 ...
