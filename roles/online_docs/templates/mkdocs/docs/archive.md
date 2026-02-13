@@ -190,7 +190,7 @@ Use `--help` argument to get more information
     --dafind-reg <path>      search for regular files / files that reside only on disk
                              (there is no copy on tape) Directories are always REG.
     --dafind-dul <path>      search for files that reside both online (on disk) and offline (on tape)
-    --dafind-ofl <path>      search for files that is no longer on disk (is only on tape)
+    --dafind-ofl <path>      search for files that are offline (present only on tape)
     --dafind-que <path>      search for files that are queued for copy FROM TAPE to disk
                              (are not yet copying, data is also not yet available). This is state before STG.
     --dafind-stg <path>      search for files which are currently being copied FROM TAPE to disk
