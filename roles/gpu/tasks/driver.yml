@@ -29,7 +29,7 @@
     state: 'installed'
     update_cache: true
     name:
-      - 'kernel-devel-{{ ansible_kernel }}'
+      - 'kernel-devel-{{ ansible_facts.kernel }}'
       - tar
       - bzip2
       - make
@@ -51,16 +51,32 @@
   become: true
 
 - name: Install driver from .run file
-  ansible.builtin.command: '/root/{{ gpu_runfile }} --silent --driver'
+  ansible.builtin.command: '/root/{{ gpu_runfile }} --silent --kernel-module-type=proprietary'
   register: install_result
   failed_when: install_result.rc != 0
   changed_when: true
+  notify: reboot_server
   become: true
+
+- name: Disable NVIDIA GSP firmware
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/nvidia-gsp.conf
+    content: "options nvidia NVreg_EnableGpuFirmware=0"
+    owner: root
+    group: root
+    mode: '0644'
+  when: gpu_type == 'a40'
+  notify:
+    - dracut
+    - reboot_server
+  become: true
+
+- name: Flush handlers to trigger dracut and server restart
+  ansible.builtin.meta: flush_handlers
 
 - name: Remove installation file
   ansible.builtin.file:
     path: '/root/{{ gpu_runfile }}'
     state: absent
   become: true
-
 ...

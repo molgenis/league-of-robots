@@ -4,24 +4,20 @@
     /etc/sysconfig/iptables-init.bash
   register: fw_reg
   changed_when: fw_reg.rc == 0
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{{ proxy_host }}+{{ item }}"
   loop: "{{ cluster_class_servers }}"
   become: true
   notify: client_restart_rsyslog
   listen: restart_server_firewall
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
 
 - name: Restart server rsyslog.service
   ansible.builtin.service:
     name: rsyslog.service
     state: restarted
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{{ proxy_host }}+{{ item }}"
   loop: "{{ cluster_class_servers }}"
   become: true
   listen: restart_server_rsyslog
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
 
 - name: Force client systemd to reread configs
   ansible.builtin.systemd:
