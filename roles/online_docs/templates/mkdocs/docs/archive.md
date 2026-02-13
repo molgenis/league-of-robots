@@ -187,7 +187,7 @@ Use `--help` argument to get more information
     --quiet                  don't print the start message - supress the extra output
     --budget                 print the used disk space by my group
                              (note that the second number might include space from other groups as well)
-    --dafind-reg <path>      search for regular files / files that reside only on disk
+    --dafind-reg <path>      search for regular / online files (present only on disk)
                              (there is no copy on tape) Directories are always REG.
     --dafind-dul <path>      search for files that reside both online (on disk) and offline (on tape)
     --dafind-ofl <path>      search for files that are offline (present only on tape)
