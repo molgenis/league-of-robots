@@ -131,10 +131,18 @@ nameservers: [
 local_admin_groups:
   - 'admin'
 local_admin_users:
+  - 'ger'
   - 'gerben'
+  - 'henkjan'
+  - 'kim'
   - 'marieke'
+  - 'max'
+  - 'morris'
   - 'pieter'
+  - 'robin'
   - 'sandi'
+  - 'wim'
+  - 'wouter'
 envsync_user: 'umcg-envsync'
 envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
