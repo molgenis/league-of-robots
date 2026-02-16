@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -15,14 +15,13 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: eth0
+                name: enp3s0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
       hosts:
         tl-repo:
           cloud_flavor: umcg.v1.vm.1-2
-          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_repo"
@@ -34,7 +33,6 @@ all:
       hosts:
         tl-transfer:
           cloud_flavor: umcg.v1.vm.1-2
-          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_ds"
@@ -68,7 +66,6 @@ all:
       hosts:
         tl-sai:
           cloud_flavor: umcg.v1.vm.4-8
-          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -85,7 +82,6 @@ all:
       hosts:
         tl-dai:
           cloud_flavor: umcg.v1.vm.4-8
-          cloud_image: RockyLinux-9.3_xfs
           host_networks:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
@@ -110,17 +106,17 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: eth0  # altname enp3s0
+                name: enp3s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: eth1  # altname enp4s0
+                name: enp4s0
               lnet:
                 name: tcp20
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               nmstate_interface:
-                name: eth2  # altname enp5s0
+                name: enp5s0
                 ipv4:
                   auto-route-metric: 80
           slurm_sockets: 4
@@ -140,16 +136,16 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: eth2
+                    name: enp130s0f0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
                   nmstate_interface:
-                    name: eth2.1068
+                    name: enp130s0f0.1068
                     type: vlan
                     vlan:
                       id: 1068
-                      base-iface: eth2
+                      base-iface: enp130s0f0
                     ipv4:
                       dhcp: false
                   lnet:
@@ -157,7 +153,6 @@ all:
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
-                  #device: '/dev/sdb'
                   device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
                   label: local
                   perc_controller: 0
@@ -183,7 +178,6 @@ all:
           hosts:
             tl-node-b01:
               cloud_flavor: umcg.v1.bm.64-512-0
-              cloud_image: RockyLinux-9.3_xfs
               host_type: baremetal
               host_networks:
                 - name: vlan1337
@@ -234,11 +228,11 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: eth0
+                    name: enp3s0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: eth1
+                    name: enp4s0
                   lnet:
                     name: tcp20
               local_volume_extra:
@@ -246,7 +240,7 @@ all:
                   size: 1
               slurm_sockets: 4
               slurm_cores_per_socket: 1
-              slurm_real_memory: 7681
+              slurm_real_memory: 7680
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 900
@@ -398,7 +392,7 @@ cluster:
     administration:
 talos_cluster:
   children:
-    openstack_api:
+    controller_api:
     jumphost:
     repo:
     cluster:

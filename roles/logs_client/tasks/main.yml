@@ -32,6 +32,14 @@
     - always
     - test
 
+- name: "Set proxy host (jumphost or AI_PROXY)"
+  ansible.builtin.set_fact:
+    proxy_host: >-
+      {{
+        (groups.jumphost | default([]) | first)
+        | default(lookup('env', 'AI_PROXY'))
+      }}
+
 - name: Open logs server firewall for each client
   ansible.builtin.include_tasks:
     file: firewall.yml

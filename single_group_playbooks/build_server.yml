@@ -9,6 +9,7 @@
   hosts:
     - build_server
   roles:
+    - interfaces
     - iptables
     - grub
     - locale

@@ -67,6 +67,7 @@
         dest: /tmp/client_template.csr
         mode: '0600'
         force: true
+      become: true
 
     - name: Create certificate signing request on rsyslog client
       ansible.builtin.command: >
@@ -106,10 +107,8 @@
         mode: '0600'
         force: true
       become: true
-      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      delegate_to: "{{ proxy_host }}+{{ item }}"
       loop: "{{ cluster_class_servers }}"
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
 
     - name: Copy client temporary template to rsyslog server
       ansible.builtin.template:
@@ -118,10 +117,8 @@
         mode: '0600'
         force: true
       become: true
-      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      delegate_to: "{{ proxy_host }}+{{ item }}"
       loop: "{{ cluster_class_servers }}"
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
 
     - name: Sign rsyslog client certificate on rsyslog server with rsyslog CA certificate
       ansible.builtin.command: >
@@ -135,11 +132,9 @@
       changed_when: client_certificates_generate_results.rc == 0
       failed_when: client_certificates_generate_results.rc != 0
       become: true
-      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      delegate_to: "{{ proxy_host }}+{{ item }}"
       loop: "{{ cluster_class_servers }}"
       notify: restart_server_rsyslog
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
 
     - name: Fetch rsyslog client certificates from rsyslog server
       ansible.builtin.fetch:
@@ -149,11 +144,9 @@
         fail_on_missing: true
         validate_checksum: true
       become: true
-      delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+      delegate_to: "{{ proxy_host }}+{{ item }}"
       loop: "{{ cluster_class_servers }}"
       notify: restart_server_rsyslog
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
 
     - name: Deploy rsyslog client certificate
       ansible.builtin.copy:

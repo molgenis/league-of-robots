@@ -2,6 +2,6 @@
 user_quota_on_root_partition:
   blocks_soft: 2G
   blocks_hard: 3G
-  inodes_soft: 32k
-  inodes_hard: 64k
+  inodes_soft: 32000
+  inodes_hard: 64000
 ...

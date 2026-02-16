@@ -10,6 +10,7 @@
   ansible.builtin.slurp:
     src: "/etc/{{ ansible_hostname }}.figlet.{{ figlet_cmd | checksum }}"
   register: figlet
+  become: true
 
 - name: 'Create /etc/motd.'
   ansible.builtin.template:

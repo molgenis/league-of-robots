@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -41,8 +41,8 @@ all:
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['lsaai']['perun'] }}"
             - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
+            - "{{ hyperchicken_cluster.ip_addresses['portal']['external_unfiltered'] }}"
             - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
-            - "{{ fender_cluster.ip_addresses['corridor']['public'] }}"
             - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -63,7 +63,7 @@ cluster:
     administration:
 donbot_azure:
   children:
-    openstack_api:
+    controller_api:
     cluster:
     ldap_server:
 ...

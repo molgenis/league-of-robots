@@ -9,6 +9,7 @@
   hosts:
     - docs
   roles:
+    - interfaces
     - iptables
     - grub
     - locale

@@ -18,12 +18,25 @@ ssh_host_signer_hostnames: "{{ inventory_hostname }}\
         {% endif %}\
       {% endif %}\
     {% endfor %}"
-# This is enforcing that jumphosts use `yum_repos` for defining repositories,
-# since jumphosts cannot use Pulp
+#
+# Enforce that jumphost servers use `yum_repos` for defining repositories, since they cannot use Pulp.
+#
 repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
+              | map(attribute='id') }}"
 user_quota_on_root_partition:
   blocks_soft: 512K
   blocks_hard: 1024K
-  inodes_soft: 8k
-  inodes_hard: 10k
+  inodes_soft: 500
+  inodes_hard: 1000
 ...
