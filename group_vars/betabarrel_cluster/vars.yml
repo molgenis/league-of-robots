@@ -42,7 +42,7 @@ slurm_qos_limit_fractions:
   interactive-short:
     user: 0.5
 repo_manager: 'none'
-os_distribution: 'centos7'
+os_distribution: 'rocky9'
 figlet_font: 'ogre'
 motd: |
       =========================================================
@@ -109,7 +109,6 @@ totp:
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
     - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['address'] }}{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['netmask'] }}"
 cloud_image: Rocky-9.5
-os_distribution: 'rocky9'
 availability_zone: nova
 stack_networks:
   - name: vlan1336  # Internal management for VMs and BMs
@@ -135,7 +134,8 @@ security_group_mods:
   - name: "{{ stack_prefix }}_cluster"
     allow_ingress:
       - "{{ betabarrel_cluster.ip_addresses['bb-dragen']['vlan1336']['address'] }}{{ betabarrel_cluster.ip_addresses['bb-dragen']['vlan1336']['netmask'] }}"
-      - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['netmask'] }}"
+      # Placeholder for when betabarrel is upgraded to bare metal Merlin machine running Rocky 9.
+      # - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['netmask'] }}"
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
