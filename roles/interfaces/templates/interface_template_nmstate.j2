@@ -5,7 +5,7 @@ interfaces:
     {% if ansible_facts['os_family'] == "RedHat" and
         ansible_facts['distribution_major_version'] <= "8" %}
     #
-    # nmstate on EL <= 8.x does not support settting/changing profile names,
+    # nmstate on EL <= 8.x does not support setting/changing profile names,
     # so the name of the NetworkManager config file will be whatever NetworkManager dreamed up.
     #
     #profile-name: ???
