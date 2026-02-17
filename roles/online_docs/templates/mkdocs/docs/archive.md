@@ -182,18 +182,23 @@ We must wait until it is changed to `DUL` (Dual-state).
 Use `--help` argument to get more information
 
 ```
-   dm-user $ $ arc_surf --help
+   [dm-user@~]$ /usr/local/bin/arc_surf --help
    Provide one of the following arguments
-    --dafind-reg <path>      print regular files / files that reside only on disk
-    --dafind-que <path>      print files that are being copied from disk to tape
-    --dafind-dul <path>      print files that reside both online and offline
-    --dafind-ofl <path>      print data that is no longer on disk (is on tape)
-    --dafind-stg <path>      print files which are being copied from tape to disk
-    --daget      <path>      recall / stage online FROM TAPE
-    --dals       <path>      list state
+    --quiet                  don't print the start message - supress the extra output
+    --budget                 print the used disk space by my group
+                             (note that the second number might include space from other groups as well)
+    --dafind-reg <path>      search for regular / online files (present only on disk)
+                             (there is no copy on tape) Directories are always REG.
+    --dafind-dul <path>      search for files that reside both online (on disk) and offline (on tape)
+    --dafind-ofl <path>      search for files that are offline (present only on tape)
+    --dafind-que <path>      search for files that are queued for copy FROM TAPE to disk
+                             (are not yet copying, data is also not yet available). This is state before STG.
+    --dafind-stg <path>      search for files which are currently being copied FROM TAPE to disk
+                             (files that are currently copying, but data is not yet available)
+    --daget      <path>      recall / request data to be staged online FROM TAPE to disk
+    --dals       <path>      list file state in long format (including queue state)
     --darelease  <path>      send to offline / stage TO TAPE
     --sha256sum  <path>      compute the sha256sum of the file
-
 ```
 
 ## 5. Best practices
