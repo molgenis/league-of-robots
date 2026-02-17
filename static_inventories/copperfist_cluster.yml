@@ -33,8 +33,6 @@ all:
                   network: external
             - group: betabarrel_cluster
               nodes:
-                - name: bb-dragen
-                  network: vlan16
                 - name: betabarrel
                   network: vlan16
             - group: copperfist_cluster
