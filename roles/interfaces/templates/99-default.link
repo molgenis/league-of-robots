@@ -13,5 +13,5 @@ OriginalName=*
 
 [Link]
 NamePolicy=kernel database onboard path slot
-AlternativeNamesPolicy=database onboard path slot
+AlternativeNamesPolicy=database mac onboard path slot
 MACAddressPolicy=none

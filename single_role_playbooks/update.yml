@@ -14,6 +14,7 @@
     - irods
     - jenkins
     - logs
+    - repo_servers
   roles:
     - update
 ...

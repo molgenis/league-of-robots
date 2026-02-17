@@ -15,6 +15,7 @@
     - irods
     - jenkins
     - repo
+    - repo_servers
     - logs
   roles:
     - sshd
