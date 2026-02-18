@@ -9,7 +9,6 @@ all:
       hosts:
         cf-porch:
           cloud_image: RockyLinux-9.3_xfs
-          os_distribution: 'rocky9'
           ansible_python_interpreter: /usr/bin/python3
           cloud_flavor: general.v1.small
           host_networks:
@@ -34,8 +33,6 @@ all:
                   network: external
             - group: betabarrel_cluster
               nodes:
-                - name: bb-dragen
-                  network: vlan16
                 - name: betabarrel
                   network: vlan16
             - group: copperfist_cluster
@@ -48,7 +45,6 @@ all:
       hosts:
         cf-transfer:
           cloud_image: RockyLinux-9.3_xfs
-          os_distribution: 'rocky9'
           cloud_flavor: general.v1.small
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
@@ -305,7 +301,6 @@ all:
       hosts:
         cf-storage:
           cloud_image: RockyLinux-9.3_xfs
-          os_distribution: 'rocky9'
           cloud_flavor: umcg.v2.bm.20-128-894
           host_type: baremetal
           host_networks:

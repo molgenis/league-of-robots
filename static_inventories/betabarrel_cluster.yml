@@ -31,8 +31,6 @@ all:
                   network: external
             - group: betabarrel_cluster
               nodes:
-                - name: bb-dragen
-                  network: vlan16
                 - name: betabarrel
                   network: vlan16
             - group: copperfist_cluster
@@ -163,6 +161,17 @@ all:
             - name: vlan16
             - name: vlan990
               add_hostname_to_ip_address: true
+          additional_etc_hosts:
+            - group: betabarrel_cluster
+              nodes:
+                - name: bb-dragen
+                  network: vlan990
+            - group: copperfist_cluster
+              nodes:
+                - name: cf-dragen
+                  network: vlan16
+                - name: copperfist
+                  network: vlan16
           local_yum_repository: true # enable local yum repository
           local_mounts:
             - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
@@ -238,21 +247,14 @@ all:
                 #   speed: 10 Gbit fibre
                 #   vlans:
                 #     untagged: -
-                #     tagged: 13, 16, 985, 990
+                #     tagged: 13, 16, 990
                 # enp134s0f1 altname ens3f1:
-                #   speed: 10 Gbit fibre, not connected.
+                #   speed: 10 Gbit fibre
+                #   vlans:
+                #     untagged: -
+                #     tagged: 985, 1336
                 #
-                - name: vlan16
-                  nmstate_interface:
-                    name: enp134s0f0.16
-                    type: vlan
-                    vlan:
-                      id: 16
-                      base-iface: enp134s0f0  # altname ens3f0
-                    ipv4:
-                      dhcp: false
                 - name: vlan990
-                  add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp134s0f0.990
                     type: vlan
@@ -261,6 +263,18 @@ all:
                       base-iface: enp134s0f0  # altname ens3f0
                     ipv4:
                       dhcp: false
+                - name: vlan1336
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp134s0f1.1336
+                    type: vlan
+                    vlan:
+                      id: 1336
+                      base-iface: enp134s0f1  # altname ens3f1
+                    ipv4:
+                      dhcp: false
+                  nmstate_route:
+                    destination: 0.0.0.0/0
               local_mounts:
                 - mount_point: '/staging'
                   device: 'LABEL=staging'
@@ -331,6 +345,7 @@ all:
               attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
               nmstate_interface:
                 name: eth2.990
+                mtu: 1500
                 type: vlan
                 vlan:
                   id: 990
