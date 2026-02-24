@@ -10,7 +10,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-erdera: 2048
       umcg-fg: 2048
-      umcg-franke-scrna: 21504
+      umcg-franke-scrna: 4096
       umcg-fu: 2048
       umcg-gaf: 22528
       umcg-gap: 1024
@@ -60,7 +60,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-endocrinology: 1024
       umcg-fg: 4096
-      umcg-franke-scrna: 27648
+      umcg-franke-scrna: 20480
       umcg-fu: 2048
       umcg-gaf: 15360
       umcg-gap: 1024
