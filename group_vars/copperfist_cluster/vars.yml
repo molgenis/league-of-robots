@@ -56,21 +56,6 @@ additional_etc_hosts:
       - name: betabarrel
         network: vlan990
 #
-# Jumphosts from other stack-name infra groups.
-# We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
-#
-external_jumphosts:
-  - group: wingedhelix_cluster
-    hosts:
-      - hostname: wh-porch
-        network: vlan16
-  - group: betabarrel_cluster
-    hosts:
-      - hostname: bb-porch
-        network: vlan16
-      - hostname: az-porch
-        network: az_public
-#
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
 ssh_client_configs:
@@ -109,7 +94,6 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-    - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['netmask'] }}"
 cloud_image: CentOS 7
 cloud_user: centos
 availability_zone: nova
