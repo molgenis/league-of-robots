@@ -5,7 +5,7 @@ interfaces:
     {% if ansible_facts['os_family'] == "RedHat" and
         ansible_facts['distribution_major_version'] <= "8" %}
     #
-    # nmstate on EL <= 8.x does not support settting/changing profile names,
+    # nmstate on EL <= 8.x does not support setting/changing profile names,
     # so the name of the NetworkManager config file will be whatever NetworkManager dreamed up.
     #
     #profile-name: ???
@@ -13,6 +13,9 @@ interfaces:
     profile-name: {{ network['name'] }}
     {% endif %}
     state: {{ network['nmstate_interface']['state'] | default('up') }}
+    {% if network['nmstate_interface']['mtu'] is defined %}
+    mtu: {{ network['nmstate_interface']['mtu'] }}
+    {% endif %}
     {% if network['nmstate_interface']['type'] is defined %}
     type: {{ network['nmstate_interface']['type'] }}
     {% endif %}
@@ -40,4 +43,15 @@ interfaces:
       {% endif %}
     ipv6:
       enabled: {{ network['nmstate_interface']['ipv6']['enabled'] | default('false') }}
+{% if network['nmstate_route']['destination'] is defined %}
+routes:
+  config:
+    - destination: {{ network['nmstate_route']['destination'] }}
+      next-hop-address: {{ stack_networks
+                          | selectattr('name', 'equalto', network['name'])
+                          | map(attribute='router')
+                          | map(attribute='next-hop-address')
+                          | first }}
+      next-hop-interface: {{ network['nmstate_interface']['name'] }}
+{% endif %}
 ...

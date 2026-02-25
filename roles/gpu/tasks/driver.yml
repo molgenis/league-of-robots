@@ -66,16 +66,12 @@
     group: root
     mode: '0644'
   when: gpu_type == 'a40'
+  notify:
+    - dracut
+    - reboot_server
   become: true
 
-- name: Rebuild initramfs
-  ansible.builtin.command: dracut -f
-  notify: reboot_server
-  register: dracut_reg
-  changed_when: dracut_reg.rc == 0
-  become: true
-
-- name: Reboot system if needed
+- name: Flush handlers to trigger dracut and server restart
   ansible.builtin.meta: flush_handlers
 
 - name: Remove installation file

@@ -8,6 +8,14 @@
   become: true
   listen: 'nvidia_service'
 
+- name: Rebuild initramfs
+  ansible.builtin.command: dracut -f
+  notify: reboot_server
+  register: dracut_reg
+  changed_when: dracut_reg.rc == 0
+  listen: 'dracut'
+  become: true
+
 - name: Restart server
   ansible.builtin.reboot:
     msg: "Reboot initiated by Ansible"

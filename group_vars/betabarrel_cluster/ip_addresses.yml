@@ -1,8 +1,8 @@
 ---
 ip_addresses:
   bb-dragen:
-    vlan16:
-      address: 195.169.22.42
+    vlan1336:  # Manually selected IP, because machine is not controlled by OpenStack.
+      address: 172.23.77.133
       netmask: /32
     vlan990:
       address: 192.168.1.61
