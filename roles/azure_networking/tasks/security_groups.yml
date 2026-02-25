@@ -122,4 +122,36 @@
   vars:
     security_group_name: "{{ stack_prefix }}_logservers"
   when: security_group_name in security_group_names_of_all_hosts_created_in_azure
+#
+# Repository: receive 8443 from anywhere, block ICMP
+#
+- name: "Create {{ stack_prefix }}_repository security group."
+  azure.azcollection.azure_rm_securitygroup:
+    name: "{{ stack_prefix }}_repository"
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        source_address_prefix: '*'
+        access: Allow
+        priority: 101
+      - name: SSH_fallback
+        protocol: Tcp
+        destination_port_range: 443
+        source_address_prefix: '*'
+        access: Allow
+        priority: 102
+      - name: ICMP
+        protocol: Icmp
+        source_address_prefix: '*'
+        access: Deny
+        priority: 103
+      - name: HTTPs
+        protocol: Tcp
+        destination_port_range: 8443
+        source_address_prefix: '*'
+        access: Allow
+        priority: 104
+    purge_rules: true
+    resource_group: "{{ azure_resource_group }}"
 ...

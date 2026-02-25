@@ -1,0 +1,126 @@
+#
+# (Re)mount file systems with quota support.
+#
+---
+#
+# Adding quota options to /etc/fstab does noting for an XFS root partition,
+# but we add them anyway to get /etc/fstab in sync with what the mount or /proc/mounts will report.
+#
+- name: 'Enable user quota for XFS / in /etc/fstab.'
+  ansible.builtin.lineinfile:
+    path: '/etc/fstab'
+    backup: true
+    backrefs: true
+    regexp: '^(\S+\s+{{ item.mountpoint }}\s+\S+\s+)(?!(?:\S*,)?{{ item.mountoption }}(?:,\S*)?\s+)(\S+)(\s+.+)$'
+    line: '\1{{ item.mountoption }},\2\3'
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - mountpoint: '/'
+      mountoption: 'uquota'
+  register: fstab_status
+  become: true
+
+#
+# Cannot simply remount an XFS file system to enable quota:
+# Quota must be enabled at boot.
+#
+- name: 'Checking if GRUB_CMDLINE_LINUX is present in /etc/default/grub.'
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX=' /etc/default/grub"
+  register: grub_config_grep_grub_cmdline_linux
+  changed_when: false
+  failed_when: grub_config_grep_grub_cmdline_linux.rc >= 2
+
+- name: 'Checking if GRUB_CMDLINE_LINUX_DEFAULT is present in /etc/default/grub.'
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub"
+  register: grub_config_grep_grub_cmdline_linux_default
+  changed_when: false
+  failed_when: grub_config_grep_grub_cmdline_linux_default.rc >= 2
+
+- name: 'Fail if Grub config is in an unsupported state.'
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+                    Both GRUB_CMDLINE_LINUX and GRUB_CMDLINE_LINUX_DEFAULT are missing from /etc/default/grub
+                    Check the Grub config and documentation ...
+         ***********************************************************************************************************
+  when:
+    - "'GRUB_CMDLINE_LINUX=' not in grub_config_grep_grub_cmdline_linux.stdout"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in grub_config_grep_grub_cmdline_linux_default.stdout"
+  failed_when:
+    - "'GRUB_CMDLINE_LINUX=' not in grub_config_grep_grub_cmdline_linux.stdout"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in grub_config_grep_grub_cmdline_linux_default.stdout"
+
+- name: 'Checking if we need to add or update rootflags for GRUB_CMDLINE_LINUX* in /etc/default/grub.'
+  ansible.builtin.command:
+    cmd: |
+         grep 'GRUB_CMDLINE_LINUX\(_DEFAULT\)\?=.*rootflags.*' /etc/default/grub
+  register: grub_config_grep_rootflags
+  changed_when: false
+  failed_when: grub_config_grep_rootflags.rc >= 2
+
+- name: 'Update rootflags to enable user quota for XFS / in GRUB config.'
+  ansible.builtin.lineinfile:
+    path: '/etc/default/grub'
+    backup: true
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX(_DEFAULT)?=\")([^\"]*)(\s+rootflags=(\S+))([^\"]*\")$'
+    line: '\1\3 rootflags=uquota,\5\6'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - "'rootflags' in grub_config_grep_rootflags.stdout"
+    - "'uquota' not in grub_config_grep_rootflags.stdout"
+  notify: rebuild_grub_config_by_logins_role
+  become: true
+
+- name: 'Add rootflags to enable user quota for XFS / in GRUB config.'
+  ansible.builtin.lineinfile:
+    path: '/etc/default/grub'
+    backup: true
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX(_DEFAULT)?=\")([^\"]*)(\")$'
+    line: '\1\3 rootflags=uquota\4'
+    owner: root
+    group: root
+    mode: '0644'
+  when: "'rootflags' not in grub_config_grep_rootflags.stdout"
+  notify: rebuild_grub_config_by_logins_role
+  become: true
+
+- name: 'Check if GRUB configs needs to be rebuild in order to have uquota present in the list of rootflags for the running kernel.'
+  ansible.builtin.command:
+    cmd: grep uquota /proc/cmdline
+  register: logins_search_uquota_in_kernel_params
+  changed_when: logins_search_uquota_in_kernel_params['rc'] == 1
+  failed_when: logins_search_uquota_in_kernel_params['rc'] >= 2
+  notify: rebuild_grub_config_by_logins_role
+
+- name: 'Flush handlers.'
+  ansible.builtin.meta: flush_handlers
+
+#
+# Sanity check, which will fail and stop the play when previous tasks to enable user quota did not work.
+#
+- name: 'Check if usrquota was enabled for the root XFS mount.'
+  ansible.builtin.command:
+    cmd: findmnt --notruncate --types xfs --target / --options usrquota
+  changed_when: false
+
+#
+# This depends on a correctly configured pam-exec PAM plugin.
+#
+- name: 'Install set_quota.sh script.'
+  ansible.builtin.template:
+    src: 'set_quota.sh.j2'
+    dest: '/etc/pam-script.d/set_quota.sh'
+    owner: root
+    group: root
+    mode: '0744'
+  become: true
+...

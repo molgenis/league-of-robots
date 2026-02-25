@@ -22,7 +22,7 @@ cloud_image: Rocky-9.5
 cloud_user: rocky
 availability_zone: nova
 os_distribution: 'rocky9'
-repo_manager: 'none'
+repo_manager: 'pulp'
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
@@ -48,4 +48,7 @@ local_admin_users:
   - 'sandi'
   - 'wim'
   - 'wouter'
+cvmfs_repos: 
+  - 'hpc.umcg.nl'
+  - 'test.talos'
 ...

@@ -8,7 +8,9 @@
 
 ### 1.1. Basic overview
 
-It is the storage that is hosted on the tapes on the remote location. Currently we only have one archive provider - [SURF](https://www.surf.nl/en/services/data-archive).
+Remote archive is the storage, that is hosted on the tapes on the remote location.
+Remote archive is connected to the UMCG research HPC clusters.
+Currently, only [SURF archive](https://www.surf.nl/en/services/data-archive) is available as archive provider.
 
 The following guidelines apply to this archive storage
 
@@ -21,12 +23,26 @@ The following guidelines apply to this archive storage
 - Tape storage has the [ISO 27001 certification](https://www.surf.nl/en/services/data-archive)
 - Data is stored in two physical locations in the Netherlands.
 
-
 ### 1.2. How it works
 
 Archive is automatically mounted when user navigates to the `/groups/[GROUP]/arc[XX]` folder. At that moment storage from remote server gets mounted on the folder. It remains accessible until some specific idle time is reached.
 
 Data-manager account of the specific group is the **only** account that has **read** and **write** access to the archive folder of the group. This is to prevent users accidentally recalling files online when not needed. Also to make sure that all the files are stored in correct format (see 'Best practices' below).
+
+### 1.3 How can group request an access to the archive
+
+In order for the groups to use SURF archive solution, they can either make a request to use a joint Shared Contract from the [Helpdesk](../contact) or they can choose to make their own Individual Contract with the SURF.
+
+**Shared Contract**
+
+Shared contract is a one-stop shop for the groups who want to avoid arranging their own SURF archive storage contract.
+Groups that are using a Shared Contract, can access their SURF archive storage only within the UMCG HPC clusters maintained by the HPC [Helpdesk](../contact).
+Data separation  between the groups is supported only within our HPC environments. And due to the fact that we cannot guarantee the separation outside of our systems, we do not provide the archive access for the groups outside our HPC environments. Groups that need this external access, should consider Individual Contract instead.
+
+**Individual Contract**
+
+Groups can arrange their own (separate) contract with SURF Archive, allowing unrestricted access to the archive storage from **any** external system. (As long as they use a protocol supported by the SURF archive server - SSH protocol.)
+If a group wants its SURF Archive storage attached to the HPC system, the group owner must coordinate the request with (and provide the access to) the [Helpdesk](../contact).
 
 ## 2. Managing data
 
@@ -166,18 +182,23 @@ We must wait until it is changed to `DUL` (Dual-state).
 Use `--help` argument to get more information
 
 ```
-   dm-user $ $ arc_surf --help
+   [dm-user@~]$ /usr/local/bin/arc_surf --help
    Provide one of the following arguments
-    --dafind-reg <path>      print regular files / files that reside only on disk
-    --dafind-que <path>      print files that are being copied from disk to tape
-    --dafind-dul <path>      print files that reside both online and offline
-    --dafind-ofl <path>      print data that is no longer on disk (is on tape)
-    --dafind-stg <path>      print files which are being copied from tape to disk
-    --daget      <path>      recall / stage online FROM TAPE
-    --dals       <path>      list state
+    --quiet                  don't print the start message - supress the extra output
+    --budget                 print the used disk space by my group
+                             (note that the second number might include space from other groups as well)
+    --dafind-reg <path>      search for regular / online files (present only on disk)
+                             (there is no copy on tape) Directories are always REG.
+    --dafind-dul <path>      search for files that reside both online (on disk) and offline (on tape)
+    --dafind-ofl <path>      search for files that are offline (present only on tape)
+    --dafind-que <path>      search for files that are queued for copy FROM TAPE to disk
+                             (are not yet copying, data is also not yet available). This is state before STG.
+    --dafind-stg <path>      search for files which are currently being copied FROM TAPE to disk
+                             (files that are currently copying, but data is not yet available)
+    --daget      <path>      recall / request data to be staged online FROM TAPE to disk
+    --dals       <path>      list file state in long format (including queue state)
     --darelease  <path>      send to offline / stage TO TAPE
     --sha256sum  <path>      compute the sha256sum of the file
-
 ```
 
 ## 5. Best practices
@@ -206,10 +227,10 @@ Which means that archiving and restoring of the large datasets can take (dependi
 
 So far most of the bugs have been resolved, but it could happen that
 
- - the archive folder is not available - please inform the helpdesk unless maintenance was announced,
+ - the archive folder is not available - please inform the [helpdesk](../contact) unless maintenance was announced,
  - download/upload perfomance occasionally drops - this most probably depends on the Login node usage (and data copy by other users) - notify helpdesk if it persists for a longer period,
 
-If you expirence any issues with the archive solution, please notify helpdesk.
+If you expirence any issues with the archive solution, please notify the helpdesk.
 
 ```
 Where is my data stored?

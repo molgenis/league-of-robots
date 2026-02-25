@@ -1,0 +1,51 @@
+# Create a stratum 0 cvmfs_server (silo-*)
+
+Minimal configuration can be found in ```/etc/cvmfs/default.local```
+ * Respositories to mount
+ * Proxy server that is used for the connection (default = direct)
+
+Some commands to check the setup of your stratum 0 server:
+ * Check client configuration: ```cvmfs_config chksetup```
+ * Check mounts: ```cvmfs_config probe```
+ * Check used settings: ```cvmfs_config showconfig```
+ * Check list of repo's: ```cvmfs_server list```
+
+Create a new repo and publish:
+ * ```cvmfs_server mkfs [repo_name]``` -> Owner of [repo] [root]: [type enter]
+ * ```systemctl daemon-reload``` Mounting CernVM-FS Storage (overlayfs), fstab has been modified
+ * ```cvmfs_server transaction [repo_name]```
+ * ```cd /cvmfs/[repo_name]/``` and make changes
+ * ```cd``` get out of repo before publishing
+ * ```cvmfs_server publish -a [tag] [repo_name]``` tag format: YYMMDD-[v0*]
+ * check created repo: ```cvmfs_server info [repo_name]```
+
+The above commands can be deployed using the playbook: cvmfs_server, using the tag: configure_cvmfs_repos
+Note that adding files to the repo needs to be done manually on the silo server (stratum 0).
+
+In order to mount the newly created repo on the client (startum 1), these configurations are needed on the client:
+ * Add [repo_name] to ```CVMFS_REPOSITORIES``` in ```/etc/cvmfs/default.local```
+ * Create ```/etc/cvmfs/config.d/[repo_name].conf``` and set
+    * ```CVMFS_SERVER_URL=http://[cvmfs_server_ip]/cvmfs/[repo_name]```
+    * ```CVMFS_PUBLIC_KEY=/etc/cvmfs/keys/[repo_name].pub```
+ * Copy ```/etc/cvmfs/keys/[repo_name].pub``` to the client
+
+The above commands can be deployed using the playbook: cvmfs_client, using the tag: configure_cvmfs_repos
+
+# Data storage locations
+
+Server side - stratum 0:
+* Repository data storage - ```/srv/cvmfs/```
+* Temporary scratch area used for creating new files and repository updates (can grow large during repository updates) - ```/var/spool/cvmfs/```
+* Authoritative configuration files for the repos - ```/etc/cvmfs/```
+* Repo creation - ```/cvmfs/```
+
+Client side:
+* Local cache dir for storage of the downloaded file contents and other client-specific data - ```/var/lib/cvmfs``` (configurable via CVMFS_CACHE_BASE)
+* Authoritative configuration files for the repos - ```/etc/cvmfs/```
+* Mount point for repos - default: ```/cvmfs/```, automounted by autofs  
+  
+
+**NOTE:**
+- New repo names can be added in the static inventory.
+- For testing purposes, the client role is only deployed on talos. When moving to production, please change the hosts in single_role_playbooks/cvmfs_client.yml.
+- Put cvmfs rpm(s) on client repo server(s) and use following command to only sync this repo: ```pulp-sync-publish-distribute cvmfs```

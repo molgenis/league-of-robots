@@ -6,14 +6,12 @@
     group: "root"
     mode: '0770'
     state: 'directory'
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{{ proxy_host }}+{{ item }}"
   register: create_iptables_extras_d
   loop: "{{ cluster_class_servers }}"
   become: true
   ignore_errors: true
   ignore_unreachable: true
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
 
 - name: Count log servers online and offline
   ansible.builtin.set_fact:
@@ -46,15 +44,13 @@
     create: true
     regexp: "{{ client_public_ip.content | trim }} 41514"
     line: "{{ client_public_ip.content | trim }} 41514"
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{{ proxy_host }}+{{ item }}"
   register: add_ip_to_firewall_extra_allow
   loop: "{{ cluster_class_servers }}"
   become: true
   notify: restart_server_firewall
   ignore_errors: true
   ignore_unreachable: true
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
 
 - name: Force all services to restart, before we continue to configure logs clients
   ansible.builtin.meta: flush_handlers

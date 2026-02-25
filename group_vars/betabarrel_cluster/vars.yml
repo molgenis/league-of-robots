@@ -42,32 +42,18 @@ slurm_qos_limit_fractions:
   interactive-short:
     user: 0.5
 repo_manager: 'none'
-os_distribution: 'centos7'
+os_distribution: 'rocky9'
 figlet_font: 'ogre'
 motd: |
       =========================================================
           Welcome to {{ slurm_cluster_name | capitalize }}
       =========================================================
 additional_etc_hosts:
-  - group: betabarrel_cluster
-    nodes:
-      - name: betabarrel
-        network: vlan990
-  - group: betabarrel_cluster
-    nodes:
-      - name: bb-dragen
-        network: vlan990
-  - group: betabarrel_cluster
-    nodes:
-      - name: bb-storage
-        network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: copperfist
-        network: vlan990
   - group: copperfist_cluster
     nodes:
       - name: cf-dragen
+        network: vlan990
+      - name: copperfist
         network: vlan990
 #
 # Jumphosts from other stack-name infra groups.
@@ -112,8 +98,6 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-    group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-    group_quota_hard_limit_template: ruggroupumcgquotaLFS
     create_ldap: false
 totp:
   machines: "{{ groups['jumphost'] }}"
@@ -124,8 +108,7 @@ totp:
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
     - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['address'] }}{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['netmask'] }}"
-cloud_image: CentOS 7
-cloud_user: centos
+cloud_image: Rocky-9.5
 availability_zone: nova
 stack_networks:
   - name: vlan1336  # Internal management for VMs and BMs
@@ -147,7 +130,12 @@ stack_networks:
 security_group_mods:
   - name: "{{ stack_prefix }}_storage"
     allow_ingress:
-      - '192.168.1.0/25'
+      - '192.168.1.0/24'  # private vlan990 for lab equipment.
+  - name: "{{ stack_prefix }}_cluster"
+    allow_ingress:
+      - "{{ betabarrel_cluster.ip_addresses['bb-dragen']['vlan1336']['address'] }}{{ betabarrel_cluster.ip_addresses['bb-dragen']['vlan1336']['netmask'] }}"
+      # Placeholder for when betabarrel is upgraded to bare metal Merlin machine running Rocky 9.
+      # - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan1336']['netmask'] }}"
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -178,7 +166,6 @@ iptables_allow_ssh_outbound:
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
-  - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
 local_admin_groups:
@@ -190,7 +177,6 @@ local_admin_users:
   - 'henkjan'
   - 'kim'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'robin'
@@ -510,12 +496,42 @@ pfs_mounts:
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
+  - pfs: umcgst15
+    source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
+    type: nfs4    # checked with cat /proc/filesystem
+    rw_options: 'defaults,_netdev,noatime,nodiratime,nofail,local_lock=flock'
+    ro_options: 'defaults,_netdev,noatime,nodiratime,nofail,ro'
+    machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
     pfs: local_raid
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: tmp05
     pfs: local_raid
+    groups:
+      - name: umcg-atd
+        mode: '2770'
+      - name: umcg-gap
+        mode: '2770'
+      - name: umcg-gd
+        mode: '2770'
+      - name: umcg-genomescan
+        mode: '2770'
+      - name: umcg-gsad
+        mode: '2770'
+      - name: umcg-gst
+        mode: '2770'
+      - name: umcg-lab
+      - name: umcg-labgnkbh
+        mode: '2770'
+      - name: umcg-patho
+        mode: '2770'
+      # - name: umcg-pr
+      - name: umcg-vipt
+        mode: '2770'
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+  - lfs: tmp15
+    pfs: 'umcgst15'
     groups:
       - name: umcg-atd
       - name: umcg-gap
@@ -527,9 +543,9 @@ lfs_mounts:
         mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
-#     - name: umcg-pr
+      # - name: umcg-pr
       - name: umcg-vipt
-    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
     groups:

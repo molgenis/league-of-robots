@@ -1,0 +1,53 @@
+DOCUMENTATION:
+  name: intersect
+  author: UMCG HPC team
+  short_description: Is any item in the list also an item in another list
+  description:
+    - Validate if the first list has any items in common with the second list.
+  options:
+    _list1:
+      description: List.
+      type: list
+      elements: raw
+      required: True
+    _list2:
+      description: List to test against.
+      type: list
+      elements: raw
+      required: True
+EXAMPLES: |
+  #
+  # Simple test.
+  #
+  list_a: [1,2,3,4,5]
+  list_b: [3,6,7]
+  list_c: [10,15]
+  lists_share_elements: "{{ list_a is intersect(list_b) }}"
+  # -> lists_share_elements: True
+  lists_share_elements: "{{ list_a is intersect(list_c) }}"
+  # -> lists_share_elements: False
+  #
+  # Example using intersect test as part of selecattr filter to get a subset of dict items.
+  #
+  tags_to_select:
+    - old
+    - core
+  example_dict:
+    item1:
+      tags:
+        - label
+        - core
+    item2:
+      tags:
+        - extra
+        - new
+  dict_subset: "{{ example_dict | selectattr('tags', 'intersect', tags_to_select) }}"
+  # -> dict_subset:
+  #     item1:
+  #       tags:
+  #         - label
+  #         - core
+RETURN:
+  _value:
+    description: Returns V(True) if the lists have any elements in common, V(False) otherwise.
+    type: boolean

@@ -1,0 +1,24 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
+#
+# Slurm Logrotate Configuration
+#
+/var/log/slurm/*.log {
+    compress
+    missingok
+    nocopytruncate
+    nocreate
+    nodelaycompress
+    nomail
+    notifempty
+    noolddir
+    rotate 5
+    sharedscripts
+    size 10M
+    create 640 slurm root
+    postrotate
+        {% for slurm_daemon in slurm_daemons %}
+        pkill -x --signal SIGUSR2 {{ slurm_daemon }}
+        {% endfor %}
+        exit 0
+    endscript
+}

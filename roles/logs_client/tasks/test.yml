@@ -48,11 +48,9 @@
   until: remote_test_result.rc == 0
   retries: 12
   delay: 5
-  delegate_to: "{{ groups['jumphost'] | first }}+{{ item }}"
+  delegate_to: "{{ proxy_host }}+{{ item }}"
   loop: "{{ cluster_class_servers }}"
   become: true
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
   tags:
     - always
     - test

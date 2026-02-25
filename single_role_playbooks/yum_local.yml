@@ -2,6 +2,7 @@
 - hosts:
    - jumphost
    - cluster
+   - data_transfer
   roles:
    - yum_local
 ...

@@ -8,6 +8,7 @@
 - name: '###==-> Roles only for completely managed chaperones <-==###'
   hosts: chaperone,!mit_chaperone
   roles:
+    - interfaces
     - iptables
     - grub
     - swap

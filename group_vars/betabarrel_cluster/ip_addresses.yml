@@ -1,46 +1,34 @@
 ---
 ip_addresses:
   bb-dragen:
-    vlan16:
-      address: 195.169.22.42
+    vlan1336:  # Manually selected IP, because machine is not controlled by OpenStack.
+      address: 172.23.77.133
       netmask: /32
     vlan990:
       address: 192.168.1.61
       netmask: /32
-    vlan990_bmc_ipmi:
-      address: 10.10.1.101
-      netmask: /32
-    vlan990_bmc_mgmt:
-      address: 10.10.1.71
+    vlan990_ipmi:
+      address: 192.168.1.241
       netmask: /32
   bb-porch:
-    bb_internal_management:
-      address: 10.10.1.164
+    vlan1336:
+      address: 172.23.77.51
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     vlan16:
       address: 195.169.22.140
       netmask: /32
       fqdn: 'NXDOMAIN'
-  bb-porch-1336:
-    vlan1336:
-      address: 172.23.77.8
-      netmask: /32
-      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    vlan16:
-      address: 195.169.22.156
-      netmask: /32
-      fqdn: 'NXDOMAIN'
   bb-storage:
     vlan1336:
-      address: 172.23.77.56
+      address: 172.23.77.63
       netmask: /32
     vlan990:
       address: 192.168.1.158
       netmask: /32
   bb-transfer:
-    bb_internal_management:
-      address: 10.10.1.29
+    vlan1336:
+      address: 172.23.77.84
       netmask: /32
       publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
     vlan16:

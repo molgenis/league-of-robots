@@ -119,18 +119,19 @@
   when: inventory_hostname in groups['data_transfer'] | default([])
   become: true
 
-- name: 'Set tiny quota for regular users on the XFS root partition.'
+- name: 'Set quota for regular users on the XFS root partition.'
   ansible.builtin.include_tasks:
-    file: tiny-user-quota-on-xfs-root-partition.yml
+    file: user-quota-on-xfs-root-partition.yml
   when:
-    - inventory_hostname in groups['jumphost'] | default([]) or
-      inventory_hostname in groups['data_transfer'] | default([])
+    - user_quota_on_root_partition is defined
+    - user_quota_on_root_partition is not none
     - hostvars[inventory_hostname]['ansible_mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first == 'xfs'
 
 - name: 'Enable services.'
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
+    masked: false
     state: started
     daemon_reload: true
   with_items:
@@ -164,4 +165,20 @@
   when:
     - inventory_hostname not in groups['deploy_admin_interface'] | default([])
     - cluster_class | default('') != 'diagnostics'
+
+- name: 'Include/remove screen_reaper.sh from PAM session config of sudo (it is not using authselect)'
+  ansible.builtin.lineinfile:
+    path: "/etc/pam.d/sudo"
+    state: "{{ pam_state }}"
+    insertafter: 'EOF'
+    regexp: 'session.*pam_exec\.so.*screen_reaper\.sh'
+    line: 'session    optional     pam_exec.so stdout seteuid /etc/pam-script.d/screen_reaper.sh'
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    pam_state: "{% if screen_cleanup_deploy is defined and screen_cleanup_deploy %}present{% else %}absent{% endif %}"
+  when:
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
 ...

@@ -4,6 +4,7 @@
     - jumphost
     - data_transfer
     - logs
+    - repo_servers
   roles:
     - admin_users
 - name: Running > admin_users < role on second batch of machines
@@ -14,6 +15,7 @@
     - docs
     - jenkins
     - build_server
+    - silo_server
   roles:
     - admin_users
 ...

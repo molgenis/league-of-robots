@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -40,7 +40,10 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-          local_volume_size_extra: 100
+          local_yum_repository: true  # For nhc_standalone.
+          local_volume_extra:
+            - name: groups
+              size: 100
           local_mount_subfolders:
             - mount_point: '/groups'
               machines: "{{ groups['data_transfer'] }}"
@@ -91,7 +94,9 @@ all:
                 name: enp3s0
               lnet:
                 name: tcp20
-          local_volume_size_extra: 300
+          local_volume_extra:
+            - name: apps
+              size: 300
     user_interface:
       hosts:
         talos:
@@ -101,11 +106,11 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp4s0
+                name: enp3s0
             - name: vlan1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: enp3s0
+                name: enp4s0
               lnet:
                 name: tcp20
             - name: "{{ stack_prefix }}_internal_management"
@@ -116,37 +121,31 @@ all:
                   auto-route-metric: 80
           slurm_sockets: 4
           slurm_cores_per_socket: 1
-          slurm_real_memory: 7684
+          slurm_real_memory: 7681
           slurm_local_disk: 0
           slurm_features: 'prm08,tmp08'
-          slurm_ethernet_interfaces:
-            - enp3s0
-            - enp4s0
-            - enp5s0
     compute_node:
       children:
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-a01:
               cloud_flavor: umcg.v1.bm.28-256-0.vlan1337
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_type: baremetal
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: eth2
+                    name: enp130s0f0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
                   nmstate_interface:
-                    name: eth2.1068
+                    name: enp130s0f0.1068
                     type: vlan
                     vlan:
                       id: 1068
-                      base-iface: eth2
+                      base-iface: enp130s0f0
                     ipv4:
                       dhcp: false
                   lnet:
@@ -154,7 +153,6 @@ all:
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
-                  #device: '/dev/sdb'
                   device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
                   label: local
                   perc_controller: 0
@@ -169,19 +167,13 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 14
-              slurm_real_memory: 257320
+              slurm_real_memory: 257317
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
               slurm_features: 'tmp08'
-              slurm_ethernet_interfaces:
-                #- enp130s0f0
-                #- enp130s0f0.1068
-                - eth2
-                - eth2.1068
         cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-b01:
@@ -220,46 +212,39 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 1
               slurm_cores_per_socket: 64
-              slurm_real_memory: 514860
+              slurm_real_memory: 514857
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
               slurm_features: 'tmp08'
-              slurm_ethernet_interfaces:
-                - enp65s0np0
-                - enp65s0np0.1068
         cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-c01:
               cloud_flavor: umcg.v1.vm.4-8
-              cloud_image: Rocky-9.5
-              cloud_user: rocky
               host_networks:
                 - name: vlan1337
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: eth0
+                    name: enp3s0
                 - name: vlan1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: eth1
+                    name: enp4s0
                   lnet:
                     name: tcp20
-              local_volume_size_extra: 1
+              local_volume_extra:
+                - name: local
+                  size: 1
               slurm_sockets: 4
               slurm_cores_per_socket: 1
-              slurm_real_memory: 257320
+              slurm_real_memory: 7680
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 900
               slurm_features: 'tmp08'
-              slurm_ethernet_interfaces:
-              - eth0
-              - eth1
     chaperone:
       hosts:
         tl-chaperone:
@@ -336,7 +321,9 @@ all:
           ssh_client_configs:
             - logs_library
           lfs_mounts: []  # Overrule the list of network shares; we use local storage instead.
-          local_volume_size_extra: 200  # The extra virtual disk for dat* and prm*
+          local_volume_extra: # The extra virtual disk for dat* and prm*
+            - name: groups
+              size: 200
           local_mounts:
             - mount_point: '/groups'
               device: '/dev/vdb'
@@ -405,7 +392,7 @@ cluster:
     administration:
 talos_cluster:
   children:
-    openstack_api:
+    controller_api:
     jumphost:
     repo:
     cluster:

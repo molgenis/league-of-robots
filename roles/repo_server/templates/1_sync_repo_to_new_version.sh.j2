@@ -1,0 +1,50 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
+#!/bin/bash
+
+set -ueo pipefail
+_main="{{ main_repo_path }}"
+
+{% raw %}
+
+! test -d "${_main}/0cache" && mkdir "${_main}/0cache"
+
+print_all_repos() {
+   echo ""
+   echo "Available [operating systems] [repositories] options are"
+   cd "${_main}/dnf.repos.d/"
+   grep '\[.*\]' */*.repo | tr ':' '/' | tr -d '[]' | cut -d'/' -f 1,3 --output-delimiter=" " | sort -u
+}
+
+if [[ -z "${1:-}" ]]; then
+      echo "Error, you did not provide distribution!"
+      print_all_repos
+      echo ""
+      echo "Correct syntax for downloading the specific repository is"
+      echo "  ${0} [os_distribution] [repository]"
+      echo "or to download ALL repositories of a specific OS distribution"
+      echo "  ${0} [os_distribution]"
+      exit
+fi
+
+_os_distribution=${1}
+_do_repos=${2:-}
+_time="$(date +%Y%m%d-%H%M%S)"
+
+if [[ -z "${_do_repos:-}" ]]; then
+   _do_repos="$(grep -h "\[.*\]" "${_main}/dnf.repos.d/${_os_distribution}/"*.repo | tr -d '[]' | sort -u)"
+fi
+
+for _repo in ${_do_repos}; do
+   _repo_log_dir="${_main}/reposync.logs/${_os_distribution}/${_repo}"
+   ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
+   _repo_log="${_repo_log_dir}/${_time}"
+   echo "Log file: ${_repo_log}"
+   dnf reposync --conf "${_main}/dnf.repos.d/${_os_distribution}.conf" --repo "${_repo}" --downloaddir="${_main}/0cache/${_os_distribution}/" 1>"${_repo_log}" 2>&1 && \
+   mkdir -p "${_main}/1versions/${_os_distribution}/${_repo}/" && \
+   cp -a --reflink=always "${_main}/0cache/${_os_distribution}/${_repo}/" "${_main}/1versions/${_os_distribution}/${_repo}/${_time}/" || exit
+   echo "New version created:   ${_main}/1versions/${_os_distribution}/${_repo}/${_time}"
+   echo ""
+   echo ""
+done
+
+{% endraw %}

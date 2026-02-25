@@ -11,6 +11,7 @@
     - docs
     - irods
     - logs
+    - repo_servers
   roles:
     - remove
 ...

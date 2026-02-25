@@ -1,4 +1,21 @@
 ---
+#
+# Enforce that data_transfer servers use `yum_repos` for defining repositories, since they cannot use Pulp.
+#
+repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
+              | map(attribute='id') }}"
+additional_etc_hosts: []  # Do not add additional machines to /etc/hosts on data transfer servers.
 iptables_allow_icmp_inbound:
   - ANY
 iptables_allow_https_inbound:
@@ -32,5 +49,9 @@ local_mounts:
     mounted_mode: '0755'
     mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
     type: ext4
-repo_manager: 'none'
+user_quota_on_root_partition:
+  blocks_soft: 512K
+  blocks_hard: 1024K
+  inodes_soft: 500
+  inodes_hard: 1000
 ...

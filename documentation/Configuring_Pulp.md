@@ -125,9 +125,9 @@ You can _refresh_ an _ACS_ without affecting the _publications_ served to Pulp c
 
 # <a name="Create-Server"/> Create Server
 
-### Use deploy-os_server.yml playbook
+### Use openstack.yml playbook
 
-The `deploy-os_server.yml` playbook can be used to create all VMs for a cluster including a repo server.
+The `openstack.yml` playbook can be used to create all VMs for a cluster including a repo server.
 This playbook requires the _OpenStack SDK_ to be installed and configured on your _Ansible control host_;
 See the `README.md` in the root of this repo for details.
 
@@ -145,7 +145,7 @@ Next you can use
 ```bash
 . ./lor-init
 lor-config [stack_prefix]
-ansible-playbook -u [admin_account] single_role_playbooks/pulp_server.yml
+ansible-playbook -u [admin_account] single_role_playbooks/repo.yml
 ```
 This will install Pulp, create an admin account to manage Pulp and install the Pulp CLI in a Python virtual environment
 for that admin account. It will also do part of the initial configuration, but this is incomplete due to missing features in _Pulp Squeezer_;
@@ -181,7 +181,7 @@ rsync -av --rsync-path 'sudo -u repoadmin rsync' [os_distribution] [admin]@[jump
 
 The remaining tasks can be performed on the Pulp server in one go with the functions
  * ```pulp-refresh-acs```
- * ```pulp-sync-publish-distribute```
+ * ```pulp-sync-publish-distribute [all|single_repo]```
 which were deployed on the repo server by the ```pulp_server``` role.
 
 #### Manual work - on the Pulp server: pulp-refresh-acs
@@ -205,11 +205,11 @@ pulp-refresh-acs
 
 The `pulp-sync-publish-distribute` function is used to
  * Add new content (RPMs) to our `cpel` _repository_, which does not have a _remote_.
- * Sync all _repositories_ with their _remotes_ for the ones that do have _remotes_.
- * This creates new _repository versions_ for all _repositories_.
- * Create new _publications_ for all _repository versions_.
+ * Sync all or a single _repository_ with their _remotes_ for the ones that do have _remotes_.
+ * This creates new _repository versions_ for all or a single _repository_.
+ * Create new _publications_ for all or a single _repository version_.
  * Create new _distributions_ to serve the latest _publications_ if the _distributions_ did not exist yet.
- * Update all existing _distributions_ to serve the latest _publications_.
+ * Update all or a single existing _distribution_ to serve the latest _publication_.
 
 Hence this procedure changes what will be served to Pulp clients if any _repository_ had changed content since the previous sync.
 
@@ -221,7 +221,7 @@ source ./pulp-cli.venv/bin/activate
 set -u
 pulp status
 source ./pulp-init.bash
-pulp-sync-publish-distribute
+pulp-sync-publish-distribute [all|single_repo]
 ```
 
 Alternatively or for debugging issues with ```pulp-sync-publish-distribute``` you can also perform these tasks manually using:
@@ -354,8 +354,8 @@ done
 set -e
 set -u
 
-stack_prefix='' # Must be filled in; check group_vars (f.e. 'fd').
-stack_name=''   # Must be filled in; check group_vars (f.e. 'fender_cluster').
+stack_prefix='' # Must be filled in; check group_vars (f.e. 'nb').
+stack_name=''   # Must be filled in; check group_vars (f.e. 'nibbler_cluster').
 #
 # Make sure you already declared the ${all_pulp_repos[@]} array: see above.
 #
@@ -931,10 +931,10 @@ pulp rpm publication create --repository /pulp/api/v3/repositories/rpm/rpm/b7180
 pulp rpm distribution update --name ? --publication /pulp/api/v3/publications/rpm/rpm/98300791-39cb-4918-b613-7c8f481a8ffd/
 ```
 
-With correct distribution name, like **nb-cpel7** or **fd-cpel7**. Then check if distribution is now linked to the new publication (f.e. for fd--cpel7 repository on fender)
+With correct distribution name, like **nb-cpel9** or **vt-cpel9**. Then check if distribution is now linked to the new publication (f.e. for nb--cpel9 repository on nibbler)
 
 ```
-pulp rpm distribution show --name fd-cpel7
+pulp rpm distribution show --name nb-cpel9
 ```
 
 

@@ -4,7 +4,7 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'tl'
 stack_dtap_state: development
-slurm_version: '24.11.4-1.el9.umcg'
+slurm_version: '24.11.6-1.el9.umcg'
 slurm_partitions:
   - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
     default: yes
@@ -98,21 +98,6 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-    #
-    # LDAP is case insensitive, but we use lowercase only for quota field names,
-    # so we can use simple literal strings in comparisons as opposed to regexes
-    # to handle differences in UPPERCASE vs. lowercase.
-    #
-    # The UPPERCASE "LFS" in {{ ldap_domains[domain]['group_quota_*_limit_template'] }} Ansible variables
-    # is a required placeholder that will get replaced with the value of the Logical File System (LFS)
-    # for which we will try to fetch quota limits from the LDAP.
-    # E.g. with
-    #     group_quota_soft_limit_template: 'ruggroupumcgquotaLFSsoft'
-    # the fieldname/key used to lookup the soft quota limit for the prm01 LFS is
-    #     ruggroupumcgquotaprm01soft
-    #
-    group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-    group_quota_hard_limit_template: ruggroupumcgquotaLFS
     # listserv_mailinglist: Be careful not to use a production mailinglist for testing!
 pam_weblogin:
   machines: "{{ groups['jumphost'] }}"
@@ -128,9 +113,9 @@ pam_weblogin:
   max_uid: "{{ ldap_domains['sram']['max_id'] }}"
   retries: 3
   cache_duration: 3600  # seconds
-cloud_image: RockyLinux-9.3_xfs
-cloud_user: cloud-user
+cloud_image: Rocky-9.6
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: vlan1337  # Internal management for VMs and BMs
     cidr: '172.23.68.0/24'
@@ -166,7 +151,6 @@ local_admin_users:
   - 'henkjan'
   - 'kim'
   - 'marieke'
-  - 'marloes'
   - 'max'
   - 'morris'
   - 'pieter'
@@ -276,8 +260,8 @@ pfs_mounts:
   - pfs: umcgst04/slice5
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -285,18 +269,18 @@ lfs_mounts:
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-atd
       - name: umcg-gcc
-        mode: '2750'
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-sysops
-        mode: '2750'
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
@@ -304,6 +288,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
     pfs: umcgst04/slice5
+    type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops

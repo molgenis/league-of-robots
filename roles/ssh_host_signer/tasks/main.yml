@@ -4,6 +4,20 @@
     name: "{{ hostvars[inventory_hostname].fqdn | default(inventory_hostname) }}"
   become: true
 
+- name: 'Check if ssh is working'
+  ansible.builtin.command: 'ssh -V'
+  failed_when: false
+  changed_when: false # this role is just testing and changes nothing
+  register: ssh_version
+
+- name: 'Update ssh before configuring keys'
+  ansible.builtin.package:
+    name: openssh
+    state: latest
+    update_cache: true
+  when: ssh_version.rc != 1
+  become: true
+
 - name: '(Re)create RSA host key with 4096 bits.'
   community.crypto.openssh_keypair:
     path: "{{ ssh_host_signer_key_directory }}/ssh_host_rsa_key"
