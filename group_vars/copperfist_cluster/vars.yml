@@ -68,8 +68,6 @@ external_jumphosts:
     hosts:
       - hostname: bb-porch
         network: vlan16
-      - hostname: az-porch
-        network: az_public
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
@@ -142,7 +140,6 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -151,12 +148,10 @@ iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net4'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_outbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
