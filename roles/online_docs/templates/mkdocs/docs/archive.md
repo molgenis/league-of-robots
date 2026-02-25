@@ -71,6 +71,14 @@ browse folders and check file permissions and their metadata information.
 
 How to upload and modify states of the remote files.
 
+Main steps to reliably upload the data
+
+ - [become a data-manager user](#user)
+ - [bundle the data](#bundling)
+ - [create local checksum](#local-checksum)
+ - [upload data to remote storage](#uploading)
+ - [verify checksums on a remote storage](#remote-checksum)
+
 ### User
 
 Become the data manager
@@ -203,9 +211,12 @@ Use `--help` argument to get more information
 
 ## 5. Best practices
 
+It is always highly recommended to accompany files with their checksums, especially when utilizing remote archive storage. Long-term storage can occasionally experience data degradation or loss, therefore verifying the file's checksum upon retrieval is the most reliable way to ensure the data remains intact and uncorrupted.
+
 File sizes are extremely important for archive. Tape storage performance and management is better when the files are larger size.
 
 Therefore
+
  - files should be in range 1 and 100GB (checksums are exception)
  - average file size should not be lower than a **1GB**
  - the archive filesystem was build around the idea of occasional (as in *once or twice a year at most*) accessing the data content
