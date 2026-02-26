@@ -11,7 +11,6 @@ ssh_client_known_hosts: "\
   195.169.22.140,\
   bb-porch-1336*,\
   195.169.22.156,\
-  74.234.160.235,\
   *bb-transfer*,\
   *bb-storage,\
   *betabarrel,\
