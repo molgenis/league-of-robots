@@ -42,15 +42,6 @@ ip_addresses:
     vlan990:
       address: 192.168.1.21
       netmask: /32
-  az-porch:
-    az_internal_management:
-      address: 10.1.0.4
-      netmask: /32
-      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    az_public:
-      address: 74.234.160.235
-      netmask: /32
-      fqdn: 'NXDOMAIN'
   bb_internal_management-vlan16-router:
     bb_internal_management:
       address: 10.10.1.1
