@@ -1,36 +1,57 @@
 #jinja2: trim_blocks:True, lstrip_blocks:True
 ---
 interfaces:
-- name: {{ network['nmstate_interface']['name'] }}
-  profile-name: {{ network['name'] }}
-  state: {{ network['nmstate_interface']['state'] | default('up') }}
-  {% if network['nmstate_interface']['type'] is defined %}
-  type: {{ network['nmstate_interface']['type'] }}
-  {% endif %}
-  {% if network['nmstate_interface']['vlan'] is defined %}
-  vlan:
-    id: {{ network['nmstate_interface']['vlan']['id'] }}
-    base-iface: {{ network['nmstate_interface']['vlan']['base-iface'] }}
-  {% endif %}
-  ipv4:
-    enabled: {{ network['nmstate_interface']['ipv4']['enabled'] | default('true') }}
-    {% if network['nmstate_interface']['ipv4']['dhcp'] | default(true) %}
-    dhcp: true
+  - name: {{ network['nmstate_interface']['name'] }}
+    {% if ansible_facts['os_family'] == "RedHat" and
+        ansible_facts['distribution_major_version'] <= "8" %}
+    #
+    # nmstate on EL <= 8.x does not support setting/changing profile names,
+    # so the name of the NetworkManager config file will be whatever NetworkManager dreamed up.
+    #
+    #profile-name: ???
     {% else %}
-    dhcp: false
+    profile-name: {{ network['name'] }}
     {% endif %}
-    {% if network['nmstate_interface']['ipv4']['auto-route-metric'] is defined %}
-    auto-route-metric: {{ network['nmstate_interface']['ipv4']['auto-route-metric'] }}
+    state: {{ network['nmstate_interface']['state'] | default('up') }}
+    {% if network['nmstate_interface']['mtu'] is defined %}
+    mtu: {{ network['nmstate_interface']['mtu'] }}
     {% endif %}
-    {% if network['nmstate_interface']['ipv4']['dhcp'] | default(true) is false %}
-    address:
-      - ip: {{ ip_addresses[inventory_hostname][network['name']]['address'] }}
-        prefix-length: {{ stack_networks
+    {% if network['nmstate_interface']['type'] is defined %}
+    type: {{ network['nmstate_interface']['type'] }}
+    {% endif %}
+    {% if network['nmstate_interface']['vlan'] is defined %}
+    vlan:
+      id: {{ network['nmstate_interface']['vlan']['id'] }}
+      base-iface: {{ network['nmstate_interface']['vlan']['base-iface'] }}
+    {% endif %}
+    ipv4:
+      enabled: {{ network['nmstate_interface']['ipv4']['enabled'] | default('true') }}
+      {% if network['nmstate_interface']['ipv4']['dhcp'] | default(true) %}
+      dhcp: true
+      {% else %}
+      dhcp: false
+      address:
+        - ip: {{ ip_addresses[inventory_hostname][network['name']]['address'] }}
+          prefix-length: {{ stack_networks
+                            | selectattr('name', 'equalto', network['name'])
+                            | map(attribute='cidr')
+                            | first
+                            | regex_replace('^[^/]+/([0-9]+)$', '\\1') }}
+      {% endif %}
+      {% if network['nmstate_interface']['ipv4']['auto-route-metric'] is defined %}
+      auto-route-metric: {{ network['nmstate_interface']['ipv4']['auto-route-metric'] }}
+      {% endif %}
+    ipv6:
+      enabled: {{ network['nmstate_interface']['ipv6']['enabled'] | default('false') }}
+{% if network['nmstate_route']['destination'] is defined %}
+routes:
+  config:
+    - destination: {{ network['nmstate_route']['destination'] }}
+      next-hop-address: {{ stack_networks
                           | selectattr('name', 'equalto', network['name'])
-                          | map(attribute='cidr')
-                          | first
-                          | regex_replace('^[^/]+/([0-9]+)$', '\\1') }}
-    {% endif %}
-  ipv6:
-    enabled: {{ network['nmstate_interface']['ipv6']['enabled'] | default('false') }}
+                          | map(attribute='router')
+                          | map(attribute='next-hop-address')
+                          | first }}
+      next-hop-interface: {{ network['nmstate_interface']['name'] }}
+{% endif %}
 ...

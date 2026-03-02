@@ -13,10 +13,12 @@
   openstack.cloud.networks_info:
   register: api_network_info
   run_once: true
+  tags: query_api
 - name: Get info on routers from OpenStack API.
   openstack.cloud.routers_info:
   register: api_router_info
   run_once: true
+  tags: query_api
 #
 # Create the servers.
 #
@@ -36,25 +38,30 @@
   openstack.cloud.floating_ip_info:
   register: api_fip_info
   run_once: true
+  tags: query_api
 - name: Get server info from OpenStack API.
   openstack.cloud.server_info:
   register: api_server_info
   run_once: true
+  tags: query_api
 - name: Rename old "openstack_networks" dict key to new "networks" dict key for backwards compatibility.
   ansible.builtin.set_fact:
     api_network_info: "{{ api_network_info | combine({'networks': api_network_info['openstack_networks']}) }}"
   when: api_network_info['openstack_networks'] is defined
   run_once: true
+  tags: query_api
 - name: Rename old "openstack_routers" dict key to new "routers" dict key for backwards compatibility.
   ansible.builtin.set_fact:
     api_router_info: "{{ api_router_info | combine({'routers': api_router_info['openstack_routers']}) }}"
   when: api_router_info['openstack_routers'] is defined
   run_once: true
+  tags: query_api
 - name: Rename old "openstack_servers" dict key to new "servers" dict key for backwards compatibility.
   ansible.builtin.set_fact:
     api_server_info: "{{ api_server_info | combine({'servers': api_server_info['openstack_servers']}) }}"
   when: api_server_info['openstack_servers'] is defined
   run_once: true
+  tags: query_api
 - name: "Add IP addresses to {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new"
   ansible.builtin.template:
     src: "{{ playbook_dir }}/group_vars/template/ip_addresses_openstack.yml.j2"
@@ -63,27 +70,141 @@
   vars:
     relevant_servers_info: "{{ api_server_info.servers | selectattr('name', 'in', stack_hosts_created_in_openstack) | list }}"
   run_once: true
+  tags: update_ip_addresses_config
+- name: "Get checksum for group_vars/{{ stack_name }}/ip_addresses.yml."
+  ansible.builtin.stat:
+    path: "group_vars/{{ stack_name }}/ip_addresses.yml"
+  register: stat_existing_ip_addresses
+  run_once: true
+  tags: update_ip_addresses_config
+- name: "Get checksum for group_vars/{{ stack_name }}/ip_addresses.yml.new."
+  ansible.builtin.stat:
+    path: "group_vars/{{ stack_name }}/ip_addresses.yml.new"
+  register: stat_new_ip_addresses
+  run_once: true
+  tags: update_ip_addresses_config
+- name: 'Fail when ip_addresses.yml needs a manual update.'
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+         ***********************************************************************************************************
+         Ansible created:
+             {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new
+         Please inspect the changes carefully with:
+             diff -y {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml{.new,}
+         and if OK, then
+           * firstly execute:
+               mv {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml{.new,}
+           * and secondly re-run this role/play to finish the last part using the updated ip_addresses.yml file:
+               ansible-playbook single_role_playbooks/openstack_computing.yml -t update_ssh_client_settings
+         ***********************************************************************************************************
+  run_once: true
+  tags: update_ip_addresses_config
+  failed_when:
+    - stat_existing_ip_addresses['stat']['checksum'] != stat_new_ip_addresses['stat']['checksum']
+  when:
+    - stat_existing_ip_addresses['stat']['exists']
+    - stat_new_ip_addresses['stat']['exists']
+    - stat_existing_ip_addresses['stat']['checksum'] != stat_new_ip_addresses['stat']['checksum']
+- name: 'Fail when ip_addresses.yml does not exist yet.'
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+         ***********************************************************************************************************
+         Ansible created:
+             {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new
+         Please inspect the new file carefully and if OK, then
+           * firstly execute:
+               mv {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml{.new,}
+           * and secondly re-run this role/play to finish the last part using the new ip_addresses.yml file:
+               ansible-playbook single_role_playbooks/openstack_computing.yml -t update_ssh_client_settings
+         ***********************************************************************************************************
+  run_once: true
+  tags: update_ip_addresses_config
+  failed_when:
+    - stat_existing_ip_addresses['stat']['exists'] is false
+  when:
+    - stat_existing_ip_addresses['stat']['exists'] is false
+- name: 'Delete ip_addresses.yml.new when it contains no changes compared to ip_addresses.yml.'
+  ansible.builtin.file:
+    path: "group_vars/{{ stack_name }}/ip_addresses.yml.new"
+    state: absent
+  run_once: true
+  tags: update_ip_addresses_config
+  when:
+    - stat_existing_ip_addresses['stat']['exists']
+    - stat_new_ip_addresses['stat']['exists']
+    - stat_existing_ip_addresses['stat']['checksum'] == stat_new_ip_addresses['stat']['checksum']
+#
+# The ssh_client_settings.yml.j2 template depends on the ip_addresses variable from the ip_addresses.yml file.
+#
 - name: "Create {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new"
   ansible.builtin.template:
     src: "{{ playbook_dir }}/group_vars/template/ssh_client_settings.yml.j2"
     dest: "{{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new"
     mode: '0644'
+  tags: update_ssh_client_settings
   run_once: true
-- name: "ToDo"
+- name: "Get checksum for group_vars/{{ stack_name }}/ssh_client_settings.yml."
+  ansible.builtin.stat:
+    path: "group_vars/{{ stack_name }}/ssh_client_settings.yml"
+  register: stat_existing_ssh_client_settings
+  run_once: true
+  tags: update_ssh_client_settings
+- name: "Get checksum for group_vars/{{ stack_name }}/ssh_client_settings.yml.new."
+  ansible.builtin.stat:
+    path: "group_vars/{{ stack_name }}/ssh_client_settings.yml.new"
+  register: stat_new_ssh_client_settings
+  run_once: true
+  tags: update_ssh_client_settings
+- name: 'Fail when ssh_client_settings.yml needs a manual update.'
   ansible.builtin.debug:
     msg: |
          ***********************************************************************************************************
          IMPORTANT: Manual work!
-                    Ansible created:
-                        {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml.new
-                        {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new
-                    Please inspect these files carefully with:
-                        diff -y {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml{.new,}
-                        diff -y {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml{.new,}
-                    and if both are Ok execute:
-                        mv {{ playbook_dir }}/group_vars/{{ stack_name }}/ip_addresses.yml{.new,}
-                        mv {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml{.new,}
+         ***********************************************************************************************************
+         Ansible created:
+             {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new
+         Please inspect the changes carefully with:
+             diff -y {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml{.new,}
+         and if OK:
+             mv {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml{.new,}
          ***********************************************************************************************************
   run_once: true
-  failed_when: true  # Make sure to always interrupt any playbook here.
+  tags: update_ssh_client_settings
+  failed_when:
+    - stat_existing_ssh_client_settings['stat']['checksum'] != stat_new_ssh_client_settings['stat']['checksum']
+  when:
+    - stat_existing_ssh_client_settings['stat']['exists']
+    - stat_new_ssh_client_settings['stat']['exists']
+    - stat_existing_ssh_client_settings['stat']['checksum'] != stat_new_ssh_client_settings['stat']['checksum']
+- name: 'Fail when ssh_client_settings.yml does not exist yet.'
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+         ***********************************************************************************************************
+         Ansible created:
+             {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml.new
+         Please inspect the new file carefully and if OK:
+             mv {{ playbook_dir }}/group_vars/{{ stack_name }}/ssh_client_settings.yml{.new,}
+         ***********************************************************************************************************
+  run_once: true
+  tags: update_ssh_client_settings
+  failed_when:
+    - stat_existing_ssh_client_settings['stat']['exists'] is false
+  when:
+    - stat_existing_ssh_client_settings['stat']['exists'] is false
+- name: 'Delete ssh_client_settings.yml.new when it contains no changes compared to ssh_client_settings.yml.'
+  ansible.builtin.file:
+    path: "group_vars/{{ stack_name }}/ssh_client_settings.yml.new"
+    state: absent
+  run_once: true
+  tags: update_ssh_client_settings
+  when:
+    - stat_existing_ssh_client_settings['stat']['exists']
+    - stat_new_ssh_client_settings['stat']['exists']
+    - stat_existing_ssh_client_settings['stat']['checksum'] == stat_new_ssh_client_settings['stat']['checksum']
 ...

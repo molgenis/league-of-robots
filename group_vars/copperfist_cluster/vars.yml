@@ -42,7 +42,7 @@ slurm_qos_limit_fractions:
   interactive-short:
     user: 0.5
 repo_manager: 'none'
-os_distribution: 'centos7'
+os_distribution: 'rocky9'
 figlet_font: 'ogre'
 motd: |
       =========================================================
@@ -51,29 +51,10 @@ motd: |
 additional_etc_hosts:
   - group: betabarrel_cluster
     nodes:
-      - name: betabarrel
-        network: vlan990
-  - group: betabarrel_cluster
-    nodes:
       - name: bb-dragen
         network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: copperfist
+      - name: betabarrel
         network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: cf-dragen
-        network: vlan990
-  - group: copperfist_cluster
-    nodes:
-      - name: cf-storage
-        network: vlan990
-# TODO : fix this - bb-storage is still missing
-#  - group: betabarrel_cluster
-#    nodes:
-#      - name: bb-storage
-#        network: vlan990
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -87,8 +68,6 @@ external_jumphosts:
     hosts:
       - hostname: bb-porch
         network: vlan16
-      - hostname: az-porch
-        network: az_public
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
@@ -98,7 +77,7 @@ ssh_client_configs:
 #
 # Cluster classification (used by `logs` and `login` roles)
 #
-cluster_class: 'diagnostic'
+cluster_class: 'diagnostics'
 #
 # Ldap settings
 #
@@ -119,8 +98,6 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-    group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-    group_quota_hard_limit_template: ruggroupumcgquotaLFS
     create_ldap: false
 totp:
   machines: "{{ groups['jumphost'] }}"
@@ -163,7 +140,6 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -172,14 +148,11 @@ iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net4'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_outbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
-  - "{{ gearshift_cluster.ip_addresses['airlock']['vlan16'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
 local_admin_groups:
@@ -191,7 +164,6 @@ local_admin_users:
   - 'henkjan'
   - 'kim'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'robin'
@@ -205,7 +177,7 @@ functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
 regular_groups:
-# Note, for chaperone machines this is controlled in the static_inventories
+  # Note, for chaperone machines this is controlled in the static_inventories
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
   - name: "{{ functional_users_group }}"
@@ -223,7 +195,7 @@ regular_groups:
   - name: 'umcg-pr'
   - name: 'umcg-vipt'
 regular_users:
-# Note, for chaperone machines this is controlled in the static_inventories
+  # Note, for chaperone machines this is controlled in the static_inventories
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
   - name: 'umcg-atd-ateambot'
@@ -511,12 +483,6 @@ pfs_mounts:
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
-#   - pfs: 'umcgst16'
-#     source: 'beegfs_nodev'   # source for beegfs is 'beegfs_nodev' - a virtualized device name that uses /etc/beegfs/beegfs-client.conf configuration
-#     type: beegfs    # checked with cat /proc/filesystem
-#     rw_options: 'rw,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
-#     ro_options: 'ro,relatime,cfgFile=/etc/beegfs/beegfs-client.conf,_netdev,x-systemd.after=beegfs-helperd 0 0'
-#     machines: "{{ groups['beegfs_server'] }}"  # TODO this must be changed!
   - pfs: umcgst16
     source: "{{ ip_addresses[stack_prefix + '-storage']['vlan990']['address'] }}:/mnt"
     type: nfs4    # checked with cat /proc/filesystem

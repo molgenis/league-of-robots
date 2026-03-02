@@ -4,7 +4,7 @@
 # Handlers are executed in the order in which they are defined
 # and not in the order in which they are listed in a "notify: handler_name" statement!
 #
-# Restart before reload: an reload after a restart may be redundant but should not fail,
+# Restart before reload: a reload after a restart may be redundant but should not fail,
 # but the other way around may fail when the impact of changes was too large for a reload.
 #
 - name: 'Restart munge service.'

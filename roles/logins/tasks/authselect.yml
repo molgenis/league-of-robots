@@ -59,8 +59,8 @@
     # Add the right amount of padding with spaces to keep layout in sync with the rest of the password-auth file
     logins_pam_exec_prefix: 'session     optional                                     pam_exec.so'
   when:
-    - inventory_hostname in groups['jumphost'] | default([]) or
-      inventory_hostname in groups['data_transfer'] | default([])
+    - user_quota_on_root_partition is defined
+    - user_quota_on_root_partition is not none
     - hostvars[inventory_hostname]['ansible_mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first == 'xfs'
   become: true
 
@@ -95,10 +95,12 @@
     owner: root
     group: root
     mode: '0755'
-  when: screen_cleanup_deploy | default(true)
+  when:
+    - screen_cleanup_deploy | default(true)
+    - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
-- name: 'Include screen_reaper in the pam session config of postlogin'
+- name: 'Include/remove screen_reaper.sh from PAM postlogin session'
   ansible.builtin.lineinfile:
     path: "/etc/authselect/custom/{{ stack_name }}/postlogin"
     state: "{{ pam_state }}"
@@ -110,6 +112,8 @@
     mode: '0644'
   vars:
     pam_state: "{% if screen_cleanup_deploy is defined and screen_cleanup_deploy %}present{% else %}absent{% endif %}"
+  when:
+    - inventory_hostname in groups['user_interface'] | default([])
   become: true
 
 - name: "Force enable authselect {{ stack_name }} profile."
@@ -124,8 +128,8 @@
              {% if inventory_hostname in groups['data_transfer'] | default([]) %}
                  with-login_checks_chrooted_home
              {% endif %}
-             {% if inventory_hostname in groups['jumphost'] | default([]) or
-                   inventory_hostname in groups['data_transfer'] | default([]) %}
+             {% if user_quota_on_root_partition is defined and
+                   user_quota_on_root_partition is not none %}
                  {% if hostvars[inventory_hostname]['ansible_mounts']
                        | selectattr('mount', 'equalto', '/')
                        | map(attribute='fstype')

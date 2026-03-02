@@ -4,7 +4,7 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'nb'
 stack_dtap_state: production
-slurm_version: '23.02.7-2.el9.umcg'
+slurm_version: '24.11.6-1.el9.umcg'
 slurm_partitions:
   - name: cpu_r6515  # Must be in sync with group listed in Ansible inventory.
     default: no
@@ -17,7 +17,7 @@ slurm_partitions:
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: gpu_a40  # Must be in sync with group listed in Ansible inventory.
     default: no
-    nodes: "{{ stack_prefix }}-node-b[01-02]"  # Must be in sync with Ansible hostnames listed in inventory.
+    nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
     max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['gpu_a40']|list|length }}{% else %}1{% endif %}"
     max_cores_per_node: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
     max_mem_per_node: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
@@ -26,7 +26,7 @@ slurm_partitions:
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.260G,GRES/gpu=3.75" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
     default: yes
-    nodes: "{{ stack_prefix }}-node-c[01-10]"  # Must be in sync with Ansible hostnames listed in inventory.
+    nodes: "{{ stack_prefix }}-node-c[01-11]"  # Must be in sync with Ansible hostnames listed in inventory.
     max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r630']|list|length }}{% else %}1{% endif %}"
     max_cores_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
     max_mem_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
@@ -65,6 +65,7 @@ slurm_qos_limit_fractions:
 cluster_class: 'research'
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
+rocky_vault_minorversion: '.6'
 figlet_font: 'ogre'
 motd: |
       ===============================================================
@@ -85,7 +86,7 @@ additional_etc_hosts:
         network: external
   - group: build_library
     nodes:
-      - name: vip_build
+      - name: rocky9-build
         network: vlan16
   - group: donbot_azure
     nodes:
@@ -95,7 +96,6 @@ additional_etc_hosts:
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
 ssh_client_configs:
-  - gearshift_cluster
   - vaxtron_cluster
 ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/umcg-hpc-development-ca"
 use_ldap: true
@@ -126,21 +126,7 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-    #
-    # LDAP is case insensitive, but we use lowercase only for quota field names,
-    # so we can use simple literal strings in comparisons as opposed to regexes
-    # to handle differences in UPPERCASE vs. lowercase.
-    #
-    # The UPPERCASE "LFS" in {{ ldap_domains[domain]['group_quota_*_limit_template'] }} Ansible variables
-    # is a required placeholder that will get replaced with the value of the Logical File System (LFS)
-    # for which we will try to fetch quota limits from the LDAP.
-    # E.g. with
-    #     group_quota_soft_limit_template: 'ruggroupumcgquotaLFSsoft'
-    # the fieldname/key used to lookup the soft quota limit for the prm01 LFS is
-    #     ruggroupumcgquotaprm01soft
-    #
-    group_quota_soft_limit_template: ruggroupumcgquotaLFSsoft
-    group_quota_hard_limit_template: ruggroupumcgquotaLFS
+    listserv_mailinglist: UMCG-HPC
 pam_weblogin:
   machines: "{{ groups['jumphost'] }}"
   excluded:
@@ -155,9 +141,9 @@ pam_weblogin:
   max_uid: "{{ ldap_domains['sram']['max_id'] }}"
   retries: 3
   cache_duration: 3600  # seconds
-cloud_image: RockyLinux-9.3_xfs
-cloud_user: cloud-user
+cloud_image: Rocky-9.5
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: vlan1338  # Internal management for VMs and BMs
     cidr: '172.23.69.0/24'
@@ -202,7 +188,6 @@ local_admin_users:
   - 'henkjan'
   - 'kim'
   - 'marieke'
-  - 'marloes'
   - 'max'
   - 'morris'
   - 'pieter'
@@ -218,6 +203,33 @@ hpc_env_prefix: '/apps'
 sponsors:
   - name: umcg-research-it
     slurm_shares: 100
+# Remote archive settings
+remote_archive:
+  - name: arc02
+    local_top_level_mount: '/groups'
+    groups:
+      - 'umcg-biogen'
+      - 'umcg-bios'
+      - 'umcg-fg'
+      - 'umcg-franke-scrna'
+    archive_user: 'pdeelen'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-fg'
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+  - name: arc03
+    local_top_level_mount: '/groups'
+    groups:
+      - 'umcg-lifelines'
+    archive_user: 'umcg-hpc-lifelines'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-hpc-lifelines'
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
 regular_groups:
   - name: "{{ data_transfer_only_group }}"
   - name: "{{ envsync_group }}"
@@ -236,11 +248,9 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-datateam'
     sponsor: umcg-research-it
-  - name: 'umcg-ejp-rd'
+  - name: 'umcg-endocrinology'
     sponsor: umcg-research-it
   - name: 'umcg-erdera'
-    sponsor: umcg-mswertz
-  - name: 'umcg-endocrinology'
     sponsor: umcg-research-it
   - name: 'umcg-fg'
     sponsor: umcg-research-it
@@ -357,8 +367,6 @@ regular_users:
     groups: ['umcg-dag3']
   - name: 'umcg-datateam-dm'
     groups: ['umcg-datateam']
-  - name: 'umcg-ejp-rd-dm'
-    groups: ['umcg-ejp-rd']
   - name: 'umcg-endocrinology-dm'
     groups: ['umcg-endocrinology']
   - name: 'umcg-erdera-dm'
@@ -435,6 +443,8 @@ regular_users:
     groups: ['umcg-rehabilitation']
   - name: 'umcg-reki-dm'
     groups: ['umcg-reki']
+  - name: 'umcg-respire-dm'
+    groups: ['umcg-respire']
   - name: 'umcg-solve-rd-dm'
     groups: ['umcg-solve-rd']
   - name: 'umcg-sommer-dm'
@@ -480,8 +490,6 @@ sudoers:
     become: 'umcg-dag3-dm'
   - who: ['%umcg-datateam']
     become: 'umcg-datateam-dm'
-  - who: ['%umcg-ejp-rd-dms']
-    become: 'umcg-ejp-rd-dm'
   - who: ['%umcg-endocrinology-dms']
     become: 'umcg-endocrinology-dm'
   - who: ['%umcg-erdera-dms']
@@ -562,6 +570,8 @@ sudoers:
     become: 'umcg-rehabilitation-dm'
   - who: ['%umcg-reki-dms']
     become: 'umcg-reki-dm'
+  - who: ['%umcg-respire-dms']
+    become: 'umcg-respire-dm'
   - who: ['%umcg-solve-rd-dms']
     become: 'umcg-solve-rd-dm'
   - who: ['%umcg-sommer-dms']
@@ -606,7 +616,6 @@ local_mount_subfolders:
           - umcg-bios
           - umcg-dag3
           - umcg-datateam
-          - umcg-ejp-rd
           - umcg-endocrinology
           - umcg-fg
           - umcg-franke-scrna
@@ -662,14 +671,14 @@ pfs_mounts:
   - pfs: umcgst01
     source: '172.23.15.186@tcp15:172.23.15.187@tcp15:/umcgdh5'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock'
+    ro_options: 'defaults,_netdev,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst02
     source: '172.23.57.213@tcp14:172.23.57.214@tcp14:/umcg'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock'
+    ro_options: 'defaults,_netdev,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: umcgst04/slice2
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
@@ -680,8 +689,8 @@ pfs_mounts:
   - pfs: umcgst04/slice3
     source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
     type: lustre
-    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
-    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60,x-systemd.automount,x-systemd.idle-timeout=600'
+    rw_options: 'defaults,_netdev,flock'
+    ro_options: 'defaults,_netdev,ro'
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
@@ -689,6 +698,7 @@ lfs_mounts:
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp02
     pfs: umcgst04/slice2
+    type: bind
     groups:
       - name: umcg-as
       - name: umcg-atd
@@ -697,7 +707,6 @@ lfs_mounts:
       - name: umcg-bios
       - name: umcg-dag3
       - name: umcg-datateam
-      - name: umcg-ejp-rd
       - name: umcg-endocrinology
       - name: umcg-fg
       - name: umcg-franke-scrna
@@ -749,6 +758,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm02
     pfs: umcgst01
+    type: bind
     groups:
       - name: umcg-as
       - name: umcg-atd
@@ -757,7 +767,6 @@ lfs_mounts:
       - name: umcg-bios
       - name: umcg-dag3
       - name: umcg-datateam
-      - name: umcg-ejp-rd
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
@@ -793,6 +802,7 @@ lfs_mounts:
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
+      - name: umcg-respire
       - name: umcg-solve-rd
       - name: umcg-sommer
       - name: umcg-surg
@@ -807,6 +817,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
+    type: bind
     groups:
       - name: umcg-as
       - name: umcg-atd
@@ -815,7 +826,6 @@ lfs_mounts:
       - name: umcg-bios
       - name: umcg-dag3
       - name: umcg-datateam
-      - name: umcg-ejp-rd
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
@@ -865,6 +875,7 @@ lfs_mounts:
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: rsc02
     pfs: umcgst04/slice3
+    type: bind
     groups:
       - name: umcg-atd
       - name: umcg-biogen
@@ -872,7 +883,6 @@ lfs_mounts:
       - name: umcg-bios
       - name: umcg-dag3
       - name: umcg-datateam
-      - name: umcg-ejp-rd
       - name: umcg-endocrinology
       - name: umcg-fg
       - name: umcg-franke-scrna

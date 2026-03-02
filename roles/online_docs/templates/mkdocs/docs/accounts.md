@@ -16,7 +16,7 @@ Hence your public key cannot be _compromised_, because it's intended to be publi
 The private key on the other hand must be private; if it gets stolen your account is compromised and can be abused.
 Therefore, [contact us](../contact/) immediately if you ever suspect your private key may have been stolen/copied!
 
-For additional details and background see [WikiPedia: Asymmetric Key Cryptography](http://en.wikipedia.org/wiki/Public-key_cryptography)
+For additional details and background see [WikiPedia: Asymmetric Key Cryptography](http://en.wikipedia.org/wiki/Public-key_cryptography).
 
 When you try to login you use the private key on the client side to encrypt a small piece of data containing a request to login.
 The cluster uses your public key on the server side to decrypt the login request: if this was successful the server has verified that you have the private key corresponding to the public key and will let you in.
@@ -44,3 +44,7 @@ Use the instructions for your operating system:
  * Instructions for [Windows clients](../generate-key-pair-mobaxterm/).
  * Instructions for [macOS clients](../generate-key-pair-openssh/).
  * Instructions for [Linux/Unix clients](../generate-key-pair-openssh/).
+
+## 3. Request an account via email
+
+**[Follow the instructions](request-an-account.md)**

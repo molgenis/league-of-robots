@@ -2,8 +2,20 @@
 stack_prefix: 'db'
 stack_domain: 'donbot'
 stack_name: "{{ stack_domain }}_azure"  # stack_name must match the name of the folder that contains this vars.yml file.
-repo_manager: 'none'
 os_distribution: 'rocky9'
+repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+managed_yum_repos:
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog', 'ltb', 'perun'])
+              | map(attribute='id') }}"
 azure_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
@@ -24,26 +36,18 @@ local_admin_groups:
 local_admin_users:
   - 'gerben'
   - 'marieke'
-  - 'marloes'
   - 'morris'
   - 'pieter'
   - 'sandi'
-use_sssd: true
 use_ldap: false
 create_ldap: false
+use_sssd: true
+
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
 #
 external_jumphosts:
-  - group: nibbler_cluster
-    hosts:
-      - hostname: tunnel
-        network: vlan16
-  - group: gearshift_cluster
-    hosts:
-    - hostname: airlock
-      network: vlan16
   - group: talos_cluster
     hosts:
       - hostname: reception
@@ -56,6 +60,14 @@ external_jumphosts:
     hosts:
       - hostname: corridor
         network: public
+  - group: nibbler_cluster
+    hosts:
+      - hostname: tunnel
+        network: vlan16
+  - group: vaxtron_cluster
+    hosts:
+      - hostname: foyer
+        network: external
   - group: wingedhelix_cluster
     hosts:
       - hostname: wh-porch
@@ -68,4 +80,8 @@ external_jumphosts:
     hosts:
       - hostname: cf-porch
         network: external
+  - group: logs_library
+    hosts:
+      - hostname: hatch
+        network: logs_external_public
 ...

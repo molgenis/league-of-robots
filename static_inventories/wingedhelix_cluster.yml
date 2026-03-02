@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
@@ -48,7 +48,44 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-          local_volume_size_extra: 8300
+          local_yum_repository: true  # For nhc_standalone.
+          local_volume_extra:
+            - name: groups1
+              size: 1536
+            - name: groups2
+              size: 1536
+            - name: groups3
+              size: 1536
+            - name: groups4
+              size: 1536
+            - name: groups5
+              size: 1536
+            - name: groups6
+              size: 1536
+            - name: groups7
+              size: 1536
+            - name: groups8
+              size: 1536
+          local_mounts:
+            - mount_point: '/groups'
+              device: '/dev/md0'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
+              type: ext4
+              md:
+                raid_level: 0
+                raid_devices: 8
+                component_devices:
+                  - /dev/vdb
+                  - /dev/vdc
+                  - /dev/vdd
+                  - /dev/vde
+                  - /dev/vdf
+                  - /dev/vdg
+                  - /dev/vdh
+                  - /dev/vdi
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -59,8 +96,8 @@ all:
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
@@ -76,8 +113,8 @@ all:
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
@@ -92,8 +129,8 @@ all:
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['bb_internal_management'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb_internal_management-vlan16-router']['vlan16'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
+            - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
@@ -125,7 +162,10 @@ all:
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp6s0
-          local_volume_size_extra: 3072
+          local_volume_extra:
+            - name: umcgst12
+              size: 3072
+          postfix_hostname: "{{ listserv_domain_name }}"
     deploy_admin_interface:
       hosts:
         wh-dai:
@@ -146,7 +186,9 @@ all:
                 name: enp5s0
               lnet:
                 name: tcp20
-          local_volume_size_extra: 2000
+          local_volume_extra:
+            - name: apps
+              size: 2000
     ldap_server:
       hosts:
         wh-dai:
@@ -198,7 +240,9 @@ all:
                   name: enp5s0
                 lnet:
                   name: tcp20
-            local_volume_size_extra: 1
+            local_volume_extra:
+              - name: local
+                size: 1
             slurm_sockets: 63
             slurm_cores_per_socket: 1
             slurm_real_memory: 491355
@@ -268,7 +312,7 @@ cluster:
     administration:
 wingedhelix_cluster:
   children:
-    openstack_api:
+    controller_api:
     jumphost:
     repo:
     cluster:

@@ -8,16 +8,16 @@
   ansible.builtin.shell: |
          timestamp="$(date '+%Y-%m-%dT%H:%M:%S%z')"
          cp -v '/boot/grub2/grub.cfg' "/boot/grub2/grub.cfg.ansible_backup_${timestamp}"
-         grub2-mkconfig -o '/boot/grub2/grub.cfg'
+         grub2-mkconfig --update-bls-cmdline -o '/boot/grub2/grub.cfg'
   args:
     executable: '/bin/bash'
   changed_when: true
   become: true
-  listen: rebuild_grub_config
+  listen: rebuild_grub_config_by_logins_role
 
 - name: 'Reboot to activate updated GRUB config.'
   ansible.builtin.reboot:
-    msg: 'Reboot initiated by Ansible role logins from League of Robots playbook/repo.'
+    msg: 'Reboot initiated by Ansible "logins" role from League of Robots playbook/repo.'
   become: true
-  listen: rebuild_grub_config
+  listen: rebuild_grub_config_by_logins_role
 ...

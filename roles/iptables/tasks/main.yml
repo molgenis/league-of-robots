@@ -31,6 +31,10 @@
   loop: "{{ kernel_network_tweaks }}"
   become: true
 
+- name: Update network facts to make sure we have the correct network interface names.
+  ansible.builtin.setup:
+    gather_subset: '!all,!min,network'
+
 - name: Create lists of public IP addresses.
   ansible.builtin.set_fact:
     public_ip_addresses: "{{ ansible_facts | dict2items

@@ -13,8 +13,6 @@ use_ldap: true  # needed for the sshd template
 #    user_object_class: posixAccount
 #    user_ssh_public_key_attr: sshPublicKey
 #    group_object_class: ''
-#    group_quota_soft_limit_template: ''
-#    group_quota_hard_limit_template: ''
 #
 # Example of structure of ldap_credentials variable in group_vars/.../secrets.yml
 # At least a read-only account is required to query the LDAP.

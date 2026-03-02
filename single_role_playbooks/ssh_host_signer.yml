@@ -5,7 +5,7 @@
     - ssh_host_signer
 
 - name: Deploy ssh_host_signer role on machines behind jumphosts.
-  hosts: all,!jumphost,!openstack_api,!mit_chaperone
+  hosts: all,!jumphost,!controller_api,!mit_chaperone
   roles:
     - ssh_host_signer
 ...

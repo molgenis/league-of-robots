@@ -1,117 +1,121 @@
 ---
 all:
   children:
-    openstack_api:
+    controller_api:
       hosts:
         localhost:
           ansible_python_interpreter: /usr/bin/env python
     jumphost:
       hosts:
         foyer:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           local_yum_repository: true
     repo:
       hosts:
         vt-repo:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
           swap_file_size: 2
     data_transfer:
       hosts:
 #        vt-transfer:
-#          cloud_flavor: general.v1.small
+#          cloud_flavor: umcg.v1.vm.1-2
 #          host_networks:
 #            - name: "{{ stack_prefix }}_internal_management"
 #              security_group: "{{ stack_prefix }}_ds"
 #              assign_floating_ip: true
 #              add_hostname_to_ip_address: true
-#          local_volume_size_extra: 10000
+#          local_volume_extra:
+#            - name: groups
+#              size: 10000
     docs:
       hosts:
         docs-on-bateleur:
     sys_admin_interface:
       hosts:
         vt-sai:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
             - name: DH4 Lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens4
+                name: enp4s0
               lnet:
                 name: tcp14
             - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens5
+                name: enp5s0
               lnet:
                 name: tcp15
     deploy_admin_interface:
       hosts:
         vt-dai:
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
             - name: DH4 Lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens4
+                name: enp4s0
               lnet:
                 name: tcp14
             - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens5
+                name: enp5s0
               lnet:
                 name: tcp15
-          local_volume_size_extra: 1000
+          local_volume_extra:
+            - name: apps
+              size: 1000
     user_interface:
       hosts:
         vaxtron:
-          cloud_flavor: general.v1.medium
+          cloud_flavor: umcg.v1.vm.16-64
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
             - name: DH4 Lustre
-              security_gro up: "{{ stack_prefix }}_storage"
+              security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens4
+                name: enp4s0
               lnet:
                 name: tcp14
             - name: lustre
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens5
+                name: enp5s0
               lnet:
                 name: tcp15
-          slurm_sockets: 7
+          slurm_sockets: 16
           slurm_cores_per_socket: 1
-          slurm_real_memory: 31072
+          slurm_real_memory: 63786
           slurm_local_disk: 0
           slurm_features: 'prm02,prm03,rsc04,tmp04'
     compute_node:
@@ -150,10 +154,9 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 32
-              slurm_real_memory: 2063196
+              slurm_real_memory: 2063193
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 3420400
@@ -193,10 +196,9 @@ all:
                       ,nofail,x-systemd.device-timeout=10
                     {%- endif -%}
                   type: ext4
-              local_volume_size_extra: 0  # No extra virtual disk present on bare metal nodes.
               slurm_sockets: 2
               slurm_cores_per_socket: 96
-              slurm_real_memory: 768000
+              slurm_real_memory: 773020
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 2850100
@@ -212,7 +214,7 @@ cluster:
     administration:
 vaxtron_cluster:
   children:
-    openstack_api:
+    controller_api:
     jumphost:
     repo:
     cluster:

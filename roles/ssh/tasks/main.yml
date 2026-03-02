@@ -27,14 +27,7 @@
     line: 'Include /etc/ssh/ssh_config.d/*.conf'
   become: true
 
-- name: Configure ssh client for external stack.
+- name: Configure ssh client for all external stacks.
   ansible.builtin.include_tasks:
-    file: configure_ssh_client_for_external_stack.yml
-  vars:
-    external_stack: "{{ item }}"
-  when:
-    - ssh_client_configs is defined
-    - inventory_hostname in groups['jumphost'] | default([]) or
-      inventory_hostname in groups['cluster'] | default([])
-  loop: "{{ ssh_client_configs }}"
+    file: configure_ssh_client_for_other_stacks.yml
 ...

@@ -1,0 +1,56 @@
+---
+- name: Install s-nail.
+  ansible.builtin.package:
+    name:
+      - s-nail
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Create directories for mailinglists script.
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0750'
+    owner: 'root'
+    group: 'root'
+  with_items:
+    - '/root/mailinglists'
+    - '/root/mailinglists/listserv_backups'
+  become: true
+
+- name: Copy listserv script.
+  ansible.builtin.template:
+    src: 'templates/LDAP2LISTSERV.bash'
+    dest: '/root/mailinglists/LDAP2LISTSERV.bash'
+    owner: 'root'
+    group: 'root'
+    mode: '0750'
+  become: true
+
+- name: Create cron job to manage mailing list subscriptions without creating backups.
+  ansible.builtin.cron:
+    name: Manage mailing list subscriptions without creating backups.
+    weekday: '*'
+    hour: '12,15,18'
+    minute: '15'
+    user: 'root'
+    job: |
+         /bin/bash -c '/root/mailinglists/LDAP2LISTSERV.bash -l ERROR -u -n 2>&1  | /bin/logger'
+    cron_file: 'ldap-2-mailinglists'
+    disabled: false
+  become: true
+
+- name: Create cron job to manage mailing list subscriptions and create backup.
+  ansible.builtin.cron:
+    name: Manage mailing list subscriptions and create backup.
+    weekday: '*'
+    hour: '09'
+    minute: '15'
+    user: 'root'
+    job: |
+         /bin/bash -c '/root/mailinglists/LDAP2LISTSERV.bash -l ERROR -u -n -b /root/mailinglists/listserv_backups 2>&1 | /bin/logger'
+    cron_file: 'ldap-2-mailinglists'
+    disabled: false
+  become: true
+...

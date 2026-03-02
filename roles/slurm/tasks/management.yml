@@ -54,12 +54,16 @@
   become: true
 
 - name: 'Install logrotate config file for slurmctld and slurmdbd.'
-  ansible.builtin.copy:
-    src: "files/logrotate_slurm"
-    owner: 'root'
-    group: 'root'
-    mode: '0644'
+  ansible.builtin.template:
+    src: 'templates/logrotate_slurm.j2'
     dest: '/etc/logrotate.d/slurm'
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    slurm_daemons:
+      - slurmdbd
+      - slurmctld
   become: true
 
 - name: 'Install munge.key file.'
@@ -202,6 +206,7 @@
 
 - name: 'Install Slurm job_submit.lua script.'
   ansible.builtin.template:
+    # noqa: jinja[spacing]
     src: "job_submit.lua.el
          {%- if ansible_facts['distribution_major_version'] is version('8', '>=') -%}
            8

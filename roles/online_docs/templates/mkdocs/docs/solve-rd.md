@@ -1,5 +1,5 @@
 #jinja2: trim_blocks:False
-{% if 'hyperchicken' in slurm_cluster_name or 'fender' in slurm_cluster_name %}
+{% if 'fender' in slurm_cluster_name %}
 # How to find and work with Solve-RD data on {{ slurm_cluster_name | capitalize }}
 
 #### First: getting an account and starting a session on a User Interface (UI) server
