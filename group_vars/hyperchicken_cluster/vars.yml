@@ -88,8 +88,6 @@ ldap_domains:
     user_object_class: posixAccount
     user_name: uid
     user_ssh_public_key: sshPublicKey
-    user_member_of: member
-    group_object_class: groupofnames
     user_member_of: groupMembership
     user_expiration_date: loginExpirationTime
     group_member: memberUid
