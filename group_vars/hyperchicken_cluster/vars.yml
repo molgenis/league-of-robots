@@ -90,6 +90,9 @@ ldap_domains:
     user_ssh_public_key: sshPublicKey
     user_member_of: member
     group_object_class: groupofnames
+    user_member_of: groupMembership
+    user_expiration_date: loginExpirationTime
+    group_member: memberUid
   ladap:
     # must be FQDN or certificate authentication with LDAP server fails
     uri: ldaps://ladap.westeurope.cloudapp.azure.com
