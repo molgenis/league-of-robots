@@ -53,7 +53,12 @@ all:
           iptables_allow_ssh_outbound:
             - ANY
           iptables_allow_icmp_inbound: "{{ iptables_allow_ssh_inbound }}"
-          iptables_allow_ldap_inbound: "{{ iptables_allow_ssh_inbound }}"
+          iptables_allow_ldap_inbound:
+            - ANY
+          iptables_allow_http_inbound:
+            - ANY
+          iptables_allow_https_inbound:
+            - ANY
           perun_facility_name: "umcg-gcc"
           perun_service_whitelist: "ldap_lsaai"
 administration:
