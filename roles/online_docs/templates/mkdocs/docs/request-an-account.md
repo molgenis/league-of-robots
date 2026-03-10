@@ -4,7 +4,7 @@
 
 ## Instructions
 
-**Copy the template mail below and fill in all the fields** (the yes/no field should be answered with either yes OR no).
+**Copy the e-mail template below and fill in all the fields.** (The yes/no field should be answered with either yes OR no.)
 If everything is filled in, please send it back to the [HPC helpdesk](../contact/) and request access of the group owners (preferably in the same email by cc'ing (all) the group owner(s).
 
 **NOTE**
