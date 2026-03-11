@@ -354,7 +354,7 @@ regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
   - name: 'umcg-adorable-dm'
-    groups: ['umcg-adorable'
+    groups: ['umcg-adorable']
   - name: 'umcg-vipbot'
     groups: ['umcg-as']
   - name: 'umcg-as-dm'
