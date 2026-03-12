@@ -478,7 +478,7 @@ regular_users:
   - name: 'umcg-wijmenga-dm'
     groups: ['umcg-wijmenga']
 sudoers:
-  - who: ['%umcg-adorable']
+  - who: ['%umcg-adorable-dms']
     become: 'umcg-adorable-dm'
   - who: ['%umcg-as']
     become: 'umcg-capicebot'
