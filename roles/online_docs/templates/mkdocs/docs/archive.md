@@ -223,7 +223,7 @@ Therefore
 
 The average size is monitored and the groups with average size lower than this will have **locked accounts**.
 
-Data should ideally be uploaded sequentially rather than in parallel. While not a strict requirement, this approach is highly recommended to keep the load at manageable levels. Since the archive is a shared remote storage used by multiple teams, it has more limited bandwidth compared to local storage.
+To keep storage and network load manageable, upload data sequentially rather than in parallel. Note that archive is a _remote_, _shared_ storage system used by multiple teams. As such, it has less bandwidth compared to the other cluster storage systems.
 
 ## 6. Performance
 
