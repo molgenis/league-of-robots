@@ -192,6 +192,7 @@
     group: 'root'
     mode: '0644'
   notify: 'restart_slurmctld'
+  tags: 'gres.conf'
   become: true
 
 - name: 'Install Slurm DBD config file.'
@@ -202,6 +203,7 @@
     group: 'slurm'
     mode: '0600'
   notify: 'reload_slurmdbd'
+  tags: 'slurmdbd.conf'
   become: true
 
 - name: 'Install Slurm job_submit.lua script.'
