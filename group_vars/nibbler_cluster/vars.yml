@@ -897,7 +897,6 @@ lfs_mounts:
     pfs: umcgst04/slice3
     type: bind
     groups:
-      - name: umcg-adorable
       - name: umcg-atd
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
@@ -906,7 +905,6 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-endocrinology
       - name: umcg-fg
-      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
