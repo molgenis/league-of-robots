@@ -158,6 +158,7 @@
     mode: '0644'
   notify:
     - 'restart_slurmd'
+  tags: 'slurm.conf'
   become: true
 
 - name: 'Install Slurm GRES config file.'
@@ -168,6 +169,7 @@
     group: 'root'
     mode: '0644'
   notify: 'restart_slurmd'
+  tags: 'gres.conf'
   become: true
 
 - name: 'Configure cgroups.'
@@ -192,6 +194,7 @@
         (inventory_hostname in groups['compute_node'])
   tags:
     - nhc
+    - nhc.conf
     - groups
   become: true
 

@@ -227,6 +227,8 @@ regular_groups:
   - name: "{{ data_transfer_only_group }}"
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
+  - name: 'umcg-adorable'
+    sponsor: umcg-research-it
   - name: 'umcg-as'
     sponsor: umcg-mswertz
   - name: 'umcg-atd'
@@ -247,6 +249,8 @@ regular_groups:
     sponsor: umcg-mswertz
   - name: 'umcg-fg'
     sponsor: umcg-lfranke
+  - name: 'umcg-forcespe'
+    sponsor: umcg-research-it
   - name: 'umcg-franke-scrna'
     sponsor: umcg-lfranke
   - name: 'umcg-fu'
@@ -344,6 +348,8 @@ regular_groups:
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
+  - name: 'umcg-adorable-dm'
+    groups: ['umcg-adorable']
   - name: 'umcg-capicebot'
     groups: ['umcg-as']
   - name: 'umcg-vipbot'
@@ -370,6 +376,8 @@ regular_users:
     groups: ['umcg-erdera']
   - name: 'umcg-fg-dm'
     groups: ['umcg-fg']
+  - name: 'umcg-forcespe-dm'
+    groups: ['umcg-forcespe']
   - name: 'umcg-franke-scrna-dm'
     groups: ['umcg-franke-scrna']
   - name: 'umcg-fu-dm'
@@ -467,6 +475,8 @@ regular_users:
   - name: 'umcg-wijmenga-dm'
     groups: ['umcg-wijmenga']
 sudoers:
+  - who: ['%umcg-adorable-dms']
+    become: 'umcg-adorable-dm'
   - who: ['%umcg-as']
     become: 'umcg-capicebot'
   - who: ['%umcg-as']
@@ -495,6 +505,8 @@ sudoers:
     become: 'umcg-gcc-dm'
   - who: ['%umcg-fg-dms']
     become: 'umcg-fg-dm'
+  - who: ['%umcg-forcespe-dms']
+    become: 'umcg-forcespe-dm'
   - who: ['%umcg-franke-scrna-dms']
     become: 'umcg-franke-scrna-dm'
   - who: ['%umcg-fu-dms']
@@ -648,6 +660,7 @@ lfs_mounts:
     pfs: umcgst06
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -657,6 +670,7 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -698,6 +712,7 @@ lfs_mounts:
     pfs: umcgst01
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -708,6 +723,7 @@ lfs_mounts:
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -757,6 +773,7 @@ lfs_mounts:
     pfs: umcgst02
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -767,6 +784,7 @@ lfs_mounts:
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
