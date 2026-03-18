@@ -410,7 +410,7 @@ regular_users:
   - name: 'umcg-hematology-dm'
     groups: ['umcg-hematology']
   - name: 'umcg-hgsvc-dm'
-    groups: ['umcg-hgsvc'
+    groups: ['umcg-hgsvc']
   - name: 'umcg-hlhs-dm'
     groups: ['umcg-hlhs']
   - name: 'umcg-immunogenetics-dm'
