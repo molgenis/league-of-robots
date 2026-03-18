@@ -282,6 +282,8 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-hematology'
     sponsor: umcg-research-it
+  - name: 'umcg-hgsvc'
+    sponsor: umcg-research-it
   - name: 'umcg-hlhs'
     sponsor: umcg-research-it
   - name: 'umcg-immunogenetics'
@@ -407,6 +409,8 @@ regular_users:
     groups: ['umcg-gsad']
   - name: 'umcg-hematology-dm'
     groups: ['umcg-hematology']
+  - name: 'umcg-hgsvc-dm'
+    groups: ['umcg-hgsvc'
   - name: 'umcg-hlhs-dm'
     groups: ['umcg-hlhs']
   - name: 'umcg-immunogenetics-dm'
@@ -538,6 +542,8 @@ sudoers:
     become: 'umcg-gsad-dm'
   - who: ['%umcg-hematology-dms']
     become: 'umcg-hematology-dm'
+  - who: ['%umcg-hgsvc-dms']
+    become: 'umcg-hgsvc-dm'
   - who: ['%umcg-hlhs-dms']
     become: 'umcg-hlhs-dm'
   - who: ['%umcg-immunogenetics-dms']
@@ -645,6 +651,7 @@ local_mount_subfolders:
           - umcg-grip
           - umcg-gsad
           - umcg-hematology
+          - umcg-hgsvc
           - umcg-impact
           - umcg-intercept
           - umcg-lifelines
@@ -737,6 +744,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -800,6 +808,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -861,6 +870,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -917,6 +927,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
