@@ -167,7 +167,7 @@ lfs_quota:
       umcg-grip: 1024
       umcg-gsad: 1024
       umcg-hematology: 3072
-      umcg-hgsvc 2048
+      umcg-hgsvc: 2048
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
