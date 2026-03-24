@@ -12,8 +12,7 @@ local_mount_subfolders:
     machines: "{{ groups['compute_node'] }}"
     folders:
       - rel_paths:
-          - apps
-          - apps/data
+          - cache
         mode: '2755'
         owner: "{{ envsync_user }}"
         group: "{{ envsync_group }}"
