@@ -101,6 +101,7 @@
 - name: "Check if ssh public key for the {{ envsync_user }} user was added to the account management system."
   ansible.builtin.shell:
     cmd: |
+         set -o pipefail
          "{{ get_public_keys_command }}" "{{ envsync_user }}" \
          | fgrep -f "/home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}.pub"
   register: envsync_user_authorized_public_keys
