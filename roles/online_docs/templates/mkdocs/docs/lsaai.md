@@ -34,7 +34,7 @@ If your organization is not yet a member of LSAAI community, you will need to wa
 
 Account can be be simply created at [LifeScience Login](https://perun.aai.lifescience-ri.eu/login)
 
-![1. Login](img/lsaai_user_1.png) 
+![1. Login](img/lsaai_user_1.png)
 
  - Select your organization and Login
    ![2. Select organization](img/lsaai_user_2.png) 
