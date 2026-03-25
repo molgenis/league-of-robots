@@ -14,14 +14,14 @@ It allows researchers to use a single digital identity—leveraging their existi
 
 It provides following key functions
 
-* **User management**
-    * Identity Consolidation: Link multiple login methods (like your university account and ORCID) into one persistent Life Science ID
-    * Access credentials management: allows users to self-manage their SSH public keys for remote server access
-* **Virtual Organization (VO) Management**
-    * Facailitates separated environments for communities and projects: called Virtual Organizations
-    * VO allows fully managing user access and group management - independant of the rest of LSAAI community
-* **Resource Authorization**
-    * Control which groups or individuals have permission to use specific services or datasets across different research infrastructures
+- **User management**
+    - Identity Consolidation: Link multiple login methods (like your university account and ORCID) into one persistent Life Science ID
+    - Access credentials management: allows users to self-manage their SSH public keys for remote server access
+- **Virtual Organization (VO) Management**
+    - Provide separated environments for communities and projects, outside of the main LSAAI community
+    - VO allows full control over managing user access and groups
+- **Resource Authorization**
+    - Control which groups or individuals have permission to use specific services or datasets across different research infrastructures
 
 ## 2. Regular users
 
@@ -31,17 +31,19 @@ To request access to the **GGCC Virtual Organization (VO)**, you must first poss
 
 The registration process varies depending on your home organization. 
 
-- **For RUG and UMCG Members**
+- i. **For RUG and UMCG Members**
 
     University of Groningen (RUG) and UMCG are already members of the LSAAI community.
-  - **Timeline:** Account creation takes only a few minutes.
-  - **Process:** Select your organization from the list and log in with your institutional credentials.
+
+    - **Timeline:** Account creation takes only a few minutes.
+    - **Process:** Select your organization from the list and log in with your institutional credentials.
 
 - **For Other Organizations**
 
     If your organization is not yet a member of the LSAAI community
-  - **Approval:** You must wait for manual access approval by LSAAI administrators.
-  - **Requirements:** Admins may contact you to request additional information.
+
+    - **Approval:** You must wait for manual access approval by LSAAI administrators.
+    - **Requirements:** Admins may contact you to request additional information.
 
 ---
 
