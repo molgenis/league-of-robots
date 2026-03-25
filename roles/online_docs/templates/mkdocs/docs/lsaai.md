@@ -31,7 +31,7 @@ To request access to the **GGCC Virtual Organization (VO)**, you must first poss
 
 The registration process varies depending on your home organization. 
 
-- i. **For RUG and UMCG Members**
+- **For RUG and UMCG Members**
 
     University of Groningen (RUG) and UMCG are already members of the LSAAI community.
 
@@ -69,11 +69,14 @@ Once your account is created and you log in to LifeScience, you may see a messag
 #### Option A: Join the GGCC Virtual Organization
 
 You can request general membership by visiting the registrar:
+
 * **Link:** [Request GGCC Membership](https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc) ([image 9](img/lsaai_user_9.png))
 * Follow the prompts to join the VO and specific groups as needed.
 
 #### Option B: Join via Invitation Link
+
 If a project lead has provided you with a **specific group invitation link**:
+
 * Clicking the link will automatically generate an access request on your behalf.
 * You should see a confirmation: *"You have successfully applied for membership."*
 
