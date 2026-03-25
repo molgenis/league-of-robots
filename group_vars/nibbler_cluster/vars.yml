@@ -640,7 +640,6 @@ local_mount_subfolders:
           - umcg-forcespe
           - umcg-franke-scrna
           - umcg-fu
-          - umcg-gaf
           - umcg-gap
           - umcg-gastrocol
           - umcg-gcc
