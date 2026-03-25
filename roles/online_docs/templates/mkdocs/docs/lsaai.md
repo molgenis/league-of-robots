@@ -13,46 +13,85 @@ It allows researchers to use a single digital identity—leveraging their existi
 ### 1.2. Key Functions
 
 It provides following key functions
- - User management:
+
+ - **User management**
    - Identity Consolidation: Link multiple login methods (like your university account and ORCID) into one persistent Life Science ID
    - Access credentials management: allows users to self-manage their SSH public keys for remote server access
- - Virtual Organization (VO) Management:
+ - **Virtual Organization (VO) Management**
    - Facailitates separated environments for communities and projects: called Virtual Organizations
    - VO allows fully managing user access and group management - independant of the rest of LSAAI community
- - Resource Authorization
+ - **Resource Authorization**
    - Control which groups or individuals have permission to use specific services or datasets across different research infrastructures
 
 ## 2. Regular user
 
-## 2.1 Creating an account
+To request access to the **GGCC Virtual Organization (VO)**, you must first possess a **LifeScience AAI (LSAAI)** account.
 
-In order to request an access to the GGCC Virtual Organization, user must own an LSAAI account.
+### 2.1. Create your LSAAI Account
 
-If you are a member (an employee or a student) of an organization that is already a member of LSAAI community, then creation of an account is a matter of few clicks, and can be done within a few minutes. UMCG and RUG are already a members.
+The registration process varies depending on your home organization. 
 
-If your organization is not yet a member of LSAAI community, you will need to wait for an access approval by admins of LSAAI. They might ask for extra infromation.
+#### For RUG and UMCG Members
 
-Account can be be simply created at [LifeScience Login](https://perun.aai.lifescience-ri.eu/login) (see [image 1](img/lsaai_user_1.png))
+University of Groningen (RUG) and UMCG are already members of the LSAAI community. 
 
- - Select your organization and Login (see [image 2](img/lsaai_user_2.png))
- - If you don't have account, you will receive `No user account found` (see [image 3](img/lsaai_user_3.png)) > Click on `Proceed to register for an account`.
-   - Fill out the application to join LifeScience community LSAAI (see [image 4](img/lsaai_user_4.png))
-   - Accept use policy and `Submit` (see [image 5](img/lsaai_user_5.png))
- - Email verification (see [image 6](img/lsaai_user_6.png)) > check your inbox and follow the link to verify an account (see [image 7](img/lsaai_user_7.png)
-   (If your organization is not yet part of LifeScience community, you might need to Wait for the account approval.)
- - Once account is crated
-   - Go to [LifeScience Login](https://perun.aai.lifescience-ri.eu/login)
-   - Now you will see: `Login, but no service available yet` (see [image 8](img/lsaai_user_8.png)).
+ - **Timeline:** Account creation takes only a few minutes.
+ - **Process:** Select your organization from the list and log in with your institutional credentials.
 
-You can choose, to either request accessa (see [image 9](img/lsaai_user_9.png)) to
+#### For Other Organizations
 
-- `GGCC` Virtual organization
-  Alternatively request to join GGCC Virtual Organization by following the link to request https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc and request to join group after that
+If your organization is not yet a member of the LSAAI community:
 
-- Specific group
-  In case you already have invitation link to specific group, request directly to join the group. Visiting the link will automatically create an access request on your behalf. `You should see: You have successfully applied for membership`
+ - **Approval:** You must wait for manual access approval by LSAAI administrators.
+ - **Requirements:** Admins may contact you to request additional information.
 
-In both cases, you will have access to the HPC groups once group administrators approve your request - you should also receive email stating this.
+---
+
+### 2.2. Step-by-Step Registration
+
+Follow these steps to set up your identity:
+
+1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://aai.lifescience-ri.eu/) page.  
+    [LifeScience Login](img/lsaai_user_1.png)
+2.  **Select Organization** Choose your home institution and log in.  
+    [Select Organization](img/lsaai_user_2.png)
+3.  **Register New Account** If no account is found, you will see a "No user account found" message. Click **Proceed to register for an account**.  
+    [No account found](img/lsaai_user_3.png)
+4.  **Fill Application** Complete the application form to join the LifeScience LSAAI community.  
+    [Application form](img/lsaai_user_4.png)
+5.  **Accept Policies** Accept the Acceptable Use Policy and click **Submit**.  
+    [Policy acceptance](img/lsaai_user_5.png)
+6.  **Verify Email** Check your inbox for a verification email and follow the link to activate your account.  
+    [Email verification](img/lsaai_user_7.png)
+
+**If your organization is not part of the LifeScience community, you may need to wait** for administrative approval before proceeding to the next step.
+
+---
+
+### 2.3. Requesting GGCC VO Access
+
+Once your account is created and you log in to LifeScience, you may see a message stating: *"Login, but no service available yet"* ([Image 8](img/lsaai_user_8.png)). You must now join the GGCC Virtual Organization.
+
+#### Option A: Join the GGCC Virtual Organization
+
+You can request general membership by visiting the registrar:
+* **Link:** [Request GGCC Membership](https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc)
+* Follow the prompts to join the VO and specific groups as needed.
+
+#### Option B: Join via Invitation Link
+If a project lead has provided you with a **specific group invitation link**:
+* Clicking the link will automatically generate an access request on your behalf.
+* You should see a confirmation: *"You have successfully applied for membership."*
+
+---
+
+### 2.4. Final Approval
+
+In both cases, access to **HPC groups** is granted only after **group administrators** approve your request. 
+
+* You will receive a notification email once your access has been provisioned.
+* You can then proceed to use the GGCC computing resources.
+
 
 ## 3. Group managers
 
@@ -65,4 +104,5 @@ In both cases, you will have access to the HPC groups once group administrators 
 ### 3.3. Removing user from a group
 
 ## 4. Best practices
+
 
