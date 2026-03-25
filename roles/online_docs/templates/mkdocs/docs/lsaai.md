@@ -51,12 +51,12 @@ The registration process varies depending on your home organization.
 
 Follow these steps to set up your identity:
 
-1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://aai.lifescience-ri.eu/) page. ([screenshot 1](img/lsaai_user_1.png))
-2.  **Select Organization** Choose your home institution and log in. ([screenshot 2](img/lsaai_user_2.png))
-3.  **Register New Account** If no account is found, you will see a "No user account found" message. Click **Proceed to register for an account**.   ([screnshot 3](img/lsaai_user_3.png))
-4.  **Fill Application** Complete the application form to join the LifeScience LSAAI community. ([screenshot 4](img/lsaai_user_4.png))
-5.  **Accept Policies** Accept the Acceptable Use Policy and click **Submit**. ([screenshot 5](img/lsaai_user_5.png))
-6.  **Verify Email** Check your inbox for a verification email and follow the link to activate your account. ([schreenshot 6](img/lsaai_user_7.png))
+1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://aai.lifescience-ri.eu/) page. ([image 1](img/lsaai_user_1.png))
+2.  **Select Organization** Choose your home institution and log in. ([image 2](img/lsaai_user_2.png))
+3.  **Register New Account** If no account is found, you will see a "No user account found" message. Click **Proceed to register for an account**.   ([image 3](img/lsaai_user_3.png))
+4.  **Fill Application** Complete the application form to join the LifeScience LSAAI community. ([image 4](img/lsaai_user_4.png))
+5.  **Accept Policies** Accept the Acceptable Use Policy and click **Submit**. ([image 5](img/lsaai_user_5.png))
+6.  **Verify Email** Check your inbox for a verification email and follow the link to activate your account. ([image 6](img/lsaai_user_7.png))
 
 **If your organization is not part of the LifeScience community, you may need to wait** for administrative approval before proceeding to the next step.
 
@@ -64,12 +64,12 @@ Follow these steps to set up your identity:
 
 ### 2.3. Requesting GGCC VO Access
 
-Once your account is created and you log in to LifeScience, you may see a message stating: *"Login, but no service available yet"* ([Image 8](img/lsaai_user_8.png)). You must now join the GGCC Virtual Organization.
+Once your account is created and you log in to LifeScience, you may see a message stating: *"Login, but no service available yet"* ([image 8](img/lsaai_user_8.png)). You must now join the GGCC Virtual Organization.
 
 #### Option A: Join the GGCC Virtual Organization
 
 You can request general membership by visiting the registrar:
-* **Link:** [Request GGCC Membership](https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc)
+* **Link:** [Request GGCC Membership](https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc) ([image 9](img/lsaai_user_9.png))
 * Follow the prompts to join the VO and specific groups as needed.
 
 #### Option B: Join via Invitation Link
