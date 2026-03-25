@@ -32,40 +32,22 @@ If you are a member (an employee or a student) of an organization that is alread
 
 If your organization is not yet a member of LSAAI community, you will need to wait for an access approval by admins of LSAAI. They might ask for extra infromation.
 
-Account can be be simply created at [LifeScience Login](https://perun.aai.lifescience-ri.eu/login)
+Account can be be simply created at [LifeScience Login](https://perun.aai.lifescience-ri.eu/login) (see [image 1](img/lsaai_user_1.png))
 
-![1. Login](img/lsaai_user_1.png)
-
- - Select your organization and Login
-
-   ![2. Select organization](img/lsaai_user_2.png) 
-
- - If you don't have account, you will receive `No user account found` > Click on `Proceed to register for an account`.
-
-   ![3. No user account found](img/lsaai_user_3.png) 
-
-   - Fill out the application to join LifeScience community LSAAI
-
-   ![4. No user account found](img/lsaai_user_4.png) 
-
-   - Accept use policy and `Submit`
-
-   ![5. No user account found](img/lsaai_user_5.png) 
-
- - Email verification > check your inbox and follow the link to verify an account
-
+ - Select your organization and Login (see [image 2](img/lsaai_user_2.png))
+ - If you don't have account, you will receive `No user account found` (see [image 3](img/lsaai_user_3.png)) > Click on `Proceed to register for an account`.
+   - Fill out the application to join LifeScience community LSAAI (see [image 4](img/lsaai_user_4.png))
+   - Accept use policy and `Submit` (see [image 5](img/lsaai_user_5.png))
+ - Email verification (see [image 6](img/lsaai_user_6.png)) > check your inbox and follow the link to verify an account (see [image 7](img/lsaai_user_7.png)
    (If your organization is not yet part of LifeScience community, you might need to Wait for the account approval.)
-
  - Once account is crated
-
    - Go to [LifeScience Login](https://perun.aai.lifescience-ri.eu/login)
+   - Now you will see: `Login, but no service available yet` (see [image 8](img/lsaai_user_8.png)).
 
-   - Now you will see: `Login, but no service available yet`.
-
-You can choose, to either request access to
+You can choose, to either request accessa (see [image 9](img/lsaai_user_9.png)) to
 
 - `GGCC` Virtual organization
-  Alternatively request to join GGCC Virtual Organization by following the Link to request https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc and request to join group after that
+  Alternatively request to join GGCC Virtual Organization by following the link to request https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc and request to join group after that
 
 - Specific group
   In case you already have invitation link to specific group, request directly to join the group. Visiting the link will automatically create an access request on your behalf. `You should see: You have successfully applied for membership`
