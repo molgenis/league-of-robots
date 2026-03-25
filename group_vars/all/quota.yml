@@ -53,6 +53,7 @@ lfs_quota:
   prm03:
     quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
+      umcg-adorable: 1024
       umcg-atd: 1024
       umcg-biogen: 17408
       umcg-bionic-mdd-gwama: 13312
@@ -60,6 +61,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-endocrinology: 1024
       umcg-fg: 4096
+      umcg-forcespe: 1024
       umcg-franke-scrna: 20480
       umcg-fu: 2048
       umcg-gaf: 15360
@@ -73,6 +75,7 @@ lfs_quota:
       umcg-grip: 2048
       umcg-gsad: 1024
       umcg-hematology: 5120
+      umcg-hgsvc: 1024
       umcg-hlhs: 3072
       umcg-immunogenetics: 2048
       umcg-impact: 3072
@@ -141,6 +144,7 @@ lfs_quota:
   tmp02:
     quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
+      umcg-adorable: 1024
       umcg-as: 1024
       umcg-atd: 1024
       umcg-biogen: 20480
@@ -163,6 +167,7 @@ lfs_quota:
       umcg-grip: 1024
       umcg-gsad: 1024
       umcg-hematology: 3072
+      umcg-hgsvc: 2048
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024
@@ -209,6 +214,7 @@ lfs_quota:
       umcg-endocrinology: 2048
       umcg-erdera: 11264
       umcg-fg: 10240
+      umcg-forcespe: 1024
       umcg-franke-scrna: 15360
       umcg-fu: 2048
       umcg-gap: 1024

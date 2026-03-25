@@ -39,21 +39,6 @@ all:
                   network: vlan16
                 - name: copperfist
                   network: vlan16
-        az-porch:
-          host_networks:
-            - name: "{{ stack_prefix }}_internal_management"
-              security_group: "{{ stack_prefix }}_jumphosts"
-              add_hostname_to_ip_address: true
-          basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
-          iptables_allow_icmp_inbound:
-            - "{{ all.ip_addresses['umcg']['net1'] }}"
-            - "{{ all.ip_addresses['umcg']['net2'] }}"
-            - "{{ all.ip_addresses['umcg']['net3'] }}"
-            - "{{ all.ip_addresses['umcg']['net4'] }}"
-            - "{{ all.ip_addresses['rug']['bwp_net'] }}"
-            - "{{ all.ip_addresses['rug']['operator'] }}"
-          ssh_client_configs:
-            - logs_library
     data_transfer:
       hosts:
         bb-transfer:
