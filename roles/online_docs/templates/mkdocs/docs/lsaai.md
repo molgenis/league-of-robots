@@ -37,17 +37,29 @@ Account can be be simply created at [LifeScience Login](https://perun.aai.lifesc
 ![1. Login](img/lsaai_user_1.png)
 
  - Select your organization and Login
+
    ![2. Select organization](img/lsaai_user_2.png) 
+
  - If you don't have account, you will receive `No user account found` > Click on `Proceed to register for an account`.
+
    ![3. No user account found](img/lsaai_user_3.png) 
+
    - Fill out the application to join LifeScience community LSAAI
+
    ![4. No user account found](img/lsaai_user_4.png) 
+
    - Accept use policy and `Submit`
+
    ![5. No user account found](img/lsaai_user_5.png) 
+
  - Email verification > check your inbox and follow the link to verify an account
+
    (If your organization is not yet part of LifeScience community, you might need to Wait for the account approval.)
+
  - Once account is crated
+
    - Go to [LifeScience Login](https://perun.aai.lifescience-ri.eu/login)
+
    - Now you will see: `Login, but no service available yet`.
 
 You can choose, to either request access to
