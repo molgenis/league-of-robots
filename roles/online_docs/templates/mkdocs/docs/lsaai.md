@@ -6,24 +6,24 @@
 
 ### 1.1. What is LSAAI
 
-It is a specialized identity and access management system for the European life science research community.
+It is a specialized **identity and access management** system for the European life science research community.
 
-It allows researchers to use a single digital identity—leveraging their existing institutional, social, or community accounts—to securely access a vast ecosystem of shared data, tools, and computing resources. Within this interface, users and administrators can manage virtual organizations, handle group memberships, and configure fine-grained access rights to ensure that sensitive scientific data remains protected while remaining accessible to authorized collaborators.
+It allows researchers to use a single digital identity—leveraging their existing institutional, social, or community accounts—to securely acces shared data and computing resources. Users and administrators can manage virtual organizations, handle group memberships, and configure fine-grained access rights to ensure that sensitive scientific data remains protected while remaining accessible to authorized collaborators.
 
 ### 1.2. Key Functions
 
 It provides following key functions
 
- - **User management**
-   - Identity Consolidation: Link multiple login methods (like your university account and ORCID) into one persistent Life Science ID
-   - Access credentials management: allows users to self-manage their SSH public keys for remote server access
- - **Virtual Organization (VO) Management**
-   - Facailitates separated environments for communities and projects: called Virtual Organizations
-   - VO allows fully managing user access and group management - independant of the rest of LSAAI community
- - **Resource Authorization**
-   - Control which groups or individuals have permission to use specific services or datasets across different research infrastructures
+* **User management**
+    * Identity Consolidation: Link multiple login methods (like your university account and ORCID) into one persistent Life Science ID
+    * Access credentials management: allows users to self-manage their SSH public keys for remote server access
+* **Virtual Organization (VO) Management**
+    * Facailitates separated environments for communities and projects: called Virtual Organizations
+    * VO allows fully managing user access and group management - independant of the rest of LSAAI community
+* **Resource Authorization**
+    * Control which groups or individuals have permission to use specific services or datasets across different research infrastructures
 
-## 2. Regular user
+## 2. Regular users
 
 To request access to the **GGCC Virtual Organization (VO)**, you must first possess a **LifeScience AAI (LSAAI)** account.
 
@@ -31,19 +31,17 @@ To request access to the **GGCC Virtual Organization (VO)**, you must first poss
 
 The registration process varies depending on your home organization. 
 
-#### For RUG and UMCG Members
+- **For RUG and UMCG Members**
 
-University of Groningen (RUG) and UMCG are already members of the LSAAI community. 
+    University of Groningen (RUG) and UMCG are already members of the LSAAI community.
+  - **Timeline:** Account creation takes only a few minutes.
+  - **Process:** Select your organization from the list and log in with your institutional credentials.
 
- - **Timeline:** Account creation takes only a few minutes.
- - **Process:** Select your organization from the list and log in with your institutional credentials.
+- **For Other Organizations**
 
-#### For Other Organizations
-
-If your organization is not yet a member of the LSAAI community:
-
- - **Approval:** You must wait for manual access approval by LSAAI administrators.
- - **Requirements:** Admins may contact you to request additional information.
+    If your organization is not yet a member of the LSAAI community
+  - **Approval:** You must wait for manual access approval by LSAAI administrators.
+  - **Requirements:** Admins may contact you to request additional information.
 
 ---
 
@@ -51,18 +49,12 @@ If your organization is not yet a member of the LSAAI community:
 
 Follow these steps to set up your identity:
 
-1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://aai.lifescience-ri.eu/) page.  
-    [LifeScience Login](img/lsaai_user_1.png)
-2.  **Select Organization** Choose your home institution and log in.  
-    [Select Organization](img/lsaai_user_2.png)
-3.  **Register New Account** If no account is found, you will see a "No user account found" message. Click **Proceed to register for an account**.  
-    [No account found](img/lsaai_user_3.png)
-4.  **Fill Application** Complete the application form to join the LifeScience LSAAI community.  
-    [Application form](img/lsaai_user_4.png)
-5.  **Accept Policies** Accept the Acceptable Use Policy and click **Submit**.  
-    [Policy acceptance](img/lsaai_user_5.png)
-6.  **Verify Email** Check your inbox for a verification email and follow the link to activate your account.  
-    [Email verification](img/lsaai_user_7.png)
+1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://aai.lifescience-ri.eu/) page. ([screenshot 1](img/lsaai_user_1.png))
+2.  **Select Organization** Choose your home institution and log in. ([screenshot 2](img/lsaai_user_2.png))
+3.  **Register New Account** If no account is found, you will see a "No user account found" message. Click **Proceed to register for an account**.   ([screnshot 3](img/lsaai_user_3.png))
+4.  **Fill Application** Complete the application form to join the LifeScience LSAAI community. ([screenshot 4](img/lsaai_user_4.png))
+5.  **Accept Policies** Accept the Acceptable Use Policy and click **Submit**. ([screenshot 5](img/lsaai_user_5.png))
+6.  **Verify Email** Check your inbox for a verification email and follow the link to activate your account. ([schreenshot 6](img/lsaai_user_7.png))
 
 **If your organization is not part of the LifeScience community, you may need to wait** for administrative approval before proceeding to the next step.
 
