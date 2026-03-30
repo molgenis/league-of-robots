@@ -120,7 +120,7 @@ Note: If you lose your key or forget your passphrase, simply generate a new pair
 **Option B: Add Users Manually**
 
  - Open the group and locate the `Members` tile (available to group administrators). ([screenshot](img/lsaai_manager_1.png))
- - Click Add and search for the person you wish to include. You can search by name or email address. ([screenshot](img/lsaai_manager_2.png))
+ - Click `Add` and search for the person you wish to include. You can search by name or email address. ([screenshot](img/lsaai_manager_2.png))
 
 
 ### 3.4. Extending user group access
