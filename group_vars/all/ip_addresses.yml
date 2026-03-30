@@ -81,6 +81,10 @@ ip_addresses:
       netmask: '/32'
       fqdn: 'molgenis26.gcc.rug.nl'
       desc: 'Public downloads.'
+    step01:
+      address: '195.169.22.57'
+      netmask: '/32'
+      desc: 'Molgenis jumphost stepping stone 01'
   #
   # Other clusters / grid / DS machines.
   #
