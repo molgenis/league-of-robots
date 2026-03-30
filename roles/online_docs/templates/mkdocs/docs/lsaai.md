@@ -91,12 +91,14 @@ In both cases, access to **HPC groups** is granted only after **group administra
 
 ### 2.5. Adding and managing ssh keys to access clusters
 
-In order to access clusters, users must create an `ssh` public-private key pair. The public part of the keypair can be uploaded to the [lsaai profile management site](https://profile.aai.lifescience-ri.eu/) > Authentication > [SSH keys](https://profile.aai.lifescience-ri.eu/profile/auth/sshKeys).
+Accessing the clusters requires an SSH public-private key pair (see instructions on how to make for [Linux/Mac](../generate-key-pair-openssh/) and [Win](../generate-key-pair-mobaxterm/)).
+
+ - Upload: Add your **public** key to your [LSAAI profile](https://profile.aai.lifescience-ri.eu/) > Authentication > [SSH keys](https://profile.aai.lifescience-ri.eu/profile/auth/sshKeys).
 ([image 9](img/lsaai_ssh.png))
+ - Wait: It typically takes a few minutes for the key to propagate to the clusters.
+ - Connect: Log in using your private key.
 
-Once public key is uploaded, user can login (by using private key) to the cluster, within a matter of minutes.
-
-If you have a lost, changed, or simply forget the password of the key-pair, you can simply replace it with the new one at this website.
+Note: If you lose your key or forget your passphrase, simply generate a new pair and update your profile at the link above.
 
 ---
 
@@ -104,7 +106,22 @@ If you have a lost, changed, or simply forget the password of the key-pair, you 
 
 ### 3.1. Login
 
+ - [Login to LSAAI](https://perun.aai.lifescience-ri.eu/)
+ - Go to [GGCC Virtual Organization](https://perun.aai.lifescience-ri.eu/organizations/3363) and browse the `Groups`
+
 ### 3.2. Adding users to a group
+
+**Option A: Invite Users via Link**
+
+ - From the group administration page, navigate to `Members` and select `Copy invitation link`. [screenshot](img/lsaai_manager_3.png)
+ - User clicks on the invitation URL: the system automatically submits a request to join the group for them.
+ - Group administrator must navigate into `Group` > `Applications`, go into `pending` view (to show users that applied to join), then select and `Approve` them
+
+**Option B: Add Users Manually**
+
+ - Open the group and locate the `Members` tile (available to group administrators). ([screenshot](img/lsaai_manager_1.png))
+ - Click Add and search for the person you wish to include. You can search by name or email address. ([screenshot](img/lsaai_manager_2.png))
+
 
 ### 3.4. Extending user group access
 
