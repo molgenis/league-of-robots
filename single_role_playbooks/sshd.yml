@@ -17,6 +17,7 @@
     - repo
     - repo_servers
     - logs
+    - silo
   roles:
     - sshd
 ...
