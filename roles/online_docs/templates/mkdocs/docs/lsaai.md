@@ -89,6 +89,16 @@ In both cases, access to **HPC groups** is granted only after **group administra
 * You will receive a notification email once your access has been provisioned.
 * You can then proceed to use the GGCC computing resources.
 
+### 2.5. Adding and managing ssh keys to access clusters
+
+In order to access clusters, users must create an `ssh` public-private key pair. The public part of the keypair can be uploaded to the [lsaai profile management site](https://profile.aai.lifescience-ri.eu/) > Authentication > [SSH keys](https://profile.aai.lifescience-ri.eu/profile/auth/sshKeys).
+([image 9](img/lsaai_ssh.png))
+
+Once public key is uploaded, user can login (by using private key) to the cluster, within a matter of minutes.
+
+If you have a lost, changed, or simply forget the password of the key-pair, you can simply replace it with the new one at this website.
+
+---
 
 ## 3. Group managers
 
