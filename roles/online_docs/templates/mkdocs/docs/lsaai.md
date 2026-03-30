@@ -8,7 +8,7 @@
 
 It is a specialized **identity and access management** system for the European life science research community.
 
-It allows researchers to use a single digital identity—leveraging their existing institutional, social, or community accounts—to securely acces shared data and computing resources. Users and administrators can manage virtual organizations, handle group memberships, and configure fine-grained access rights to ensure that sensitive scientific data remains protected while remaining accessible to authorized collaborators.
+It allows researchers to use a single digital identity, using their existing institutional or community accounts, to securely acces shared data and computing resources. Users and administrators can manage virtual organizations, handle group memberships, and configure fine-grained access rights to ensure that sensitive scientific data remains protected while remaining accessible to authorized collaborators.
 
 ### 1.2. Key Functions
 
