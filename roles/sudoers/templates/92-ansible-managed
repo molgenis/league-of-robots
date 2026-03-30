@@ -6,4 +6,5 @@
 #
 # Allow specific users or groups to run specific commands
 #
+Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 {% if functional_admin_group is defined and functional_admin_group | length %}%{{ functional_admin_group | regex_replace(' ', '\\ ') }},{% endif %}{% for user_group in item.who %}{{user_group}}{{ "," if not loop.last else "" }}{% endfor %}    ALL=({{ item.become }})    NOPASSWD:{{ item.command | default('ALL') }}
