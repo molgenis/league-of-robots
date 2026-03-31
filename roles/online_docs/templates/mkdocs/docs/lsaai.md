@@ -4,6 +4,13 @@
 
 ## 1. Overview
 
+In short
+
+ - Create LSAAI Account: Register for an LSAAI account if you do not already have one.
+ - Request VO Access: Log in to LSAAI and request to join the designated Virtual Organization.
+ - Request Group Access: Navigate to the group listing and request access to the relevant groups.
+ - Finalize: Upload your public SSH key. Access to the cluster will be granted automatically upon key validation.
+
 ### 1.1. What is LSAAI
 
 It is a specialized **identity and access management** system for the European life science research community.
@@ -25,9 +32,6 @@ It provides following key functions
 
 ## 2. Regular users
 
-To request access to the **GGCC Virtual Organization (VO)**, you must first possess a **LifeScience AAI (LSAAI)** account.
-
-### 2.1. Create your LSAAI Account
 
 The registration process varies depending on your home organization. 
 
@@ -46,10 +50,11 @@ The registration process varies depending on your home organization.
     - **Requirements:** Admins may contact you to request additional information.
 
 ---
+To request access to the **GGCC Virtual Organization (VO)**, you must first possess a **LifeScience AAI (LSAAI)** account.
 
-### 2.2. Step-by-Step Registration
+### 2.1. Create LSAAI Account
 
-Follow these steps to set up your identity:
+Please note that following steps may differ from user to user, as it depends on their previous LSAAI accounts - therfore **some users might need to skip some of the steps**.
 
 1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://perun.aai.lifescience-ri.eu/) page. ([image 1](img/lsaai_user_1.png))
 2.  **Select Organization** Choose your home institution and log in. ([image 2](img/lsaai_user_2.png))
@@ -62,7 +67,7 @@ Follow these steps to set up your identity:
 
 ---
 
-### 2.3. Requesting GGCC VO Access
+### 2.2. Requesting GGCC VO Access
 
 Once your account is created and you log in to LifeScience, you may see a message stating: *"Login, but no service available yet"* ([image 8](img/lsaai_user_8.png)). You must now join the GGCC Virtual Organization.
 
@@ -82,14 +87,14 @@ If a project lead has provided you with a **specific group invitation link**:
 
 ---
 
-### 2.4. Final Approval
+### 2.3. Final Approval
 
 In both cases, access to **HPC groups** is granted only after **group administrators** approve your request. 
 
 * You will receive a notification email once your access has been provisioned.
 * You can then proceed to use the GGCC computing resources.
 
-### 2.5. Adding and managing ssh keys to access clusters
+### 2.4. Adding and managing ssh keys to access clusters
 
 Accessing the clusters requires an SSH public-private key pair (see instructions on how to make for [Linux/Mac](../generate-key-pair-openssh/) and [Win](../generate-key-pair-mobaxterm/)).
 
