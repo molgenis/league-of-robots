@@ -9,6 +9,7 @@
     - cluster
     - chaperone,!mit_chaperone
     - docs
+    - silo
   roles:
     - logrotate
 ...
