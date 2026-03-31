@@ -51,7 +51,7 @@ The registration process varies depending on your home organization.
 
 Follow these steps to set up your identity:
 
-1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://aai.lifescience-ri.eu/) page. ([image 1](img/lsaai_user_1.png))
+1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://perun.aai.lifescience-ri.eu/) page. ([image 1](img/lsaai_user_1.png))
 2.  **Select Organization** Choose your home institution and log in. ([image 2](img/lsaai_user_2.png))
 3.  **Register New Account** If no account is found, you will see a "No user account found" message. Click **Proceed to register for an account**.   ([image 3](img/lsaai_user_3.png))
 4.  **Fill Application** Complete the application form to join the LifeScience LSAAI community. ([image 4](img/lsaai_user_4.png))

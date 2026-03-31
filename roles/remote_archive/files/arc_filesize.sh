@@ -1,0 +1,100 @@
+#!/bin/bash
+set -euo pipefail
+
+[[ -z "${1:-}" || -n "${2:-}" ]] && { echo "$0 /path/to"; exit 1; }
+
+_file="$(mktemp)"
+trap 'rm -f "${_file}"' EXIT INT TERM
+#echo "Collecting file statistics and storing into ${_file}"
+
+#{ find "${1}" -type f -print0 2>/dev/null | xargs -0 stat --format="%n %s" 2>/dev/null | awk '{ print "> " $0 }'; }
+#exit
+
+
+# stat %s size, %n file path and file name
+{ find "${1}" -type f -print0 2>/dev/null | xargs -0 stat --format="%s %n" 2>/dev/null | awk -v ipath="${1}" '
+BEGIN {
+   limit_max_power = 10     # 10 GB
+   limit_max = 10^limit_max_power
+   big_files = ""
+}
+
+function reformat(x) {
+   if (x < 1000) return x "  B"
+   if (x < 1000^2) return int(x/1000) " KB"
+   if (x < 1000^3) return int(x/(1000^2)) " MB"
+   if (x < 1000^4) return int(x/(1000^3)) " GB"
+   return int(x/(1000^4)) " TB"
+}
+{
+   size=$1
+   path=""; for(i=2;i<=NF;i++) path=path" "$i
+   idx = (size > 0) ? int(log(size)/log(10)) : 0
+   sizes[idx]++
+   if (idx > maxi) maxi = idx
+   sumsize += size
+   filescount++
+   if (size > limit_max) big_files = big_files "      " path " (" size/10^9 " GB)\n"
+}
+
+END {
+   printf("\n--------------------------- File size histogram --------------------------------\n\n")
+   if (sumsize > 0 && filescount > 0){
+      limit_avg_power = 9      # 1 GB
+      limit_avg = 10^limit_avg_power
+      avg = sumsize/filescount
+      minmax = 10
+      if (maxi < 12) maxi = 12
+
+      maxc = 0
+      for (i=0;i<=maxi;i++)
+         if (sizes[i] > maxc) maxc = sizes[i]
+      
+      for (i=0;i<=maxi;i++) {
+         w = maxc ? int(sizes[i]*56/maxc) : 0
+         if (int((log(avg)/log(10)))==i) {
+            labelavg = "~avg~"
+      } else labelavg = "     "
+      
+      label = reformat(10^i)
+      if (10^i == limit_avg) {
+         label = "=> " label
+      }
+     
+      printf("%5s %7s |", labelavg, label)
+      for (j=0;j<w;j++) printf("*")
+         printf(" %d\n", sizes[i]+0)
+      }
+      printf("\n   size  = %.3f GB   |   files = %d   |   average size = %.2f GB/file\n", sumsize/limit_avg, filescount, avg/limit_avg)
+      printf("\n-------------------------------- Result -----------------------------------------\n\n")
+      if (avg < limit_avg) {
+         printf("   This data is too fragmented. Average file size is approximately\n")
+         printf("     %2.2f%%\n", avg/limit_avg)
+         printf("   of the minimum 1GB limit!\n")
+         printf("   Before copying it to the archive, first compress & bundle it with tar:\n")
+         gsub(/\/+$/, "", ipath)
+         printf("      tar -czf %s.tar.gz %s\n", ipath, ipath)
+         printf("      sha256sum %s.tar.gz > %s.tar.gz.sha256sum\n", ipath, ipath)
+         printf("      rsync -rlP --size-only %s.tar.gz %s.tar.gz.sha256sum /groups/[group]/[arc0X]/...\n", ipath, ipath)
+         printf("   Check if remote sha256sum is correct and only then you can remove original local files.\n")
+      } else {
+         printf("    Your data is of correct size and you may simply copy it to the archive.")
+      }
+      if ( big_files ) printf("\n   There was also files that were too big:\n%s\n\n", big_files)
+   } else {
+      print "Error: empty dataset or no permission."
+      exit 255
+   }
+}
+' > "${_file}" & _pid=$! ; } || {
+   exit 255
+}
+
+# -0 does not kill it, but just collects if process still exist
+while kill -0 "$_pid" 2>/dev/null; do
+   printf "."
+   sleep 0.5
+done
+echo ""
+
+cat "${_file}"
