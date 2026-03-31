@@ -115,9 +115,8 @@ all:
                 name: tcp15
           slurm_sockets: 16
           slurm_cores_per_socket: 1
-          slurm_real_memory: 63786
+          slurm_real_memory: 63785
           slurm_local_disk: 0
-          slurm_features: 'prm02,prm03,rsc04,tmp04'
     compute_node:
       children:
         cpu_r750:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -160,7 +159,6 @@ all:
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 3420400
-              slurm_features: 'rsc04,tmp04'
               slurm_weight: 10
         cpu_r6625:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
@@ -202,7 +200,53 @@ all:
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 2850100
-              slurm_features: 'rsc04,tmp04'
+        cpu_xe7745:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            vt-node-c01:
+              cloud_flavor: umcg.v1.bm.128-1536-849.8rtx6000
+              host_type: baremetal
+              gpu_count: 8
+              gpu_type: rtx6000
+              gpu_driver_version: 595.58.03
+              host_networks:
+                - name: "{{ stack_prefix }}_internal_management"
+                  security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: eno16695np0
+                - name: lustre
+                  security_group: "{{ stack_prefix }}_storage"
+                  nmstate_interface:
+                    name: eno17095np0
+                  lnet:
+                    name: tcp15
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: '/dev/md0'
+                  label: local
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
+                  type: ext4
+                  md:
+                    raid_level: 0
+                    raid_devices: 5
+                    component_devices:
+                      - /dev/nvme0n1
+                      - /dev/nvme1n1
+                      - /dev/nvme2n1
+                      # NOT /dev/nvme3n1, which is the DELL BOSS card and contains the OS!
+                      - /dev/nvme4n1
+                      - /dev/nvme5n1
+              slurm_sockets: 2
+              slurm_cores_per_socket: 64
+              slurm_real_memory: 1546619
+              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
+              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
+              slurm_local_disk: 14376000
+              slurm_weight: 20
 administration:
   children:
     sys_admin_interface:

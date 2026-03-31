@@ -51,7 +51,9 @@
   become: true
 
 - name: Install driver from .run file
-  ansible.builtin.command: '/root/{{ gpu_runfile }} --silent --kernel-module-type=proprietary'
+  ansible.builtin.command:
+    cmd: |
+         "/root/{{ gpu_runfile }}" --silent --kernel-module-type="{{ gpu_kernel_module_type | default('open') }}"
   register: install_result
   failed_when: install_result.rc != 0
   changed_when: true
