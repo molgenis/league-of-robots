@@ -9,3 +9,4 @@
 # league-of-robots/group_vars/{{ stack_name }}/vars.yml
 #
 %{{ functional_admin_group }}    ALL=(root)    NOPASSWD:/opt/edico/bin/dragen_reset
+%{{ functional_admin_group }}    ALL=(root)    NOPASSWD:/opt/dragen/[0-9.]*/bin/dragen_reset
