@@ -27,7 +27,7 @@
 - name: "Workaround - disable KASLR or {{ gpu_type }} GPUs that use NVIDIA HMM for NVIDIA UVM."
   ansible.builtin.include_tasks: disable_kaslr.yml
   when:
-    - gpu_count|default(0) >= 1 
+    - gpu_count|default(0) >= 1
     - gpu_type == 'rtx6000'
 
 - name: Reboot system if needed
