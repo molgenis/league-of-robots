@@ -67,11 +67,10 @@ END {
       }
       printf("\n   size  = %.3f GB   |   files = %d   |   average size = %.2f GB/file\n", sumsize/limit_avg, filescount, avg/limit_avg)
       printf("\n-------------------------------- Result -----------------------------------------\n\n")
+      if ( big_files ) printf("\n   There was also files that were too big:\n%s\n\n", big_files)
       if (avg < limit_avg) {
-         printf("   This data is too fragmented. Average file size is approximately\n")
-         printf("     %2.2f%%\n", avg/limit_avg)
-         printf("   of the minimum 1GB limit!\n")
-         printf("   Before copying it to the archive, first compress & bundle it with tar:\n")
+         printf("   This data is too fragmented.\n")
+         printf("   Before copying it to the archive, compress & bundle it with tar:\n")
          gsub(/\/+$/, "", ipath)
          printf("      tar -czf %s.tar.gz %s\n", ipath, ipath)
          printf("      sha256sum %s.tar.gz > %s.tar.gz.sha256sum\n", ipath, ipath)
@@ -80,7 +79,6 @@ END {
       } else {
          printf("    Your data is of correct size and you may simply copy it to the archive.")
       }
-      if ( big_files ) printf("\n   There was also files that were too big:\n%s\n\n", big_files)
    } else {
       print "Error: empty dataset or no permission."
       exit 255

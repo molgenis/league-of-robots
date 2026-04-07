@@ -88,7 +88,22 @@ Become the data manager
 
 ### Bundling
 
-Optional, but be aware that upload to an archive system should be in average well above 1GB per file:
+Optional, but be aware that upload to an archive system should be in average well above 1GB per file.
+
+#### Checking
+
+We created a script that will help data managers to easily determine if the data is of correct size or too fragmented.
+Simply run it and as an argument provide the path to the folder
+
+`/usr/local/bin/arc_surf_sizecheck /path/to/data`
+
+The script might take a little longer to finish if folder is larger or there are many small files.
+
+When finished, it should print the information of the average filesize, and if the data can be
+simply copied to the archive, or if not, it will suggest what to do next.
+
+#### Preparing the data
+
 Prepare the data by merging multiple files/folders
  into one compressed **tar** file.
 
@@ -126,6 +141,12 @@ be checked later to verify that the file was successfully uploaded to the archiv
 Checksum verification process on the remote storage side supports only **`sha256sum`**
 
 ### Uploading
+
+For this step, you might prefer using `[screen]`(
+            specifies the command character to be x and the character) command, as this step takes a long time, and if you disconnect
+from a cluster the upload will be canceled, and you need to start it again. On the other hand, uploading from
+within the `screen` command will continue even if you run
+
 
 Upload of the file(s) to the archive
 ```
