@@ -32,25 +32,38 @@ automatically when a new kernel is installed.
     - reboots the machine
     - checks if number of GPU devices reported from `nvidia-smi` is same as in `gpu_count`
 
-## Solved issues - described
+The `nvidia-persistenced.service` service script was modified based on trial and error,
+but is taken mostly from the example files that come with the driver installation,
+and can be found in the folder 
 
-`gpu_count` is needed to install the driver, since any other `automatic` detection is
-failing sooner or later. To list few:
+    /usr/share/doc/NVIDIA_GLX-1.0/samples/nvidia-persistenced-init.tar.bz2
+
+## Known issues and workarounds
+
+#### Finding the correct number of GPUs
+
+`gpu_count` is required to install the driver, since any other `automatic` detection is failing sooner or later.
+To list few:
 
  - `lspci` found one nvidia device when there were 8,
  - `nvidia-smi` reported no device found, when it actually should found some,
  - and `nvidia-smi` had up-and-running 3 GPU's when it should be 8
 
-This was just while testing, but I can expect more.
+Therefore `gpu_count` instead defines the correct "truth", which the role can test - that is if all the GPUs are actually working correctly. 
 
-`gpu_count` instead defines the correct "truth", and can test aginst it - that is
-if all the GPUs are actually working correctly.
+#### A40
 
-Persistenced service script was modified based on trial and error, but is taken
-mostly from the example files that come with the driver installation, and can be
-found in the folder 
+When the NVIDIA GSP firmware is anabled the cards may vanish from PCI bus in a Liqid chassis when the server is rebooted,
+which then requires rebooting the entire Liqid chassis. Therefore the GSP firmware is disabled for A40 cards.
 
-    /usr/share/doc/NVIDIA_GLX-1.0/samples/nvidia-persistenced-init.tar.bz2
+#### RTX6000
+
+These cards have issues with CUDA 13.2.x and Kernel Address Space Layout Randomization (KASLR).
+With some NVidia driver + Linux kernel combinations you may get errors, whith others the kernel may crash taking the machine offline.
+
+See https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#known-issues
+
+Therefore KASLR is currently disabled for the RTX6000 cards.
 
 ## Other comments
 
