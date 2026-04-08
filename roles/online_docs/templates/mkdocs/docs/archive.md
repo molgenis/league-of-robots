@@ -142,16 +142,27 @@ Checksum verification process on the remote storage side supports only **`sha256
 
 ### Uploading
 
-For this step, you might prefer using `[screen]`(
-            specifies the command character to be x and the character) command, as this step takes a long time, and if you disconnect
-from a cluster the upload will be canceled, and you need to start it again. On the other hand, uploading from
-within the `screen` command will continue even if you run
+This step takes a long time, and if you disconnect from a cluster, the upload will be canceled and you need to start it again.
+This can be easily prevented by using `screen` ([man pages](https://manned.org/man/screen), [quick guide](https://wiki.archlinux.org/title/GNU_Screen)) command and run copy from within.
+If connection is lost, the `screen` will continue to finish the upload.
 
+You can upload the the file(s) to the archive either by using `rsync` command [man pages](https://manned.org/man/rsync) as it can show
+progress of the upload. But note, that `--size-only` parameter prevent data to be sent back and forward, and therefore
 
-Upload of the file(s) to the archive
+```
+   dm-user $ rsync -rlP /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
+```
+
+where arguments are
+ - `-r` is for recursive copy,
+ - `-l` copies links and
+ - `-P` enables a partial copy, which means, that a failed copy will not delete partially created file, but keep
+   a file with partially uploaded content - which can be resumed afterwards.
+
+or you can simply use `cp`
+
 ```
    dm-user $ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
-
 ```
 
 ### Remote checksum
