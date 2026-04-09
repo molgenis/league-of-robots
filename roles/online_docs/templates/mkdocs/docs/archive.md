@@ -67,30 +67,34 @@ The data migrates on remote server from disk to tape and during this it has diff
 Note that the folders are always online (in state `REG`) and as such you can always
 browse folders and check file permissions and their metadata information.
 
+---
+
 ## 3. Workflow example
 
 How to upload and modify states of the remote files.
 
-Main steps to reliably upload the data
+**Main steps** to reliably upload the data
 
  - [become a data-manager user](#user)
  - [bundle the data](#bundling)
  - [create local checksum](#local-checksum)
  - [upload data to remote storage](#uploading)
  - [verify checksums on a remote storage](#remote-checksum)
+ - [delete files on cluster](#delete-files-on-cluster)
 
-### User
+### 3.1. Login as data-manager user
 
 Become the data manager
+
 ```
    user $ sudo -u [group]-dm bash
 ```
 
-### Bundling
+### 3.1.1. Bundling
 
 Optional, but be aware that upload to an archive system should be in average well above 1GB per file.
 
-#### Checking
+**Checking**
 
 We created a script that will help data managers to easily determine if the data is of correct size or too fragmented.
 Simply run it and as an argument provide the path to the folder
@@ -102,7 +106,8 @@ The script might take a little longer to finish if folder is larger or there are
 When finished, it should print the information of the average filesize, and if the data can be
 simply copied to the archive, or if not, it will suggest what to do next.
 
-#### Preparing the data
+
+**Preparing the data**
 
 Prepare the data by merging multiple files/folders
  into one compressed **tar** file.
@@ -130,6 +135,8 @@ this will result (in comparison to the option a)
  - but it will use more disk space both on prm and archive
  - and it will take longer to copy the entire file to the archive and back
 
+---
+
 ### Local checksum
 
 Create a checksum of the file. This _fingerprint_ can
@@ -140,30 +147,35 @@ be checked later to verify that the file was successfully uploaded to the archiv
 
 Checksum verification process on the remote storage side supports only **`sha256sum`**
 
+---
+
 ### Uploading
 
-This step takes a long time, and if you disconnect from a cluster, the upload will be canceled and you need to start it again.
-This can be easily prevented by using `screen` ([man pages](https://manned.org/man/screen), [quick guide](https://wiki.archlinux.org/title/GNU_Screen)) command and run copy from within.
-If connection is lost, the `screen` will continue to finish the upload.
+This step takes a long time, and if you disconnect from a cluster, the upload will be canceled and you will need to start it again.
 
-You can upload the the file(s) to the archive either by using `rsync` command [man pages](https://manned.org/man/rsync) as it can show
-progress of the upload. But note, that `--size-only` parameter prevent data to be sent back and forward, and therefore
+This can be easily prevented by using the `screen` command ([man pages](https://manned.org/man/screen), [quick guide](https://wiki.archlinux.org/title/GNU_Screen)) and running the copy from within it.
+If the connection is lost, `screen` will continue running and finish the upload.
 
-```
-   dm-user $ rsync -rlP /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
-```
-
-where arguments are
- - `-r` is for recursive copy,
- - `-l` copies links and
- - `-P` enables a partial copy, which means, that a failed copy will not delete partially created file, but keep
-   a file with partially uploaded content - which can be resumed afterwards.
-
-or you can simply use `cp`
+You can upload the file(s) to the archive either by using the `rsync` command ([man pages](https://manned.org/man/rsync)),
+as it can show the upload progress
 
 ```
-   dm-user $ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
+   dm-user $ rsync -rlP /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[arc0X]/projects/project-x.tar.gz
 ```
+
+where the arguments are
+
+ - `-r` is for recursive copy
+ - `-l` preserves links
+ - `-P` enables a partial copy, which means that a failed copy will not delete a partially created file, but will keep a file with partially uploaded content that can be resumed afterwards
+
+Alternatively you can simply use `cp` command
+
+```
+   dm-user $ cp /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[arc0X]/projects/project-x.tar.gz
+```
+
+---
 
 ### Remote checksum
 
@@ -174,7 +186,11 @@ on the remote archive server, so we can simply issue remote command to calculate
    arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
 ```
 
-If checkum was also made just after the .tar file was created, then both values can be checked if they are still identical.
+If checkum was also made just after the .tar(.gz) file was created, then both values can be checked if they are still identical.
+
+### Delete files on cluster
+
+Files in tmp/prm that have been successfully archived and verified by checksum can be safely removed from the cluster.
 
 ### Migrating
 

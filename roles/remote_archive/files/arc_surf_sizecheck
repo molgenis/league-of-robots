@@ -14,7 +14,7 @@ trap 'rm -f "${_file}"' EXIT INT TERM
 # stat %s size, %n file path and file name
 { find "${1}" -type f -print0 2>/dev/null | xargs -0 stat --format="%s %n" 2>/dev/null | awk -v ipath="${1}" '
 BEGIN {
-   limit_max_power = 10     # 10 GB
+   limit_max_power = 11     # 11 = 100 GB
    limit_max = 10^limit_max_power
    big_files = ""
 }
