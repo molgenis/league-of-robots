@@ -88,4 +88,10 @@
 
 - name: Flush handlers.
   ansible.builtin.meta: flush_handlers
+
+- name: Remove installation file.
+  ansible.builtin.file:
+    path: '/root/{{ gpu_runfile }}'
+    state: absent
+  become: true
 ...
