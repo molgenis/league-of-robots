@@ -90,7 +90,7 @@ Become the data manager
    user $ sudo -u [group]-dm bash
 ```
 
-### 3.1.1. Bundling
+### 3.2. Bundling
 
 Optional, but be aware that upload to an archive system should be in average well above 1GB per file.
 
@@ -137,7 +137,7 @@ this will result (in comparison to the option a)
 
 ---
 
-### Local checksum
+### 3.3. Local checksum
 
 Create a checksum of the file. This _fingerprint_ can
 be checked later to verify that the file was successfully uploaded to the archive and that it was correctly restored when when downloading it back from the archive.
@@ -149,7 +149,7 @@ Checksum verification process on the remote storage side supports only **`sha256
 
 ---
 
-### Uploading
+### 3.4. Uploading
 
 This step takes a long time, and if you disconnect from a cluster, the upload will be canceled and you will need to start it again.
 
@@ -177,7 +177,7 @@ Alternatively you can simply use `cp` command
 
 ---
 
-### Remote checksum
+### 3.5. Remote checksum
 
 If file was copied recently, it _can be_ still on regular disks
 on the remote archive server, so we can simply issue remote command to calculate the
@@ -188,29 +188,34 @@ on the remote archive server, so we can simply issue remote command to calculate
 
 If checkum was also made just after the .tar(.gz) file was created, then both values can be checked if they are still identical.
 
-### Delete files on cluster
+### 3.6. Delete files on cluster
 
 Files in tmp/prm that have been successfully archived and verified by checksum can be safely removed from the cluster.
 
-### Migrating
+### 3.7 Changing file state on the archive
+
+**Move from disk to tape**
 
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
+
 ```
    dm-user $ arc_surf --darelease /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
 
-### Status
+**Status**
 
-Check the file status
+Listing the file status
+
 ```
    dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
 ```
-### Unmigrating
+
+**Move from tape to disks**
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
