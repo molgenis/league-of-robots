@@ -67,7 +67,7 @@ END {
       }
       printf("\n   size  = %.3f GB   |   files = %d   |   average size = %.2f GB/file\n", sumsize/limit_avg, filescount, avg/limit_avg)
       printf("\n-------------------------------- Result -----------------------------------------\n\n")
-      if ( big_files ) printf("\n   There was also files that were too big:\n%s\n\n", big_files)
+      if ( big_files ) printf("\n   There were files that were too big:\n%s\n", big_files)
       if (avg < limit_avg) {
          printf("   This data is too fragmented.\n")
          printf("   Before copying it to the archive, compress & bundle it with tar:\n")
@@ -77,7 +77,7 @@ END {
          printf("      rsync -rlP --size-only %s.tar.gz %s.tar.gz.sha256sum /groups/[group]/[arc0X]/...\n", ipath, ipath)
          printf("   Check if remote sha256sum is correct and only then you can remove original local files.\n")
       } else {
-         printf("    Your data is of correct size and you may simply copy it to the archive.")
+         printf("   Your data is of correct size and you may simply copy it to the archive.\n\n")
       }
    } else {
       print "Error: empty dataset or no permission."
