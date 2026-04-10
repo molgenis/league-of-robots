@@ -54,7 +54,7 @@ Therefore the correct procedure is to **first stage (recall from the tape) the f
 
 ### 2.1. Data states
 
-The data migrates on remote server from disk to tape and during this it has different states. **As long as the data is online (on disks), it is available to the user. It can be read or modified.**.
+The data migrates on remote server from disk to tape and during this it has different states. **As long as the data is online (on disks), it is available to the user. It can be read or modified**.
 
 | State | Code | Online (on disks) | Offline (on tape) | Explanation |
 | ----- | ---- |-------------- | ------------ | ----------- |
