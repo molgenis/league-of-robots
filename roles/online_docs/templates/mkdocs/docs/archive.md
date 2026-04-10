@@ -110,7 +110,7 @@ simply copied to the archive, or if not, it will suggest what to do next.
 **Preparing the data**
 
 Prepare the data by merging multiple files/folders
- into one compressed **tar** file.
+ into one compressed **tar.gz** file.
 
 Here are two options available
 
@@ -160,7 +160,7 @@ You can upload the file(s) to the archive either by using the `rsync` command ([
 as it can show the upload progress
 
 ```
-   dm-user $ rsync -rlP /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[arc0X]/projects/project-x.tar.gz
+   dm-user $ rsync -rlP --progress /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/arc[0X]/projects/project-x.tar.gz
 ```
 
 where the arguments are
@@ -172,7 +172,7 @@ where the arguments are
 Alternatively you can simply use `cp` command
 
 ```
-   dm-user $ cp /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[arc0X]/projects/project-x.tar.gz
+   dm-user $ cp /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/arc[0X]/projects/project-x.tar.gz
 ```
 
 ---
@@ -183,7 +183,7 @@ If file was copied recently, it _can be_ still on regular disks
 on the remote archive server, so we can simply issue remote command to calculate the
 `sha256sum` value of it
 ```
-   arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
+   /usr/local/bin/arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
 ```
 
 If checkum was also made just after the .tar(.gz) file was created, then both values can be checked if they are still identical.
@@ -199,7 +199,7 @@ Files in tmp/prm that have been successfully archived and verified by checksum c
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
 
 ```
-   dm-user $ arc_surf --darelease /groups/[group]/[arc0X]/projects/project-x.tar
+   dm-user $ /usr/local/bin/arc_surf --darelease /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
@@ -209,17 +209,17 @@ Files in tmp/prm that have been successfully archived and verified by checksum c
 Listing the file status
 
 ```
-   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
+   dm-user $ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
-   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
+   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar.gz
 ```
 
 **Move from tape to disks**
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
-   dm-user $ arc_surf --daget /groups/[group]/[arc0X]/projects/project-x.tar
+   dm-user $ /usr/local/bin/arc_surf --daget /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
 ```
@@ -229,14 +229,24 @@ If file is offline, we can call it back to disks - stage it `online` with
 After some time we check the status again.
 
 ```
-   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
+   dm-user $ /usr/local/bin/arc_sur --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
-   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar
+   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar.gz
 ```
 
 In this example, the file has status `QUE` (queued), but it can also have `STG` (staged).
 We must wait until it is changed to `DUL` (Dual-state).
+
+### 3.8 Retrieving the data from archive and extracting it
+
+Make sure the .tar.gz file
+
+```
+    dm-user $ rsync --progress /groups/[group]/arc[0X]/projects/project-x.tar.gz /groups/[group]/tmp[0X]/projects/
+    dm-user $ cd /groups/[group]/tmp[0X]/projects/
+    dm-user $ tar xvzf project-x.tar.gz
+```
 
 ## 4. Other command line options
 
