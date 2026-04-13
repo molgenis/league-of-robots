@@ -86,6 +86,20 @@ all:
                   - /dev/vdg
                   - /dev/vdh
                   - /dev/vdi
+          local_mount_subfolders:
+            - mount_point: '/groups'
+              machines: "{{ groups['data_transfer'] }}"
+              folders:
+                - rel_paths:
+                    - "{{ data_transfer_only_group }}"
+                  mode: '2750'
+                  owner: root
+                  group: "{{ data_transfer_only_group }}"
+                - rel_paths:
+                    - umcg-genomescan
+                    - umcg-gst
+                  mode: '2770'
+                  owner: root
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -166,13 +180,22 @@ all:
               mounted_mode: '0755'
               mount_options: 'defaults,nofail,x-systemd.device-timeout=10'
               type: xfs
-            - mount_point: '/local'
+            - mount_point: "{{ slurm_local_scratch_dir }}"
               device: '/mnt/local_raid/local'
               mounted_owner: root
               mounted_group: root
               mounted_mode: '2755'
               mount_options: 'bind,nofail'
               type: none
+          local_mount_subfolders:
+            - mount_point: "{{ slurm_local_scratch_dir }}"
+              machines: "{{ groups['compute_node'] }}"
+              folders:
+                - rel_paths:
+                    - cache
+                  mode: '2755'
+                  owner: "{{ envsync_user }}"
+                  group: "{{ envsync_group }}"
     deploy_admin_interface:
       hosts:
         betabarrel:
@@ -266,13 +289,35 @@ all:
                   mounted_mode: '0755'
                   mount_options: 'defaults,noatime,nofail'
                   type: xfs
-                - mount_point: '/local'
+                - mount_point: "{{ slurm_local_scratch_dir }}"
                   device: '/staging/slurm'
                   mounted_owner: root
                   mounted_group: root
                   mounted_mode: '0755'
                   mount_options: 'bind,nofail'
                   type: none
+              local_mount_subfolders:
+                - mount_point: '/staging'
+                  machines: "{{ groups['dragen'] }}"
+                  folders:
+                    - rel_paths:
+                        - development
+                      mode: '0770'
+                      owner: umcg-atd-ateambot
+                      group: umcg-atd
+                    - rel_paths:
+                        - slurm
+                      mode: '0755'
+                      owner: root
+                      group: root
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  machines: "{{ groups['dragen'] }}"
+                  folders:
+                    - rel_paths:
+                        - cache
+                      mode: '2755'
+                      owner: "{{ envsync_user }}"
+                      group: "{{ envsync_group }}"
               slurm_version: '20.11.9-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16

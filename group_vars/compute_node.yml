@@ -25,4 +25,13 @@ slurm_features: "{%- set slurm_feature_list =
       {%- set slurm_feature_list = slurm_feature_list | default([]) | union(['dragen']) -%}
     {%- endif -%}
     {{ slurm_feature_list | sort | join(',') }}"
+local_mount_subfolders:
+  - mount_point: "{{ slurm_local_scratch_dir }}"
+    machines: "{{ groups['compute_node'] }}"
+    folders:
+      - rel_paths:
+          - cache
+        mode: '2755'
+        owner: "{{ envsync_user }}"
+        group: "{{ envsync_group }}"
 ...
