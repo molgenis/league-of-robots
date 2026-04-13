@@ -7,4 +7,13 @@ local_mounts:
     mounted_mode: '0755'
     mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
     type: ext4
+local_mount_subfolders:
+  - mount_point: "{{ slurm_local_scratch_dir }}"
+    machines: "{{ groups['compute_node'] }}"
+    folders:
+      - rel_paths:
+          - cache
+        mode: '2755'
+        owner: "{{ envsync_user }}"
+        group: "{{ envsync_group }}"
 ...

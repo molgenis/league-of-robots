@@ -1,0 +1,7 @@
+---
+#
+# Command used to retrieve all public keys for a certain user from an LDAP.
+# Used a.o. by the envsync, sshd and sssd roles.
+#
+get_public_keys_command: /usr/libexec/openssh/get_public_keys_from_ldap.bash
+...
