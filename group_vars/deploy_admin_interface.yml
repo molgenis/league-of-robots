@@ -9,7 +9,7 @@ local_mounts:
     type: ext4
 local_mount_subfolders:
   - mount_point: "{{ hpc_env_prefix }}"
-    machines: "{{ groups['compute_node'] }}"
+    machines: "{{ groups['deploy_admin_interface'] }}"
     folders:
       - rel_paths:
           - cache
