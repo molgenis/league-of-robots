@@ -99,6 +99,13 @@ ip_addresses:
     vt_internal_management:
       address: 10.10.1.198
       netmask: /32
+  vt-node-c01:
+    lustre:
+      address: 172.23.12.236
+      netmask: /32
+    vt_internal_management:
+      address: 10.10.1.162
+      netmask: /32
   vt-repo:
     vt_internal_management:
       address: 10.10.1.71
