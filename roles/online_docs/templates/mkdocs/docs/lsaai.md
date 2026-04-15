@@ -1,6 +1,6 @@
 #jinja2: trim_blocks:False
 
-# Using LSAAI accounts
+# LSAAI accounts
 
 ## 1. Overview
 
