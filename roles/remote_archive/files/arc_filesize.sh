@@ -49,18 +49,18 @@ END {
       maxc = 0
       for (i=0;i<=maxi;i++)
          if (sizes[i] > maxc) maxc = sizes[i]
-      
+
       for (i=0;i<=maxi;i++) {
          w = maxc ? int(sizes[i]*56/maxc) : 0
          if (int((log(avg)/log(10)))==i) {
             labelavg = "~avg~"
       } else labelavg = "     "
-      
+
       label = reformat(10^i)
       if (10^i == limit_avg) {
          label = "=> " label
       }
-     
+
       printf("%5s %7s |", labelavg, label)
       for (j=0;j<w;j++) printf("*")
          printf(" %d\n", sizes[i]+0)

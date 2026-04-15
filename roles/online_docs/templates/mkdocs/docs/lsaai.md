@@ -33,7 +33,7 @@ It provides following key functions
 ## 2. Regular users
 
 
-The registration process varies depending on your home organization. 
+The registration process varies depending on your home organization.
 
 - **For RUG and UMCG Members**
 
@@ -89,7 +89,7 @@ If a project lead has provided you with a **specific group invitation link**:
 
 ### 2.3. Final Approval
 
-In both cases, access to **HPC groups** is granted only after **group administrators** approve your request. 
+In both cases, access to **HPC groups** is granted only after **group administrators** approve your request.
 
 * You will receive a notification email once your access has been provisioned.
 * You can then proceed to use the GGCC computing resources.
