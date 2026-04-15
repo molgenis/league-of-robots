@@ -13,9 +13,11 @@ In short
 
 ### 1.1. What is LSAAI
 
-It is a specialized **identity and access management** system for the European life science research community.
+It is an **identity and access management** system designed for the European Life Science research community. It enables researchers to use a single digital identity—leveraging their existing institutional or community accounts—to securely access shared data and computing resources.
 
-It allows researchers to use a single digital identity, using their existing institutional or community accounts, to securely acces shared data and computing resources. Users and administrators can manage virtual organizations, handle group memberships, and configure fine-grained access rights to ensure that sensitive scientific data remains protected while remaining accessible to authorized collaborators.
+Users can request and manage their own access credentials.
+
+Group owners and data managers can manage group membership themselves or delegate this responsibility to others.
 
 ### 1.2. Key Functions
 
@@ -130,7 +132,11 @@ Note: If you lose your key or forget your passphrase, simply generate a new pair
 
 ### 3.4. Extending user group access
 
+
+
 ### 3.3. Removing user from a group
+
+
 
 ## 4. Best practices
 
