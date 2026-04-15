@@ -134,21 +134,21 @@ Note: If you lose your key or forget your passphrase, simply generate a new pair
  - Open the group and locate the `Members` tile (available to group administrators). ([screenshot](img/lsaai_manager_1.png))
  - Click `Add` and search for the person you wish to include. You can search by name or email address. ([screenshot](img/lsaai_manager_2.png))
 
-### 3.4. Extending user group access
+### 3.3. Extending user group access
 
-1. Login to the [Perun](https://perun.aai.lifescience-ri.eu/organizations/3363/)
-2. Use `Groups` tab, and go to the group you wish to manage membership
-3. Select `Members` tab ([screenshot](img/lsaai_manager_4.png))
-  3.1. Use drop-down `Filter by group status` (default is set to `ACTIVE`) and pick `EXPIRED`
-  3.2. You will now see only users that have expired
-  3.3. Click on username and in the new page, under `Group membership` next to the `Status: EXPIRED` you can select edit (pen) icon ([screenshot](img/lsaai_manager_5.png))
-  3.4. Here you select from the three options and click `Change status` ([screenshot](img/lsaai_manager_6.png))
+- Login to the [Perun](https://perun.aai.lifescience-ri.eu/organizations/3363/)
+- Use `Groups` tab, and go to the group you wish to manage membership
+- Select `Members` tab ([screenshot](img/lsaai_manager_4.png))
+- Use drop-down `Filter by group status` (default is set to `ACTIVE`) and pick `EXPIRED`
+- You will now see only users that have expired
+- Click on username and in the new page, under `Group membership` next to the `Status: EXPIRED` you can select edit (pen) icon ([screenshot](img/lsaai_manager_5.png))
+- Here you select from the three options and click `Change status` ([screenshot](img/lsaai_manager_6.png))
 
-### 3.3. Removing user from a group
+### 3.4. Removing user from a group
 
-1. Login to the [Perun](https://perun.aai.lifescience-ri.eu/organizations/3363/)
-2. Use `Groups` tab, and go to the group you wish to manage membership
-3. Select `Members` tab ([screenshot](img/lsaai_manager_4.png))
-4. Tick the checkboxes in front of the usernames you wish to remove
-5. Confirm with `Remove` ([screenshot](img/lsaai_manager_7.png))
+- Login to the [Perun](https://perun.aai.lifescience-ri.eu/organizations/3363/)
+- Use `Groups` tab, and go to the group you wish to manage membership
+- Select `Members` tab ([screenshot](img/lsaai_manager_4.png))
+- Tick the checkboxes in front of the usernames you wish to remove
+- Confirm with `Remove` ([screenshot](img/lsaai_manager_7.png))
 
