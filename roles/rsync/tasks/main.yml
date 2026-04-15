@@ -6,13 +6,13 @@
 # which configures an rsync deamon on a managed host.
 #
 ---
-#- name: Install rsync.
-#  ansible.builtin.package:
-#<S-F3>    state: 'latest'
-#    update_cache: true
-#    name: 'rsync'
-#  become: true
-#
+- name: Install rsync.
+  ansible.builtin.package:
+    state: 'latest'
+    update_cache: true
+    name: 'rsync'
+  become: true
+
 # Check managed hosts.
 #
 - name: Check if rsync >= 3.1.2 is installed on the managed hosts.
