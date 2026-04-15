@@ -2,6 +2,12 @@
 
 # LSAAI accounts
 
+This page is written in three parts
+
+1. [Overview](#1-overview) - brief description of LSAAI
+2. [Regular users](#2-regular-users) - instructions for regular users creating an account
+3. [Group managers](#3-group-managers) - instructions for group managers
+
 ## 1. Overview
 
 In short
