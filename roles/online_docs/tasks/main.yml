@@ -83,30 +83,30 @@
     state: 'permissive'
   become: true
 
-- name: 'Install rsync.'
-  ansible.builtin.package:
-    state: 'latest'
-    update_cache: true
-    name:
-      - 'rsync'
-  become: true
+#- name: 'Install rsync.'
+##  ansible.builtin.package:
+#    state: 'latest'
+#    update_cache: true
+#    name:
+#      - 'rsync'
+#  become: true
 
-- name: 'Install nano, PHP, Python and Apache webserver.'
-  ansible.builtin.package:
-    state: 'latest'
-    update_cache: true
-    name:
-      - 'nano'
-      - 'php'
-      - 'python3'
-      - 'python3-pip'
-      - 'python3-jinja2'
-      - 'python3-markupsafe'
-      - 'httpd'
-      - 'mod_ssl'
-  notify:
-    - 'restart_httpd'
-  become: true
+#- name: 'Install nano, PHP, Python and Apache webserver.'
+#  ansible.builtin.package:
+#    state: 'latest'
+#    update_cache: true
+#    name:
+#      - 'nano'
+#      - 'php'
+#      - 'python3'
+#      - 'python3-pip'
+#      - 'python3-jinja2'
+#      - 'python3-markupsafe'
+#      - 'httpd'
+#      - 'mod_ssl'
+#  notify:
+#    - 'restart_httpd'
+#  become: true
 
 - name: 'Install the private key, certificate and chain files.'
   ansible.builtin.copy:  # noqa risky-file-permissions
