@@ -1,6 +1,6 @@
 #jinja2: trim_blocks:False
 
-# LSAAI accounts
+# LSAAI accounts and groups
 
 This page is written in three parts
 
