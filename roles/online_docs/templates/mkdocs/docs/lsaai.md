@@ -109,8 +109,8 @@ Accessing the clusters requires an SSH public-private key pair (see instructions
 ([image 9](img/lsaai_ssh.png))
  - Wait: It typically takes a few minutes for the key to propagate to the clusters.
  - Connect to the cluter
-   - **remember: your username is the email address** that you are using to login into the LSAAI
-   - follow the [login instructions](../logins/) using this username
+    - **remember: your username is the email address** that you are using to login into the LSAAI
+    - follow the [login instructions](../logins/) using this username
 
 Note: If you lose your key or forget your passphrase, simply generate a new pair and update your profile at the link above.
 
