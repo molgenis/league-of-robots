@@ -80,14 +80,14 @@ Once your account is created and you log in to LifeScience, you may see a messag
 
 #### Option A: Join the GGCC Virtual Organization
 
-You can request general membership by visiting the registrar:
+You can request general membership by visiting the registrar
 
 * **Link:** [Request GGCC Membership](https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc) ([image 9](img/lsaai_user_9.png))
 * Follow the prompts to join the VO and specific groups as needed.
 
 #### Option B: Join via Invitation Link
 
-If a project lead has provided you with a **specific group invitation link**:
+If a project lead has provided you with a **specific group invitation link**
 
 * Clicking the link will automatically generate an access request on your behalf.
 * You should see a confirmation: *"You have successfully applied for membership."*
@@ -127,7 +127,7 @@ Note: If you lose your key or forget your passphrase, simply generate a new pair
 
 **Option A: Invite Users via Link**
 
- - From the group administration page, navigate to `Members` and select `Copy invitation link`. [screenshot](img/lsaai_manager_3.png)
+ - From the group administration page, navigate to `Members` and select `Copy invitation link`. ([screenshot](img/lsaai_manager_3.png))
  - User clicks on the invitation URL: the system automatically submits a request to join the group for them.
  - Group administrator must navigate into `Group` > `Applications`, go into `pending` view (to show users that applied to join), then select and `Approve` them
 
