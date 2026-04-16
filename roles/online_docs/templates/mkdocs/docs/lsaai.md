@@ -108,8 +108,8 @@ Accessing the clusters requires an SSH public-private key pair (see instructions
  - Upload: Add your **public** key to your [LSAAI profile](https://profile.aai.lifescience-ri.eu/) > Authentication > [SSH keys](https://profile.aai.lifescience-ri.eu/profile/auth/sshKeys).
 ([image 9](img/lsaai_ssh.png))
  - Wait: It typically takes a few minutes for the key to propagate to the clusters.
- - Connect to the cluter
-    - **remember: your username is the email address** that you are using to login into the LSAAI
+ - Connect to the cluster
+    - **remember: your accountname / username is the email address** that you are using to login into the LSAAI
     - follow the [login instructions](../logins/) using this username
 
 Note: If you lose your key or forget your passphrase, simply generate a new pair and update your profile at the link above.
