@@ -45,6 +45,9 @@ Use the instructions for your operating system:
  * Instructions for [macOS clients](../generate-key-pair-openssh/).
  * Instructions for [Linux/Unix clients](../generate-key-pair-openssh/).
 
-## 3. Request an account via email
+## 3. Request an account
 
-**[Follow the instructions](request-an-account.md)**
+There are two ways you can request an account on the clusters and it depends on project you wish to be involved and which group you wish join
+
+- **(Most stable)** Write an email with relevant information and sent it to a **[Helpdesk Support](request-an-account.md)**
+- **(Testing/upcoming)** Create account by using **[LifeScience Infrastructure](lsaai.md)**
