@@ -199,4 +199,24 @@
   register: lsaai_schema_modify_reg
   notify: lsaai_schema_modify
   become: true
+
+- name: Deploy LDAP backup script
+  ansible.builtin.copy:
+    src: "lsaai_ldap_backup.sh"
+    dest: "/root/lsaai_ldap_backup.sh"
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: 'Deploy cron job to daily backup LDAP server.'
+  ansible.builtin.cron:
+    name: "lsaai_ldap_daily_backup # don't change, made by Ansible"
+    weekday: "*"
+    hour: "05"
+    minute: "44"
+    user: "root"
+    cron_file: "lsaai_ldap_backup"
+    job: "/bin/bash -c '/root/lsaai_ldap_backup.sh'"
+  become: true
 ...

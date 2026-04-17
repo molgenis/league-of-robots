@@ -50,6 +50,30 @@ ip_addresses:
       address: '129.125.2.0'
       netmask: '/24'
       desc: 'RUG F5 load balancers.'
+    vlan16:
+      address: '195.169.22.0'
+      netmask: '/23'
+      desc: 'vlan16'
+    merlin_16:
+      address: '195.169.22.0'
+      netmask: '/24'
+      desc: 'subset of vlan16 - Merlin'
+    bateleur_16:
+      address: '195.169.23.0'
+      netmask: '/24'
+      desc: 'subset of vlan16 - Bateleur external'
+    vlan1066:
+      address: '194.171.202.0'
+      netmask: '/23'
+      desc: 'vlan1066'
+    merlin_1066:
+      address: '194.171.203.0'
+      netmask: '/24'
+      desc: 'subset of vlan1066 - Merlin'
+    batelur_1066:
+      address: '194.171.202.0'
+      netmask: '/24'
+      desc: 'subset of vlan1066 - Bateleur external_unfiltered'
   #
   # RUG research cluster UIs.
   #
