@@ -83,7 +83,7 @@ Main steps to reliably upload the data
 
 Become the data manager
 ```
-   user $ sudo -u [group]-dm bash
+sudo -u [group]-dm bash
 ```
 
 ### Bundling
@@ -98,7 +98,7 @@ a) data is compressed
 
 the data can be bundled and *compressed* at the same time
 ```
-   dm-user $ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
+   [dm-user@~]$ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
 ```
 this will result (in comparison with the option b) in
  - taking longer to compress and decompress the files
@@ -107,7 +107,7 @@ this will result (in comparison with the option b) in
 
 b) or it can be simply bundled without compression
 ```
-   dm-user $ tar -cvf /groups/[group]/[prm0X]/projects/project-x.tar /groups/[group]/[prm0X]/projects/x/*
+   [dm-user@~]$ tar -cvf /groups/[group]/[prm0X]/projects/project-x.tar /groups/[group]/[prm0X]/projects/x/*
 ```
 
 this will result (in comparison to the option a)
@@ -120,7 +120,7 @@ this will result (in comparison to the option a)
 Create a checksum of the file. This _fingerprint_ can
 be checked later to verify that the file was successfully uploaded to the archive and that it was correctly restored when when downloading it back from the archive.
 ```
-   dm-user $ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
+   [dm-user@~]$ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
 ```
 
 Checksum verification process on the remote storage side supports only **`sha256sum`**
@@ -129,7 +129,7 @@ Checksum verification process on the remote storage side supports only **`sha256
 
 Upload of the file(s) to the archive
 ```
-   dm-user $ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
 
 ```
 
@@ -148,7 +148,7 @@ If checkum was also made just after the .tar file was created, then both values 
 
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
 ```
-   dm-user $ arc_surf --darelease /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ arc_surf --darelease /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
@@ -157,7 +157,7 @@ If checkum was also made just after the .tar file was created, then both values 
 
 Check the file status
 ```
-   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
@@ -166,7 +166,7 @@ Check the file status
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
-   dm-user $ arc_surf --daget /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ arc_surf --daget /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
 ```
@@ -176,7 +176,7 @@ If file is offline, we can call it back to disks - stage it `online` with
 After some time we check the status again.
 
 ```
-   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar
