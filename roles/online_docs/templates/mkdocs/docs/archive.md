@@ -229,7 +229,7 @@ If file is offline, we can call it back to disks - stage it `online` with
 After some time we check the status again.
 
 ```
-   dm-user $ /usr/local/bin/arc_sur --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   dm-user $ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar.gz
