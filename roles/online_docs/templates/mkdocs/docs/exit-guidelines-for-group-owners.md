@@ -1,5 +1,10 @@
 # Exit Guidelines for group owners
 
+These guidelines should be used in case you stop using the cluster.
+So you leave the cluster neat and orginized, and important data stored in the correct location.
+
+Thank you in advance for taking the time to clean up your group, very much appreciated.  
+
 #### First some general remarks. 
 TMP is for calculating, this is not backed-up. PRM is for storage of important data, this is backed-up. We now also privide an archive option, for sleeping datasets. Archive is substanially cheaper compared to PRM storage.
 As you might know by our [code of conduct](/../coc_umcg_research_clusters/), you are obliged to work according the [UMCG research code](https://researchcode.umcgresearch.org/en/).
