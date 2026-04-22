@@ -16,7 +16,7 @@ In these guidelines a few easy steps to follow to clean out your part of the clu
 - Get your DMP(s).
 - Go to your tmp folder on the cluster. Check all clusters, if you used more than 1.
 - Gather all important data, data you need to store for publication/storage/FAIRdata purposes and organise it logicaly. Be critical, only keep the important data.
-- Write or adapt the README for each data set/project. 
+- Write or adapt the README for each dataset/project. 
 	- Mention your name and contact information
 	- Responsible PIs and contact information
 	- Retention time
