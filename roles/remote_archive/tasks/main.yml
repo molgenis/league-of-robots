@@ -19,4 +19,16 @@
   when:
     - remote_archive is defined
     - inventory_hostname in groups['user_interface'] | default([])
+
+- name: Install file size check script
+  ansible.builtin.copy:
+    src: "files/arc_sizecheck"
+    dest: /usr/local/bin/arc_sizecheck
+    mode: "0755"
+    owner: root
+    group: root
+  when:
+    - remote_archive is defined
+    - inventory_hostname in groups['user_interface'] | default([])
+  become: true
 ...
