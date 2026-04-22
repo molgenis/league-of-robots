@@ -1,7 +1,7 @@
 # Exit Guidelines for group owners
 
 These guidelines should be used in case you stop using the cluster.
-So you leave the cluster neat and orginized, and important data stored in the correct location.
+So you leave the cluster neat and organized, and important data stored in the correct location.
 
 Thank you in advance for taking the time to clean up your group, very much appreciated.  
 
