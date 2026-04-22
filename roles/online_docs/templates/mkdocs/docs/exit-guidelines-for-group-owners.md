@@ -6,7 +6,7 @@ So you leave the cluster neat and organized, and important data stored in the co
 Thank you in advance for taking the time to clean up your group, very much appreciated.  
 
 #### First some general remarks. 
-TMP is for calculating, this is not backed-up. PRM is for storage of important data, this is backed-up. We now also privide an archive option, for sleeping datasets. Archive is substanially cheaper compared to PRM storage.
+TMP is for calculating and without backup. PRM is for storage of important data and has backup. We now also privide an archive option, for sleeping datasets. Archive is substantially cheaper compared to PRM storage.
 As you might know by our [code of conduct](/../coc_umcg_research_clusters/), you are obliged to work according the [UMCG research code](https://researchcode.umcgresearch.org/en/).
 According to the UMCG research code, you are obliged to have a [Data Management Plan (DMP)](https://umcg.zenya.work/portal/#/document/99b46c52-2c81-4193-b688-ad5a01d1a496?scope=global&searchText=data%20management%20plan) for your project(s).
 In this DMP, a lot of information gathered concerning your project, including retention time, and where you are supposed to store your data.
