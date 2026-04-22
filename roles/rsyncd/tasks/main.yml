@@ -9,12 +9,12 @@
 # which configures rsync on a managed host for use with the Ansible "ansible.posix.synchronize" task.
 #
 ---
-- name: 'Install rsync.'
-  ansible.builtin.package:
-    state: 'latest'
-    update_cache: true
-    name: 'rsync'
-  become: true
+#- name: 'Install rsync.'
+#  ansible.builtin.package:
+#    state: 'latest'
+#    update_cache: true
+#    name: 'rsync'
+#  become: true
 
 - name: 'Install rsyncd config files with "modules" on data transfer machines'
   ansible.builtin.template:

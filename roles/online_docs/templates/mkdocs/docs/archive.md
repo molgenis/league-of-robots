@@ -87,7 +87,7 @@ How to upload and modify states of the remote files.
 Become the data manager
 
 ```
-   user $ sudo -u [group]-dm bash
+sudo -u [group]-dm bash
 ```
 
 ### 3.2. Bundling
@@ -118,7 +118,7 @@ a) data is compressed
 
 the data can be bundled and *compressed* at the same time
 ```
-   dm-user $ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
+   [dm-user@~]$ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
 ```
 this will result (in comparison with the option b) in
  - taking longer to compress and decompress the files
@@ -127,7 +127,7 @@ this will result (in comparison with the option b) in
 
 b) or it can be simply bundled without compression
 ```
-   dm-user $ tar -cvf /groups/[group]/[prm0X]/projects/project-x.tar /groups/[group]/[prm0X]/projects/x/*
+   [dm-user@~]$ tar -cvf /groups/[group]/[prm0X]/projects/project-x.tar /groups/[group]/[prm0X]/projects/x/*
 ```
 
 this will result (in comparison to the option a)
@@ -142,7 +142,7 @@ this will result (in comparison to the option a)
 Create a checksum of the file. This _fingerprint_ can
 be checked later to verify that the file was successfully uploaded to the archive and that it was correctly restored when when downloading it back from the archive.
 ```
-   dm-user $ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
+   [dm-user@~]$ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
 ```
 
 Checksum verification process on the remote storage side supports only **`sha256sum`**
