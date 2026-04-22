@@ -1,12 +1,12 @@
 # Exit Guidelines for group owners
 
 These guidelines should be used in case you stop using the cluster.
-So you leave the cluster neat and orginized, and important data stored in the correct location.
+So you leave the cluster neat and organized, and important data stored in the correct location.
 
 Thank you in advance for taking the time to clean up your group, very much appreciated.  
 
 #### First some general remarks. 
-TMP is for calculating, this is not backed-up. PRM is for storage of important data, this is backed-up. We now also privide an archive option, for sleeping datasets. Archive is substanially cheaper compared to PRM storage.
+TMP is for calculating and without backup. PRM is for storage of important data and has backup. We now also privide an archive option, for sleeping datasets. Archive is substantially cheaper compared to PRM storage.
 As you might know by our [code of conduct](/../coc_umcg_research_clusters/), you are obliged to work according the [UMCG research code](https://researchcode.umcgresearch.org/en/).
 According to the UMCG research code, you are obliged to have a [Data Management Plan (DMP)](https://umcg.zenya.work/portal/#/document/99b46c52-2c81-4193-b688-ad5a01d1a496?scope=global&searchText=data%20management%20plan) for your project(s).
 In this DMP, a lot of information gathered concerning your project, including retention time, and where you are supposed to store your data.
@@ -17,7 +17,7 @@ Stated in the [UMCG research code](https://researchcode.umcgresearch.org/en/):
 - *"A principal investigator is available and responsible for all aspects of a study"*
 - *"The study's research goals and methods are laid down in a high-quality and complete research protocol with a DMP"*
 
-To sum it up, you, as a group owner, you are responsible for paiying the bill, but also for the work conducted in your group. You are oblidged to make sure the projects/studies in your group are documented accordingly and up to UMCG standards.  
+To sum it up, you, as a group owner, are responsible for paying the bill, but also for the work conducted in your group. You are obliged to make sure the projects/studies in your group are documented accordingly and up to UMCG standards.  
 
 #### The steps to follow:
 
@@ -42,7 +42,7 @@ Together we can figure out how to proceed.
 
 If you fail your responsibilities, and leave your group without following the above guidelines, we will consider your former group as legacy data. We, as HPC admins, are not responsible for making decision concerning data. In practice this will mean we will ask the department head what we should do with the data. The department head has 2 options. 
 1. Delete all data and the group.
-2. Assaign a new data costodian, who is then responsible for the data and has to make sure it is again documented accoring the UMCG research code.
+2. Assign a new data custodian, who is then responsible for the data and has to make sure it is again documented according the UMCG research code.
 
 
 
