@@ -17,7 +17,7 @@ Stated in the [UMCG research code](https://researchcode.umcgresearch.org/en/):
 - *"A principal investigator is available and responsible for all aspects of a study"*
 - *"The study's research goals and methods are laid down in a high-quality and complete research protocol with a DMP"*
 
-To sum it up, you, as a group owner, you are responsible for paiying the bill, but also for the work conducted in your group. You are oblidged to make sure the projects/studies in your group are documented accordingly and up to UMCG standards.  
+To sum it up, you, as a group owner, are responsible for paying the bill, but also for the work conducted in your group. You are obliged to make sure the projects/studies in your group are documented accordingly and up to UMCG standards.  
 
 #### The steps to follow:
 
