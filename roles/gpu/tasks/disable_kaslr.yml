@@ -1,0 +1,67 @@
+---
+- name: Check if GRUB_CMDLINE_LINUX is present in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX=' /etc/default/grub"
+  register: search_grub_cmdline_linux_in_grub_config_by_gpu_role
+  changed_when: false
+  failed_when: search_grub_cmdline_linux_in_grub_config_by_gpu_role['rc'] >= 2
+
+- name: Check if GRUB_CMDLINE_LINUX_DEFAULT is present in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub"
+  register: search_grub_cmdline_linux_default_in_grub_config_by_gpu_role
+  changed_when: false
+  failed_when: search_grub_cmdline_linux_default_in_grub_config_by_gpu_role['rc'] >= 2
+
+- name: Fail if Grub config is in an unsupported state.
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+                    Both GRUB_CMDLINE_LINUX and GRUB_CMDLINE_LINUX_DEFAULT are missing from /etc/default/grub
+                    Check the Grub config and documentation ...
+         ***********************************************************************************************************
+  when:
+    - "'GRUB_CMDLINE_LINUX=' not in search_grub_cmdline_linux_in_grub_config_by_gpu_role['stdout']"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in search_grub_cmdline_linux_default_in_grub_config_by_gpu_role['stdout']"
+  failed_when:
+    - "'GRUB_CMDLINE_LINUX=' not in search_grub_cmdline_linux_in_grub_config_by_gpu_role['stdout']"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in search_grub_cmdline_linux_default_in_grub_config_by_gpu_role['stdout']"
+
+- name: Check if we need to add "nokaslr" to GRUB_CMDLINE_LINUX* in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: |
+         grep 'GRUB_CMDLINE_LINUX\(_DEFAULT\)\?=.*nokaslr.*' /etc/default/grub
+  register: search_nokaslr_in_grub_config_by_gpu_role
+  changed_when: false
+  failed_when: search_nokaslr_in_grub_config_by_gpu_role['rc'] >= 2
+
+- name: Add "nokaslr" to GRUB config.
+  ansible.builtin.lineinfile:
+    path: '/etc/default/grub'
+    backup: true
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX(_DEFAULT)?=\")([^\"]*)(\")$'
+    line: '\1\3 nokaslr\4'
+    owner: root
+    group: root
+    mode: '0644'
+  when: "'nokaslr' not in search_nokaslr_in_grub_config_by_gpu_role['stdout']"
+  notify:
+    - rebuild_grub_config_by_gpu_role
+    - reboot_by_gpu_role
+  become: true
+
+- name: 'Check if GRUB configs needs to be rebuild for the running kernel.'
+  ansible.builtin.command:
+    cmd: grep 'nokaslr' /proc/cmdline
+  register: search_nokaslr_in_kernel_params
+  changed_when: search_nokaslr_in_kernel_params['rc'] == 1
+  failed_when: search_nokaslr_in_kernel_params['rc'] >= 2
+  notify:
+    - rebuild_grub_config_by_gpu_role
+    - reboot_by_gpu_role
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
+...

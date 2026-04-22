@@ -1,5 +1,21 @@
 ---
-- name: Enable / restart nvidia-persistenced service
+#
+# Important: maintain correct handler order.
+# Handlers are executed in the order in which they are defined
+# and not in the order in which they are listed in a "notify: handler_name" statement!
+#
+- name: Rebuild GRUB config.
+  ansible.builtin.shell: |
+         timestamp="$(date '+%Y-%m-%dT%H:%M:%S%z')"
+         cp -v '/boot/grub2/grub.cfg' "/boot/grub2/grub.cfg.ansible_backup_${timestamp}"
+         grub2-mkconfig --update-bls-cmdline -o '/boot/grub2/grub.cfg'
+  args:
+    executable: '/bin/bash'
+  changed_when: true
+  become: true
+  listen: rebuild_grub_config_by_gpu_role
+
+- name: Enable / restart nvidia-persistenced service.
   ansible.builtin.systemd:
     name: nvidia-persistenced.service
     state: restarted
@@ -8,17 +24,17 @@
   become: true
   listen: 'nvidia_service'
 
-- name: Rebuild initramfs
+- name: Rebuild initramfs.
   ansible.builtin.command: dracut -f
-  notify: reboot_server
+  notify: reboot_by_gpu_role
   register: dracut_reg
   changed_when: dracut_reg.rc == 0
   listen: 'dracut'
   become: true
 
-- name: Restart server
+- name: Restart server.
   ansible.builtin.reboot:
-    msg: "Reboot initiated by Ansible"
-  listen: 'reboot_server'
+    msg: 'Reboot initiated by Ansible "gpu" role from League of Robots playbook/repo.'
+  listen: reboot_by_gpu_role
   become: true
 ...

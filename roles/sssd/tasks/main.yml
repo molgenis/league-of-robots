@@ -123,7 +123,7 @@
 - name: Deploy custom script to fetch public keys from LDAP servers.
   ansible.builtin.template:
     src: get_public_keys_from_ldap.bash
-    dest: /usr/libexec/openssh/get_public_keys_from_ldap.bash
+    dest: "{{ get_public_keys_command }}"
     owner: root
     group: root
     mode: '0755'

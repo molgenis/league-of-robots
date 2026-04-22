@@ -118,7 +118,7 @@ IgnoreRhosts yes
 # Get public keys for regular users from LDAP.
 #
   {% if use_sssd | default(false) | bool %}
-AuthorizedKeysCommand /usr/libexec/openssh/get_public_keys_from_ldap.bash
+AuthorizedKeysCommand {{ get_public_keys_command }}
   {% else %}
 AuthorizedKeysCommand /usr/libexec/openssh/ssh-ldap-wrapper.bash
   {% endif %}

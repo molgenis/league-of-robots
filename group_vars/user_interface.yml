@@ -4,4 +4,19 @@ user_quota_on_root_partition:
   blocks_hard: 3G
   inodes_soft: 32000
   inodes_hard: 64000
+slurm_features: "{%- set slurm_feature_list =
+      lfs_mounts
+        | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+        | rejectattr('rw_machines', 'undefined')
+        | selectattr('rw_machines', 'contains', inventory_hostname)
+      | union(
+        lfs_mounts
+          | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
+          | rejectattr('ro_machines', 'undefined')
+          | selectattr('ro_machines', 'contains', inventory_hostname))
+      | map(attribute='lfs') -%}
+    {%- if gpu_count | default(0) >= 1 -%}
+      {%- set slurm_feature_list = slurm_feature_list | default([]) | union(['gpu', gpu_type]) -%}
+    {%- endif -%}
+    {{ slurm_feature_list | sort | join(',') }}"
 ...
