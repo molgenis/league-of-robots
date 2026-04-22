@@ -1,14 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
-[[ -z "${1:-}" || -n "${2:-}" ]] && { echo "$0 /path/to"; exit 1; }
+[[ -z "${1:-}" || "${#}" -gt "1" ]] && {
+   echo -e "\nRunning a diagnostic on the directory contents..."
+   echo "Output reports if the folder content meets archival requirements"
+   echo "(if average file sizes are within the permitted range)."
+   echo ""
+   echo "To use this script, you should use a path to a specific directory"
+   echo -e "    $0 /path/to/directory\n"
+   exit 1
+}
+! test -d ${1} && echo "Directory does not exist or you don't have permission to read it." && exit 1
 
 _file="$(mktemp)"
 trap 'rm -f "${_file}"' EXIT INT TERM
-#echo "Collecting file statistics and storing into ${_file}"
-
-#{ find "${1}" -type f -print0 2>/dev/null | xargs -0 stat --format="%n %s" 2>/dev/null | awk '{ print "> " $0 }'; }
-#exit
 
 
 # stat %s size, %n file path and file name
