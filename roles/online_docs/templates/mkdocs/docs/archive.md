@@ -245,7 +245,7 @@ Make sure the .tar.gz file
 ```
     [dm-user@~]$ rsync --progress /groups/[group]/arc[0X]/projects/project-x.tar.gz /groups/[group]/tmp[0X]/projects/
     [dm-user@~]$ cd /groups/[group]/tmp[0X]/projects/
-    [dm-user@~]$ tar xvzf project-x.tar.gz
+    [dm-user@~]$ tar -xvzf project-x.tar.gz
 ```
 
 ## 4. Other command line options
