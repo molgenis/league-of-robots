@@ -10,7 +10,7 @@ set -euo pipefail
    echo -e "    $0 /path/to/directory\n"
    exit 1
 }
-! test -d ${1} && echo "Directory does not exist or you don't have permission to read it." && exit 1
+! test -d "${1}" && echo "Directory does not exist or you don't have permission to read it." && exit 1
 
 _file="$(mktemp)"
 trap 'rm -f "${_file}"' EXIT INT TERM
