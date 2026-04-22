@@ -43,6 +43,7 @@ all:
           local_mounts:
             - mount_point: '/var/spool/cvmfs'
               device: '/dev/vdb'
+              label: cvmfs-spool
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
@@ -55,6 +56,7 @@ all:
               type: ext4
             - mount_point: '/srv/cvmfs'
               device: '/dev/vdc'
+              label: cvmfs-srv
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'

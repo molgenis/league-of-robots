@@ -7,4 +7,13 @@ local_mounts:
     mounted_mode: '2775'
     mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
     type: ext4
+local_mount_subfolders:
+  - mount_point: "{{ hpc_env_prefix }}"
+    machines: "{{ groups['deploy_admin_interface'] }}"
+    folders:
+      - rel_paths:
+          - cache
+        mode: '2755'
+        owner: "{{ envsync_user }}"
+        group: "{{ envsync_group }}"
 ...

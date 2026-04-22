@@ -54,6 +54,17 @@ all:
             - ANY
           iptables_allow_icmp_inbound: "{{ iptables_allow_ssh_inbound }}"
           iptables_allow_ldap_inbound:
+            - "{{ all.ip_addresses['umcg']['net1'] }}"
+            - "{{ all.ip_addresses['umcg']['net2'] }}"
+            - "{{ all.ip_addresses['umcg']['net3'] }}"
+            - "{{ all.ip_addresses['umcg']['net4'] }}"
+            - "{{ all.ip_addresses['rug']['bwp_net'] }}"
+            - "{{ all.ip_addresses['rug']['operator'] }}"
+            - "{{ all.ip_addresses['rug']['vlan16'] }}"
+            - "{{ all.ip_addresses['rug']['vlan1066'] }}"
+          iptables_allow_http_inbound:
+            - ANY
+          iptables_allow_https_inbound:
             - ANY
           perun_facility_name: "umcg-gcc"
           perun_service_whitelist: "ldap_lsaai"

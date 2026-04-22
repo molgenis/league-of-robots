@@ -5,7 +5,7 @@
   failed_when: 'needs_restarting.rc > 1'
   changed_when: 'needs_restarting.rc == 1'
   become: true
-  notify: 'reboot_server'
+  notify: reboot_by_gpu_role
 
 - name: Copy blacklist-nouveau.conf file into modprobe.d to disable Nouveau drivers
   ansible.builtin.copy:
@@ -15,7 +15,20 @@
     group: root
     mode: '0644'
   become: true
-  notify: 'reboot_server'
+  notify: reboot_by_gpu_role
+
+#
+# Workaround: Disable the Kernel Address Space Layout Randomization (KASLR) security feature
+# for GPUs that use the CUDA memory management feature "Heterogeneous Memory Management (HMM)" for
+# "NVIDIA Unified Virtual Memory (UVM)", which currently crashes machines when KASLR is enabled.
+#
+# See https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#known-issues
+#
+- name: "Workaround - disable KASLR or {{ gpu_type }} GPUs that use NVIDIA HMM for NVIDIA UVM."
+  ansible.builtin.include_tasks: disable_kaslr.yml
+  when:
+    - gpu_count|default(0) >= 1
+    - gpu_type == 'rtx6000'
 
 - name: Reboot system if needed
   ansible.builtin.meta: flush_handlers
@@ -43,22 +56,24 @@
       - wget
   become: true
 
-- name: Download a driver installation file from NVidia
+- name: Download GPU driver installation file.
   ansible.builtin.get_url:
-    url: '{{ gpu_url_dir }}/{{ gpu_runfile }}'
+    url: "{{ gpu_url_dir }}/{{ gpu_runfile }}"
     dest: '/root/{{ gpu_runfile }}'
     mode: '0700'
   become: true
 
-- name: Install driver from .run file
-  ansible.builtin.command: '/root/{{ gpu_runfile }} --silent --kernel-module-type=proprietary'
+- name: Install GPU driver.
+  ansible.builtin.command:
+    cmd: |
+         "/root/{{ gpu_runfile }}" --silent --kernel-module-type="{{ gpu_kernel_module_type | default('open') }}"
   register: install_result
   failed_when: install_result.rc != 0
   changed_when: true
-  notify: reboot_server
+  notify: reboot_by_gpu_role
   become: true
 
-- name: Disable NVIDIA GSP firmware
+- name: Disable NVIDIA GSP firmware.
   ansible.builtin.copy:
     dest: /etc/modprobe.d/nvidia-gsp.conf
     content: "options nvidia NVreg_EnableGpuFirmware=0"
@@ -68,13 +83,13 @@
   when: gpu_type == 'a40'
   notify:
     - dracut
-    - reboot_server
+    - reboot_by_gpu_role
   become: true
 
-- name: Flush handlers to trigger dracut and server restart
+- name: Flush handlers.
   ansible.builtin.meta: flush_handlers
 
-- name: Remove installation file
+- name: Remove installation file.
   ansible.builtin.file:
     path: '/root/{{ gpu_runfile }}'
     state: absent

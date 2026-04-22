@@ -12,7 +12,6 @@ lfs_quota:
       umcg-fg: 2048
       umcg-franke-scrna: 4096
       umcg-fu: 2048
-      umcg-gaf: 22528
       umcg-gap: 1024
       umcg-gastrocol: 5120
       umcg-gcc: 27648
@@ -64,7 +63,6 @@ lfs_quota:
       umcg-forcespe: 1024
       umcg-franke-scrna: 20480
       umcg-fu: 2048
-      umcg-gaf: 15360
       umcg-gap: 1024
       umcg-gastrocol: 5120
       umcg-gcc: 1024
@@ -75,6 +73,7 @@ lfs_quota:
       umcg-grip: 2048
       umcg-gsad: 1024
       umcg-hematology: 5120
+      umcg-hgsvc: 1024
       umcg-hlhs: 3072
       umcg-immunogenetics: 2048
       umcg-impact: 3072
@@ -155,7 +154,6 @@ lfs_quota:
       umcg-fg: 10240
       umcg-franke-scrna: 20480
       umcg-fu: 2048
-      umcg-gaf: 2048
       umcg-gap: 1024
       umcg-gastrocol: 10240
       umcg-gcc: 9216
@@ -166,6 +164,7 @@ lfs_quota:
       umcg-grip: 1024
       umcg-gsad: 1024
       umcg-hematology: 3072
+      umcg-hgsvc: 2048
       umcg-hlhs: 1024
       umcg-immunogenetics: 2048
       umcg-impact: 1024

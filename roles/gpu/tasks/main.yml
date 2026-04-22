@@ -2,7 +2,7 @@
 - name: Check how many NVidia devices are up and running (might take some time).
   ansible.builtin.command: 'nvidia-smi -L'
   register: smi
-  when: gpu_count|default(0) >= 1
+  when: gpu_count | default(0) >= 1
   changed_when: false
   failed_when: false
 
@@ -11,15 +11,16 @@
   register: modinfo
   changed_when: false
   failed_when: false
-  when: gpu_count|default(0) >= 1
+  when: gpu_count | default(0) >= 1
 
 - name: Install GPU driver if not all GPU devices are present and working.
   ansible.builtin.include_tasks: driver.yml
-  when: gpu_count|default(0) >= 1 and
-        (( smi.stdout|default([])|lower|regex_findall('nvidia')|length != gpu_count ) or
-        gpu_driver_version not in modinfo.stdout|default("")|regex_search("version:.*"))
+  when:
+    - gpu_count | default(0) >= 1
+    - (( smi.stdout | default([]) | lower | regex_findall('nvidia') | length != gpu_count ) or
+         gpu_driver_version not in modinfo.stdout | default("") | regex_search("version:.*"))
 
 - name: Configure GPU - users, files and services.
   ansible.builtin.include_tasks: configuration.yml
-  when: gpu_count|default(0) >= 1
+  when: gpu_count | default(0) >= 1
 ...
