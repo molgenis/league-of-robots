@@ -172,7 +172,7 @@ where the arguments are
 Alternatively you can simply use `cp` command
 
 ```
-   dm-user $ cp /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/arc[0X]/projects/project-x.tar.gz
+    [dm-user@~]$ cp /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/arc[0X]/projects/project-x.tar.gz
 ```
 
 ---
@@ -199,7 +199,7 @@ Files in tmp/prm that have been successfully archived and verified by checksum c
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
 
 ```
-   dm-user $ /usr/local/bin/arc_surf --darelease /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ /usr/local/bin/arc_surf --darelease /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
@@ -209,7 +209,7 @@ Files in tmp/prm that have been successfully archived and verified by checksum c
 Listing the file status
 
 ```
-   dm-user $ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar.gz
@@ -219,7 +219,7 @@ Listing the file status
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
-   dm-user $ /usr/local/bin/arc_surf --daget /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ /usr/local/bin/arc_surf --daget /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
 ```
@@ -229,7 +229,7 @@ If file is offline, we can call it back to disks - stage it `online` with
 After some time we check the status again.
 
 ```
-   dm-user $ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar.gz
@@ -243,9 +243,9 @@ We must wait until it is changed to `DUL` (Dual-state).
 Make sure the .tar.gz file
 
 ```
-    dm-user $ rsync --progress /groups/[group]/arc[0X]/projects/project-x.tar.gz /groups/[group]/tmp[0X]/projects/
-    dm-user $ cd /groups/[group]/tmp[0X]/projects/
-    dm-user $ tar xvzf project-x.tar.gz
+    [dm-user@~]$ rsync --progress /groups/[group]/arc[0X]/projects/project-x.tar.gz /groups/[group]/tmp[0X]/projects/
+    [dm-user@~]$ cd /groups/[group]/tmp[0X]/projects/
+    [dm-user@~]$ tar xvzf project-x.tar.gz
 ```
 
 ## 4. Other command line options
