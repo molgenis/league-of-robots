@@ -29,16 +29,6 @@ all:
               nodes:
                 - name: docs-on-bateleur
                   network: external
-            - group: betabarrel_cluster
-              nodes:
-                - name: betabarrel
-                  network: vlan16
-            - group: copperfist_cluster
-              nodes:
-                - name: cf-dragen
-                  network: vlan16
-                - name: copperfist
-                  network: vlan16
     data_transfer:
       hosts:
         bb-transfer:
@@ -112,7 +102,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -129,7 +118,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -145,7 +133,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -155,30 +142,42 @@ all:
     sys_admin_interface:
       hosts:
         betabarrel:
-          os_distribution: 'centos7'
+          cloud_flavor: umcg.v2.bm.128-512-12000.vlan1336
+          host_type: baremetal
           host_networks:
-            - name: vlan16
-            - name: vlan990
+            - name: vlan1336
+              security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
-          additional_etc_hosts:
-            - group: betabarrel_cluster
-              nodes:
-                - name: bb-dragen
-                  network: vlan990
-            - group: copperfist_cluster
-              nodes:
-                - name: cf-dragen
-                  network: vlan16
-                - name: copperfist
-                  network: vlan16
-          local_yum_repository: true # enable local yum repository
+              nmstate_interface:
+                name: em3
+            - name: vlan990
+              security_group: "{{ stack_prefix }}_storage"
+              attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+              nmstate_interface:
+                name: em3.990
+                mtu: 1500
+                type: vlan
+                vlan:
+                  id: 990
+                  base-iface: em3
+                ipv4:
+                  dhcp: false
+          local_yum_repository: true # enable local yum repository for PERC CLI utility.
+          perc_devices: true
           local_mounts:
-            - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
-              device: 'LABEL=local_raid'
+            - mount_point: '/mnt/local_raid'
+              device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+              perc_controller: 0
+              perc_virtual_drive: 239
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
-              mount_options: 'defaults,nofail,x-systemd.device-timeout=10'
+              mount_options: >-
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
               type: xfs
             - mount_point: "{{ slurm_local_scratch_dir }}"
               device: '/mnt/local_raid/local'
@@ -208,16 +207,9 @@ all:
     user_interface:
       hosts:
         betabarrel:
-          slurm_sockets: 2
-          slurm_cores_per_socket: 64
-          slurm_real_memory: 515456
-          slurm_local_disk: 0
-          slurm_ethernet_interfaces:
-            - em1
-            - em3
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r7525:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             betabarrel:
               slurm_sockets: 2
@@ -226,9 +218,6 @@ all:
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 8 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - 8 * 2048 }}"
               slurm_local_disk: 0
-              slurm_ethernet_interfaces:
-                - em1
-                - em3
         dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             bb-dragen:
