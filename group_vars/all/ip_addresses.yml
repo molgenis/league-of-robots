@@ -38,6 +38,14 @@ ip_addresses:
   # RUG network ranges.
   #
   rug:
+    org1:
+      address: '129.125.0.0'
+      netmask: '/16'
+      desc: 'One of main ranges of RUG network'
+    org2:
+      address: '195.169.0.0'
+      netmask: '/16'
+      desc: 'One of main ranges of RUG network'
     bwp_net:
       address: '129.125.249.0'
       netmask: '/24'
@@ -74,6 +82,10 @@ ip_addresses:
       address: '194.171.202.0'
       netmask: '/24'
       desc: 'subset of vlan1066 - Bateleur external_unfiltered'
+    dh5-mds:
+      address: '129.125.243.16'
+      netmask: '/32'
+      desc: 'DH5 Metadata Server public IP'
   #
   # RUG research cluster UIs.
   #
