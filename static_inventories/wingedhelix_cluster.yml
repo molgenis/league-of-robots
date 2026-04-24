@@ -26,6 +26,11 @@ all:
             - "{{ all.ip_addresses['rug']['operator'] }}"
           ssh_client_configs:
             - logs_library
+          additional_etc_hosts:
+            - group: docs_library
+              nodes:
+                - name: docs-on-bateleur
+                  network: external
     repo:
       hosts:
         wh-repo:
@@ -98,7 +103,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -115,7 +119,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -131,7 +134,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"

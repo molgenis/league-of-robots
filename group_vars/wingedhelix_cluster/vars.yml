@@ -49,31 +49,10 @@ motd: |
           Welcome to {{ slurm_cluster_name | capitalize }}
       =========================================================
 additional_etc_hosts:
-  - group: docs_library
-    nodes:
-      - name: docs-on-bateleur
-        network: external
-  - group: betabarrel_cluster
-    nodes:
-      - name: betabarrel
-        network: vlan16
   - group: copperfist_cluster
     nodes:
       - name: copperfist
         network: vlan16
-#
-# Jumphosts from other stack-name infra groups.
-# We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
-#
-external_jumphosts:
-  - group: betabarrel_cluster
-    hosts:
-      - hostname: bb-porch
-        network: vlan16
-  - group: copperfist_cluster
-    hosts:
-      - hostname: cf-porch
-        network: external
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
