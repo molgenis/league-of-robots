@@ -371,7 +371,8 @@ remote_users_in_local_groups:
 soft_partitions:
   - path: /mnt/local_raid/groups/umcg-lab/tmp05/sequencers_incoming
     src: /mnt/local_raid/groups/umcg-lab/tmp05/sequencers_incoming.disk.img
-    fstype: btrfs             # btrfs supports the 4k formatting and works on sequencers
+    fstype: xfs                        # xfs and btrfs support 4k that works on sequencers
+    fsopts: ' -b size=4k -s size=4k'   # extra options for 4k filesystem formatting
     size: 600                 # in GB
     user: sbsuser
     group: umcg-lab
