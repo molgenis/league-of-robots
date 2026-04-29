@@ -72,6 +72,7 @@ browse folders and check file permissions and their metadata information.
 ## 3. Workflow example
 
 How to upload and modify states of the remote files.
+Make sure your data/project/folder is accompanied by a README, see our [storage](../storage/#the-life-cycle-of-experimental-data) page, on how to write a good README.
 
 **Main steps** to reliably upload the data
 
@@ -275,6 +276,7 @@ Use `--help` argument to get more information
 ## 5. Best practices
 
 It is always highly recommended to accompany files with their checksums, especially when utilizing remote archive storage. Long-term storage can occasionally experience data degradation or loss, therefore verifying the file's checksum upon retrieval is the most reliable way to ensure the data remains intact and uncorrupted.
+Make sure your data/project/folder is accompanied by a README, see our [storage](../storage/#the-life-cycle-of-experimental-data) page, on how to write a good README.
 
 File sizes are extremely important for archive. Tape storage performance and management is better when the files are larger size.
 
@@ -287,6 +289,7 @@ Therefore
 The average size is monitored and the groups with average size lower than this will have **locked accounts**.
 
 To keep storage and network load manageable, upload data sequentially rather than in parallel. Note that archive is a _remote_, _shared_ storage system used by multiple teams. As such, it has less bandwidth compared to the other cluster storage systems.
+
 
 ## 6. Performance
 

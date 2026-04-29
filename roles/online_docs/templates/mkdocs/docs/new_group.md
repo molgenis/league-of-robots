@@ -33,6 +33,7 @@ members on ```tmp``` file systems before migrating/copying them to ```prm``` or 
 members of the group.
     * Have read-write access to all file systems including ```prm```, ```rsc``` (if available) and ```arc``` (if 
 available).
+    * Our ```arc``` is substantially cheaper compared to our ```prm``` storage, for sleeping datasets this might be a good option for your data. See [archive](../archive) for more information.
  * Other _regular_ group members:
     * Have read-only access to ```prm```, ```rsc``` (if available) and ```arc``` (if available) file systems to 
 check-out existing data sets.
@@ -63,3 +64,37 @@ owners on the cluster. If you want to proceed with working our clusters, please 
 We assume that you are familiar with some basic knowledge about Linux command line (shell) navigation and shell 
 scripting. If you never worked on the command line, consider some Linux tutorials on the subject first and sign 
 up for the RUG cluster course: [Hábrók basis | Corporate Academy | Rijksuniversiteit Groningen (rug.nl)](https://wiki.hpc.rug.nl/habrok/introduction/courses#basic_habrok_course)
+
+See [https://umcg.topdesk.net/](https://umcg.topdesk.net/) the Scientific Research Support page of the UMCG, for all you scientific research support questions.
+
+
+## When you want to leave
+
+When, for what ever reason, you would like to leave the group, see below a few scenarios we could think of, accompanied with the steps to take.
+
+- **You are retiring or going to work in another facility. But the group remains active.**
+	- Assign or ask a new person to be the new group owner. We prefer to have 2 group owners. 
+	  This new group owner is then also responsible for the bill and correct data management.
+- **You no longer need the group anymore for calculating.**
+	- Make sure all regular users have followed the [when you leave](../storage/#when-you-leave) steps. If everybody did their job right, no data remains on TMP. Ask your data managers to manage this, to keep everybody on their toes.
+	- All data sets are accompanied by a README with the correct information (your name and contact information, responsible PIs, retention time, project numer, used in article/project, data source (human, mouse,....), tissue type (blood, fibroblasts, heart biopt,...), data type (array, NGS, longread,....), .)
+	- If only sleeping data sets remain, we have an [archive](../archive) option. This is substantially cheaper compared to PRM storage. Ask [the helpdesk](../contact/) to help setup an archive for your group.
+	- It is really important to state the retention time. After this date, the responsible PI should re-evaluate this data set and notify the [the helpdesk](../contact/) the data can be deleted or has an updated DMP. See [health-ri.nl](https://www.health-ri.nl/sites/healthri/files/2025-06/Handreiking-evaluatie-biobankcollecties_juni2025_0.pdf) for guidelines concerning bio bank collections, but can be applicable on other data set, if you need some guidelines concerning the decision making.  
+- **You no longer need to store your sleeping dataset.**
+	- Email the helpdesk that we can delete all data remaining in the group. 
+	- we will delete all data and remove the group completely from all the clusters. 
+- **If you calculated on the cluster, please also follow the [when you leave](../storage/#when-you-leave) steps.**
+
+If one of these scenarios is not applicable to you, or anything is uncleare please contact [the helpdesk](../contact/). 
+Together we can figure out how to proceed.
+
+#### Final note
+
+If you fail your responsibilities, and leave your group without following the above guidelines, we will consider your former group as legacy data. We, as HPC admins, are not responsible for making decision concerning data. In practice this will mean we will ask the department head what we should do with the data. The department head has 2 options. 
+1. Delete all data and the group.
+2. Assign a new data custodian, who is then responsible for the data and has to make sure it is again documented according the UMCG research code.
+
+
+
+
+
