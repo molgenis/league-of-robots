@@ -214,7 +214,7 @@ all:
             betabarrel:
               slurm_sockets: 2
               slurm_cores_per_socket: 64
-              slurm_real_memory: 515456
+              slurm_real_memory: 515041
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 8 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - 8 * 2048 }}"
               slurm_local_disk: 0
