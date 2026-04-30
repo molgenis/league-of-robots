@@ -42,12 +42,6 @@ This must be performed on a _DAI_ with configured ```rpmbuild```.
 
 The following packages should be already installed on the DAI, but run ```yum```/```dnf``` as root to make sure they are there and up to date:
 
-##### On RHEL <= 7.x
-
-```
-yum install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix
-```
-
 ##### On RHEL >= 8.x
 
 Note: Slurm has support for both ```cgroups``` v1 and v2, but support for v2 is only compiled if the dbus development files are present.
@@ -71,26 +65,7 @@ Disabled UID check in **_rpc_stat_jobacct** function of
 slurm-${SLURM_VERSION}/src/slurmd/slurmd/req.c
 ```
 to allow all users to retrieve job stats for all jobs with ```sstat```.
-In Slurm versions <= `22.05.x`:
-```
-    /*
-     * check that requesting user ID is the SLURM UID or root
-     * DISABLED to allow sstat to retrieve job stats for all running jobs of all users.
-     * This may have a negative impact on highly parallellized apps or large clusters.
-     */
-    /*if ((req_uid != uid) && (!_slurm_authorized_user(req_uid))) {
-    *    error("stat_jobacct from uid %ld for job %u " 
-    *             "owned by uid %ld",
-    *             (long) req_uid, req->job_id, (long) uid);
-    *
-    *    if (msg->conn_fd >= 0) {
-    *               slurm_send_rc_msg(msg, ESLURM_USER_ID_MISSING);
-    *               close(fd);
-    *               return ESLURM_USER_ID_MISSING;
-    *    }
-    }*/
-```
-In Slurm versions >= ```23.02.x```:
+
 ```
 	/*
 	 * check that requesting user ID is the Slurm UID or root
@@ -118,11 +93,11 @@ Patch the SLURM ```slurm-${SLURM_VERSION}/slurm.spec``` file.
    Example for Slurm 18.08.8 where the patch level (last number) is ```8```:
    Change:
    ```
-       Release: 8%{?dist}
+       Release:        %{rel}%{?extraver}%{?dist}
    ```
    into:
    ```
-       Release: 8%{?dist}.umcg
+       Release:        %{rel}%{?extraver}%{?dist}.umcg
    ```
    The patch level number may be different for other releases.
  * Change:
@@ -139,22 +114,24 @@ Patch the SLURM ```slurm-${SLURM_VERSION}/slurm.spec``` file.
        %global slurm_source_dir %{name}-%{version}-%{rel}.umcg
    ```
 
-Make sure to also add the ```.umcg``` suffix to the folder name:
+Make sure to also add the ```%{rel}``` and ```.umcg``` suffix to the folder name.
+E.g. when ```%{rel}``` is 1, then:
 
 ```
-mv slurm-${SLURM_VERSION} slurm-${SLURM_VERSION}.umcg
+SLURM_REL=1
+mv slurm-${SLURM_VERSION} slurm-${SLURM_VERSION}-${SLURM_REL}.umcg
 ```
 
 ### 5. Create new tar.bz2 source code archive with patched code
 
 ```
-tar -cvjf ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}.umcg.tar.bz2  slurm-${SLURM_VERSION}.umcg
+tar -cvjf ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}-${SLURM_REL}.umcg.tar.bz2  slurm-${SLURM_VERSION}-${SLURM_REL}.umcg
 ```
 
 ### 6. Build patched RPMs
 
 ```
-rpmbuild -ta --with lua --with mysql ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}.umcg.tar.bz2
+rpmbuild -ta --with lua --with mysql ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}-${SLURM_REL}.umcg.tar.bz2
 ```
 When successful, add the patched RPMs to our custom repo on the Pulp repo servers for the corresponding infra stacks.
 Don't forget to create a new Pulp publication for the updated repo version and then update the Pulp distribution 
