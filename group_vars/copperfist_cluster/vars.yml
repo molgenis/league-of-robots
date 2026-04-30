@@ -56,21 +56,6 @@ additional_etc_hosts:
       - name: betabarrel
         network: vlan990
 #
-# Jumphosts from other stack-name infra groups.
-# We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
-#
-external_jumphosts:
-  - group: wingedhelix_cluster
-    hosts:
-      - hostname: wh-porch
-        network: vlan16
-  - group: betabarrel_cluster
-    hosts:
-      - hostname: bb-porch
-        network: vlan16
-      - hostname: az-porch
-        network: az_public
-#
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
 ssh_client_configs:
@@ -109,7 +94,6 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-    - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['netmask'] }}"
 cloud_image: CentOS 7
 cloud_user: centos
 availability_zone: nova
@@ -142,7 +126,6 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -151,12 +134,10 @@ iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net4'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_outbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
@@ -399,37 +380,6 @@ ogm_servers:
       me=${trendanalysis_api_username}&password={{ ogm_api_password }}\" | grep -oP '\"to\
       ken\":\\s*\"\\K[^\"]+')\"'; userrole=3; userpk=24' https://${ogm_server}:3005/proje\
       ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?period=90 > ${prm_location}/TrendAnalysis/${ogm_server}-$(date +%F)-${stack_prefix}.csv"
-
-#
-# Local storage variables.
-#
-local_mount_subfolders:
-  - mount_point: '/groups'
-    machines: "{{ groups['data_transfer'] }}"
-    folders:
-      - rel_paths:
-          - "{{ data_transfer_only_group }}"
-        mode: '2750'
-        owner: root
-        group: "{{ data_transfer_only_group }}"
-      - rel_paths:
-          - umcg-genomescan
-          - umcg-gst
-        mode: '2770'
-        owner: root
-  - mount_point: '/staging'
-    machines: "{{ groups['dragen'] }}"
-    folders:
-      - rel_paths:
-          - development
-        mode: '0770'
-        owner: umcg-atd-ateambot
-        group: umcg-atd
-      - rel_paths:
-          - slurm
-        mode: '0755'
-        owner: root
-        group: root
 #
 # Shared storage related variables
 #

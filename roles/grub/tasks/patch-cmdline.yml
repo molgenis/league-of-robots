@@ -1,0 +1,36 @@
+---
+- name: Check if GRUB_CMDLINE_LINUX is present in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX=' /etc/default/grub"
+  register: search_grub_cmdline_linux_in_grub_config_by_grub_role
+  changed_when: false
+  failed_when: search_grub_cmdline_linux_in_grub_config_by_grub_role['rc'] >= 2
+
+- name: Check if GRUB_CMDLINE_LINUX_DEFAULT is present in /etc/default/grub.
+  ansible.builtin.command:
+    cmd: "grep 'GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub"
+  register: search_grub_cmdline_linux_default_in_grub_config_by_grub_role
+  changed_when: false
+  failed_when: search_grub_cmdline_linux_default_in_grub_config_by_grub_role['rc'] >= 2
+
+- name: Fail if Grub config is in an unsupported state.
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+                    Both GRUB_CMDLINE_LINUX and GRUB_CMDLINE_LINUX_DEFAULT are missing from /etc/default/grub
+                    Check the Grub config and documentation ...
+         ***********************************************************************************************************
+  when:
+    - "'GRUB_CMDLINE_LINUX=' not in search_grub_cmdline_linux_in_grub_config_by_grub_role['stdout']"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in search_grub_cmdline_linux_default_in_grub_config_by_grub_role['stdout']"
+  failed_when:
+    - "'GRUB_CMDLINE_LINUX=' not in search_grub_cmdline_linux_in_grub_config_by_grub_role['stdout']"
+    - "'GRUB_CMDLINE_LINUX_DEFAULT=' not in search_grub_cmdline_linux_default_in_grub_config_by_grub_role['stdout']"
+
+- name: Mitigate CopyFail CVE-2026-31431.
+  ansible.builtin.import_tasks: mitigate-copyfail.yml
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
+...

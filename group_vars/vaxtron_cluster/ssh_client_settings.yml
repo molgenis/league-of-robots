@@ -1,12 +1,11 @@
 ---
 ssh_client_jumphosts:
   - alias: foyer
-    hostname: 195.169.23.114
+    hostname: foyer.hpc.rug.nl
 
 ssh_client_known_hosts: "\
   @cert-authority \
   foyer*,\
-  195.169.23.114,\
   *vt-sai,\
   *vt-dai,\
   *vaxtron,\

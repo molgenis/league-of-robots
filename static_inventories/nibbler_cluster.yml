@@ -220,7 +220,6 @@ all:
           slurm_cores_per_socket: 1
           slurm_real_memory: 63786
           slurm_local_disk: 0
-          slurm_features: 'prm02,prm03,rsc02,tmp02'
     compute_node:
       children:
         cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -267,15 +266,16 @@ all:
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
-              slurm_features: 'rsc02,tmp02'
               slurm_weight: 5
         gpu_a40:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             nb-node-b01:
               cloud_flavor: umcg.v1.bm.64-256-440.vlan1338.16a40
               host_type: baremetal
-              gpu_count: 16
-              gpu_type: 'a40'
+              gpu_count: 11
+              gpu_type: a40
+              gpu_driver_version: 590.48.01
+              gpu_kernel_module_type: proprietary
               enable_predictable_network_interface_names: true
               host_networks:
                 - name: vlan1338
@@ -316,7 +316,6 @@ all:
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 1420000
-              slurm_features: 'rsc02,tmp02,gpu,A40'
               slurm_weight: 10
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
@@ -366,7 +365,6 @@ all:
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
-              slurm_features: 'rsc02,tmp02'
 administration:
   children:
     sys_admin_interface:

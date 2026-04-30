@@ -52,7 +52,8 @@
 #
 - name: 'Initialize envsync account creating home dir if it did not exist yet.'
   ansible.builtin.command:
-    cmd: "mkhomedir_helper {{ envsync_user }} 0077"
+    cmd: |
+         /sbin/mkhomedir_helper '{{ envsync_user }}' 0077
     creates: "/home/{{ envsync_user }}"
   become: true
 
@@ -70,15 +71,77 @@
   ansible.builtin.blockinfile:
     dest: "/home/{{ envsync_user }}/.bashrc"
     block: |
-      [[ $(id -gn) == '{{ envsync_group }}' ]] || exec newgrp '{{ envsync_group }}'
-      cd
-      umask 0002
-      module load depad-utils
-      module list
+           #
+           # Non interactive processes like rsync and sftp will break
+           # when anything they did not expect is printed to STDOUT or STDERR.
+           # Therefore, only configure the environment when
+           #   * either the shell was started with -i flag to create an interactive shell
+           #   * or a non-interactive process like a cron job requested a modified environment explicitly.
+           #
+           if [[ "${-}" == *'i'* ]] || [[ "${SOURCE_HPC_ENV}" == 'True' ]]; then
+             [[ $(id -gn) == '{{ envsync_group }}' ]] || exec newgrp '{{ envsync_group }}'
+             cd
+             umask 0002
+             module load depad-utils
+             module list
+           fi
     marker: "# {mark} ANSIBLE MANAGED BLOCK - Setup environment for environment synchronization account."
     insertafter: EOF
     create: false
   become: true
+
+- name: 'Create ssh key pair for rsyncing cache to compute nodes.'
+  community.crypto.openssh_keypair:
+    path: "/home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}"
+    type: "{{ envsync_ssh_key_type }}"
+    comment: "{{ envsync_user }}@{{ inventory_hostname }}"
+    regenerate: full_idempotence
+  become: true
+  become_user: "{{ envsync_user }}"
+
+- name: "Check if ssh public key for the {{ envsync_user }} user was added to the account management system."
+  ansible.builtin.shell:
+    cmd: |
+         set -o pipefail
+         "{{ get_public_keys_command }}" "{{ envsync_user }}" \
+         | fgrep -f "/home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}.pub"
+  register: envsync_user_authorized_public_keys
+  changed_when: false
+  failed_when: false
+  when: use_ldap is true
+  become: true
+  become_user: "{{ envsync_user }}"
+
+- name: "Fail when the ssh public key for the {{ envsync_user }} user is missing."
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+         ***********************************************************************************************************
+         Ansible created:
+             {{ inventory_hostname }}:/home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}.pub
+         But that public key is not yet available for the {{ envsync_user }} user
+         in the output of the {{ get_public_keys_command }} command:
+             stdout: {{ envsync_user_authorized_public_keys['stdout'] }}
+             stderr: {{ envsync_user_authorized_public_keys['stderr'] }}
+         Please check the account management system, add the public key for the user and re-run this role.
+         ***********************************************************************************************************
+  failed_when:
+    - envsync_user_authorized_public_keys['rc'] >= 1
+  when:
+    - use_ldap | default(true) | bool
+    - envsync_user_authorized_public_keys['rc'] >= 1
+
+- name: "Assign ssh public key to ~/.ssh/authorized_keys for {{ envsync_user }}."
+  ansible.posix.authorized_key:
+    user: "{{ envsync_user }}"
+    key: "file:///home/{{ envsync_user }}/.ssh/id_ed25519.pub"
+    state: present
+    exclusive: true
+  when:
+    - not use_ldap | default(true) | bool
+  become: true
+  become_user: "{{ envsync_user }}"
 
 - name: 'Deploy script to verify and if necessary fix permissions of the environment managed by the envsync account.'
   ansible.builtin.template:

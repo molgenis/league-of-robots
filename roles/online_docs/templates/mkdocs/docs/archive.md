@@ -54,7 +54,7 @@ Therefore the correct procedure is to **first stage (recall from the tape) the f
 
 ### 2.1. Data states
 
-The data migrates on remote server from disk to tape and during this it has different states. **As long as the data is online (on disks), it is available to the user. It can be read or modified.**.
+The data migrates on remote server from disk to tape and during this it has different states. **As long as the data is online (on disks), it is available to the user. It can be read or modified**.
 
 | State | Code | Online (on disks) | Offline (on tape) | Explanation |
 | ----- | ---- |-------------- | ------------ | ----------- |
@@ -67,22 +67,50 @@ The data migrates on remote server from disk to tape and during this it has diff
 Note that the folders are always online (in state `REG`) and as such you can always
 browse folders and check file permissions and their metadata information.
 
+---
+
 ## 3. Workflow example
 
 How to upload and modify states of the remote files.
 
-### User
+**Main steps** to reliably upload the data
+
+ - [become a data-manager user](#user)
+ - [bundle the data](#bundling)
+ - [create local checksum](#local-checksum)
+ - [upload data to remote storage](#uploading)
+ - [verify checksums on a remote storage](#remote-checksum)
+ - [delete files on cluster](#delete-files-on-cluster)
+
+### 3.1. Login as data-manager user
 
 Become the data manager
+
 ```
-   user $ sudo -u [group]-dm bash
+sudo -u [group]-dm bash
 ```
 
-### Bundling
+### 3.2. Bundling
 
-Optional, but be aware that upload to an archive system should be in average well above 1GB per file:
+Optional, but be aware that upload to an archive system should be in average well above 1GB per file.
+
+**Checking**
+
+We created a script that will help data managers to easily determine if the data is of correct size or too fragmented.
+Simply run it and as an argument provide the path to the folder
+
+`/usr/local/bin/arc_sizecheck /path/to/data`
+
+The script might take a little longer to finish if folder is larger or there are many small files.
+
+When finished, it should print the information of the average filesize, and if the data can be
+simply copied to the archive, or if not, it will suggest what to do next.
+
+
+**Preparing the data**
+
 Prepare the data by merging multiple files/folders
- into one compressed **tar** file.
+ into one compressed **tar.gz** file.
 
 Here are two options available
 
@@ -90,7 +118,7 @@ a) data is compressed
 
 the data can be bundled and *compressed* at the same time
 ```
-   dm-user $ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
+   [dm-user@~]$ tar -czvf /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/[prm0X]/projects/x/*
 ```
 this will result (in comparison with the option b) in
  - taking longer to compress and decompress the files
@@ -99,7 +127,7 @@ this will result (in comparison with the option b) in
 
 b) or it can be simply bundled without compression
 ```
-   dm-user $ tar -cvf /groups/[group]/[prm0X]/projects/project-x.tar /groups/[group]/[prm0X]/projects/x/*
+   [dm-user@~]$ tar -cvf /groups/[group]/[prm0X]/projects/project-x.tar /groups/[group]/[prm0X]/projects/x/*
 ```
 
 this will result (in comparison to the option a)
@@ -107,58 +135,91 @@ this will result (in comparison to the option a)
  - but it will use more disk space both on prm and archive
  - and it will take longer to copy the entire file to the archive and back
 
-### Local checksum
+---
+
+### 3.3. Local checksum
 
 Create a checksum of the file. This _fingerprint_ can
 be checked later to verify that the file was successfully uploaded to the archive and that it was correctly restored when when downloading it back from the archive.
 ```
-   dm-user $ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
+   [dm-user@~]$ sha256sum /groups/[group]/[prm0X]/projects/project-x.tar.gz > /groups/[group]/[prm0X]/projects/project-x.tar.gz.sha256sum
 ```
 
 Checksum verification process on the remote storage side supports only **`sha256sum`**
 
-### Uploading
+---
 
-Upload of the file(s) to the archive
+### 3.4. Uploading
+
+This step takes a long time, and if you disconnect from a cluster, the upload will be canceled and you will need to start it again.
+
+This can be easily prevented by using the `screen` command ([man pages](https://manned.org/man/screen), [quick guide](https://wiki.archlinux.org/title/GNU_Screen)) and running the copy from within it.
+If the connection is lost, `screen` will continue running and finish the upload.
+
+You can upload the file(s) to the archive either by using the `rsync` command ([man pages](https://manned.org/man/rsync)),
+as it can show the upload progress
+
 ```
-   dm-user $ cp /groups/[group]/[pmp0X]/project-x.tar /groups/[group]/[arc0X]/projects/project-x.tar
-
+   dm-user $ rsync -rlP --progress /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/arc[0X]/projects/project-x.tar.gz
 ```
 
-### Remote checksum
+where the arguments are
+
+ - `-r` is for recursive copy
+ - `-l` preserves links
+ - `-P` enables a partial copy, which means that a failed copy will not delete a partially created file, but will keep a file with partially uploaded content that can be resumed afterwards
+
+Alternatively you can simply use `cp` command
+
+```
+    [dm-user@~]$ cp /groups/[group]/[prm0X]/projects/project-x.tar.gz /groups/[group]/arc[0X]/projects/project-x.tar.gz
+```
+
+---
+
+### 3.5. Remote checksum
 
 If file was copied recently, it _can be_ still on regular disks
 on the remote archive server, so we can simply issue remote command to calculate the
 `sha256sum` value of it
 ```
-   arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
+   /usr/local/bin/arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
 ```
 
-If checkum was also made just after the .tar file was created, then both values can be checked if they are still identical.
+If checkum was also made just after the .tar(.gz) file was created, then both values can be checked if they are still identical.
 
-### Migrating
+### 3.6. Delete files on cluster
+
+Files in tmp/prm that have been successfully archived and verified by checksum can be safely removed from the cluster.
+
+### 3.7 Changing file state on the archive
+
+**Move from disk to tape**
 
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
+
 ```
-   dm-user $ arc_surf --darelease /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ /usr/local/bin/arc_surf --darelease /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
 
-### Status
+**Status**
 
-Check the file status
+Listing the file status
+
 ```
-   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
-   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar
+   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar.gz
 ```
-### Unmigrating
+
+**Move from tape to disks**
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
-   dm-user $ arc_surf --daget /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ /usr/local/bin/arc_surf --daget /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
 ```
@@ -168,14 +229,24 @@ If file is offline, we can call it back to disks - stage it `online` with
 After some time we check the status again.
 
 ```
-   dm-user $ arc_surf --dals /groups/[group]/[arc0X]/projects/project-x.tar
+   [dm-user@~]$ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
-   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar
+   -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar.gz
 ```
 
 In this example, the file has status `QUE` (queued), but it can also have `STG` (staged).
 We must wait until it is changed to `DUL` (Dual-state).
+
+### 3.8 Retrieving the data from archive and extracting it
+
+Make sure the .tar.gz file
+
+```
+    [dm-user@~]$ rsync --progress /groups/[group]/arc[0X]/projects/project-x.tar.gz /groups/[group]/tmp[0X]/projects/
+    [dm-user@~]$ cd /groups/[group]/tmp[0X]/projects/
+    [dm-user@~]$ tar -xvzf project-x.tar.gz
+```
 
 ## 4. Other command line options
 
@@ -203,14 +274,19 @@ Use `--help` argument to get more information
 
 ## 5. Best practices
 
+It is always highly recommended to accompany files with their checksums, especially when utilizing remote archive storage. Long-term storage can occasionally experience data degradation or loss, therefore verifying the file's checksum upon retrieval is the most reliable way to ensure the data remains intact and uncorrupted.
+
 File sizes are extremely important for archive. Tape storage performance and management is better when the files are larger size.
 
 Therefore
+
  - files should be in range 1 and 100GB (checksums are exception)
  - average file size should not be lower than a **1GB**
  - the archive filesystem was build around the idea of occasional (as in *once or twice a year at most*) accessing the data content
 
 The average size is monitored and the groups with average size lower than this will have **locked accounts**.
+
+To keep storage and network load manageable, upload data sequentially rather than in parallel. Note that archive is a _remote_, _shared_ storage system used by multiple teams. As such, it has less bandwidth compared to the other cluster storage systems.
 
 ## 6. Performance
 

@@ -1,5 +1,5 @@
 ---
-gpu_driver_version: '590.48.01'
+# gpu_driver_version has no defaults: must be specified for specific machines in static_inventory/{{ stackname }}.yml
 gpu_url_dir: 'https://download.nvidia.com/XFree86/Linux-x86_64/{{ gpu_driver_version }}/'
 gpu_runfile: 'NVIDIA-Linux-x86_64-{{ gpu_driver_version }}.run'
 nvidia_user: nvidia

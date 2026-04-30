@@ -14,7 +14,7 @@ slurm_partitions:
     max_mem_per_node: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
     local_disk: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
-    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.05G" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_r6625  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: "{{ stack_prefix }}-node-b[01-06]"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -24,6 +24,15 @@ slurm_partitions:
     local_disk: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
     features: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: gpu_xe7745  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-c01"  # Must be in sync with Ansible hostnames listed in inventory.
+    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['gpu_xe7745']|list|length }}{% else %}1{% endif %}"
+    max_cores_per_node: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
+    max_mem_per_node: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
+    local_disk: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
+    features: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.1G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
@@ -227,6 +236,8 @@ regular_groups:
   - name: "{{ data_transfer_only_group }}"
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
+  - name: 'umcg-adorable'
+    sponsor: umcg-research-it
   - name: 'umcg-as'
     sponsor: umcg-mswertz
   - name: 'umcg-atd'
@@ -247,6 +258,8 @@ regular_groups:
     sponsor: umcg-mswertz
   - name: 'umcg-fg'
     sponsor: umcg-lfranke
+  - name: 'umcg-forcespe'
+    sponsor: umcg-research-it
   - name: 'umcg-franke-scrna'
     sponsor: umcg-lfranke
   - name: 'umcg-fu'
@@ -270,6 +283,8 @@ regular_groups:
   - name: 'umcg-gsad'
     sponsor: umcg-mswertz
   - name: 'umcg-hematology'
+    sponsor: umcg-research-it
+  - name: 'umcg-hgsvc'
     sponsor: umcg-research-it
   - name: 'umcg-hlhs'
     sponsor: umcg-cvandiemen
@@ -344,6 +359,8 @@ regular_groups:
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
+  - name: 'umcg-adorable-dm'
+    groups: ['umcg-adorable']
   - name: 'umcg-capicebot'
     groups: ['umcg-as']
   - name: 'umcg-vipbot'
@@ -370,6 +387,8 @@ regular_users:
     groups: ['umcg-erdera']
   - name: 'umcg-fg-dm'
     groups: ['umcg-fg']
+  - name: 'umcg-forcespe-dm'
+    groups: ['umcg-forcespe']
   - name: 'umcg-franke-scrna-dm'
     groups: ['umcg-franke-scrna']
   - name: 'umcg-fu-dm'
@@ -396,6 +415,8 @@ regular_users:
     groups: ['umcg-gsad']
   - name: 'umcg-hematology-dm'
     groups: ['umcg-hematology']
+  - name: 'umcg-hgsvc-dm'
+    groups: ['umcg-hgsvc']
   - name: 'umcg-hlhs-dm'
     groups: ['umcg-hlhs']
   - name: 'umcg-immunogenetics-dm'
@@ -467,6 +488,8 @@ regular_users:
   - name: 'umcg-wijmenga-dm'
     groups: ['umcg-wijmenga']
 sudoers:
+  - who: ['%umcg-adorable-dms']
+    become: 'umcg-adorable-dm'
   - who: ['%umcg-as']
     become: 'umcg-capicebot'
   - who: ['%umcg-as']
@@ -495,6 +518,8 @@ sudoers:
     become: 'umcg-gcc-dm'
   - who: ['%umcg-fg-dms']
     become: 'umcg-fg-dm'
+  - who: ['%umcg-forcespe-dms']
+    become: 'umcg-forcespe-dm'
   - who: ['%umcg-franke-scrna-dms']
     become: 'umcg-franke-scrna-dm'
   - who: ['%umcg-fu-dms']
@@ -523,6 +548,8 @@ sudoers:
     become: 'umcg-gsad-dm'
   - who: ['%umcg-hematology-dms']
     become: 'umcg-hematology-dm'
+  - who: ['%umcg-hgsvc-dms']
+    become: 'umcg-hgsvc-dm'
   - who: ['%umcg-hlhs-dms']
     become: 'umcg-hlhs-dm'
   - who: ['%umcg-immunogenetics-dms']
@@ -611,7 +638,6 @@ sudoers:
 #           - regular_group_placeholder
 #         mode: '2770'
 #         owner: root
-
 #
 # Shared storage related variables
 #
@@ -648,6 +674,7 @@ lfs_mounts:
     pfs: umcgst06
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -657,6 +684,7 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -669,6 +697,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -698,6 +727,7 @@ lfs_mounts:
     pfs: umcgst01
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -708,6 +738,7 @@ lfs_mounts:
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -720,6 +751,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -757,6 +789,7 @@ lfs_mounts:
     pfs: umcgst02
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -767,6 +800,7 @@ lfs_mounts:
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -779,6 +813,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact

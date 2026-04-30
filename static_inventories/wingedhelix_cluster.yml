@@ -26,6 +26,11 @@ all:
             - "{{ all.ip_addresses['rug']['operator'] }}"
           ssh_client_configs:
             - logs_library
+          additional_etc_hosts:
+            - group: docs_library
+              nodes:
+                - name: docs-on-bateleur
+                  network: external
     repo:
       hosts:
         wh-repo:
@@ -98,7 +103,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -115,7 +119,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -131,7 +134,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -216,7 +218,6 @@ all:
           slurm_cores_per_socket: 1
           slurm_real_memory: 15724
           slurm_local_disk: 0
-          slurm_features: 'tmp07'
     compute_node:
       children:
         regular_big_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -249,7 +250,6 @@ all:
             slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
             slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
             slurm_local_disk: 900
-            slurm_features: 'tmp07'
     mit_chaperone:
       hosts:
         wh-chaperone:

@@ -38,6 +38,14 @@ ip_addresses:
   # RUG network ranges.
   #
   rug:
+    org1:
+      address: '129.125.0.0'
+      netmask: '/16'
+      desc: 'One of main ranges of RUG network'
+    org2:
+      address: '195.169.0.0'
+      netmask: '/16'
+      desc: 'One of main ranges of RUG network'
     bwp_net:
       address: '129.125.249.0'
       netmask: '/24'
@@ -50,6 +58,34 @@ ip_addresses:
       address: '129.125.2.0'
       netmask: '/24'
       desc: 'RUG F5 load balancers.'
+    vlan16:
+      address: '195.169.22.0'
+      netmask: '/23'
+      desc: 'vlan16'
+    merlin_16:
+      address: '195.169.22.0'
+      netmask: '/24'
+      desc: 'subset of vlan16 - Merlin'
+    bateleur_16:
+      address: '195.169.23.0'
+      netmask: '/24'
+      desc: 'subset of vlan16 - Bateleur external'
+    vlan1066:
+      address: '194.171.202.0'
+      netmask: '/23'
+      desc: 'vlan1066'
+    merlin_1066:
+      address: '194.171.203.0'
+      netmask: '/24'
+      desc: 'subset of vlan1066 - Merlin'
+    batelur_1066:
+      address: '194.171.202.0'
+      netmask: '/24'
+      desc: 'subset of vlan1066 - Bateleur external_unfiltered'
+    dh5-mds:
+      address: '129.125.243.16'
+      netmask: '/32'
+      desc: 'DH5 Metadata Server public IP'
   #
   # RUG research cluster UIs.
   #
@@ -81,6 +117,10 @@ ip_addresses:
       netmask: '/32'
       fqdn: 'molgenis26.gcc.rug.nl'
       desc: 'Public downloads.'
+    step01:
+      address: '195.169.22.57'
+      netmask: '/32'
+      desc: 'Molgenis jumphost stepping stone 01'
   #
   # Other clusters / grid / DS machines.
   #

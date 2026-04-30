@@ -29,31 +29,6 @@ all:
               nodes:
                 - name: docs-on-bateleur
                   network: external
-            - group: betabarrel_cluster
-              nodes:
-                - name: betabarrel
-                  network: vlan16
-            - group: copperfist_cluster
-              nodes:
-                - name: cf-dragen
-                  network: vlan16
-                - name: copperfist
-                  network: vlan16
-        az-porch:
-          host_networks:
-            - name: "{{ stack_prefix }}_internal_management"
-              security_group: "{{ stack_prefix }}_jumphosts"
-              add_hostname_to_ip_address: true
-          basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
-          iptables_allow_icmp_inbound:
-            - "{{ all.ip_addresses['umcg']['net1'] }}"
-            - "{{ all.ip_addresses['umcg']['net2'] }}"
-            - "{{ all.ip_addresses['umcg']['net3'] }}"
-            - "{{ all.ip_addresses['umcg']['net4'] }}"
-            - "{{ all.ip_addresses['rug']['bwp_net'] }}"
-            - "{{ all.ip_addresses['rug']['operator'] }}"
-          ssh_client_configs:
-            - logs_library
     data_transfer:
       hosts:
         bb-transfer:
@@ -101,6 +76,20 @@ all:
                   - /dev/vdg
                   - /dev/vdh
                   - /dev/vdi
+          local_mount_subfolders:
+            - mount_point: '/groups'
+              machines: "{{ groups['data_transfer'] }}"
+              folders:
+                - rel_paths:
+                    - "{{ data_transfer_only_group }}"
+                  mode: '2750'
+                  owner: root
+                  group: "{{ data_transfer_only_group }}"
+                - rel_paths:
+                    - umcg-genomescan
+                    - umcg-gst
+                  mode: '2770'
+                  owner: root
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -113,7 +102,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -130,7 +118,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -146,7 +133,6 @@ all:
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
             - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
             - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
@@ -156,38 +142,66 @@ all:
     sys_admin_interface:
       hosts:
         betabarrel:
-          os_distribution: 'centos7'
+          cloud_flavor: umcg.v2.bm.128-512-11900.vlan1336
+          host_type: baremetal
           host_networks:
-            - name: vlan16
-            - name: vlan990
+            - name: vlan1336
+              security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
-          additional_etc_hosts:
-            - group: betabarrel_cluster
-              nodes:
-                - name: bb-dragen
-                  network: vlan990
-            - group: copperfist_cluster
-              nodes:
-                - name: cf-dragen
-                  network: vlan16
-                - name: copperfist
-                  network: vlan16
-          local_yum_repository: true # enable local yum repository
+              nmstate_interface:
+                name: eno12409np1
+            - name: vlan990
+              security_group: "{{ stack_prefix }}_storage"
+              attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
+              nmstate_interface:
+                name: eno12399np0.990
+                mtu: 1500
+                type: vlan
+                vlan:
+                  id: 990
+                  base-iface: eno12399np0
+                ipv4:
+                  dhcp: false
+          local_yum_repository: true # enable local yum repository for PERC CLI utility.
+          perc_devices: true
           local_mounts:
-            - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
-              device: 'LABEL=local_raid'
+            - mount_point: '/mnt/local_raid'
+              device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+              perc_controller: 0
+              perc_virtual_drive: 239
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
-              mount_options: 'defaults,nofail,x-systemd.device-timeout=10'
+              mount_options: >-
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
               type: xfs
-            - mount_point: '/local'
+            - mount_point: "{{ slurm_local_scratch_dir }}"
               device: '/mnt/local_raid/local'
               mounted_owner: root
               mounted_group: root
               mounted_mode: '2755'
               mount_options: 'bind,nofail'
               type: none
+            - mount_point: '/apps'
+              device: '/mnt/env05/apps/'
+              mounted_owner: root
+              mounted_group: "{{ envsync_group }}"
+              mounted_mode: '2775'
+              mount_options: 'bind,nofail'
+              type: none
+          local_mount_subfolders:
+            - mount_point: "{{ slurm_local_scratch_dir }}"
+              machines: "{{ groups['compute_node'] }}"
+              folders:
+                - rel_paths:
+                    - cache
+                  mode: '2755'
+                  owner: "{{ envsync_user }}"
+                  group: "{{ envsync_group }}"
     deploy_admin_interface:
       hosts:
         betabarrel:
@@ -200,29 +214,17 @@ all:
     user_interface:
       hosts:
         betabarrel:
-          slurm_sockets: 2
-          slurm_cores_per_socket: 64
-          slurm_real_memory: 515456
-          slurm_local_disk: 0
-          slurm_features: 'tmp05'  # Beta-Barrel will replace Zinc-Finger
-          slurm_ethernet_interfaces:
-            - em1
-            - em3
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r7525:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             betabarrel:
               slurm_sockets: 2
               slurm_cores_per_socket: 64
-              slurm_real_memory: 515456
+              slurm_real_memory: 515041
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 8 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - 8 * 2048 }}"
               slurm_local_disk: 0
-              slurm_features: 'tmp05,tmp15'
-              slurm_ethernet_interfaces:
-                - em1
-                - em3
         dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             bb-dragen:
@@ -283,13 +285,35 @@ all:
                   mounted_mode: '0755'
                   mount_options: 'defaults,noatime,nofail'
                   type: xfs
-                - mount_point: '/local'
+                - mount_point: "{{ slurm_local_scratch_dir }}"
                   device: '/staging/slurm'
                   mounted_owner: root
                   mounted_group: root
                   mounted_mode: '0755'
                   mount_options: 'bind,nofail'
                   type: none
+              local_mount_subfolders:
+                - mount_point: '/staging'
+                  machines: "{{ groups['dragen'] }}"
+                  folders:
+                    - rel_paths:
+                        - development
+                      mode: '0770'
+                      owner: umcg-atd-ateambot
+                      group: umcg-atd
+                    - rel_paths:
+                        - slurm
+                      mode: '0755'
+                      owner: root
+                      group: root
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  machines: "{{ groups['dragen'] }}"
+                  folders:
+                    - rel_paths:
+                        - cache
+                      mode: '2755'
+                      owner: "{{ envsync_user }}"
+                      group: "{{ envsync_group }}"
               slurm_version: '20.11.9-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
@@ -298,7 +322,6 @@ all:
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket * slurm_threads_per_core - 2 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 102400
-              slurm_features: 'tmp15,dragen'
               slurm_weight: 10
               local_yum_repository: true # enable local yum repository
     mit_chaperone:
