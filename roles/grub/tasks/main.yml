@@ -17,7 +17,7 @@
     regexp: '^#?GRUB_TIMEOUT'
     line: "GRUB_TIMEOUT={{ grub_timeout_sec }}"
   become: true
-  notify: grub2mkconfig
+  notify: rebuild_grub_config_by_grub_role
 
 - name: Configure GRUB_DEFAULT in /etc/default/grub.
   ansible.builtin.lineinfile:
@@ -30,7 +30,7 @@
     regexp: "^#?GRUB_DEFAULT="
     line: 'GRUB_DEFAULT=saved'
   become: true
-  notify: grub2mkconfig
+  notify: rebuild_grub_config_by_grub_role
   when:
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= "9"
@@ -40,4 +40,7 @@
   when:
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= "9"
+
+- name: Patch GRUB_CMDLINE_LINUX* in /etc/default/grub.
+  ansible.builtin.import_tasks: patch-cmdline.yml
 ...
