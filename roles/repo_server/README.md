@@ -4,17 +4,15 @@
 
 ## Repository settings
 
-Repository servers role take existing repository settings defined inside
-`yum_repos` variable in the `group_vars/all/repos.yml`.
+The Repository Server role mirrors local repositories based on the `yum_repos` variable in `group_vars/all/repos.yml`.
 
-It deployes all the settings and scripts
- - and places them under `/mnt/repos` (default) on the repository server
- - under a folder `dnf/repos.d/[distribution]`, where `distribution` are the
-   first level sub-items of the `yum_repos` variable
- - all the repositories that have variable `repo_server_download` set to `True` in the `yum_repos` are placed into
- - `/mnt/repos/dnf/repos.d/[distribution].conf` file defines the path where the
-   `.repo` files of that distribution exist - this is set to
-   `/mnt/repos/dnf/repos.d/[distribution]/` folder
+Deployment Logic
+ - Filtering: Only repositories with `repo_server_download: True` are processed.
+ - Remote server file structure
+   - All repositroy configuration files are stored inside top directory /mnt/repos/dnf/repos.d/
+   - Master Config: A `[distribution].conf` file is created at the root of the `repos.d` folder to point to the specific distribution directory.
+   - All the Repo Files for specific distrubution are stored inside `/mnt/repos/dnf/repos.d/[distribution]/` (e.g. `.../repos.d/centos7/`).
+
 
 ## Configurations scripts
 
@@ -25,7 +23,6 @@ It deployes all the settings and scripts
      using this version
    - `3_xxx.sh` script cleans all the versions that are not used by any stack
      deployments
-
 
 ## Server file storage
 
