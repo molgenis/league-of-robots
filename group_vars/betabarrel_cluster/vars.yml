@@ -173,7 +173,7 @@ functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
 sponsors:
-  - name: umcg-gd
+  - name: umcg-gd-owners
     slurm_shares: 120
   - name: umcg-mswertz
     slurm_shares: 8
@@ -183,29 +183,29 @@ regular_groups:
   - name: "{{ functional_admin_group }}"
   - name: "{{ functional_users_group }}"
   - name: 'umcg-atd'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-gap'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-gd'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-genomescan'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-gsad'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-gst'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-lab'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-labgnkbh'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-logstoprm'
-    sponsor: umcg-gd
+    # No sponsor as this group does not use Slurm.
   - name: 'umcg-ogm'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-patho'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-pr'
-    sponsor: umcg-gd
+    sponsor: umcg-gd-owners
   - name: 'umcg-vipt'
     sponsor: umcg-mswertz
 regular_users:
@@ -371,7 +371,8 @@ remote_users_in_local_groups:
 soft_partitions:
   - path: /mnt/local_raid/groups/umcg-lab/tmp05/sequencers_incoming
     src: /mnt/local_raid/groups/umcg-lab/tmp05/sequencers_incoming.disk.img
-    fstype: btrfs             # btrfs supports the 4k formatting and works on sequencers
+    fstype: xfs                        # xfs and btrfs support 4k that works on sequencers
+    fsopts: ' -b size=4k -s size=4k'   # extra options for 4k filesystem formatting
     size: 600                 # in GB
     user: sbsuser
     group: umcg-lab

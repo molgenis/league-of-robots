@@ -52,7 +52,8 @@
 #
 - name: 'Initialize envsync account creating home dir if it did not exist yet.'
   ansible.builtin.command:
-    cmd: "mkhomedir_helper {{ envsync_user }} 0077"
+    cmd: |
+         /sbin/mkhomedir_helper '{{ envsync_user }}' 0077
     creates: "/home/{{ envsync_user }}"
   become: true
 

@@ -1,8 +1,24 @@
 ---
-- name: Reconfigure grub
-  ansible.builtin.command: 'grub2-mkconfig --update-bls-cmdline --output /boot/grub2/grub.cfg'
+#
+# Important: maintain correct handler order.
+# Handlers are executed in the order in which they are defined
+# and not in the order in which they are listed in a "notify: handler_name" statement!
+#
+- name: 'Rebuild GRUB config.'
+  ansible.builtin.shell:
+    cmd: |
+         timestamp="$(date '+%Y-%m-%dT%H:%M:%S%z')"
+         cp -v '/boot/grub2/grub.cfg' "/boot/grub2/grub.cfg.ansible_backup_${timestamp}"
+         grub2-mkconfig --update-bls-cmdline -o '/boot/grub2/grub.cfg'
+    executable: '/bin/bash'
   register: grub2_result
   changed_when: grub2_result.rc == 0
-  listen: grub2mkconfig
   become: true
+  listen: rebuild_grub_config_by_grub_role
+
+- name: 'Reboot to activate updated GRUB config.'
+  ansible.builtin.reboot:
+    msg: 'Reboot initiated by Ansible "grub" role from League of Robots playbook/repo.'
+  become: true
+  listen: rebuild_grub_config_by_grub_role
 ...

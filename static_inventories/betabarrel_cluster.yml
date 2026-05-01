@@ -142,24 +142,24 @@ all:
     sys_admin_interface:
       hosts:
         betabarrel:
-          cloud_flavor: umcg.v2.bm.128-512-12000.vlan1336
+          cloud_flavor: umcg.v2.bm.128-512-11900.vlan1336
           host_type: baremetal
           host_networks:
             - name: vlan1336
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: em3
+                name: eno12409np1
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
               nmstate_interface:
-                name: em3.990
+                name: eno12399np0.990
                 mtu: 1500
                 type: vlan
                 vlan:
                   id: 990
-                  base-iface: em3
+                  base-iface: eno12399np0
                 ipv4:
                   dhcp: false
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
@@ -184,6 +184,13 @@ all:
               mounted_owner: root
               mounted_group: root
               mounted_mode: '2755'
+              mount_options: 'bind,nofail'
+              type: none
+            - mount_point: '/apps'
+              device: '/mnt/env05/apps/'
+              mounted_owner: root
+              mounted_group: "{{ envsync_group }}"
+              mounted_mode: '2775'
               mount_options: 'bind,nofail'
               type: none
           local_mount_subfolders:
@@ -214,7 +221,7 @@ all:
             betabarrel:
               slurm_sockets: 2
               slurm_cores_per_socket: 64
-              slurm_real_memory: 515456
+              slurm_real_memory: 515041
               slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 8 }}"
               slurm_max_mem_per_node: "{{ slurm_real_memory - 8 * 2048 }}"
               slurm_local_disk: 0

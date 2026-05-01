@@ -1,6 +1,11 @@
 ---
-- name: Configure grub on all hosts.
-  hosts: all,!controller_api,!mit_chaperone
+- name: Configure grub on jumphosts.
+  hosts: jumphost
+  roles:
+    - grub
+
+- name: Configure grub on all other hosts except mit_chaperones.
+  hosts: all,!controller_api,!mit_chaperone,!jumphost
   roles:
     - grub
 ...

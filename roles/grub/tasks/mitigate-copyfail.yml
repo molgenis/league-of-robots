@@ -1,0 +1,59 @@
+---
+#
+# Mitigate the CopyFail privilege escalation bug
+#
+# CVE-2026-31431 https://copy.fail/
+# Mitigation that disables the kernel module using
+#     echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
+# does not work on EL and clones, because it is not a separate module, but a "builtin".
+# Blocking the init call for functionality from this "builtin" module does mitigate the bug.
+# See also:
+#   https://gist.github.com/m3nu/c19269ef4fd6fa53b03eb388f77464da
+#   https://www.reddit.com/r/HPC/comments/1szhpav/copyfail_mitigations_in_a_hpc_cluster_environment/
+#
+- name: 'Checking if we need to add or update initcall_blacklist for GRUB_CMDLINE_LINUX* in /etc/default/grub.'
+  ansible.builtin.command:
+    cmd: |
+         grep 'GRUB_CMDLINE_LINUX\(_DEFAULT\)\?=.*initcall_blacklist.*' /etc/default/grub
+  register: grub_config_grep_initcall_blacklist
+  changed_when: false
+  failed_when: grub_config_grep_initcall_blacklist.rc >= 2
+
+- name: 'Update initcall_blacklist to disable algif_aead_init in GRUB config.'
+  ansible.builtin.lineinfile:
+    path: '/etc/default/grub'
+    backup: true
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX(_DEFAULT)?=\")([^\"]*)(\s+initcall_blacklist=(\S+))([^\"]*\")$'
+    line: '\1\3 initcall_blacklist=algif_aead_init,\5\6'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - "'initcall_blacklist' in grub_config_grep_initcall_blacklist.stdout"
+    - "'algif_aead_init' not in grub_config_grep_initcall_blacklist.stdout"
+  notify: rebuild_grub_config_by_grub_role
+  become: true
+
+- name: 'Add initcall_blacklist to disable algif_aead_init in GRUB config.'
+  ansible.builtin.lineinfile:
+    path: '/etc/default/grub'
+    backup: true
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX(_DEFAULT)?=\")([^\"]*)(\")$'
+    line: '\1\3 initcall_blacklist=algif_aead_init\4'
+    owner: root
+    group: root
+    mode: '0644'
+  when: "'initcall_blacklist' not in grub_config_grep_initcall_blacklist.stdout"
+  notify: rebuild_grub_config_by_grub_role
+  become: true
+
+- name: 'Check if GRUB configs needs to be rebuild for the running kernel.'
+  ansible.builtin.command:
+    cmd: grep algif_aead_init /proc/cmdline
+  register: grub_search_algif_aead_init_in_kernel_params
+  changed_when: grub_search_algif_aead_init_in_kernel_params['rc'] == 1
+  failed_when: grub_search_algif_aead_init_in_kernel_params['rc'] >= 2
+  notify: rebuild_grub_config_by_grub_role
+...
