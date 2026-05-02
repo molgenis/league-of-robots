@@ -56,4 +56,13 @@
     - src: '.ssh'
       mode: 'Du=rwx,Dgo-rwx,Fu=rw,Fgo-rwx'
   become: true
+
+- name: Install /etc/profile.d/custom-path.sh.
+  ansible.builtin.copy:
+    src: custom-path.sh
+    owner: root
+    group: root
+    mode: '0644'
+    dest: /etc/profile.d/custom-path.sh
+  become: true
 ...
