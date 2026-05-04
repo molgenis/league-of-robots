@@ -1,6 +1,6 @@
 ---
 - name: Create a list of all names
-  set_fact:
+  ansible.builtin.set_fact:
     all_log_servers: "{{ logs_server_public_networks | dict2items | map(attribute='value') | flatten }}"
 
 - name: Print every logs server name and public IP

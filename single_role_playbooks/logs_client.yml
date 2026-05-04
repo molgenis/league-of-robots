@@ -10,6 +10,6 @@
     - logs
   roles:
     - role: logs_client
-      when: ((syslog_external_servers is defined and ( syslog_external_servers|length>0 )) or ( cluster_class is defined ))
-            and ( ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] > "7" )
+      when: ((rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 )) or ( cluster_class is defined ))
+            and ( ansible_facts['os_family'] == "RedHat" )
 ...
