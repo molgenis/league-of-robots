@@ -40,7 +40,8 @@
   strategy: linear
   roles:
     - role: logs_client
-      when: cluster_class is defined
+      when: ((rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 )) or ( cluster_class is defined ))
+            and ( ansible_facts['os_family'] == "RedHat" )
 
 - name: '###==-> Roles for Pulp repo management servers. <-==###'
   hosts: repo
