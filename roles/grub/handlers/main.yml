@@ -7,9 +7,18 @@
 - name: 'Rebuild GRUB config.'
   ansible.builtin.shell:
     cmd: |
+         set -e
+         set -u
+         set -o pipefail
          timestamp="$(date '+%Y-%m-%dT%H:%M:%S%z')"
          cp -v '/boot/grub2/grub.cfg' "/boot/grub2/grub.cfg.ansible_backup_${timestamp}"
-         grub2-mkconfig --update-bls-cmdline -o '/boot/grub2/grub.cfg'
+         if grub2-mkconfig --help | grep update-bls-cmdline 1>/dev/null; then
+             # For newer grub2-mkconfig on EL >= 9.x
+             grub2-mkconfig --update-bls-cmdline -o '/boot/grub2/grub.cfg'
+         else
+             # For older grub2-mkconfig on EL <= 8.x
+             grub2-mkconfig -o '/boot/grub2/grub.cfg'
+         fi
     executable: '/bin/bash'
   register: grub2_result
   changed_when: grub2_result.rc == 0
