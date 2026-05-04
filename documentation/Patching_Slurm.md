@@ -46,8 +46,48 @@ The following packages should be already installed on the DAI, but run ```yum```
 
 Note: Slurm has support for both ```cgroups``` v1 and v2, but support for v2 is only compiled if the dbus development files are present.
 
+The following packages are required to compile Slurm
+ * These packages should be already present on Deploy Admin Interface (DAI) machines 
+ * On Dragen machines they must be added manually
+
 ```
-dnf install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix dbus-devel
+dnf install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix dbus-devel rpm-build autoconf automake
+```
+
+This installs on an Oracle 8.x Dragen machine:
+
+```
+[root@bb-dragen]# dnf install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix dbus-devel rpm-build autoconf automake
+Package munge-libs-0.5.13-2.el8.x86_64 is already installed.
+Package pkgconf-pkg-config-1.4.2-1.el8.x86_64 is already installed.
+Package lua-5.3.4-12.el8.x86_64 is already installed.
+======================================================================
+ Package                        Architecture    Repository            
+======================================================================
+Installing:
+ autoconf                       noarch          ol8_appstream         
+ automake                       noarch          ol8_appstream         
+ dbus-devel                     x86_64          ol8_appstream         
+ lua-devel                      x86_64          ol8_codeready_builder 
+ lua-posix                      x86_64          ol8_codeready_builder 
+ munge-devel                    x86_64          ol8_codeready_builder 
+ mysql-devel                    x86_64          ol8_appstream         
+ pam-devel                      x86_64          ol8_baseos_latest     
+ readline-devel                 x86_64          ol8_baseos_latest     
+ rpm-build                      x86_64          ol8_appstream         
+Upgrading:
+ munge                          x86_64          ol8_appstream         
+ munge-libs                     x86_64          ol8_appstream         
+ mysql-common                   x86_64          ol8_appstream         
+ mysql-libs                     x86_64          ol8_appstream         
+ pam                            x86_64          ol8_baseos_latest     
+Installing dependencies:
+ cmake-filesystem               x86_64          ol8_appstream         
+ elfutils                       x86_64          ol8_baseos_latest     
+ ncurses-c++-libs               x86_64          ol8_baseos_latest     
+ ncurses-devel                  x86_64          ol8_baseos_latest     
+ zstd                           x86_64          ol8_appstream         
+======================================================================
 ```
 
 ### 2. Download and unpack Slurm
@@ -56,7 +96,6 @@ dnf install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-deve
 wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2
 tar -xvjf slurm-${SLURM_VERSION}.tar.bz2
 ```
-
 
 ### 3. Patching slurmd source
 
@@ -157,6 +196,10 @@ and **not** the ```${NHC_VERSION}.tar.gz``` files, which are automatically gener
 rpmbuild -ta --define 'rel 1' ~/rpmbuild/SOURCES/lbnl-nhc-${NHC_VERSION}.tar.gz
 ```
 
-When successful, add the patched RPMs to our custom repo on the Pulp repo servers for the corresponding infra stacks.
-Don't forget to create a new Pulp publication for the updated repo version and then update the Pulp distribution 
-to serve the new Pulp publication. See [Configuring_Pulp](Configuring_Pulp.md) for details.
+When successful, add the patched RPMs
+ * Either - for clusters that use repo servers - to our custom repo on the _Pulp repo server_ for the corresponding infra stack.  
+   Don't forget to create a new Pulp _publication_ for the updated repo version
+   and then update the Pulp _distribution_ to serve the new Pulp _publication_.  
+   See [Configuring_Pulp](Configuring_Pulp.md) for details.
+ * Or - for clusters that do not use repo servers - to the local _yum repo_ on all machines of the correspnding stack that need Slurm.  
+   See `roles/yum_local/README.md` for details.
