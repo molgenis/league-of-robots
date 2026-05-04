@@ -1,6 +1,6 @@
 ---
 - name: Create a list of all names
-  set_fact:
+  ansible.builtin.set_fact:
     all_log_servers: "{{ logs_server_public_networks | dict2items | map(attribute='value') | flatten }}"
 
 - name: Print every logs server name and public IP
@@ -75,7 +75,12 @@
     hour: '*/8'
     day: '*'
     user: '{{ logs_toprm_chaperone_user }}'
-    job: /bin/bash -c '/usr/local/bin/parallax.sh --command="{{ home_path.stdout }}/logstoprm_cron.sh" --lock-dir="{{ logs_toprm_destination }}/lock_dirs" --logger-tag="logstoprm" >> {{ home_path.stdout }}/logstoprm_cron.sh.log'
+    job: >
+          /bin/bash -c '/usr/local/bin/parallax.sh
+           --command="{{ home_path.stdout }}/logstoprm_cron.sh"
+           --lock-dir="{{ logs_toprm_destination }}/lock_dirs"
+           --logger-tag="logstoprm"
+           >> {{ home_path.stdout }}/logstoprm_cron.sh.log'
     cron_file: 'logstoprm'
   become: true
 ...
