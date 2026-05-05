@@ -2,7 +2,7 @@
 #
 # Host settings.
 #
-Host {% for jumphost in ssh_client_settings_for_external_stack['ssh_client_jumphosts'] %}{{ jumphost['alias'] }}* {% endfor +%}
+Host {% for jumphost in include_ssh_client_settings_for_stack['ssh_client_jumphosts'] %}{{ jumphost['alias'] }}* {% endfor +%}
     #
     # Prevent timeouts
     #
@@ -38,7 +38,7 @@ Host {% for jumphost in ssh_client_settings_for_external_stack['ssh_client_jumph
 #
 # Expand short jumphost names to FQDN or IP address.
 #
-{% for jumphost in ssh_client_settings_for_external_stack['ssh_client_jumphosts'] %}
+{% for jumphost in include_ssh_client_settings_for_stack['ssh_client_jumphosts'] %}
 Host {{ jumphost['alias'] }}
     HostName {{ jumphost['hostname'] }}
     HostKeyAlias {{ jumphost['alias'] }}
@@ -46,5 +46,5 @@ Host {{ jumphost['alias'] }}
 #
 # Double-hop SSH settings to connect via specific jumphosts.
 #
-Host {% for jumphost in ssh_client_settings_for_external_stack['ssh_client_jumphosts'] %}{{ jumphost['alias'] }}+* {% endfor +%}
+Host {% for jumphost in include_ssh_client_settings_for_stack['ssh_client_jumphosts'] %}{{ jumphost['alias'] }}+* {% endfor +%}
     ProxyCommand ssh -x -q $(echo "${JUMPHOST_USER:-%r}")@$(echo %h | sed 's/+[^+]*$//') -W $(echo %h | sed 's/^[^+]*+//'):%p
