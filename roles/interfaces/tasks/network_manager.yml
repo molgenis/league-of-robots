@@ -80,8 +80,8 @@
          set -u
          set -e
          set -o pipefail
-         nmcli --fields UUID,TIMESTAMP-REAL con show \
-           | awk '$2 ~ /never/ {print $1}'
+         nmcli --fields UUID,DEVICE,TIMESTAMP-REAL con show \
+           | awk '$2 == "--" || $3 ~ /never/ {print $1}'
   register: nmcli_con_show_never_used
   changed_when: nmcli_con_show_never_used['stdout'] | length > 1
 
