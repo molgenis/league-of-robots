@@ -3,6 +3,8 @@
   ansible.builtin.setup:
   delegate_to: "{{ item }}"
   delegate_facts: true
+  vars:
+    ansible_python_interpreter: python  # Bugfix for machines running EL <= 8.x like Dragen servers.
   with_items: "{{ groups['sys_admin_interface'] }}"
 
 - name: 'Add Slurm group.'
