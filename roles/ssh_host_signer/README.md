@@ -7,7 +7,7 @@ An Ansible role to securely sign SSH host keys with an SSH certificate authority
     * `HostKey` and matching `HostCertificate` directives are only added to the SSH config file for the key types specified.
     * Any `HostKey` and matching `HostCertificate` directives for keys that do not match the key type regex will be removed from the SSH config.
 
-Note: adding the public key of the CA as cert in /etc/ssh/ssh_known_hosts is relocated to the `ssh` (client) role.
+Note: adding the public key of the CA as cert in `/etc/ssh/ssh_known_hosts` is relocated to the `ssh` (client) role.
 
 ## Requirements
 The machine running this playbook is expected to have an `ssh-keygen` binary on the path. It should be new enough to support SSH CAs.
