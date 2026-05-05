@@ -131,9 +131,9 @@
       group: 'root'
       mode: '0755'
     - name: '/var/run/slurm'
-      owner: 'slurm'
+      owner: 'root'
       group: 'root'
-      mode: '0775'
+      mode: '0755'
   become: true
 
 - name: 'Deploy slurm prolog/epilog scripts.'
@@ -205,9 +205,6 @@
     owner: root
     group: root
     mode: '0644'
-  vars:
-    slurm_daemons:
-      - slurmd
   become: true
 
 - name: 'Create folders for systemd override file.'

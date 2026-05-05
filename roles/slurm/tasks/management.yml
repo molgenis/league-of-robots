@@ -60,10 +60,6 @@
     owner: root
     group: root
     mode: '0644'
-  vars:
-    slurm_daemons:
-      - slurmdbd
-      - slurmctld
   become: true
 
 - name: 'Install munge.key file.'
@@ -167,10 +163,14 @@
       owner: 'slurm'
       group: 'root'
       mode: '0750'
-    - name: '/var/run/slurm'
+    - name: '/var/run/slurmctld'
       owner: 'slurm'
-      group: 'root'
-      mode: '0775'
+      group: 'slurm'
+      mode: '0755'
+    - name: '/var/run/slurmdbd'
+      owner: 'slurm'
+      group: 'slurm'
+      mode: '0755'
   become: true
 
 - name: 'Install Slurm config file.'
