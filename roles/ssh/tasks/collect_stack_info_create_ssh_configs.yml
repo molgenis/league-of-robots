@@ -1,19 +1,19 @@
 ---
-- name: "Collect variables from {{ playbook_dir }}/{{ each_ssh_config }}"
+- name: "Collect variables from {{ local_ssh_client_config_path }}."
   ansible.builtin.include_vars:
-    file: "{{ playbook_dir }}/{{ each_ssh_config }}"
-    name: ssh_client_settings_for_external_stack
+    file: "{{ local_ssh_client_config_path }}"
+    name: include_ssh_client_settings_for_stack
   delegate_to: localhost
   connection: local
   run_once: true
 
-- name: Add CA public key to list of all public CA keys
+- name: Add CA public key to list of all public CA keys.
   ansible.builtin.set_fact:
-    public_certificate_authorities: "{{ public_certificate_authorities | default([]) + [ssh_client_settings_for_external_stack['ssh_client_known_hosts']] }}"
+    public_certificate_authorities: "{{ public_certificate_authorities | default([]) + [include_ssh_client_settings_for_stack['ssh_client_known_hosts']] }}"
   when:
-    - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] is defined
-    - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] is not none
-    - ssh_client_settings_for_external_stack['ssh_client_known_hosts'] | default('') | length >= 1
+    - include_ssh_client_settings_for_stack['ssh_client_known_hosts'] is defined
+    - include_ssh_client_settings_for_stack['ssh_client_known_hosts'] is not none
+    - include_ssh_client_settings_for_stack['ssh_client_known_hosts'] | default('') | length >= 1
   delegate_to: localhost
   connection: local
   run_once: true
@@ -26,8 +26,8 @@
     group: root
     mode: '0644'
   when:
-    - ssh_client_settings_for_external_stack['ssh_client_jumphosts'] is defined
-    - ssh_client_settings_for_external_stack['ssh_client_jumphosts'] is not none
-    - ssh_client_settings_for_external_stack['ssh_client_jumphosts'] | default('') | length >= 1
+    - include_ssh_client_settings_for_stack['ssh_client_jumphosts'] is defined
+    - include_ssh_client_settings_for_stack['ssh_client_jumphosts'] is not none
+    - include_ssh_client_settings_for_stack['ssh_client_jumphosts'] | default('') | length >= 1
   become: true
 ...
