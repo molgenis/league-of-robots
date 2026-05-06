@@ -39,7 +39,7 @@ The exec summary:
 /groups/${group}/rsc*/:   Read-only Storage Cache; Your group's fast dirs for (reference) data sets
 {% endif %}
 {% if lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | list | length %}
-/groups/${group}/tmp*/:   TeMPorary; Your group's fastest dirs for temporary data, NO BACKED-UP
+/groups/${group}/tmp*/:   TeMPorary; Your group's fastest dirs for temporary data, NOT BACKED-UP
 {% endif %}
 ```
 
