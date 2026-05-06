@@ -12,7 +12,7 @@ Thank you in advance for taking the time to read these guidelines, very much app
 ## Our storage system
 
 We work with multiple storage systems ranging from large, parallel, shared storage available on multiple servers to small local storage available on a single server. 
-Some of these storage systems are optimized for _high performance_ (HP), others for _high availability_ (HA) and yet others for slow, but cheap long term archiving of data. 
+Some of these storage systems are optimized for _high performance_ (HP, (tmp)), others for _high availability_ (HA, (prm)) and yet others for slow, but cheap long term archiving of data. 
 The exec summary:
 ```
 #
@@ -43,7 +43,7 @@ The exec summary:
 {% endif %}
 ```
 
-We now also provide an archive option, for sleeping datasets. The archive option is substantially cheaper than storing data on PRM.
+We now also provide an archive option, for sleeping datasets. The archive option is substantially cheaper than storing data on prm.
 
 Please consult the info below and make sure you know what to store where!
 
@@ -63,15 +63,15 @@ For each project/folder write a README.
 	- Data source (human, mouse,....) 
 	- Tissue type (blood, fibroblasts, heart biopt,...) 
 	- Data type (array, NGS, longread,....)
-	- Small overview of the folder structure, rawdata is in this folder, final data is in this folder
+	- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
 
- 1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on HA storage.
- 1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on HP storage.  
+ 1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on HA _prm_ storage.
+ 1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on HP _tmp_ storage.  
     Make sure your in-silico experiment processes a chunk of data that can easily be analysed in << 45 days.
- 1. Generate jobs, which will read and write to and from folders in ```/groups/${group}/tmp*/...``` on HP storage systems.
+ 1. Generate jobs, which will read and write to and from folders in ```/groups/${group}/tmp*/...``` on HP _tmp_ storage systems.
  1. Submit your jobs on the Slurm workload manager with the ```sbatch``` command.
  1. Once all jobs have finished successfully, assess the results.
- 1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on HA storage, with a README.
+ 1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on HA _prm_ storage, with a README.
  1. Cleanup by deleting data from ```/groups/${group}/tmp*/...``` to free up space for your next experiment.
  1. Document and publish your experiment/data.
 
@@ -125,7 +125,7 @@ A typical home dir contains << 100 Mb of data:
 Important:
 
  * Your home is designed to be a **private folder**; do not try to change permissions to share data located in your home with other users.
- * Your home is on _HA_ and hence not on _HP_ storage. Therefore you should try to minimize the IO load on your home to make sure everyone can enjoy a fast responsive home.
+ * Your home is on HA _prm_ and hence not on HP _tmp_ storage. Therefore you should try to minimize the IO load on your home to make sure everyone can enjoy a fast responsive home.
  * Do not abuse your home dir, so:
     * Don't waste resources by installing in your private home dir yet another copy of the same software package that is already available centrally from the module system.
     * Don't run anything that causes massive random IO on your home dir.  
@@ -182,7 +182,7 @@ There are two limits and a timer period that determines how these interact:
    You will need to reduce your data volume to less than your quota to reset the timer as well as the (hard) limit.
 
 The combination of quota, larger limits and timers prevents users from permanently exceeding their quota while allowing them to temporarily consume more space to handle peak loads. 
-Note that if you write a lot of data and fast it is possible to exceed both your quota as well as the larger limit in a time frame that is much shorter than the quota reporting interval. 
+Note that if you write a lot of data fast it is possible to exceed both your quota as well as the larger limit in a time frame that is much shorter than the quota reporting interval. 
 In that case you may run out of disk space before you received your first warning.
 
 Different types of file systems come with their own quota tools, which produce different reports. 
