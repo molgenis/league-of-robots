@@ -1,0 +1,56 @@
+---
+- name: "Find all {{ playbook_dir }}/group_vars/*/ssh_client_settings.yml files."
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/group_vars/"
+    patterns: ssh_client_settings.yml
+    recurse: true
+  register: local_ssh_client_configs
+  delegate_to: localhost
+  connection: local
+  run_once: true
+
+- name: Iterate over every stack and configure ssh client.
+  ansible.builtin.include_tasks:
+    file: collect_stack_info_create_ssh_configs.yml
+  loop: "{{ local_ssh_client_configs['files'] | map(attribute='path') }}"
+  loop_control:
+    loop_var: local_ssh_client_config_path
+  vars:
+    each_stack: "{{ local_ssh_client_config_path | regex_search('group_vars\/(.*)\/ssh_client_settings.yml', '\\1') | first }}"
+  when: local_ssh_client_config_path | length > 0
+
+- name: Find /etc/ssh/ssh_config.d/*.LoR.conf files.
+  ansible.builtin.find:
+    paths: "/etc/ssh/ssh_config.d/"
+    file_type: file
+    patterns: "*.LoR.conf"
+  register: remote_ssh_conf_paths
+  become: true
+
+- name: Remove outdated /etc/ssh/ssh_config.d/*.LoR.conf files.
+  ansible.builtin.file:
+    path: "/etc/ssh/ssh_config.d/{{ item }}"
+    state: absent
+  vars:
+    remote_ssh_confs: "{{ remote_ssh_conf_paths['files'] | map(attribute='path') | map('basename') | list }}"
+    local_ssh_configs_formatted: "{{ local_ssh_client_configs['files']
+        | map(attribute='path')
+        | map('regex_replace', '^.*group_vars/', '')
+        | map('regex_replace', '/ssh_client_settings.yml$', '')
+        | map('regex_replace', '$', '.LoR.conf') }}"
+  loop: "{{ remote_ssh_confs | difference(local_ssh_configs_formatted) }}"
+  become: true
+
+- name: Deploy a block of all public CAs into /etc/ssh/ssh_known_hosts file.
+  ansible.builtin.blockinfile:
+    path: /etc/ssh/ssh_known_hosts
+    marker: "## {mark} ANSIBLE MANAGED BLOCK - DO NOT CHANGE IT ##"
+    insertafter: EOF
+    mode: '0644'
+    block: |
+      {% for ca in public_certificate_authorities | sort %}
+      {{ ca }}
+      {% endfor %}
+    create: true
+  become: true
+...
