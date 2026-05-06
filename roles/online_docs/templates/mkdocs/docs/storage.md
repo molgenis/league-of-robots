@@ -39,11 +39,11 @@ The exec summary:
 /groups/${group}/rsc*/:   Read-only Storage Cache; Your group's fast dirs for (reference) data sets
 {% endif %}
 {% if lfs_mounts | selectattr('lfs', 'search', 'tmp[0-9]+$') | list | length %}
-/groups/${group}/tmp*/:   TeMPorary; Your group's fastest dirs for temporary data, NO BACKED-UP
+/groups/${group}/tmp*/:   TeMPorary; Your group's fastest dirs for temporary data, NOT BACKED-UP
 {% endif %}
 ```
 
-We now also privide an archive option, for sleeping datasets. Archive option is substantially cheaper than PRM.
+We now also privide an archive option, for sleeping datasets. The Archive option is substantially cheaper than PRM.
 
 Please consult the info below and make sure you know what to store where!
 
@@ -255,31 +255,4 @@ All good things come to an end, please follow these steps when you are finished 
 - Important data should be stored in the correct place, prm or archive, accompanied by a README with your name, responsible PIs, retention time, project number, used in article(s)/project(s), data source (human, mouse,....), tissue type (blood, fibroblasts, heart biopt,...), data type (array, NGS, longread,....).
 
 If something is unclear or you don't know how to proceed, please contact [the helpdesk](../contact/).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
