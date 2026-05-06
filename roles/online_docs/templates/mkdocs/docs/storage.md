@@ -43,7 +43,7 @@ The exec summary:
 {% endif %}
 ```
 
-We now also privide an archive option, for sleeping datasets. Archive option is substantially cheaper than PRM.
+We now also provide an archive option, for sleeping datasets. The archive option is substantially cheaper than storing data on PRM.
 
 Please consult the info below and make sure you know what to store where!
 
