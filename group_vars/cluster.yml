@@ -21,7 +21,7 @@ managed_yum_repos:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['distro', 'epel', 'rsyslog', 'irods'])
               | map(attribute='id') }}"
-  oracle8: "{{ yum_repos['rocky9']
+  oracle8: "{{ yum_repos['oracle8']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'uek', 'rsyslog'])
               | map(attribute='id') }}"

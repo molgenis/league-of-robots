@@ -4,7 +4,6 @@ all:
     controller_api:
       hosts:
         localhost:
-          ansible_python_interpreter: /usr/bin/env python
     jumphost:
       hosts:
         bb-porch:
@@ -14,6 +13,8 @@ all:
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -38,6 +39,8 @@ all:
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
           local_yum_repository: true  # For nhc_standalone.
           local_volume_extra:
             - name: groups1
@@ -362,17 +365,17 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: eth2
+                name: enp111s0f0np0  # altname ens2f0np0
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               attach_port_on_instance_launch: false  # Not possible for bare metal on Merlin. Must configure NICs after boot.
               nmstate_interface:
-                name: eth2.990
+                name: ens2f0np0.990  # Use short altname here, because primary parent interface name + VLAN ID is too long (> 15 characters).
                 mtu: 1500
                 type: vlan
                 vlan:
                   id: 990
-                  base-iface: eth2
+                  base-iface: enp111s0f0np0  # Parent interface name.
                 ipv4:
                   dhcp: false
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
