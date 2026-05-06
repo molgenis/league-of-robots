@@ -89,6 +89,7 @@ all:
                   owner: root
                   group: "{{ data_transfer_only_group }}"
                 - rel_paths:
+                    - umcg-gap
                     - umcg-genomescan
                     - umcg-gst
                   mode: '2770'
@@ -100,6 +101,7 @@ all:
             - "{{ all.ip_addresses['umcg']['net4'] }}"
             - "{{ all.ip_addresses['rug']['bwp_net'] }}"
             - "{{ all.ip_addresses['rug']['operator'] }}"
+            - "{{ all.ip_addresses['eramsmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
@@ -116,6 +118,7 @@ all:
             - "{{ all.ip_addresses['umcg']['net4'] }}"
             - "{{ all.ip_addresses['rug']['bwp_net'] }}"
             - "{{ all.ip_addresses['rug']['operator'] }}"
+            - "{{ all.ip_addresses['eramsmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
@@ -131,6 +134,7 @@ all:
             - "{{ all.ip_addresses['umcg']['net4'] }}"
             - "{{ all.ip_addresses['rug']['bwp_net'] }}"
             - "{{ all.ip_addresses['rug']['operator'] }}"
+            - "{{ all.ip_addresses['eramsmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
