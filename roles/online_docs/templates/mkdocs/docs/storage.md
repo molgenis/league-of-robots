@@ -43,7 +43,7 @@ The exec summary:
 {% endif %}
 ```
 
-We now also privide an archive option, for sleeping datasets. The Archive option is substantially cheaper than PRM.
+We now also provide an archive option, for sleeping datasets. The archive option is substantially cheaper than storing data on PRM.
 
 Please consult the info below and make sure you know what to store where!
 
@@ -247,7 +247,7 @@ All good things come to an end, please follow these steps when you are finished 
 	- Data source (human, mouse,....) 
 	- Tissue type (blood, fibroblasts, heart biopt,...) 
 	- Data type (array, NGS, longread,....)
-	- Small overview of the folder structure, rawdata is in this folder, final data is in this folder
+	- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
 - Sit with your PI, the person who is responsible for your data. Determine where to store your data sets. Here are some tips: 
 	- if the rawdata needs to be used by others, you can store it on prm, rsc...
 	- If this is a sleeping data set, probably not used by anybody else, store it in [archive](../archive), this is substantially cheaper than the prm storage location.

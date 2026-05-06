@@ -68,7 +68,6 @@ up for the RUG cluster course: [Hábrók basis | Corporate Academy | Rijksuniver
 
 See [https://umcg.topdesk.net/](https://umcg.topdesk.net/) the Scientific Research Support page of the UMCG, for all you scientific research support questions.
 
-
 ## When you want to leave
 
 When, for what ever reason, you would like to leave the group, see below a few scenarios we could think of, accompanied with the steps to take.
@@ -80,7 +79,7 @@ When, for what ever reason, you would like to leave the group, see below a few s
 	- Make sure all regular users have followed the [when you leave](../storage/#when-you-leave) steps. If everybody did their job right, no data remains on TMP. Ask your data managers to manage this, to keep everybody on their toes.
 	- All data sets are accompanied by a README with the correct information (your name and contact information, responsible PIs, retention time, project numer, used in article/project, data source (human, mouse,....), tissue type (blood, fibroblasts, heart biopt,...), data type (array, NGS, longread,....), .)
 	- If only sleeping data sets remain, we have an [archive](../archive) option. This is substantially cheaper compared to PRM storage. Ask [the helpdesk](../contact/) to help setup an archive for your group.
-	- It is really important to state the retention time. After this date, the responsible PI should re-evaluate this data set and notify the [the helpdesk](../contact/) the data can be deleted or has an updated DMP. If you need some guidelines concerning the decision making see [health-ri.nl](https://www.health-ri.nl/sites/healthri/files/2025-06/Handreiking-evaluatie-biobankcollecties_juni2025_0.pdf) for guidelines concerning bio bank collections, but this can be applied on other data set as well.  
+	- It is really important to state the retention time. After this date, the responsible PI should re-evaluate this data set and notify the [the helpdesk](../contact/) the data can be deleted or has an updated DMP.  If you need some guidelines concerning the decision making see [health-ri.nl](https://www.health-ri.nl/sites/healthri/files/2025-06/Handreiking-evaluatie-biobankcollecties_juni2025_0.pdf) for guidelines concerning bio bank collections, but this can be applied on other data sets as well. 
 - **You no longer need to store your sleeping dataset.**
 	- Email the helpdesk that we can delete all data remaining in the group. 
 	- we will delete all data and remove the group completely from all the clusters. 
