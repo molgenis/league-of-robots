@@ -10,23 +10,10 @@
 #  - Message Authentication Code (MAC) algorithms: ssh -Q mac
 #  - Key EXchange (KEX) algorithms: ssh -Q kex
 #  - Public key authentication algorithms: ssh -Q key
-# Note 1: dict key - e.g. centos7 - must match with the value for os_distribution in group_vars/{{ stack_name }}/vars.yml
-# Note 2: for Rocky >= 8 we follow system crypto policies and algorithms are no longer defined here.
+# Note 1: dict key - e.g. rocky9 - must match with the value for os_distribution in group_vars/{{ stack_name }}/vars.yml
+# Note 2: for EL >= 8 we follow system crypto policies.
 # Note 3: Ciphers and MACs can be combined in multiple ways, but in theory only Encrypt-then-MAC (EtM) should be used.
 #
-sshd_algorithms:
-  centos7:
-    # Temporarily disable chacha20-poly1305@openssh.com due to Terrapin Attack: https://terrapin-attack.com
-    # Vulnarable to Terrapin Attack are the chacha20-poly1305@openssh.com encryption algorithm and
-    # any encryption algorithm suffixed -cbc in combination with any MAC algorithm suffixed -etm@openssh.com.
-    # ciphers: chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-    ciphers: aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-    kexes: curve25519-sha256@libssh.org,curve25519-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
-    # Temporarily disable umac-128*@openssh.com due to bug in LibreSSL breaking the default Windows SSH client.
-    # https://github.com/PowerShell/Win32-OpenSSH/issues/2078
-    # macs: hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com
-    macs: hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
-    keys: ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,ssh-rsa,ssh-rsa-cert-v01@openssh.com
 sshd_crypto_policies:
   oracle8:
     - DEFAULT
