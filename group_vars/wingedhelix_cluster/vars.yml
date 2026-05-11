@@ -403,23 +403,6 @@ ogm_servers:
       ken\":\\s*\"\\K[^\"]+')\"'; userrole=3; userpk=24' https://${ogm_server}:3005/proje\
       ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?period=90 > ${prm_location}/TrendAnalysis/${ogm_server}-$(date +%F)-${stack_prefix}.csv"
 #
-# Local storage variables.
-#
-local_mount_subfolders:
-  - mount_point: '/groups'
-    machines: "{{ groups['data_transfer'] }}"
-    folders:
-      - rel_paths:
-          - "{{ data_transfer_only_group }}"
-        mode: '2750'
-        owner: root
-        group: "{{ data_transfer_only_group }}"
-      - rel_paths:
-          - umcg-genomescan
-          - umcg-gst
-        mode: '2770'
-        owner: root
-#
 # Shared storage related variables
 #
 pfs_mounts:
