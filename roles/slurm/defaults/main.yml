@@ -142,11 +142,11 @@ slurm_qos_limits:
       gpus: "{{ (slurm_total_gpus_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | round(0, 'ceil') | int }}"
 slurm_daemons: "
     {%- if inventory_hostname in groups['sys_admin_interface'] | default([]) -%}
-      {%- set _slurm_deamons_on_this_host = ['slurmdbd', 'slurmctld'] -%}
+      {%- set _slurm_daemons_on_this_host = ['slurmdbd', 'slurmctld'] -%}
     {%- endif -%}
     {%- if inventory_hostname in groups['compute_node'] | default([]) or
            inventory_hostname in groups['user_interface'] | default([]) -%}
-      {%- set _slurm_deamons_on_this_host = _slurm_deamons_on_this_host | default([]) + ['slurmd'] -%}
+      {%- set _slurm_daemons_on_this_host = _slurm_daemons_on_this_host | default([]) + ['slurmd'] -%}
     {%- endif -%}
-    {{- _slurm_deamons_on_this_host -}}"
+    {{- _slurm_daemons_on_this_host -}}"
 ...

@@ -96,7 +96,7 @@
       - 'slurm-torque'
   become: true
 
-- name: 'Install Slurm management deamons with yum.'
+- name: 'Install Slurm management daemons with yum.'
   ansible.builtin.package:
     state: 'installed'
     update_cache: true
