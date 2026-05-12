@@ -16,7 +16,7 @@
   failed_when: false
   become: true
 
-- name: 'Run certbot if certificate is missing or invalid.'
+- name: 'Create  certificates if certificate is missing or invalid.'
   ansible.builtin.command: >
          certbot certonly
              --webroot -w "/var/www/html"
