@@ -16,15 +16,6 @@ UseDNS no
 #
 Protocol 2
 
-{% if ansible_facts['os_family'] == "RedHat"
-  and ansible_facts['distribution_major_version'] >= "9" %}
-#
-# Minimal RSA key size
-#
-RequiredRSASize 4096
-{% endif %}
-{% if ansible_facts['os_family'] == "RedHat"
-  and ansible_facts['distribution_major_version'] >= "8" %}
 #
 # Disable printing of MOTD by sshd itself,
 # which is already printed by the pluggable authentication module (PAM) motd.so
@@ -34,18 +25,17 @@ PrintMotd no
 #
 # Include additional config files including one used to follow the "system wide crypto policies"
 # See manual pages for update-crypto-policies(8) and sshd_config(5).
+# This includes settings for
+#  * Ciphers
+#  * MACs
+#  * GSSAPIKexAlgorithms
+#  * KexAlgorithms
+#  * HostKeyAlgorithms
+#  * PubkeyAcceptedAlgorithms
+#  * CASignatureAlgorithms
+#  * RequiredRSASize
 #
 Include /etc/ssh/sshd_config.d/*.conf
-{% else %}
-#
-# Supported algorithms by order of preference.
-#
-HostKeyAlgorithms      {{ sshd_algorithms[os_distribution]['keys'] }}
-PubkeyAcceptedKeyTypes {{ sshd_algorithms[os_distribution]['keys'] }}
-KexAlgorithms {{ sshd_algorithms[os_distribution]['kexes'] }}
-Ciphers {{ sshd_algorithms[os_distribution]['ciphers'] }}
-MACs {{ sshd_algorithms[os_distribution]['macs'] }}
-{% endif %}
 
 #
 # Signed Host Keys.
