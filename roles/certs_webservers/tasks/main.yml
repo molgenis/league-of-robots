@@ -53,11 +53,16 @@
   when: certs_dir.files | length > 0
   become: true
 
-- name: 'Reload/ restart services and enable systemd timer for auto-renewal.'
-  ansible.builtin.command: "{{ item }}"
-  with_items:
-    - systemctl daemon-reload
-    - systemctl restart httpd
-    - systemctl enable certbot-renew.timer
+- name: 'Apply changes and enable systemd timer for auto-renewal.'
+  ansible.builtin.systemd_service:
+    name: certbot-renew.timer
+    enabled: true
+    daemon_reload: true
+  become: true
+
+- name: 'Restart httpd to apply certificates.'
+  ansible.builtin.systemd_service:
+    name: httpd
+    state: restarted
   become: true
 ...
