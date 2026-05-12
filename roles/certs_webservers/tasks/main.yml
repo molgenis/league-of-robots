@@ -36,7 +36,6 @@
     file_type: directory
     patterns: "{{ stack_prefix }}.gcc.rug.nl*" 
   register: certs_dir
-  when: cert_expiry.rc != 0
   become: true
 
 - name: 'Create symlinks from default letsencrypt folder to Linux cert folders.'
@@ -51,7 +50,7 @@
       dest: "/etc/pki/tls/certs/localhost.crt"
     - src: "{{ certs_dir.files[0].path }}/chain.pem"
       dest: "/etc/pki/tls/certs/server-chain.crt"
-  when: cert_expiry.rc != 0 and certs_dir.files | length > 0
+  when: certs_dir.files | length > 0
   become: true
 
 - name: 'Reload/ restart services and enable systemd timer for auto-renewal.'
@@ -60,6 +59,5 @@
     - systemctl daemon-reload
     - systemctl restart httpd
     - systemctl enable certbot-renew.timer
-#  when: cert_expiry.rc != 0
   become: true
 ...
