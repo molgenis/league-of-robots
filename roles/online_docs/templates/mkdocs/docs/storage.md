@@ -12,7 +12,9 @@ Thank you in advance for taking the time to read these guidelines, very much app
 ## Our storage system
 
 We work with multiple storage systems ranging from large, parallel, shared storage available on multiple servers to small local storage available on a single server. 
-Some of these storage systems are optimized for _high performance_ (HP, (tmp)), others for _high availability_ (HA, (prm)) and yet others for slow, but cheap long term archiving of data. 
+Some of these storage systems are optimized for _high performance_, to crunch jobs vast on _tmp_, others for _high availability_ our storage system on _prm_ and yet others for slow, but cheap long term archiving of data. 
+Be aware _tmp_ and your home directory are not backed-up, _prm_ is backed-up.
+
 The exec summary:
 ```
 #
@@ -25,7 +27,7 @@ The exec summary:
 #
 # Users:
 #
-/home/${user}/:           Your small home dir for personal settings/configs only
+/home/${user}/:           Your small home dir for personal settings/configs only, NOT BACKED-UP
 #
 # Groups:
 #
@@ -65,13 +67,13 @@ For each project/folder write a README.
 	- Data type (array, NGS, longread,....)
 	- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
 
- 1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on HA _prm_ storage.
- 1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on HP _tmp_ storage.  
+ 1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on _prm_ storage.
+ 1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on _tmp_ storage.  
     Make sure your in-silico experiment processes a chunk of data that can easily be analysed in << 45 days.
- 1. Generate jobs, which will read and write to and from folders in ```/groups/${group}/tmp*/...``` on HP _tmp_ storage systems.
+ 1. Generate jobs, which will read and write to and from folders in ```/groups/${group}/tmp*/...``` on _tmp_ storage systems.
  1. Submit your jobs on the Slurm workload manager with the ```sbatch``` command.
  1. Once all jobs have finished successfully, assess the results.
- 1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on HA _prm_ storage, with a README.
+ 1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on _prm_ storage, with a README.
  1. Cleanup by deleting data from ```/groups/${group}/tmp*/...``` to free up space for your next experiment.
  1. Document and publish your experiment/data.
 
@@ -94,8 +96,8 @@ interactive user. We will immediately kill such processes.
 1. Use a sub optimal data structure or experimental design resulting in many thousands of files in a directory either by using small files instead of a relatively small number of large files or by never creating sub dirs.
    As (our) large parallel file system are optimized for large files, creating many many small files will result in high load on the meta-data servers killing performance or worse...
 1. Never cleanup and run out of space crashing both your own jobs as well as those of all other users from the same group.
-1. Never finish an experiment and postpone the task of moving the _final_ results from the HP _tmp_ file systems to the HA _prm_ file systems forever.
-   As the **HP tmp filesystems have no backups and old files are deleted automatically**, you will loose your results automagically.
+1. Never finish an experiment and postpone the task of moving the _final_ results from the _tmp_ file systems to the _prm_ file systems forever.
+   As the **tmp filesystems have no backups and old files are deleted automatically**, you will loose your results automagically.
    A four year PhD project is not a single experiment! Split your work in batches / experiments that can be completed in a reasonable amount of time: weeks rather than months.
    Completed means the results were QC-ed and documented, the data that needs to be kept for the long term was migrated to _prm_ storage and the rest was deleted from _tmp_ to make room for new batches / experiments.
 
@@ -125,7 +127,7 @@ A typical home dir contains << 100 Mb of data:
 Important:
 
  * Your home is designed to be a **private folder**; do not try to change permissions to share data located in your home with other users.
- * Your home is on HA _prm_ and hence not on HP _tmp_ storage. Therefore you should try to minimize the IO load on your home to make sure everyone can enjoy a fast responsive home.
+ * Your home is on a _high availability_ system, but has **no back-up** . Therefore you should try to minimize the IO load on your home to make sure everyone can enjoy a fast responsive home.
  * Do not abuse your home dir, so:
     * Don't waste resources by installing in your private home dir yet another copy of the same software package that is already available centrally from the module system.
     * Don't run anything that causes massive random IO on your home dir.  
@@ -166,7 +168,7 @@ The following types of shared storage are available on {{ slurm_cluster_name | c
   Designed for temporary storage of intermediate files and new results produced by jobs running on the compute nodes of the cluster.
 {% endif %}
 
-Note that your group(s) may have access to only a subset of shared storage types and not all types are available on all clusters. The minimal requirements for a main group can be found [here](../new_group/#minimal-requirements). 
+Note that your group(s) may have access to only a subset of shared storage types and not all types are available on all clusters. The requirements for a main group can be found [here](../new_group/#minimal-requirements). 
 
 ## Quota
 
