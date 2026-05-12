@@ -1,5 +1,7 @@
 ---
-- hosts: jenkins
+- hosts:
+    - jenkins
+    - docs
   roles:
     - certs_webservers
 ...
