@@ -2,11 +2,6 @@
 # Creation of SSL certificates for HTTPS webservers.
 #
 ---
-- name: 'Check OS version of target host.'
-  ansible.builtin.fail:
-    msg: 'This role requires RedHat/CentOS version >= 9.x'
-  when: ansible_facts['os_family'] != "RedHat" or ansible_facts['distribution_major_version'] < "9"
-
 - name: 'Install certbot package.'
   ansible.builtin.package:
     name: certbot
