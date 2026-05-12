@@ -23,7 +23,7 @@
              --server "{{ acme_server }}"
              --eab-kid "{{ eab_kid }}"
              --eab-hmac-key "{{ eab_hmac_key }}"
-             -d "{{ stack_prefix }}.gcc.rug.nl"
+             -d "{{ fqdn }}"
              --agree-tos
              -m "{{ email_address }}"
              --non-interactive
@@ -34,7 +34,7 @@
   ansible.builtin.find:
     paths: "/etc/letsencrypt/live/"
     file_type: directory
-    patterns: "{{ stack_prefix }}.gcc.rug.nl*" 
+    patterns: "{{ fqdn }}*" 
   register: certs_dir
   become: true
 
@@ -56,6 +56,7 @@
 - name: 'Apply changes and enable systemd timer for auto-renewal.'
   ansible.builtin.systemd_service:
     name: certbot-renew.timer
+    state: started
     enabled: true
     daemon_reload: true
   become: true
