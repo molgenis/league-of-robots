@@ -41,10 +41,13 @@
     owner: root
     group: "{{ envsync_group }}"
     mode: '2775'
-  when: local_mounts | default([])
+  when:
+    - local_mounts | default([])
         | selectattr('mount_point', 'defined')
         | selectattr('mount_point', 'equalto', hpc_env_prefix)
         | length <= 0
+    - inventory_hostname not in groups['user_interface'] | default([])  # User Interface will mount an env* LFS in /apps
+    - inventory_hostname not in groups['compute_node'] | default([])  # Compute nodes will mount an env* LFS in /apps
   become: true
 
 #

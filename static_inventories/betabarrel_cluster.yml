@@ -174,6 +174,7 @@ all:
           local_mounts:
             - mount_point: '/mnt/local_raid'
               device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+              label: local_raid
               perc_controller: 0
               perc_virtual_drive: 239
               mounted_owner: root
@@ -191,13 +192,6 @@ all:
               mounted_owner: root
               mounted_group: root
               mounted_mode: '2755'
-              mount_options: 'bind,nofail'
-              type: none
-            - mount_point: '/apps'
-              device: '/mnt/env05/apps/'
-              mounted_owner: root
-              mounted_group: "{{ envsync_group }}"
-              mounted_mode: '2775'
               mount_options: 'bind,nofail'
               type: none
           local_mount_subfolders:

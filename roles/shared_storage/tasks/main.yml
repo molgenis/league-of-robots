@@ -15,7 +15,7 @@
   when: inventory_hostname in item.machines | default([])
   become: true
 
-- name: 'Mount complete Physical File Systems (PFS-ses).'
+- name: 'Mount complete Physical File Systems (PFS-ses) using standard options for both PFS and LFS.'
   ansible.posix.mount:  # noqa jinja[spacing]
     path: "/mnt/{{ item.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}"
     src: "{{ item.source }}/{{ item.pfs }}"
@@ -27,7 +27,26 @@
       {%- if item.type == 'cifs' -%}
       ,credentials=/etc/sysconfig/{{ item.pfs | regex_replace('\$$', '') | regex_replace('/', '_') }}.cifs,uid=root,gid=root,dir_mode=02750,file_mode=0640
       {%- endif -%}
-  with_items: "{{ pfs_mounts | rejectattr('type', 'equalto', 'beegfs') | list }}"
+  with_items: "{{ pfs_mounts
+                  | rejectattr('type', 'equalto', 'beegfs')
+                  | rejectattr('pfs_source', 'defined')
+                  | list }}"
+  when: inventory_hostname in item.machines | default([])
+  become: true
+
+- name: 'Mount complete Physical File Systems (PFS-ses) using special options only for PFS.'
+  ansible.posix.mount:  # noqa jinja[spacing]
+    path: "/mnt/{{ item.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') }}"
+    src: "{{ item.pfs_source }}"
+    fstype: "{{ item.pfs_type }}"
+    opts: "{{ item.pfs_options }}{{ extra_opts }}"
+    state: 'mounted'
+  vars:
+    extra_opts: >-
+      {%- if item.type == 'cifs' -%}
+      ,credentials=/etc/sysconfig/{{ item.pfs | regex_replace('\$$', '') | regex_replace('/', '_') }}.cifs,uid=root,gid=root,dir_mode=02750,file_mode=0640
+      {%- endif -%}
+  with_items: "{{ pfs_mounts | rejectattr('pfs_source', 'undefined') | list }}"
   when: inventory_hostname in item.machines | default([])
   become: true
 
