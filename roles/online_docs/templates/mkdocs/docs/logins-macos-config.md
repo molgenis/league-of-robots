@@ -46,7 +46,7 @@ The ```ssh-client-config-for-{{ slurm_cluster_name }}``` app will guide you thro
    ![ssh-client-config app not opened](img/ssh-client-config-macos-26andlater-1.png)  
    Next, go to _System Settings_ and scroll until you find the _Security & Privacy_ section and look for the ```ssh-client-config-for-{{ slurm_cluster_name }}``` application:  
    ![ssh-client-config app was blocked to protect your mac](img/ssh-client-config-macos-26andlater-2.png)  
-   Click on ```Open Anyway``` and you will get a popup window where need to select ```Open Anyway``` again:  
+   Click on ```Open Anyway``` and you will get a popup window where you need to select ```Open Anyway``` again:  
    ![Open Anyway](img/ssh-client-config-macos-26andlater-3.png)  
  * The ```ssh-client-config-for-{{ slurm_cluster_name }}``` app will open the configuration script in the ```Terminal``` application and prompt for your account name.  
    ![Type your account name](img/ssh-client-config-macos-2.png)  
