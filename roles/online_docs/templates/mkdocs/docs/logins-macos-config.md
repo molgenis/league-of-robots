@@ -41,6 +41,10 @@ The ```ssh-client-config-for-{{ slurm_cluster_name }}``` app will guide you thro
    Click _Ok_ to allow access to the ```Terminal```.  
    If you want to revoke this permission or change it back to allow later on, you can do so in 
     _System Preferences_ -> _Security & Privacy_ prefs -> _Privacy_ tab -> _Automation_
+ * With the latest MacOS version (from 26.1 and later) is not possible to install/open the script directly.
+   First open the script and there will be a message like this (img/ssh-client-config-macos-26andlater-1.png)
+   Then go to System Settings and scroll until you find the Security/Privacy section (img/ssh-client-config-macos-26andlater-2.png).
+   There is the script you want to execute, click on "Open Anyway" and you will get a new prompt, there you again will select "Open Anyway" and the script will start (img/ssh-client-config-macos-26andlater-3.png)
  * The ```ssh-client-config-for-{{ slurm_cluster_name }}``` app will open the configuration script in the ```Terminal``` application and prompt for your account name.  
    ![Type your account name](img/ssh-client-config-macos-2.png)  
    Type your account name as you received it from the helpdesk and hit the \[ENTER\] key on your keyboard.  
