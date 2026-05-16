@@ -49,9 +49,9 @@
 - name: Label existing, unmounted xfs file system.
   ansible.builtin.shell:
     cmd: |
-         xfs_admin -L '{{ volume['label'] }}' '{{ volume['device'] }}'
+         xfs_admin -L '{{ volume['label'] }}' '{{ volume['device'] }}' && udevadm trigger && lsblk -n -o LABEL '{{ volume['device'] }}'
   register: xfs_admin_result
-  #changed_when: e2label_result.stdout != device_label['stdout']
+  #changed_when: xfs_admin_result.stdout != device_label['stdout']
   when:
     - mount_point_status['rc'] != 0
     - volume['label'] is defined
