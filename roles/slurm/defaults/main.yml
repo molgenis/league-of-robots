@@ -3,6 +3,7 @@ slurm_uid: 497
 slurm_gid: 497
 munge_uid: 498
 munge_gid: 498
+slurm_version_major_minor: "{{ slurm_version | regex_replace('^([0-9]+)\\.([0-9]+)\\..*', '\\1.\\2') }}"
 #
 # slurm_allow_jobs_to_span_nodes
 #
