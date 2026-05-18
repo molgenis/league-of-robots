@@ -29,13 +29,14 @@
              -m "{{ email_address }}"
              --non-interactive
   when: cert_expiry.rc != 0
+  changed_when: cert_expiry.rc != 0
   become: true
 
 - name: 'Find directory with certificates (last couple of characters of cert directory is unknown).'
   ansible.builtin.find:
     paths: "/etc/letsencrypt/live/"
     file_type: directory
-    patterns: "{{ fqdn }}*" 
+    patterns: "{{ fqdn }}*"
   register: certs_dir
   become: true
 
