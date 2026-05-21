@@ -100,7 +100,7 @@ Optional, but be aware that upload to an archive system should be in average wel
 We created a script that will help data managers to easily determine if the data is of correct size or too fragmented.
 Simply run it and as an argument provide the path to the folder
 
-`/usr/local/bin/arc_sizecheck /path/to/data`
+`/usr/local/bin/arc_surf_sizecheck /path/to/data`
 
 The script might take a little longer to finish if folder is larger or there are many small files.
 
