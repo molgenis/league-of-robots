@@ -175,7 +175,7 @@
 
 - name: 'Install Slurm config file.'
   ansible.builtin.template:
-    src: "templates/slurm.conf.{{ slurm_version }}"
+    src: "templates/slurm.conf.{{ slurm_version_major_minor }}"
     dest: '/etc/slurm/slurm.conf'
     owner: 'root'
     group: 'root'
