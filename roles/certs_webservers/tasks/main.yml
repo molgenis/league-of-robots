@@ -44,14 +44,22 @@
   ansible.builtin.file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: 'root'
+    group: 'root'
     state: link
   loop:
     - src: "{{ certs_dir.files[0].path }}/privkey.pem"
       dest: "/etc/pki/tls/private/localhost.key"
+      mode: '0600'
     - src: "{{ certs_dir.files[0].path }}/cert.pem"
       dest: "/etc/pki/tls/certs/localhost.crt"
+      mode: '0640'
     - src: "{{ certs_dir.files[0].path }}/chain.pem"
       dest: "/etc/pki/tls/certs/server-chain.crt"
+      mode: '0640'
+  loop_control:
+    label: "{{ item.src }} -> {{ item.dest }}"
   when: certs_dir.files | length > 0
   become: true
 
