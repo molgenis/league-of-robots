@@ -1,5 +1,4 @@
 ---
-admin_ranges: "129.125.249.0/24,172.23.40.1/24"
 ssh_host_signer_ca_keypair_dir: "ssh-host-ca"
 ssh_host_signer_ca_private_key: "{{ ssh_host_signer_ca_keypair_dir }}/{{ stack_name }}-ca"
 ssh_host_signer_key_types: '.*(rsa|ed25519).*'
@@ -126,4 +125,24 @@ logs_server_public_networks:
 ## Azure
 #
 azure_location: westeurope
+#
+## Some hosts are needed globally
+#
+additional_etc_hosts_for_all_stacks:
+  - group: docs_library
+    nodes:
+      - name: docs-on-bateleur
+        network: external
+  - group: donbot_azure
+    nodes:
+      - name: ladap
+        network: donbot_external_network
+  - group: logs_library
+    nodes:
+      - name: repo-primary
+        network: logs_external_public
+  - group: logs_library
+    nodes:
+      - name: repo-secondary
+        network: vlan16
 ...

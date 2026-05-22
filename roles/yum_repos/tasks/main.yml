@@ -2,6 +2,17 @@
 - name: Flush handlers.
   ansible.builtin.meta: flush_handlers
 
+- name: Copy repo server certificates to repo clients.
+  ansible.builtin.copy:
+    src: "{{ repo_servers_certificate }}"
+    dest: /etc/pki/ca-trust/source/anchors/
+    owner: root
+    group: root
+    mode: '0600'
+  when: repo_manager == 'repo_server'
+  notify: update-ca-trust
+  become: true
+
 - name: "Find all *.repo files in {{ yum_repos_repo_config_dir }}."
   ansible.builtin.find:
     paths: "{{ yum_repos_repo_config_dir }}"
@@ -18,9 +29,8 @@
     label: "{{ item | basename }}"
   loop: "{{ yum_repos_find_result.files | map(attribute='path') | list }}"
   when: item | basename not in yum_repos[os_distribution]
-                               | selectattr('id', 'in', managed_yum_repos[os_distribution])
-                               | map(attribute='file')
-                               | sort
+                               | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
+                               | sort(attribute='id')
                                | unique
   become: true
 
@@ -34,7 +44,7 @@
   loop_control:
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
   loop: "{{ yum_repos[os_distribution]
-            | selectattr('id', 'in', managed_yum_repos[os_distribution])
+            | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
             | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
   become: true
 
@@ -45,16 +55,16 @@
   loop_control:
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
   loop: "{{ yum_repos[os_distribution]
-            | selectattr('id', 'in', managed_yum_repos[os_distribution])
+            | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
             | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
   become: true
 
-- name: "Configure {{ yum_repos_repo_config_dir }}/*.repo files."
-  ansible.builtin.include_tasks: configure_repo_options.yml
+- name: "Configure community {{ yum_repos_repo_config_dir }}/*.repo files."
+  ansible.builtin.include_tasks: configure_community_repos.yml
   loop_control:
     label: "{{ yum_repo.id }}"
     loop_var: yum_repo
   loop: "{{ yum_repos[os_distribution]
-            | selectattr('id', 'in', managed_yum_repos[os_distribution])
+            | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
             | flatten(levels=1) }}"
 ...

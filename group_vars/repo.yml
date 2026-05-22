@@ -15,7 +15,7 @@ repo_manager: 'none'
 #     group_vars/all/repos.yml
 # will be applied to the machine, which can include instructions for both enabling or disabling a repo.
 #
-managed_yum_repos:
+yum_repos_deployed_on_clients:
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])

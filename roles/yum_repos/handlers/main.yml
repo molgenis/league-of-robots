@@ -1,0 +1,8 @@
+---
+- name: Running update-ca-trust when certificates have changed.
+  ansible.builtin.command:
+    cmd: update-ca-trust extract
+  changed_when: true
+  become: true
+  listen: update-ca-trust
+...

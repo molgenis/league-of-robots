@@ -1,5 +1,13 @@
 ---
 #
+## Repo servers global variables
+#
+repo_servers_certificate: 'logs_library/logs_development.pem'
+repo_servers_certificate_key: 'logs_library/logs_development.key'
+repo_servers:
+  - name: repo-primary
+  - name: repo-secondary
+#
 # Pulp repos.
 #
 pulp_repos:
@@ -860,16 +868,16 @@ yum_repos:
 #
 # Default list of yum repos that will be managed by Ansible on a machine.
 # The items listed here must match 'id' attributes for repos in the 'yum_repos' variable listed above.
-# If you need a different (sub)set of the repos, then you can override 'managed_yum_repos' for a subset of machines
+# If you need a different (sub)set of the repos, then you can override 'yum_repos_deployed_on_clients' for a subset of machines
 # either in the group_vars for the stack, the group_vars for a specific inventory group,
 # the host_vars for a specific host or the static_inventory for a stack.
 #
-managed_yum_repos:
+yum_repos_deployed_on_clients:
   centos7: "{{ yum_repos['centos7']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'rsyslog'])
               | map(attribute='id') }}"
-  oracle8: "{{ yum_repos['rocky9']
+  oracle8: "{{ yum_repos['oracle8']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'uek', 'rsyslog'])
               | map(attribute='id') }}"

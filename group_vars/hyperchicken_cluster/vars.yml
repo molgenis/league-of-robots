@@ -29,23 +29,6 @@ os_distribution: 'rocky9'
 rocky_vault_minorversion: '.6'
 figlet_font: 'lockergnome'
 motd: "To solve or not to solve, that's the question."
-additional_etc_hosts:
-  - group: docs_library
-    nodes:
-      - name: docs-on-bateleur
-        network: external
-  - group: donbot_azure
-    nodes:
-      - name: ladap
-        network: donbot_external_network
-  - group: logs_library
-    nodes:
-      - name: repo-primary
-        network: logs_external_public
-  - group: logs_library
-    nodes:
-      - name: repo-secondary
-        network: vlan16
 #
 # Cluster classification (used by `logs` and `login` roles)
 #

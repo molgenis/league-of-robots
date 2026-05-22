@@ -50,6 +50,6 @@
   loop_control:
     loop_var: this_distribution
 
-- name: "Configure repo for each distribution"
+- name: "Configure nginx on repo_server"
   ansible.builtin.include_tasks: nginx.yml
 ...

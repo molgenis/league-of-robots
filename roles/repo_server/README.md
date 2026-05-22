@@ -2,6 +2,8 @@
 
 ## Intro
 
+This role uses `logs_library` development key as a default key for the creation of all the cryptographic communication.
+
 ## Repository settings
 
 The Repository Server role mirrors local repositories based on the `yum_repos` variable in `group_vars/all/repos.yml`.
