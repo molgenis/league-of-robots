@@ -26,12 +26,23 @@ slurm_slurmctld_spool_dir: "/var/spool/slurm{% if slurm_version is version('23.0
 #
 slurm_local_scratch_dir: '/local'
 #
+# Special a.k.a "spec" resources: these are reserved for the OS / other processes and hence not available for jobs.
+# Max resources available for jobs on a node == total node resources - spec resources.
+#
+# See group_vars/all/slurm.yml and potentially overrides elsewhere in group_vars or static_inventory for:
+#  * slurm_spec_cores_per_node
+#  * slurm_spec_mem_per_node
+#  * slurm_max_cpu_cores_per_node
+#  * slurm_max_mem_per_node
+# These variables are used by some other roles like "online_docs" and therefore must be availabel globally
+# and cannot be defined here in the defaults for the "slurm" role.
+#
 # Determine cluster size and smallest node size based on
-#  * number of vcompute nodes in inventory and
-#  * cores per node, mem per node, etc. as specified in group_vars for cluster.
+#  * number of compute nodes in inventory and
+#  * cores per node, mem per node, etc. as specified in group_vars or inventory for cluster.
 #
 slurm_cluster_cores_total: "{{ groups['compute_node']
-    | map('extract', hostvars, 'slurm_max_cpus_per_node')
+    | map('extract', hostvars, 'slurm_max_cpu_cores_per_node')
     | map('int')
     | sum }}"
 slurm_cluster_mem_total: "{{ groups['compute_node']
@@ -44,11 +55,11 @@ slurm_cluster_gpus_total: "{{ groups['compute_node']
     | default([0], true)
     | map('int')
     | sum }}"
-slurm_total_cores_of_smallest_node: "{{ groups['compute_node']
-    | map('extract', hostvars, 'slurm_max_cpus_per_node')
+slurm_max_cpu_cores_of_smallest_node: "{{ groups['compute_node']
+    | map('extract', hostvars, 'slurm_max_cpu_cores_per_node')
     | map('int')
     | min }}"
-slurm_total_mem_of_smallest_node: "{{ groups['compute_node']
+slurm_max_mem_of_smallest_node: "{{ groups['compute_node']
     | map('extract', hostvars, 'slurm_max_mem_per_node')
     | map('int')
     | min }}"
@@ -138,8 +149,8 @@ slurm_qos_limits:
       gpus: "{{ (slurm_cluster_gpus_total | float * slurm_qos_limit_fractions['priority-long']['user']) | round(0, 'ceil') | int }}"
   interactive-short:
     user:
-      cores: "{{ [1, (slurm_total_cores_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | int] | max }}"
-      mem: "{{ [1000, (slurm_total_mem_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | int] | max }}"
+      cores: "{{ [1, (slurm_max_cpu_cores_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | int] | max }}"
+      mem: "{{ [1000, (slurm_max_mem_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | int] | max }}"
       gpus: "{{ (slurm_total_gpus_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | round(0, 'ceil') | int }}"
 slurm_daemons: "
     {%- if inventory_hostname in groups['sys_admin_interface'] | default([]) -%}
