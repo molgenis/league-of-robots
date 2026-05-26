@@ -3,4 +3,4 @@
   hosts:
     - ldap_server
   roles:
-    - lsaai
+    - lsaai_server
