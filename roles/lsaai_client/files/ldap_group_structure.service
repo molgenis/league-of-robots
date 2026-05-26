@@ -1,0 +1,11 @@
+[Unit]
+Description=Create LDAP subdirectories every now and then
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/create-ldap-subgroups.sh
+# Optional: Ensure only one instance runs if you use a different timer method
+# KillMode=process
+
+[Install]
+WantedBy=multi-user.target

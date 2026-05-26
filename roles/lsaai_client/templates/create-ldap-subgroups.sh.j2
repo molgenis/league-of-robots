@@ -1,0 +1,53 @@
+#!/bin/bash
+_filesystems="{% for each_lfs in lfs_mounts                                     
+               | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat)|(arc))[0-9]+$')
+               | map(attribute='lfs') %}{{ each_lfs }} {% endfor %}"
+_all_groups="$(getent group 2>/dev/null | awk -F':' '{print $1}' | grep -E "(^L-)")"
+_main_groups="$(grep -xE "^L-[^-]+" <<< "${_all_groups}")"
+_all_groups_sorted="$(sort -V -u <<< "${_all_groups}")"
+
+
+for _main_group in ${_main_groups}; do
+   for _each_lfs in ${_filesystems}; do
+      echo ls /groups/${_main_group}/${_each_lfs}
+      ls /groups/${_main_group}/${_each_lfs}
+   done
+
+#    #echo Making main group
+#    # test -d "/tmp/lsaai/${_main_group}" && continue
+#    # install -d "/tmp/lsaai/${_main_group}" -o root -g "${_main_group}" -m 0770
+#    for _each_group in ${_all_groups_sorted}; do
+#       #echo Making sub group
+#       [[ "${_main_group}" == "${_each_group}" ]] && continue
+#       if [[ "${_each_group}" =~ ^"${_main_group}" ]]; then
+#       	# grep -qE ".*-.*-" <<< "${_each_group}" || continue # skip the short groups
+#          _group_name="${_each_group##*-}"
+#          _group_remove_main_group="${_each_group/${_main_group}-}" # remove /L-mains-/    keep sub
+#          _group_top_path="${_group_remove_main_group//-/\/}"    # replace - with 	/
+# 	 # test -d "/tmp/lsaai/${_main_group}/${_group_top_path}" && continue
+#          install -d "/tmp/lsaai/${_main_group}/${_group_top_path}" -o root -g "${_each_group}" -m 0770
+#       fi
+#    done
+done
+#   L-mains
+#   L-mains-sub
+#   L-mains-sub-sub
+#   L-mains-sub-sub-sub
+
+
+#   echo _all_groups_sorted="${_all_groups_sorted}"
+
+# for _each_group in ${_all_groups_sorted}; do
+#    grep -qE ".*-.*-" <<< "${_each_group}" || continue # skip the short groups
+# #   echo "--------------"
+# 
+# #   echo "_each_group=${_each_group}"
+# #   echo "_group_name=$_group_name"
+#    _group_parrent="${_each_group%-*}"		   # keeps (L-mains-sub) and removes /-sub/
+# #   echo "_group_parrent=${_group_parrent}"
+# #   echo "_group_remove_main_group=${_group_remove_main_group}"
+# #   echo "_group_top_path=$_group_top_path"
+#    test -d "/tmp/lsaai/${_group_top_path}" && continue
+#    echo "Creating ${_group_name} in /tmp/lsaai/${_group_top_path}"
+# #   install -d "/tmp/lsaai/${}" -o root -g "${_each_group}" -m 0770
+# done
