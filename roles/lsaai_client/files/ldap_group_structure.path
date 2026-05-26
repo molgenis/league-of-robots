@@ -1,0 +1,10 @@
+[Unit]
+Description=Watch /var/lib/sss/db/cache_ladap.ldb
+
+[Path]
+PathChanged=/var/lib/sss/db/cache_ladap.ldb
+# Unneeded
+# Unit=ldap_group_structure.path
+
+[Install]
+WantedBy=multi-user.target
