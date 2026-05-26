@@ -3,6 +3,16 @@
   ansible.builtin.setup:
   delegate_to: "{{ item }}"
   delegate_facts: true
+  vars:
+    #
+    # Work around for machines running EL <= 8.x like Dragen servers.
+    # Bug is caused by Mitogen combined with delegate_to,
+    # which does not discover the Python interpretor on the delegate_to host
+    # and uses the Python from the inventory_host on the delegate_to host.
+    # This is fixed in newer versions of Ansible + Mitogen,
+    # but EL <= 8.x machines are stuck on the older Ansible 9.x and we cannot upgrade.
+    #
+    ansible_python_interpreter: python
   with_items: "{{ groups['sys_admin_interface'] }}"
 
 - name: 'Add Slurm group.'
@@ -131,9 +141,9 @@
       group: 'root'
       mode: '0755'
     - name: '/var/run/slurm'
-      owner: 'slurm'
+      owner: 'root'
       group: 'root'
-      mode: '0775'
+      mode: '0755'
   become: true
 
 - name: 'Deploy slurm prolog/epilog scripts.'
@@ -151,7 +161,7 @@
 
 - name: 'Deploy slurm.conf.'
   ansible.builtin.template:
-    src: "templates/slurm.conf.{{ slurm_version }}"
+    src: "templates/slurm.conf.{{ slurm_version_major_minor }}"
     dest: '/etc/slurm/slurm.conf'
     owner: 'root'
     group: 'root'
@@ -174,7 +184,7 @@
 
 - name: 'Configure cgroups.'
   ansible.builtin.copy:
-    src: "files/cgroup.conf.{{ slurm_version }}"
+    src: "files/cgroup.conf.{{ slurm_version_major_minor }}"
     dest: '/etc/slurm/cgroup.conf'
     owner: 'root'
     group: 'root'
@@ -205,9 +215,6 @@
     owner: root
     group: root
     mode: '0644'
-  vars:
-    slurm_daemons:
-      - slurmd
   become: true
 
 - name: 'Create folders for systemd override file.'
