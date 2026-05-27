@@ -1,0 +1,31 @@
+---
+- name: Force systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: true
+  listen: ldap_structure_reload_systemd
+  become: true
+
+- name: Start and enable ldap_group_structure.service
+  ansible.builtin.service:
+    name: ldap_group_structure.service
+    state: started
+    enabled: true
+  listen: ldap_structure_enable_service
+  become: true
+
+- name: Start and enable ldap_group_structure.timer
+  ansible.builtin.service:
+    name: ldap_group_structure.timer
+    state: started
+    enabled: true
+  listen: ldap_structure_enable_timer
+  become: true
+
+- name: Start and enable ldap_group_structure.path
+  ansible.builtin.service:
+    name: ldap_group_structure.path
+    state: started
+    enabled: true
+  listen: ldap_structure_enable_path
+  become: true
+...

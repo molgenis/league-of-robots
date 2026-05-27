@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TOKEN_DIR="${HOME}/.cache/lsaai/"
+TOKEN_FILE="${TOKEN_DIR}/token"
+test -d "${TOKEN_DIR}" || mkdir -p "${TOKEN_DIR}"
+chmod 700 "${TOKEN_DIR}"
+
+if test -r "${TOKEN_FILE}"; then
+   TOKEN=$(cat "${TOKEN_FILE}")
+fi
+
+check_if_token_is_valid() {
+   [[ -n "${1}" ]] && {
+      local payload=$(echo "${1}" | cut -d'.' -f2)
+      local padded="$payload$(printf '=%.0s' $(seq 1 $((4 - ${#payload} % 4))))"
+      local exp=$(echo "$padded" | base64 -d 2>/dev/null | jq -r '.exp // empty')
+      if [[ -z "$exp" ]]; then
+          echo "Could not parse token expiry"
+          return 1
+      fi
+      local now=$(date +%s)
+      local remaining=$(( exp - now ))
+      if [[ $remaining -le 0 ]]; then
+         echo "Token expired $(( -remaining / 60 )) minutes ago"
+         return 1
+      else
+         echo "Token valid for $(( remaining / 60 )) minutes"
+         return 0
+      fi
+    } || return 1
+}
+
+token_request(){ 
+   CLIENT_ID='{{ LSAAI_CLIENT_ID }}'
+   CLIENT_SECRET='{{ LSAAI_CLIENT_SECRET }}'
+   DEVICE_AUTHORIZATION_ENDPOINT="https://login.aai.lifescience-ri.eu/oidc/devicecode"
+   TOKEN_ENDPOINT="https://login.aai.lifescience-ri.eu/oidc/token"
+   SCOPE="openid perun_api"
+   
+   MAX_WAIT=300   # give up after 5 minutes
+   elapsed=0
+   
+   # ── Step 1: Request device & user code ───────────────────────────────────────
+   echo "Requesting device code..."
+   response=$(curl -sf -X POST \
+       -d "client_id=$CLIENT_ID" \
+       -d "scope=$SCOPE" \
+       "$DEVICE_AUTHORIZATION_ENDPOINT") || {
+       echo "ERROR: Failed to reach device authorization endpoint." >&2
+       exit 1
+   }
+   
+   device_code=$(echo "$response"             | jq -r '.device_code')
+   user_code=$(echo "$response"               | jq -r '.user_code')
+   verification_uri_complete=$(echo "$response" | jq -r '.verification_uri_complete')
+   interval=$(echo "$response"                | jq -r '.interval // 5')  # default 5 s
+   
+   if [[ -z "$device_code" || "$device_code" == "null" ]]; then
+       echo "ERROR: Did not receive a device_code. Server response:" >&2
+       echo "$response" >&2
+       exit 1
+   fi
+   
+   echo ""
+   echo "┌──────────────────────────────────────────────────────────────────────────────────┐"
+   echo "│ To create token, you must login with your organization account.                  │"
+   echo "│ Open the following URL in your browser:                                          │"
+   echo "│    $verification_uri_complete              │"
+   echo "└──────────────────────────────────────────────────────────────────────────────────┘"
+   echo ""
+   
+   
+   
+   # ── Step 2: Poll for the access token ────────────────────────────────────────
+   echo "Checking if token is created (every ${interval}s, for maximum ${MAX_WAIT}s) ..."
+   
+   while (( elapsed < MAX_WAIT )); do
+      sleep "$interval"
+      elapsed=$(( elapsed + interval ))
+   
+      token_response=$(curl -sf -X POST "$TOKEN_ENDPOINT" \
+         -H "Content-Type: application/x-www-form-urlencoded" \
+         -d "client_id=$CLIENT_ID" \
+         -d "client_secret=$CLIENT_SECRET" \
+         -d "device_code=$device_code" \
+         -d "grant_type=urn:ietf:params:oauth:grant-type:device_code") || {
+         echo "Still no token, retrying in ${interval}s ... " >&2
+         continue
+      }
+   
+      access_token=$(echo "$token_response" | jq -r '.access_token // empty')
+   
+      # Success ✓
+      if [[ -n "$access_token" ]]; then
+         refresh_token=$(echo "$token_response" | jq -r '.refresh_token // empty')
+         expires_in=$(echo "$token_response"   | jq -r '.expires_in   // "unknown"')
+         echo "${access_token}" > "${TOKEN_FILE}"
+         chmod 600 "${TOKEN_FILE}"
+         echo ""
+         echo "Token obtained successfully! (expires in ${expires_in}s)"
+         echo ""
+         #echo "ACCESS_TOKEN  : $access_token"
+         #echo ""
+         [[ -n "$refresh_token" ]] && echo "REFRESH_TOKEN : $refresh_token" && echo ""
+         return 0
+      fi
+      error=$(echo "$token_response" | jq -r '.error // "unknown_error"')
+      case "${error}" in
+         authorization_pending)
+            echo "  [${elapsed}s] Waiting for user authorization..."
+            ;;
+         slow_down)
+            interval=$(( interval + 5 ))
+            echo "  [${elapsed}s] Server asked to slow down — new interval: ${interval}s"
+            ;;
+         expired_token)
+            echo "ERROR: Device code expired. Please restart the script." >&2
+            exit 1
+            ;;
+         access_denied)
+            echo "ERROR: User denied access." >&2
+            exit 1
+            ;;
+         *)
+            echo "ERROR: Unexpected error: $error" >&2
+            echo "Full response: $token_response" >&2
+            exit 1
+            ;;
+      esac
+   done
+   
+   echo "ERROR: Timed out after ${MAX_WAIT}s waiting for authorization." >&2
+   exit 1
+}
+
+if test -z "${TOKEN:-}" || ! check_if_token_is_valid "${TOKEN}"; then
+   token_request
+fi

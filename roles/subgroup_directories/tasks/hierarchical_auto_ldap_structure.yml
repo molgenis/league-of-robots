@@ -1,0 +1,30 @@
+---
+- name: Deploy subgroup creation script for creating LDAP subdirectory structure
+  ansible.builtin.template:
+    src: create-ldap-subgroups.sh.j2
+    dest: /usr/local/sbin/create-ldap-subgroups.sh
+    owner: root
+    group: root
+    mode: "0750"
+  become: true
+- name: Installing systemd services for automatically calling subgroup creation script
+  ansible.builtin.copy:
+    src: "files/{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: "0640"
+  with_items:
+    - ldap_group_structure.path
+    - ldap_group_structure.timer
+    - ldap_group_structure.service
+  notify:
+    - ldap_structure_reload_systemd
+    - ldap_structure_enable_service
+    - ldap_structure_enable_timer
+    - ldap_structure_enable_path
+  become: true
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+...
