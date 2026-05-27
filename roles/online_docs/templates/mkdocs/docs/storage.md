@@ -51,8 +51,8 @@ Please consult the info below and make sure you know what to store where!
 
 ## The life cycle of experimental data
 
-As you might know by our [code of conduct](/../coc_umcg_research_clusters/), you are obliged to work according the UMCG research code.
-According to the [UMCG research code](https://researchcode.umcgresearch.org/en/), you are obliged to have a [Data Management Plan (DMP)](https://umcg.zenya.work/portal/#/document/99b46c52-2c81-4193-b688-ad5a01d1a496?scope=global&searchText=data%20management%20plan) for your project(s).
+As you might know by our [code of conduct](../coc_umcg_research_clusters/), you are obliged to work according the UMCG research code.
+According to the [UMCG research code](https://researchcode.umcgresearch.org/en/), you are obliged to have a Data Management Plan. For UMCG employees, login to Zenya and use the link [DMP](https://umcg.zenya.work/portal/#/document/99b46c52-2c81-4193-b688-ad5a01d1a496?scope=global&searchText=data%20management%20plan) for your project(s).
 In this DMP, a lot of information must be gathered concerning your project, including retention time, and where you are supposed to store your data.
 See [https://umcg.topdesk.net/](https://umcg.topdesk.net/) the Scientific Research Support page of the UMCG, for all you scientific research support questions.
 
@@ -81,7 +81,7 @@ For each project/folder write a README.
 #### Job Submission
 - Before submitting the same job a hundred times, please verify that the job finishes
 successfully. We often experience that hundreds of jobs getting killed due to an invalid path referenced in the 
-job script. See our [How to manage jobs on Nibbler](/../analysis) page for all the pro tips. 
+job script. See our [How to manage jobs on Nibbler](../analysis/#job-types) page for all the pro tips. 
 
 #### Cluster Performance
 - **DO NOT** run resource-intensive computations directly on the login node AKA submit
@@ -244,12 +244,12 @@ All good things come to an end, please follow these steps when you are finished 
 	- Mention your name and contact information
 	- Responsible PIs and contact information
 	- Retention time
-	- Project number [PaNaMa](https://panama-rms.eu/)(for UMCG employees only)
+	- Project number [PaNaMa](https://panama-rms.eu/) (for UMCG employees only)
 	- Used in article(s)/project(s)
 	- Data source (human, mouse,....) 
 	- Tissue type (blood, fibroblasts, heart biopt,...) 
 	- Data type (array, NGS, longread,....)
-	- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
+	- Small overview of the folder structure, e.g.: rawdata is in folder X, final data is in folder Y.
 - Sit with your PI, the person who is responsible for your data. Determine where to store your data sets. Here are some tips: 
 	- if the rawdata needs to be used by others, you can store it on prm, rsc...
 	- If this is a sleeping data set, probably not used by anybody else, store it in [archive](../archive), this is substantially cheaper than the prm storage location.
