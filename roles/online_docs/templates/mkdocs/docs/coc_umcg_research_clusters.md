@@ -1,5 +1,5 @@
 # Code of Conduct UMCG Research IT High Performance Compute Clusters
-Version 26-9-2024
+Version 28-05-2026
 
 The following is the Code of Conduct that the Investigator agrees to abide by as a user of the UMCG HPC clusters. 
 Failure to abide by any term within this Code of Conduct may result in revocation of approved access to any or 
@@ -93,7 +93,8 @@ process as economic as possible (screenshots are very welcome).
 - If you have any results from your computations that you want to store, do not keep them on the temporary (tmp) 
 storage systems but ask the datamanager of your group to move them to the permanent (prm) filesystem. Data on the 
 prm filesystem is regularly backed up to tape whereas data on tmp is not. If anything happens to the tmp 
-filesystem all data on there can be gone with no possibility to restore it.
+filesystem all data on there can be gone with no possibility to restore it. 
+- See [The life cycle of experimental data](../storage/#the-life-cycle-of-experimental-data) for all the pro tips.
 
 #### Job Submission
 - Before submitting the same job a hundred times, please verify that the job finishes
@@ -121,9 +122,9 @@ Group owners are responsible for:
 	
 	- *"The study's research goals and methods are laid down in a high-quality and complete research protocol with a Data Management Plan (DMP)"*
 	
-- The research project should be registered in the UMCG research register [PaNaMa](https://panama-rms.eu/).
+- The research project should be registered in the UMCG research register [PaNaMa](https://umcg.mibris.nl/).
 
-- The data inside their group correctly documented in a DMP. For UMCG employees, login to Zenya use this link [Data Management Plan (DMP)](https://umcg.zenya.work/portal/#/document/99b46c52-2c81-4193-b688-ad5a01d1a496?scope=global&searchText=data%20management%20plan).
+- The data inside their group correctly documented in a DMP. For UMCG employees, login to Zenya use this link [Data Management Plan (DMP)](https://umcg.zenya.work/portal/#/document/99b46c52-2c81-4193-b688-ad5a01d1a496?scope=global&searchText=data%20management%20plan), or login to Zenya a find the DMP by pasting _8H.29619 TPL Data Management Plan (DMP) (Versie 7)_.
 
 - Giving or rejecting access to their group including the end-date of acces given.
 

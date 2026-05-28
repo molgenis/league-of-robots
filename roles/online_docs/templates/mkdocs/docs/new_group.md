@@ -91,5 +91,7 @@ Together we can figure out how to proceed.
 #### Final note
 
 If you fail your responsibilities, and leave your group without following the above guidelines, we will consider your former group as legacy data. We, as HPC admins, are not responsible for making decision concerning data. In practice this will mean we will ask the department head what we should do with the data. The department head has 2 options. 
+
 1. Delete all data and the group.
+
 2. Assign a new data custodian, who is then responsible for the data and has to make sure it is again documented according the UMCG research code.
