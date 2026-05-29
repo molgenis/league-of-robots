@@ -10,7 +10,6 @@
     - jenkins
   roles:
     - {role: yum_local, when: local_yum_repository is defined}
-    - epel
     - interfaces
     - iptables
     - grub
@@ -21,5 +20,6 @@
     - sshd
     - basic_security
     - jenkins
+    - certs_webservers
     - configure_jenkins_projects
 ...

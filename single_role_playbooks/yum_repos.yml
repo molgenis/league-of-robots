@@ -7,6 +7,7 @@
     - chaperone,!mit_chaperone
     - data_transfer
     - docs
+    - jenkins
     - logs
     - repo
     - repo_servers
