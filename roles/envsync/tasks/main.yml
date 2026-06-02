@@ -104,11 +104,11 @@
       set -u
       set -o pipefail
       if [[ ! -e "{{ envsync_key_file_path }}" ]]; then
-          touch "{{ envsync_key_file_path }}"
+          $(umask 0077 && touch "{{ envsync_key_file_path }}")
           echo "Touched {{ envsync_key_file_path }}"
       fi
       if [[ ! -e "{{ envsync_key_file_path }}.pub" ]]; then
-          touch "{{ envsync_key_file_path }}.pub"
+          $(umask 0077 && touch "{{ envsync_key_file_path }}.pub")
           echo "Touched {{ envsync_key_file_path }}.pub"
       fi
   register: envsync_touch_key_pair
