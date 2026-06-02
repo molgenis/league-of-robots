@@ -149,5 +149,5 @@ slurm_daemons: "
            inventory_hostname in groups['user_interface'] | default([]) -%}
       {%- set _slurm_daemons_on_this_host = _slurm_daemons_on_this_host | default([]) + ['slurmd'] -%}
     {%- endif -%}
-    {{- _slurm_daemons_on_this_host -}}"
+    {{- _slurm_daemons_on_this_host -}}"  # noqa jinja[spacing]
 ...
