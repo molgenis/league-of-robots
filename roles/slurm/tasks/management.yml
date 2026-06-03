@@ -113,7 +113,7 @@
   become: true
 
 - name: 'Create a database for Slurm accounting.'
-  community.mysql.mysql_db:
+  ansible.mysql.mysql_db:
     login_host: 'localhost'
     login_user: 'root'
     login_password: "{{ MYSQL_ROOT_PASSWORD | default(omit) }}"  # No longer required for MariaDB >= 10.4
@@ -127,7 +127,7 @@
     - 'restart_slurmctld'
 
 - name: 'Make sure the slurm database user is present and grant privileges on the Slurm accounting DB.'
-  community.mysql.mysql_user:
+  ansible.mysql.mysql_user:
     login_host: 'localhost'
     login_user: 'root'
     login_password: "{{ MYSQL_ROOT_PASSWORD | default(omit) }}"  # No longer required for MariaDB >= 10.4
