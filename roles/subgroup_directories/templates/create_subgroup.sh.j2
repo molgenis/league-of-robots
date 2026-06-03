@@ -1,9 +1,13 @@
+{% raw %}
 #!/bin/bash
 set -euo pipefail
 
-./get_ggcc_token.sh
+sudo /usr/local/sbin/get_lsaai_token.sh
 TOKEN_DIR="${HOME}/.cache/lsaai/"
 TOKEN_FILE="${TOKEN_DIR}/token"
+
+sleep 0.5
+
 if test -r "${TOKEN_FILE}"; then
    TOKEN=$(cat "${TOKEN_FILE}")
 else
@@ -37,7 +41,6 @@ USER_ALL_INFO="$(curl_it "${BASE_URL}/authzResolver/getPerunPrincipal")"
 #echo "   user all info: >${USER_ALL_INFO}<"
 USER_ID="$(echo "${USER_ALL_INFO}" | jq '.user.id')"
 $DEBUG && echo "  >> USER_ID >$USER_ID< <<"
-USER_ID="78969"
 
 MEMBER_ID="$(curl_it "$BASE_URL/membersManager/getMemberByUser" \
     "$(jq -n --argjson user "$USER_ID" --argjson vo "$VO_ID" '{user: $user, vo: $vo}')" \
@@ -258,7 +261,13 @@ print_all_my_groups() {
 print_all_my_groups
 
 echo "Would you like to create a new group?"
-read -rp '  Parent name: ' _parentname
+read -rp '  Parent group name: ' _parentname
+_parentname_count_groups="${_parentname//[^-]}"
+while [[ ${#_parentname_count_groups} -ge 2 ]]; do
+   echo "  > Invalid: you can only create a subgroup under the main group, try again!"
+   read -rp '  Parent group name: ' _parentname
+   _parentname_count_groups="${_parentname//[^-]}"
+done
 read -rp '  Subgroup name: ' _subgroupname
 while [[ ${#_subgroupname} -lt 2 ]] || \
       [[ ${#_subgroupname} -gt 8 ]] || \
@@ -271,3 +280,11 @@ _defaultexpirationdays=365
 read -p "(Default Membership Expiration: (set by default to ${_defaultexpirationdays} days)" _expirationdays
 [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
 make_new_subgroup "${_parentname//\-/\:}" "${_subgroupname}" "${_expirationdays}"
+
+echo "Subgroup was successfully created: but it will available on the cluster"
+echo "only after you add users to it. But existing users must first log out of"
+echo "of the cluster (and make sure all session connections are also killed)"
+echo "then login back again in order to get the access to the new group (users"
+echo "can check group membership with 'id' command which should list the new"
+echo "group as well - if their account has been added to it."
+{% endraw %}

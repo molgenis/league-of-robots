@@ -1,12 +1,26 @@
 ---
-- name: Deploy subgroup creation script for creating LDAP subdirectory structure
+- name: Deploy lsaai_auth into /etc/
   ansible.builtin.template:
-    src: create-ldap-subgroups.sh.j2
-    dest: /usr/local/sbin/create-ldap-subgroups.sh
+    src: "{{ item.name }}.j2"
+    dest: "{{ item.path }}/{{ item.name }}"
     owner: root
     group: root
-    mode: "0750"
+    mode: "{{ item.mode }}"
+  with_items:
+    - name: lsaai_auth
+      path: /etc
+      mode: "0640"
+    - name: get_lsaai_token.sh
+      path: /usr/local/sbin
+      mode: "0750"
+    - name: create-ldap-subgroups.sh
+      path: /usr/local/sbin
+      mode: "0750"
+    - name: create_subgroup.sh
+      path: /usr/local/bin
+      mode: "0755"
   become: true
+
 - name: Installing systemd services for automatically calling subgroup creation script
   ansible.builtin.copy:
     src: "files/{{ item }}"
@@ -23,6 +37,19 @@
     - ldap_structure_enable_service
     - ldap_structure_enable_timer
     - ldap_structure_enable_path
+  become: true
+
+- name: Allow all users to request lsaai token
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/92-ansible-managed-get_lsaai_token
+    owner: root
+    group: root
+    mode: "0440"   # sudoers files must be exactly 0440
+    content: |
+      # Allow any user to run reveal_secret with no password
+      # NOPASSWD with full path and prevent arguments
+      ALL ALL=(root) NOPASSWD: /usr/local/sbin/get_lsaai_token.sh
+    validate: /usr/sbin/visudo -cf %s
   become: true
 
 - name: Flush handlers

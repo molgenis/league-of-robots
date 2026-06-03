@@ -1,5 +1,8 @@
 ---
-- hosts: sys_admin_interface
+- name: Run roles for creating a subgroup structure
+  hosts:
+    - user_interface
+    - sys_admin_interface
   roles:
     - subgroup_directories
 ...

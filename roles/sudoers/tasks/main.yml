@@ -35,4 +35,14 @@
   tags:
     - groups
   become: true
+
+- name: Deploy files/99-ansible-secure-paths into /etc/sudoers.d to define secure_path variable
+  ansible.builtin.template:
+    src: "files/99-ansible-secure-paths"
+    dest: "/etc/sudoers.d/99-ansible-secure-paths"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: '/usr/sbin/visudo -cf %s'
+  become: true
 ...
