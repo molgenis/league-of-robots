@@ -90,9 +90,35 @@
     create: false
   become: true
 
+#
+# Work around to prevent
+#   "Error while setting attributes: /home/umcg-envsync/.ssh/id_ed25519.pub: Operation not permitted"
+#   "msg: chattr failed"
+# See
+#   https://github.com/ansible-collections/community.crypto/issues/416
+#   https://github.com/ansible/ansible/issues/77217
+#
+- name: 'Touch key pair files as workround for chattr bug in ansible core.'
+  ansible.builtin.shell: |
+      set -e
+      set -u
+      set -o pipefail
+      if [[ ! -e "{{ envsync_key_file_path }}" ]]; then
+          $(umask 0077 && touch "{{ envsync_key_file_path }}")
+          echo "Touched {{ envsync_key_file_path }}"
+      fi
+      if [[ ! -e "{{ envsync_key_file_path }}.pub" ]]; then
+          $(umask 0077 && touch "{{ envsync_key_file_path }}.pub")
+          echo "Touched {{ envsync_key_file_path }}.pub"
+      fi
+  register: envsync_touch_key_pair
+  changed_when: "'Touched' in envsync_touch_key_pair.stdout"
+  become: true
+  become_user: "{{ envsync_user }}"
+
 - name: 'Create ssh key pair for rsyncing cache to compute nodes.'
   community.crypto.openssh_keypair:
-    path: "/home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}"
+    path: "{{ envsync_key_file_path }}"
     type: "{{ envsync_ssh_key_type }}"
     comment: "{{ envsync_user }}@{{ inventory_hostname }}"
     regenerate: full_idempotence
@@ -104,7 +130,7 @@
     cmd: |
          set -o pipefail
          "{{ get_public_keys_command }}" "{{ envsync_user }}" \
-         | fgrep -f "/home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}.pub"
+         | fgrep -f "{{ envsync_key_file_path }}.pub"
   register: envsync_user_authorized_public_keys
   changed_when: false
   failed_when: false
@@ -119,7 +145,7 @@
          IMPORTANT: Manual work!
          ***********************************************************************************************************
          Ansible created:
-             {{ inventory_hostname }}:/home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}.pub
+             {{ inventory_hostname }}:{{ envsync_key_file_path }}.pub
          But that public key is not yet available for the {{ envsync_user }} user
          in the output of the {{ get_public_keys_command }} command:
              stdout: {{ envsync_user_authorized_public_keys['stdout'] }}
@@ -135,7 +161,7 @@
 - name: "Assign ssh public key to ~/.ssh/authorized_keys for {{ envsync_user }}."
   ansible.posix.authorized_key:
     user: "{{ envsync_user }}"
-    key: "file:///home/{{ envsync_user }}/.ssh/id_ed25519.pub"
+    key: "file://{{ envsync_key_file_path }}.pub"
     state: present
     exclusive: true
   when:

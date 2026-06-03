@@ -141,7 +141,7 @@ slurm_qos_limits:
       cores: "{{ [1, (slurm_total_cores_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | int] | max }}"
       mem: "{{ [1000, (slurm_total_mem_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | int] | max }}"
       gpus: "{{ (slurm_total_gpus_of_smallest_node | float * slurm_qos_limit_fractions['interactive-short']['user']) | round(0, 'ceil') | int }}"
-slurm_daemons: "
+slurm_daemons: >- # noqa jinja[spacing]
     {%- if inventory_hostname in groups['sys_admin_interface'] | default([]) -%}
       {%- set _slurm_daemons_on_this_host = ['slurmdbd', 'slurmctld'] -%}
     {%- endif -%}
@@ -149,5 +149,5 @@ slurm_daemons: "
            inventory_hostname in groups['user_interface'] | default([]) -%}
       {%- set _slurm_daemons_on_this_host = _slurm_daemons_on_this_host | default([]) + ['slurmd'] -%}
     {%- endif -%}
-    {{- _slurm_daemons_on_this_host -}}"
+    {{- _slurm_daemons_on_this_host -}}
 ...
