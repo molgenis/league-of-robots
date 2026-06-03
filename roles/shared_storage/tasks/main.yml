@@ -35,9 +35,15 @@
       {%- else -%}
         {{ item['type'] }}
       {%- endif -%}
+    extra_cifs_opts:
+      - credentials=/etc/sysconfig/{{ item['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}.cifs
+      - uid=root
+      - gid=root
+      - dir_mode=02750
+      - file_mode=0640
     pfs_extra_opts: >-
       {%- if item['type'] == 'cifs' -%}
-      ,credentials=/etc/sysconfig/{{ item['pfs'] | regex_replace('\$$', '') | regex_replace('/', '_') }}.cifs,uid=root,gid=root,dir_mode=02750,file_mode=0640
+      ,{{ extra_cifs_opts | join(',') }}
       {%- endif -%}
   loop: "{{ pfs_mounts
             | rejectattr('type', 'equalto', 'beegfs')
@@ -382,9 +388,15 @@
     state: "{% if basic_opts is search('automount') %}present{% else %}mounted{% endif %}"
   vars:
     basic_opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item[0]['pfs']) | map(attribute='rw_options') | first }}"
-    extra_opts: >-
+    extra_cifs_opts:
+      - "credentials=/etc/sysconfig/{{ item[0]['pfs'] | regex_replace('\\$$', '') }}.cifs"
+      - "uid={{ item[1]['name'] }}-dm"
+      - "gid={{ item[1]['name'] }}"
+      - dir_mode=02750
+      - file_mode=0640
+    extra_opts: >-  # noqa jinja[spacing]
       {%- if pfs_mounts | selectattr('pfs', 'equalto', item[0]['pfs']) | map(attribute='type') | first == 'cifs' -%}
-      ,credentials=/etc/sysconfig/{{ item[0]['pfs'] | regex_replace('\$$', '') }}.cifs,uid={{ item[1]['name'] }}-dm,gid={{ item[1]['name'] }},dir_mode=02750,file_mode=0640
+      ,{{ extra_cifs_opts | join(',') }}
       {%- endif -%}
   loop:
     "{{ lfs_mounts
@@ -412,9 +424,15 @@
     state: "{% if basic_opts is search('automount') %}present{% else %}mounted{% endif %}"
   vars:
     basic_opts: "{{ pfs_mounts | selectattr('pfs', 'equalto', item[0]['pfs']) | map(attribute='ro_options') | first }}"
-    extra_opts: >-
+    extra_cifs_opts:
+      - "credentials=/etc/sysconfig/{{ item[0]['pfs'] | regex_replace('\\$$', '') }}.cifs"
+      - "uid={{ item[1]['name'] }}-dm"
+      - "gid={{ item[1]['name'] }}"
+      - dir_mode=02750
+      - file_mode=0640
+    extra_opts: >-  # noqa jinja[spacing]
       {%- if pfs_mounts | selectattr('pfs', 'equalto', item[0]['pfs']) | map(attribute='type') | first == 'cifs' -%}
-      ,credentials=/etc/sysconfig/{{ item[0]['pfs'] | regex_replace('\$$', '') }}.cifs,uid={{ item[1]['name'] }}-dm,gid={{ item[1]['name'] }},dir_mode=02750,file_mode=0640
+      ,{{ extra_cifs_opts | join(',') }}
       {%- endif -%}
   loop:
     "{{ lfs_mounts
@@ -505,7 +523,7 @@
     # which in turn results in systemd randomly dropping units for services or mounts from the boot sequence.
     # in an attempt to break the cyclic dependency and continue to boot.
     #
-    extra_opts: >-
+    extra_opts: >-  # noqa jinja[spacing]
       {%- if '_netdev' in pfs_mounts | selectattr('pfs', 'equalto', item[0]['pfs']) | map(attribute='rw_options') | first -%}
       ,_netdev
       {%- endif -%}
@@ -540,7 +558,7 @@
     # which in turn results in systemd randomly dropping units for services or mounts from the boot sequence.
     # in an attempt to break the cyclic dependency and continue to boot.
     #
-    extra_opts: >-
+    extra_opts: >-  # noqa jinja[spacing]
       {%- if '_netdev' in pfs_mounts | selectattr('pfs', 'equalto', item[0]['pfs']) | map(attribute='ro_options') | first -%}
       ,_netdev
       {%- endif -%}

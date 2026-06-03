@@ -39,7 +39,7 @@
          FATAL: Volume label '{{ volume['label'] }}' is too long;
                 {{ volume['label'] | length }} exceeds max length of {{ max_label_length }} characters.
   vars:
-    max_label_length: >-
+    max_label_length: >-  # noqa jinja[spacing]
       {%- if volume['type'] | ansible.builtin.regex_search('^ext[0-9]+') -%}
       16
       {%- elif volume['type'] == 'xfs' -%}
