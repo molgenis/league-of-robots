@@ -115,7 +115,7 @@ lfs_quota:
       umcg-gdio: 1024
       umcg-grip: 1024
       umcg-hlhs: 1024
-      umcg-lifelines: 21504
+      umcg-lifelines: 41984
       umcg-solve-rd: 5120
       umcg-sysops: 1024
       umcg-ucu: 4096
