@@ -38,12 +38,17 @@ for _main_group in ${_main_groups}; do
             continue
          fi
          # make sure top subfolders exist in main group
-         for _subgrp_type in "rel:releases" "prj:projects" "sub:subgroups"; do
-            local _each_short="${_subgrp_type%%\:*}"
-            local _each_long="${_subgrp_type##*\:}"
-            if ! getent group "${_main_group}-${_each_short}" &>/dev/null; then
-               echo Creating directory "${_main_group_path}/${_each_long}"
-               mkdir "${_main_group_path}/${_each_long}"
+         # for _subgrp_type in "rel:releases" "prj:projects" "sub:subgroups"; do
+         #    local _each_short="${_subgrp_type%%\:*}"
+         #    local _each_long="${_subgrp_type##*\:}"
+         for _subgrp_type in "rel" "prj" "sub"; do
+            if ! getent group "${_main_group}-${_subgrp_type}" &>/dev/null; then
+               echo "Creating directory ${_main_group_path}/${_subgrp_type}"
+               mkdir "${_main_group_path}/${_subgrp_type}"
+            fi
+            if  [[ "$(stat -c '%U:%G' ${_main_group_path}/${_subgrp_type})" != "${_main_group}-dm:${_main_group}" ]]; then
+               echo "Changing ownership to ${_main_group}-dm:${_main_group}"
+               chown "${_main_group}-dm:${_main_group}" "${_main_group_path}/${_subgrp_type}"
             fi
          done
          # install -d "${_main_group_path}" -o root -g "${_main_group}" -m 0770
