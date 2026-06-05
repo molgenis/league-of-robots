@@ -76,20 +76,26 @@ Make sure your data/project/folder is accompanied by a README, see our [storage]
 
 **Main steps** to reliably upload the data
 
- - [become a data-manager user](#user)
+ - [prepare your environment](#prepare-your-environment)
  - [bundle the data](#bundling)
  - [create local checksum](#local-checksum)
  - [upload data to remote storage](#uploading)
  - [verify checksums on a remote storage](#remote-checksum)
  - [delete files on cluster](#delete-files-on-cluster)
 
-### 3.1. Login as data-manager user
+### 3.1. Prepare your environment
 
-Become the data manager
+**Become the data-manager user**
 
 ```
 sudo -u [group]-dm bash
 ```
+
+**(optional) Start screen session**
+
+If you expect that the data preparation or upload will take a long time, you should consider using a `screen`.
+It provides a way for your work to be available even if you lose a connection to the cluster.
+See [1](https://manned.org/screen) and [2](https://wiki.archlinux.org/title/GNU_Screen) for more information.
 
 ### 3.2. Bundling
 
