@@ -57,23 +57,32 @@ In this DMP, a lot of information must be gathered concerning your project, incl
 See [https://umcg.topdesk.net/](https://umcg.topdesk.net/) the Scientific Research Support page of the UMCG, for all you scientific research support questions.
 
 For each project/folder write a README.
-	- Mention your name and contact information
-	- Responsible PIs and contact information
-	- Retention time
-	- Project number [PaNaMa](https://panama-rms.eu/)(for UMCG employees only)
-	- Used in article(s)/project(s)
-	- Data source (human, mouse,....) 
-	- Tissue type (blood, fibroblasts, heart biopt,...) 
-	- Data type (array, NGS, longread,....)
-	- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
 
- 1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on _prm_ storage.
- 1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on _tmp_ storage.  
+- Mention your name and contact information
+
+- Responsible PIs and contact information
+
+- Retention time
+
+- Project number [PaNaMa](https://umcg.mibris.nl/) (for UMCG employees only)
+
+- Used in article(s)/project(s), if this concerns not publicised data, write a materials and methods.
+
+- Data source (human, mouse,....) 
+
+- Tissue type (blood, fibroblasts, heart biopt,...)
+
+- Data type (array, NGS, longread,....)
+
+- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
+
+ 1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on _prm_ storage, add the README.
+ 1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on _tmp_ storage, with the README.  
     Make sure your in-silico experiment processes a chunk of data that can easily be analysed in << 45 days.
  1. Generate jobs, which will read and write to and from folders in ```/groups/${group}/tmp*/...``` on _tmp_ storage systems.
  1. Submit your jobs on the Slurm workload manager with the ```sbatch``` command.
  1. Once all jobs have finished successfully, assess the results.
- 1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on _prm_ storage, with a README.
+ 1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on _prm_ storage, with the README.
  1. Cleanup by deleting data from ```/groups/${group}/tmp*/...``` to free up space for your next experiment.
  1. Document and publish your experiment/data.
 
@@ -237,14 +246,14 @@ The report will show 11 columns:
 All good things come to an end, please follow these steps when you are finished with your project.
 
 #### The steps to follow:
-- Get your DMP(s).
+- Get your completed Data Management Plan (DMP).
 - Go to your tmp folder on the cluster. Check all clusters, if you used more than 1.
 - Gather all important data, data you need to store for publication/storage/FAIRdata purposes and organise it logicaly. Be critical, only keep the important data.
 - Write or adapt the README for each dataset/project. 
 	- Mention your name and contact information
 	- Responsible PIs and contact information
 	- Retention time
-	- Project number [PaNaMa](https://panama-rms.eu/) (for UMCG employees only)
+	- Project number [PaNaMa](https://umcg.mibris.nl/) (for UMCG employees only)
 	- Used in article(s)/project(s)
 	- Data source (human, mouse,....) 
 	- Tissue type (blood, fibroblasts, heart biopt,...) 
@@ -253,8 +262,9 @@ All good things come to an end, please follow these steps when you are finished 
 - Sit with your PI, the person who is responsible for your data. Determine where to store your data sets. Here are some tips: 
 	- if the rawdata needs to be used by others, you can store it on prm, rsc...
 	- If this is a sleeping data set, probably not used by anybody else, store it in [archive](../archive), this is substantially cheaper than the prm storage location.
-- Your personal tmp folder should be empty and removed by the time your contract ends. If you shared a folder, only check your data/folders/files.
+- Your personal tmp folder should be empty and removed by the time your contract ends. If you shared a folder, only check your data/folders/files. 
 - Important data should be stored in the correct place, prm or archive, accompanied by a README with your name, responsible PIs, retention time, project number, used in article(s)/project(s), data source (human, mouse,....), tissue type (blood, fibroblasts, heart biopt,...), data type (array, NGS, longread,....).
+
 
 If something is unclear or you don't know how to proceed, please contact [the helpdesk](../contact/).
 
