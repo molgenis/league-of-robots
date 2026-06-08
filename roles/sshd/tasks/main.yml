@@ -3,7 +3,8 @@
   ansible.builtin.stat:
     path: /etc/pam.d/sshd
   register: pam_sshd_status
-  when: inventory_hostname in totp.machines | default([])
+  when: inventory_hostname in totp.machines | default([]) or
+        (inventory_hostname in pam_weblogin.machines | default([]))
 
 - name: Fail if host does not have /etc/pam.d/sshd.
   ansible.builtin.fail:
