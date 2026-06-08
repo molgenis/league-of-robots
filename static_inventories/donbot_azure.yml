@@ -4,7 +4,6 @@ all:
     controller_api:
       hosts:
         localhost:
-          ansible_python_interpreter: /usr/bin/env python
     ldap_server:
       hosts:
         # LsAai lDAP
@@ -62,6 +61,7 @@ all:
             - "{{ all.ip_addresses['rug']['operator'] }}"
             - "{{ all.ip_addresses['rug']['vlan16'] }}"
             - "{{ all.ip_addresses['rug']['vlan1066'] }}"
+            - "{{ all.ip_addresses['rug']['dh5-mds'] }}"
           iptables_allow_http_inbound:
             - ANY
           iptables_allow_https_inbound:

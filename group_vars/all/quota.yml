@@ -115,10 +115,10 @@ lfs_quota:
       umcg-gdio: 1024
       umcg-grip: 1024
       umcg-hlhs: 1024
-      umcg-lifelines: 21504
+      umcg-lifelines: 41984
       umcg-solve-rd: 5120
       umcg-sysops: 1024
-      umcg-ucu: 4096
+      umcg-ucu: 5120
   rsc04:
     quota_limits:  # All values in GB.
       umcg-atd: 1024
@@ -192,7 +192,7 @@ lfs_quota:
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
-      umcg-ucu: 2048
+      umcg-ucu: 3072
       umcg-ugli: 1024
       umcg-verbeek: 1024
       umcg-vdakker: 1024

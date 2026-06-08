@@ -4,7 +4,6 @@ all:
     controller_api:
       hosts:
         localhost:
-          ansible_python_interpreter: /usr/bin/env python
     jumphost:
       hosts:
         portal:
@@ -14,6 +13,8 @@ all:
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
     repo:
       hosts:
         hc-repo:
@@ -22,6 +23,8 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
     docs:
       hosts:
         docs-on-bateleur:

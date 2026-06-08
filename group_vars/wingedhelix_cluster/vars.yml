@@ -49,31 +49,10 @@ motd: |
           Welcome to {{ slurm_cluster_name | capitalize }}
       =========================================================
 additional_etc_hosts:
-  - group: docs_library
-    nodes:
-      - name: docs-on-bateleur
-        network: external
-  - group: betabarrel_cluster
-    nodes:
-      - name: betabarrel
-        network: vlan16
   - group: copperfist_cluster
     nodes:
       - name: copperfist
         network: vlan16
-#
-# Jumphosts from other stack-name infra groups.
-# We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
-#
-external_jumphosts:
-  - group: betabarrel_cluster
-    hosts:
-      - hostname: bb-porch
-        network: vlan16
-  - group: copperfist_cluster
-    hosts:
-      - hostname: cf-porch
-        network: external
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
@@ -423,24 +402,6 @@ ogm_servers:
       me=${trendanalysis_api_username}&password={{ ogm_api_password }}\" | grep -oP '\"to\
       ken\":\\s*\"\\K[^\"]+')\"'; userrole=3; userpk=24' https://${ogm_server}:3005/proje\
       ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?period=90 > ${prm_location}/TrendAnalysis/${ogm_server}-$(date +%F)-${stack_prefix}.csv"
-
-#
-# Local storage variables.
-#
-local_mount_subfolders:
-  - mount_point: '/groups'
-    machines: "{{ groups['data_transfer'] }}"
-    folders:
-      - rel_paths:
-          - "{{ data_transfer_only_group }}"
-        mode: '2750'
-        owner: root
-        group: "{{ data_transfer_only_group }}"
-      - rel_paths:
-          - umcg-genomescan
-          - umcg-gst
-        mode: '2770'
-        owner: root
 #
 # Shared storage related variables
 #

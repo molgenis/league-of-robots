@@ -60,10 +60,6 @@
     owner: root
     group: root
     mode: '0644'
-  vars:
-    slurm_daemons:
-      - slurmdbd
-      - slurmctld
   become: true
 
 - name: 'Install munge.key file.'
@@ -100,7 +96,7 @@
       - 'slurm-torque'
   become: true
 
-- name: 'Install Slurm management deamons with yum.'
+- name: 'Install Slurm management daemons with yum.'
   ansible.builtin.package:
     state: 'installed'
     update_cache: true
@@ -117,7 +113,7 @@
   become: true
 
 - name: 'Create a database for Slurm accounting.'
-  community.mysql.mysql_db:
+  ansible.mysql.mysql_db:
     login_host: 'localhost'
     login_user: 'root'
     login_password: "{{ MYSQL_ROOT_PASSWORD | default(omit) }}"  # No longer required for MariaDB >= 10.4
@@ -131,7 +127,7 @@
     - 'restart_slurmctld'
 
 - name: 'Make sure the slurm database user is present and grant privileges on the Slurm accounting DB.'
-  community.mysql.mysql_user:
+  ansible.mysql.mysql_user:
     login_host: 'localhost'
     login_user: 'root'
     login_password: "{{ MYSQL_ROOT_PASSWORD | default(omit) }}"  # No longer required for MariaDB >= 10.4
@@ -167,15 +163,19 @@
       owner: 'slurm'
       group: 'root'
       mode: '0750'
-    - name: '/var/run/slurm'
+    - name: '/var/run/slurmctld'
       owner: 'slurm'
-      group: 'root'
-      mode: '0775'
+      group: 'slurm'
+      mode: '0755'
+    - name: '/var/run/slurmdbd'
+      owner: 'slurm'
+      group: 'slurm'
+      mode: '0755'
   become: true
 
 - name: 'Install Slurm config file.'
   ansible.builtin.template:
-    src: "templates/slurm.conf.{{ slurm_version }}"
+    src: "templates/slurm.conf.{{ slurm_version_major_minor }}"
     dest: '/etc/slurm/slurm.conf'
     owner: 'root'
     group: 'root'

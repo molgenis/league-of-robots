@@ -18,5 +18,6 @@
     - update
     - sshd
     - basic_security
+    - certs_webservers
     - online_docs
 ...
