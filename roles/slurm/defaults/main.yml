@@ -34,7 +34,7 @@ slurm_local_scratch_dir: '/local'
 #  * slurm_spec_mem_per_node
 #  * slurm_max_cpu_cores_per_node
 #  * slurm_max_mem_per_node
-# These variables are used by some other roles like "online_docs" and therefore must be availabel globally
+# These variables are used by some other roles like "online_docs" and therefore must be available globally
 # and cannot be defined here in the defaults for the "slurm" role.
 #
 # Determine cluster size and smallest node size based on
