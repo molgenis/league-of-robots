@@ -203,7 +203,8 @@ sacctmgr -i modify qos Name='ds-short' set \
 	Priority=10 \
 	UsageFactor=1 \
 	GrpSubmit=5000  MaxSubmitJobsPU=1000   MaxWall=06:00:00 \
-	MaxTRESPU={% if slurm_cluster_gpus_total | int > 0 %}gres/gpu=0,{% endif %}cpu=4,mem=4096
+	GrpTRES={% if slurm_cluster_gpus_total | int > 0 %}gres/gpu=0,{% endif %}cpu=4,mem=4096
+	MaxTRESPU={% if slurm_cluster_gpus_total | int > 0 %}gres/gpu=0,{% endif %}cpu=2,mem=2048
 sacctmgr -i modify qos Name='ds-medium' set \
 	Description='ds-medium' \
 	Priority=10 \
