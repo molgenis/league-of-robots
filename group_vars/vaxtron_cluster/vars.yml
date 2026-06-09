@@ -9,38 +9,18 @@ slurm_partitions:
   - name: cpu_r750  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-a[01-04]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r750']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.05G" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_r6625  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: "{{ stack_prefix }}-node-b[01-06]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r6625']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G" DenyQos=ds-short,ds-medium,ds-long'
   - name: gpu_xe7745  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-c01"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['gpu_xe7745']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.1G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: 1
-    max_cores_per_node: 1
-    max_mem_per_node: 1024
-    local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
 slurm_qos_limit_fractions:
   regular-medium:
