@@ -2,30 +2,30 @@
 - name: Force systemd to reread configs
   ansible.builtin.systemd:
     daemon_reload: true
-  listen: ldap_structure_reload_systemd
+  listen: subgroup_directories_auto_reload_systemd
   become: true
 
-- name: Start and enable ldap_group_structure.service
+- name: Start and enable subgroup_directories_auto.service
   ansible.builtin.service:
-    name: ldap_group_structure.service
+    name: subgroup_directories_auto.service
     state: started
     enabled: true
-  listen: ldap_structure_enable_service
+  listen: subgroup_directories_auto_enable_service
   become: true
 
-- name: Start and enable ldap_group_structure.timer
+- name: Start and enable subgroup_directories_auto.timer
   ansible.builtin.service:
-    name: ldap_group_structure.timer
+    name: subgroup_directories_auto.timer
     state: started
     enabled: true
-  listen: ldap_structure_enable_timer
+  listen: subgroup_directories_auto_enable_timer
   become: true
 
-- name: Start and enable ldap_group_structure.path
+- name: Start and enable subgroup_directories_auto.path
   ansible.builtin.service:
-    name: ldap_group_structure.path
+    name: subgroup_directories_auto.path
     state: started
     enabled: true
-  listen: ldap_structure_enable_path
+  listen: subgroup_directories_auto_enable_path
   become: true
 ...

@@ -2,10 +2,14 @@
 - name: Create versioned projects and releases
   ansible.builtin.include_tasks:
     file: versions_and_projects_main.yml
-  when: inventory_hostname in groups['sys_admin_interface']
+  when:
+    - subgroup_directories_auto is false
+    - inventory_hostname in groups['sys_admin_interface']
 
 - name: Deploy hieararchical structure tools
   ansible.builtin.include_tasks:
     file: hierarchical_auto_ldap_structure.yml
-  when: inventory_hostname in groups['user_interface']
+  when:
+    - subgroup_directories_auto
+    - inventory_hostname in groups['user_interface']
 ...

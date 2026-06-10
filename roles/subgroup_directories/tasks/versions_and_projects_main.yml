@@ -8,7 +8,8 @@
   vars:
     main_groups: "{{ lfs_mounts | selectattr('lfs', 'search', '((tmp)|(rsc)|(prm)|(dat))[0-9]+$')
                                 | map(attribute='groups') | list | flatten
-                                | map(attribute='name') | list | unique }}"
+                                | map(attribute='name') | list | unique
+                                | reject('match', '^L-') | list }}"
   with_items: "{{ main_groups }}"
   loop_control:
     loop_var: main_group

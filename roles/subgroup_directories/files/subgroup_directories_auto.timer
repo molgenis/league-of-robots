@@ -1,5 +1,5 @@
 [Unit]
-Description=Run ldap_group_structure.service every 5 minutes
+Description=Run subgroup_directories_auto.service every 5 minutes
 
 [Timer]
 OnBootSec=15min

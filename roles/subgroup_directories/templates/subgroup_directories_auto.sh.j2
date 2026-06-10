@@ -34,8 +34,12 @@ for _main_group in ${_main_groups}; do
          #Check if main group exists
          _main_group_path="/groups/${_main_group}/${lfs}"
          if ! test -d "${_main_group_path}"; then
-            echo Missing directory "${_main_group_path}"
+            echo "main: missing folder ${_main_group_path}"
             continue
+         fi
+         if  [[ "$(stat -c '%U:%G' ${_main_group_path}/${_subgrp_type})" != "${_main_group}-dm:${_main_group}" ]]; then
+            echo "main: change "${_main_group_path}" ownership to ${_main_group}-dm:${_main_group}"
+            chown "${_main_group}-dm:${_main_group}" "${_main_group_path}"
          fi
          # make sure top subfolders exist in main group
          # for _subgrp_type in "rel:releases" "prj:projects" "sub:subgroups"; do
@@ -43,11 +47,12 @@ for _main_group in ${_main_groups}; do
          #    local _each_long="${_subgrp_type##*\:}"
          for _subgrp_type in "rel" "prj" "sub"; do
             if ! getent group "${_main_group}-${_subgrp_type}" &>/dev/null; then
-               echo "Creating directory ${_main_group_path}/${_subgrp_type}"
+               test -d "${_main_group_path}/${_subgrp_type}" && continue
+               echo "  subdir: creating directory ${_main_group_path}/${_subgrp_type}"
                mkdir "${_main_group_path}/${_subgrp_type}"
             fi
             if  [[ "$(stat -c '%U:%G' ${_main_group_path}/${_subgrp_type})" != "${_main_group}-dm:${_main_group}" ]]; then
-               echo "Changing ownership to ${_main_group}-dm:${_main_group}"
+               echo "  subdir: change ${_main_group_path}/${_subgrp_type} ownership to ${_main_group}-dm:${_main_group}"
                chown "${_main_group}-dm:${_main_group}" "${_main_group_path}/${_subgrp_type}"
             fi
          done
@@ -57,13 +62,18 @@ for _main_group in ${_main_groups}; do
          for _each_group in ${_all_groups_sorted}; do
             #echo Making sub group
             [[ "${_each_group}" == "${_main_group}" ]] && continue # skip main groups
+            # continue subgroups
             if [[ "${_each_group}" =~ ^"${_main_group}" ]]; then
                _group_name="${_each_group##*-}"
                [[ "${_group_name}" == "dms" ]] && continue # skip dms groups
                _group_remove_main_group="${_each_group/${_main_group}-}" # remove /L-mains-/    keep sub
                _group_top_path="${_group_remove_main_group//-/\/}"    # replace - with 	/
-               echo "Creating ${_main_group_path}/${_group_top_path} owned by ${_main_group}-dm:${_each_group} (0770)"
-               install -d "${_main_group_path}/subgroups/${_group_top_path}" -o "${_main_group}-dm" -g "${_each_group}" -m "0770"
+                test -d "${_main_group_path}/sub/${_group_top_path}" && continue
+               echo "    hier: creating ${_main_group_path}/sub/${_group_top_path}/"
+               mkdir "${_main_group_path}/sub/${_group_top_path}" 
+               if  [[ "$(stat -c '%U:%G' "${_main_group_path}/sub/${_group_top_path}")" != "${_main_group}-dm:${_main_group}" ]]; then
+                  echo "   sub: change ${_main_group_path}/sub/${_group_top_path} ownership to ${_main_group}-dm:${_main_group}"
+               owned by ${_main_group}-dm:${_each_group} (0770)"
                # install -d "${_main_group_path}/${_group_top_path}" -o "${_main_group}-dm" -g "${_each_group}" -m "0770"
             fi
          done
