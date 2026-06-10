@@ -42,14 +42,6 @@ ip_addresses:
     vlan990:
       address: 192.168.1.178
       netmask: /32
-  bb_internal_management-vlan16-router:
-    bb_internal_management:
-      address: 10.10.1.1
-      netmask: /32
-    vlan16:
-      address: 195.169.22.174
-      netmask: /32
-      fqdn: 'NXDOMAIN'
   vlan1336-vlan16-router:
     vlan1336:
       address: 172.23.77.1
