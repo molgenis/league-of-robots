@@ -58,23 +58,16 @@ See [https://umcg.topdesk.net/](https://umcg.topdesk.net/) the Scientific Resear
 
 For each project/folder write a README.
 
-- Mention your name and contact information
+ - Mention your name and contact information
+ - Responsible PIs and contact information
+ - Retention time
+ - Project number [PaNaMa](https://umcg.mibris.nl/) (for UMCG employees only)
+ - Used in article(s)/project(s), if this concerns not publicised data, write a materials and methods.
+ - Data source (human, mouse,....) 
+ - Tissue type (blood, fibroblasts, heart biopt,...)
+ - Data type (array, NGS, longread,....)
+ - Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
 
-- Responsible PIs and contact information
-
-- Retention time
-
-- Project number [PaNaMa](https://umcg.mibris.nl/) (for UMCG employees only)
-
-- Used in article(s)/project(s), if this concerns not publicised data, write a materials and methods.
-
-- Data source (human, mouse,....) 
-
-- Tissue type (blood, fibroblasts, heart biopt,...)
-
-- Data type (array, NGS, longread,....)
-
-- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
 
  1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on _prm_ storage, add the README.
  1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on _tmp_ storage, with the README.  
