@@ -57,6 +57,9 @@
     update_cache: true
     name:
       - 'munge'
+  notify:
+    - 'restart_munge'
+    - 'restart_slurmd'
   become: true
 
 - name: 'Delete deprecated/unused Slurm packages.'
