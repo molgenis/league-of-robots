@@ -56,18 +56,19 @@ According to the [UMCG research code](https://researchcode.umcgresearch.org/en/)
 In this DMP, a lot of information must be gathered concerning your project, including retention time, and where you are supposed to store your data.
 See [https://umcg.topdesk.net/](https://umcg.topdesk.net/) the Scientific Research Support page of the UMCG, for all you scientific research support questions.
 
-For each project/folder write a README.
+For each project/folder write a README containing:
 
- - Mention your name and contact information
+ - Your name and contact information
  - Responsible PIs and contact information
  - Retention time
- - Project number [PaNaMa](https://umcg.mibris.nl/) (for UMCG employees only)
- - Used in article(s)/project(s), if this concerns not publicised data, write a materials and methods.
- - Data source (human, mouse,....) 
- - Tissue type (blood, fibroblasts, heart biopt,...)
- - Data type (array, NGS, longread,....)
- - Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
+ - For UMCG employees only: the project number from [PaNaMa](https://umcg.mibris.nl/)
+ - Small overview of the folder structure, e.g.:  rawdata is in folder X, final data is in folder Y.
+ - Used in article(s)/project(s), if this concerns not publicised data, write a materials and methods containing amongst others:
+    - Data source (human, mouse,....) 
+    - Tissue type (blood, fibroblasts, heart biopt,...)
+    - Data type (array, NGS, longread,....)
 
+Steps of the life cycle of experimental data when working on {{ slurm_cluster_name | capitalize }}:
 
  1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on _prm_ storage, add the README.
  1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on _tmp_ storage, with the README.  
@@ -78,7 +79,6 @@ For each project/folder write a README.
  1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on _prm_ storage, with the README.
  1. Cleanup by deleting data from ```/groups/${group}/tmp*/...``` to free up space for your next experiment.
  1. Document and publish your experiment/data.
-
 
 #### Job Submission
 - Before submitting the same job a hundred times, please verify that the job finishes
