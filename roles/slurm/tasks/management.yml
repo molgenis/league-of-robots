@@ -53,7 +53,8 @@
       - 'munge'
   notify:
     - 'restart_munge'
-    - 'restart_slurmd'
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
   become: true
 
 - name: 'Install logrotate config file for slurmctld and slurmdbd.'
