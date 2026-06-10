@@ -4,9 +4,9 @@ stack_domain: ''  # Only add hpc.rug.nl domain when jumphost is registered in DN
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'cf'
 stack_dtap_state: production
-slurm_version: '22.05.2-1.el7.umcg'
+slurm_version: '24.11.7-1.el9.umcg'
 slurm_partitions:
-  - name: regular  # Must be in sync with group listed in Ansible inventory.
+  - name: cpu_r7525  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: copperfist # Must be in sync with Ansible hostnames listed in inventory.
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G"'
@@ -84,9 +84,9 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-cloud_image: CentOS 7
-cloud_user: centos
+cloud_image: Rocky-9.6
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
@@ -101,7 +101,7 @@ stack_networks:
 security_group_mods:
   - name: "{{ stack_prefix }}_storage"
     allow_ingress:
-      - '192.168.1.0/24'
+      - '192.168.1.0/24'  # private vlan990 for lab equipment.
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
@@ -152,26 +152,44 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
 hpc_env_prefix: '/apps'
+sponsors:
+  - name: umcg-gd-owners
+    slurm_shares: 120
+  - name: umcg-mswertz
+    slurm_shares: 8
 regular_groups:
-  # Note, for chaperone machines this is controlled in the static_inventories
+  # Note, for chaperone machines this is controlled in the static_inventories.
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
   - name: "{{ functional_users_group }}"
   - name: 'umcg-atd'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gap'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gd'
+    sponsor: umcg-gd-owners
   - name: 'umcg-genomescan'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gsad'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gst'
+    sponsor: umcg-gd-owners
   - name: 'umcg-lab'
+    sponsor: umcg-gd-owners
   - name: 'umcg-labgnkbh'
+    sponsor: umcg-gd-owners
   - name: 'umcg-logstoprm'
+    # No sponsor as this group does not use Slurm.
   - name: 'umcg-ogm'
+    sponsor: umcg-gd-owners
   - name: 'umcg-patho'
+    sponsor: umcg-gd-owners
   - name: 'umcg-pr'
+    sponsor: umcg-gd-owners
   - name: 'umcg-vipt'
+    sponsor: umcg-mswertz
 regular_users:
-  # Note, for chaperone machines this is controlled in the static_inventories
+  # Note, for chaperone machines this is controlled in the static_inventories.
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
   - name: 'umcg-atd-ateambot'
@@ -333,7 +351,8 @@ remote_users_in_local_groups:
 soft_partitions:
   - path: /mnt/local_raid/groups/umcg-lab/tmp06/sequencers_incoming
     src: /mnt/local_raid/groups/umcg-lab/tmp06/sequencers_incoming.disk.img
-    fstype: btrfs             # btrfs supports the 4k formatting and works on sequencers
+    fstype: xfs                        # xfs and btrfs support 4k that works on sequencers
+    fsopts: ' -b size=4k -s size=4k'   # extra options for 4k filesystem formatting
     size: 600                 # in GB
     user: sbsuser
     group: umcg-lab
@@ -375,11 +394,27 @@ ogm_servers:
 #
 pfs_mounts:
   - pfs: local_raid
+    #
+    # The complete PFS is not mounted via the shared_storage role; See local_storage role instead.
+    # Normally the source, type and rw_options are used to mount both the complete PFS
+    # as well as LFS-ses from that PFS, but in this case we must use separate pfs_* arguments
+    # to mount the complete PFS and these must match what was specified for this local file system.
+    # The file system should have already been mounted by the local_storage role,
+    # so the pfs_* arguments are de facto only used to validate that the file system was mounted correctly
+    # and to ensure the play stops when this is not the case to prevent making sub directories
+    # for the LFS-ses in the mount point from the small OS disk as opposed to on the PFS.
+    #
+    pfs_source: LABEL=local_raid
+    pfs_type: xfs
+    pfs_options: rw,relatime,nofail,x-systemd.device-timeout=10
+    #
+    # File system source, type and mount options only used for LFS-ses from this PFS.
+    #
     source: '/mnt'
     type: 'none'
     rw_options: 'bind,nofail'
     ro_options: 'bind,ro,nofail'
-    machines: []  # Complete PFS not mounted via shared_storage role. See local_storage role instead.
+    machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: 'medgen_zincfinger$'
     source: '//storage5.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem
@@ -442,25 +477,16 @@ lfs_mounts:
     pfs: local_raid
     groups:
       - name: umcg-atd
-        mode: '2770'
       - name: umcg-gap
-        mode: '2770'
       - name: umcg-gd
-        mode: '2770'
       - name: umcg-genomescan
-        mode: '2770'
       - name: umcg-gsad
-        mode: '2770'
       - name: umcg-gst
-        mode: '2770'
       - name: umcg-lab
       - name: umcg-labgnkbh
-        mode: '2770'
       - name: umcg-patho
-        mode: '2770'
       # - name: umcg-pr
       - name: umcg-vipt
-        mode: '2770'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: tmp16
     pfs: 'umcgst16'
@@ -472,7 +498,6 @@ lfs_mounts:
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-lab
-        mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
       # - name: umcg-pr
