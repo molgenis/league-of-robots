@@ -58,33 +58,34 @@ See [https://umcg.topdesk.net/](https://umcg.topdesk.net/) the Scientific Resear
 
 For each project/folder write a README.
 
-- Mention your name and contact information
+	- Mention your name and contact information
 
-- Responsible PIs and contact information
+	- Responsible PIs and contact information
 
-- Retention time
+	- Retention time
 
-- Project number [PaNaMa](https://umcg.mibris.nl/) (for UMCG employees only)
+	- Project number [PaNaMa](https://umcg.mibris.nl/) (for UMCG employees only)
 
-- Used in article(s)/project(s), if this concerns not publicised data, write a materials and methods.
+	- Used in article(s)/project(s), if this concerns not publicised data, write a materials and methods.
 
-- Data source (human, mouse,....) 
+	- Data source (human, mouse,....) 
 
-- Tissue type (blood, fibroblasts, heart biopt,...)
+	- Tissue type (blood, fibroblasts, heart biopt,...)
 
-- Data type (array, NGS, longread,....)
+	- Data type (array, NGS, longread,....)
 
-- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
+	- Small overview of the folder structure,e.g.:  rawdata is in folder X, final data is in folder Y.
+
 
  1. Generate _"raw data"_ in a lab and upload that to a folder in ```/groups/${group}/prm*/rawdata/...``` on _prm_ storage, add the README.
- 1. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on _tmp_ storage, with the README.  
+ 2. Select a (sub)set of your _"raw data"_ you want to analyze on the cluster and stage this data by copying it from ```/groups/${group}/prm*/rawdata/...``` to ```/groups/${group}/tmp*/...``` on _tmp_ storage, with the README.  
     Make sure your in-silico experiment processes a chunk of data that can easily be analysed in << 45 days.
- 1. Generate jobs, which will read and write to and from folders in ```/groups/${group}/tmp*/...``` on _tmp_ storage systems.
- 1. Submit your jobs on the Slurm workload manager with the ```sbatch``` command.
- 1. Once all jobs have finished successfully, assess the results.
- 1. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on _prm_ storage, with the README.
- 1. Cleanup by deleting data from ```/groups/${group}/tmp*/...``` to free up space for your next experiment.
- 1. Document and publish your experiment/data.
+ 3. Generate jobs, which will read and write to and from folders in ```/groups/${group}/tmp*/...``` on _tmp_ storage systems.
+ 4. Submit your jobs on the Slurm workload manager with the ```sbatch``` command.
+ 5. Once all jobs have finished successfully, assess the results.
+ 6. Store your final results by copying them to a folder in ```/groups/${group}/prm*/projects/...``` on _prm_ storage, with the README.
+ 7. Cleanup by deleting data from ```/groups/${group}/tmp*/...``` to free up space for your next experiment.
+ 8. Document and publish your experiment/data.
 
 
 #### Job Submission
