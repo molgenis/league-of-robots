@@ -51,6 +51,14 @@
     - 'restart_slurmd'
   become: true
 
+- name: 'Install munge.'
+  ansible.builtin.package:
+    state: 'latest'
+    update_cache: true
+    name:
+      - 'munge'
+  become: true
+
 - name: 'Delete deprecated/unused Slurm packages.'
   ansible.builtin.package:
     state: 'removed'
