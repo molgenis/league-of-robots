@@ -22,6 +22,27 @@ _lfs_by_pfs["{{ pfs }}"]="
 {%- endfor %}
 
 {% raw %}
+
+# $1 = path
+# $2 = owner:group
+# $3 = mode
+function create_chown_and_chmod(){
+   if ! test -d "${1}"; then
+      echo "  creating ${_main_group_path}/${_sub_group_name}"
+      mkdir "${1}"
+   fi
+   if [[ "$(stat -c '%U:%G' "${1}")" != "${2}" ]]; then
+      echo "  ownership changed into ${2} on ${1}"
+      chown "${2}" "${1}"
+   fi
+   # leading zero just annoys things here
+   local _mode="${3#0}"
+   if [[ "$(stat -c '%a' "${1}")" != "${_mode}" ]]; then
+      echo "  mode changed ${_mode} on ${1}"
+      chmod "${_mode}" "${1}"
+   fi
+}
+
 # For now only groups starting with 'L-'
 _all_groups="$(getent group 2>/dev/null | awk -F':' '{print $1}' | grep -E "(^L-)")"
 _main_groups="$(grep -xE "^L-[^-]+" <<< "${_all_groups}")"
@@ -37,25 +58,24 @@ for _main_group in ${_main_groups}; do
             echo "main: missing folder ${_main_group_path}"
             continue
          fi
-         if  [[ "$(stat -c '%U:%G' ${_main_group_path}/${_subgrp_type})" != "${_main_group}-dm:${_main_group}" ]]; then
-            echo "main: change "${_main_group_path}" ownership to ${_main_group}-dm:${_main_group}"
-            chown "${_main_group}-dm:${_main_group}" "${_main_group_path}"
-         fi
          # make sure top subfolders exist in main group
          # for _subgrp_type in "rel:releases" "prj:projects" "sub:subgroups"; do
          #    local _each_short="${_subgrp_type%%\:*}"
          #    local _each_long="${_subgrp_type##*\:}"
-         for _subgrp_type in "rel" "prj" "sub"; do
-            if ! getent group "${_main_group}-${_subgrp_type}" &>/dev/null; then
-               test -d "${_main_group_path}/${_subgrp_type}" && continue
-               echo "  subdir: creating directory ${_main_group_path}/${_subgrp_type}"
-               mkdir "${_main_group_path}/${_subgrp_type}"
-            fi
-            if  [[ "$(stat -c '%U:%G' ${_main_group_path}/${_subgrp_type})" != "${_main_group}-dm:${_main_group}" ]]; then
-               echo "  subdir: change ${_main_group_path}/${_subgrp_type} ownership to ${_main_group}-dm:${_main_group}"
-               chown "${_main_group}-dm:${_main_group}" "${_main_group_path}/${_subgrp_type}"
-            fi
-         done
+
+         # # Make top level directories
+         # for _subgrp_type in "rel" "prj" "sub"; do
+         #    if ! getent group "${_main_group}-${_subgrp_type}" &>/dev/null; then
+         #       test -d "${_main_group_path}/${_subgrp_type}" && continue
+         #       echo "  subdir: creating directory ${_main_group_path}/${_subgrp_type}"
+         #       mkdir "${_main_group_path}/${_subgrp_type}"
+         #    fi
+         #    if  [[ "$(stat -c '%U:%G' ${_main_group_path}/${_subgrp_type})" != "${_main_group}-dm:${_main_group}" ]]; then
+         #       echo "  subdir: change ${_main_group_path}/${_subgrp_type} ownership to ${_main_group}-dm:${_main_group} (0770)"
+         #       chown "${_main_group}-dm:${_main_group}" "${_main_group_path}/${_subgrp_type}"
+         #       chmod 0770 "${_main_group_path}/${_subgrp_type}"
+         #    fi
+         # done
          # install -d "${_main_group_path}" -o root -g "${_main_group}" -m 0770
 
          # Now create all the rest of the groups
@@ -64,22 +84,36 @@ for _main_group in ${_main_groups}; do
             [[ "${_each_group}" == "${_main_group}" ]] && continue # skip main groups
             # continue subgroups
             if [[ "${_each_group}" =~ ^"${_main_group}" ]]; then
-               _group_name="${_each_group##*-}"
-               [[ "${_group_name}" == "dms" ]] && continue # skip dms groups
-               _group_remove_main_group="${_each_group/${_main_group}-}" # remove /L-mains-/    keep sub
-               _group_top_path="${_group_remove_main_group//-/\/}"    # replace - with 	/
-                test -d "${_main_group_path}/sub/${_group_top_path}" && continue
-               echo "    hier: creating ${_main_group_path}/sub/${_group_top_path}/"
-               mkdir "${_main_group_path}/sub/${_group_top_path}" 
-               if  [[ "$(stat -c '%U:%G' "${_main_group_path}/sub/${_group_top_path}")" != "${_main_group}-dm:${_main_group}" ]]; then
-                  echo "   sub: change ${_main_group_path}/sub/${_group_top_path} ownership to ${_main_group}-dm:${_main_group}"
-               owned by ${_main_group}-dm:${_each_group} (0770)"
-               # install -d "${_main_group_path}/${_group_top_path}" -o "${_main_group}-dm" -g "${_each_group}" -m "0770"
+               _sub_group_name="${_each_group##*-}"
+
+               # skip dms group
+               [[ "${_sub_group_name}" == "dms" ]] && continue
+
+               if [[ "${_each_group}" =~ ^"${_main_group}"-(prj|rel|sub)$ ]]; then
+               # top prj/rel/sub folders
+               # - these folders are owned by main group
+                  create_chown_and_chmod "${_main_group_path}/${_sub_group_name}" "${_main_group}-dm:${_main_group}" "2770"
+               
+               elif [[ "${_each_group}" =~ ^"${_main_group}"-(prj|rel)-.{1,} ]]; then
+               # inside prj/rel FLAT structure
+               #  - owned by that individual group
+                  _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main- > becomes > rel-dataset01-v1
+                  _group_placed_flat="${_group_remove_main_group/-/\/}"  # replace first dash with slash > becomes > rel/dataset01-v1
+                  echo "WOULD BE: create_chown_and_chmod "${_main_group_path}/${_group_placed_flat}" "${_main_group}-dm:${_each_group}" "2770""
+
+               elif [[ ! "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]]; then
+               # else it is HIERARCHICAL structure and will be placed in 'sub' folder
+               # individual folders are owned by that individual group
+                  _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main-
+                  _sub_group_path="${_group_remove_main_group//-/\/}"    # replace - with 	/
+                  echo " WOULD BE: create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "2770""
+               else
+                  echo "WARNING: Group ${_each_group} cannot be placed anywhere!"
+               fi
             fi
          done
-
-
       done
    done
 done
 {% endraw %}
+
