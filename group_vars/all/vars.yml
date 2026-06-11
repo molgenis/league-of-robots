@@ -15,7 +15,6 @@ ssh_host_signer_hostnames: "{{ inventory_hostname }}\
        | map(attribute='hostname') %}\
       ,{{ external_jumphost }}+{{ inventory_hostname }}\
     {% endfor %}"
-slurm_database_name: "{{ stack_prefix }}_slurm_accounting"
 ai_jumphost: "{{ lookup('env','AI_PROXY') }}"
 #
 # Local volume size (root partition) for all instances

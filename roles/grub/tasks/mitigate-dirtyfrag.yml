@@ -2,7 +2,7 @@
 #
 # Mitigate the DirtyFrag privilege escalation bug
 #
-# CVE-2026-..... https://github.com/V4bel/dirtyfrag
+# CVE-2026-43284 https://github.com/V4bel/dirtyfrag
 # Mitigation disables the
 #    esp4
 #    esp6

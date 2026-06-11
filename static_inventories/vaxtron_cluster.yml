@@ -155,8 +155,6 @@ all:
               slurm_sockets: 2
               slurm_cores_per_socket: 32
               slurm_real_memory: 2063193
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 3420400
               slurm_weight: 10
         cpu_r6625:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -196,8 +194,6 @@ all:
               slurm_sockets: 2
               slurm_cores_per_socket: 96
               slurm_real_memory: 773020
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 2850100
         gpu_xe7745:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
@@ -242,8 +238,6 @@ all:
               slurm_sockets: 2
               slurm_cores_per_socket: 64
               slurm_real_memory: 1546619
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 14376000
               slurm_weight: 20
 administration:
