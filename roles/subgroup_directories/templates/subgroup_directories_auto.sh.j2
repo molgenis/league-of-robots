@@ -101,7 +101,7 @@ for _main_group in ${_main_groups}; do
                   _group_placed_flat="${_group_remove_main_group/-/\/}"  # replace first dash with slash > becomes > rel/dataset01-v1
                   create_chown_and_chmod "${_main_group_path}/${_group_placed_flat}" "${_main_group}-dm:${_each_group}" "2770"
 
-               elif [[ ! "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]]; then
+               elif [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]]; then
                # else it is HIERARCHICAL structure and will be placed in 'sub' folder
                # individual folders are owned by that individual group
                   _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main-
