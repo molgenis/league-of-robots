@@ -2,7 +2,9 @@
 Description=Watch /var/lib/sss/db/cache_ladap.ldb
 
 [Path]
-PathChanged=/var/lib/sss/db/cache_ladap.ldb
+PathModified=/var/lib/sss/db/cache_ladap.ldb
+# PathModified - any change that works for inotify
+# PathChanged - any time that file is closed
 # Unneeded
 # Unit=subgroup_directories_auto.path
 
