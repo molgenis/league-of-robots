@@ -84,7 +84,6 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-    - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['address'] }}{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['netmask'] }}"
 cloud_image: Rocky-9.6
 availability_zone: nova
 enable_predictable_network_interface_names: true
@@ -95,14 +94,6 @@ stack_networks:
       next-hop-address: '172.23.77.1'
       external_network: vlan16
       name: vlan1336
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.10.1.0/24'
-    router:
-      next-hop-address: '10.10.1.1'
-      external_network: vlan16
-    create: true
-  - name: vlan16
-    cidr: '195.169.22.0/23'
   - name: vlan990
     cidr: '192.168.1.0/24'
 security_group_mods:
