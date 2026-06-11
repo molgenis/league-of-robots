@@ -51,6 +51,10 @@
     update_cache: true
     name:
       - 'munge'
+  notify:
+    - 'restart_munge'
+    - 'restart_slurmdbd'
+    - 'restart_slurmctld'
   become: true
 
 - name: 'Install logrotate config file for slurmctld and slurmdbd.'
