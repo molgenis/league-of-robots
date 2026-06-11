@@ -5,6 +5,7 @@ set -euo pipefail
 sudo /usr/local/sbin/get_lsaai_token.sh
 TOKEN_DIR="${HOME}/.cache/lsaai/"
 TOKEN_FILE="${TOKEN_DIR}/token"
+MAX_SUB_LEVELS=3
 
 sleep 0.5
 
@@ -293,17 +294,17 @@ new_release (){
    make_new_subgroup "${_main_group}-rel" "${_subgroupname}" "${_expirationdays}"
 }
 
-new_hierarchical(){
-   echo '    Hierarchical sub-groups can be several levels deep. They are all stored under [main group]-sub.'
+new_hierarchical_subgroup(){
+   echo '    Hierarchical SUB-groups can be multiple levels deep. They are all stored under [main group]-sub.'
    read -rp '  > Parent group name: ' _parentname
-   while ( [[ "${UID}" -ne 0 ]] && [[ "${_parentname}" != "${_main_group}-sub"* ]] ); do
+   while ( [[ "${UID}" -ne 0 ]] && [[ ! "${_parentname}" =~ ^"${_main_group}-sub" || $(awk -F'-' '{print NF-1}' <<< "${_parentname}") -ge "$((MAX_SUB_LEVELS + 2))" ]] ); do
       echo "    ! Error: you can create a hierarchical group only inside '[main group]-sub' subfolder - try again!"
       read -rp '  > Full name of parent group: ' _parentname
    done
    read -rp '    Subgroup name: ' _subgroupname
    while ([[ ! "${_subgroupname}" =~ ^[0-9A-Za-z_]+$ ]] || [[ "${_subgroupname}" == "dms" ]]) ||
          ([[ "${UID}" -eq 0 ]] && ([[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]])); do
-      echo "    ! Error: must be 2-8 characters, only letters, digits, and underscore, and group cannot be named 'dms', try again!"
+      echo "    ! Error: can be only ${MAX_SUB_LEVELS} deep, name must be 2-8 characters, only letters, digits, underscore and group cannot be named 'dms' - try again!"
       read -rp '    Subgroup name: ' _subgroupname
    done
    _defaultexpirationdays=365
@@ -312,9 +313,9 @@ new_hierarchical(){
    make_new_subgroup "${_parentname}" "${_subgroupname}" "${_expirationdays}"
 }
 
-echo 'Would you like to create a new [p]roject, [r]elease versioned dataset or [h]ierarchical subgroup?'
+echo 'Would you like to create a new [P]roject, [R]elease versioned dataset or hierarchical [S]ubgroup?'
 read -N1 -rp '  > ' _subgroup_type
-while [[ "${_subgroup_type}" != [prh] ]]; do
+while [[ "${_subgroup_type}" != [PRS] ]]; do
    echo ' - wrong option, try again'
    read -N1 -rp '  > ' _subgroup_type
 done
@@ -327,9 +328,9 @@ while [[ ${#_main_group_count_dashes} -ne 1 ]]; do
    _main_group_count_dashes="${_main_group//[^-]}"
 done
 case "${_subgroup_type}" in
-   p) new_project ;;
-   r) new_release ;;
-   h) new_hierarchical ;;
+   P) new_project ;;
+   R) new_release ;;
+   S) new_hierarchical_subgroup ;;
 esac
 
 echo ''
