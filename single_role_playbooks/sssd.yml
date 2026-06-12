@@ -5,7 +5,6 @@
     - cluster
     - chaperone,!mit_chaperone
     - data_transfer
-  strategy: linear
   roles:
     - role: sssd
       when: use_sssd | default(false) | bool
