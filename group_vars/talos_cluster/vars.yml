@@ -232,6 +232,8 @@ regular_users:
   - name: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
+  - who: ['%L-gcc']
+    become: 'L-gcc-dm'
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
     become: 'umcg-molgenis'
   - who: ['%umcg-atd']
@@ -276,6 +278,7 @@ lfs_mounts:
     pfs: umcgst04/slice5
     type: bind
     groups:
+      - name: L-gcc
       - name: umcg-atd
       - name: umcg-gcc
       - name: umcg-gsad
@@ -287,6 +290,7 @@ lfs_mounts:
     pfs: umcgst04/slice5
     type: bind
     groups:
+      - name: L-gcc
       - name: umcg-gcc
       - name: umcg-sysops
     ro_machines: "{{ groups['compute_node'] }}"

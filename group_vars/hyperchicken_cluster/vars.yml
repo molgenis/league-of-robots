@@ -182,14 +182,14 @@ regular_users:
   - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
-  - who: ['%umcg-atd']
-    become: 'umcg-atd-dm'
-  - who: ['%umcg-gsad']
-    become: 'umcg-gsad-dm'
   - who: ['%L-erdera']
     become: 'L-erdera-dm'
   - who: ['%L-gcc']
     become: 'L-gcc-dm'
+  - who: ['%umcg-atd']
+    become: 'umcg-atd-dm'
+  - who: ['%umcg-gsad']
+    become: 'umcg-gsad-dm'
 # Remote archive settings
 remote_archive:
   - name: arc01
