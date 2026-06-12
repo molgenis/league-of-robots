@@ -40,6 +40,11 @@ additional_etc_hosts:
 # Cluster classification (used by `logs` and `login` roles)
 #
 cluster_class: 'development'
+
+# Install auto-subgroup generate scripts
+# depending on having `ladap` in `ldap_domains`
+subgroup_directories_auto: true
+
 #
 # Ldap settings
 #
@@ -183,6 +188,8 @@ sudoers:
     become: 'umcg-gsad-dm'
   - who: ['%L-erdera']
     become: 'L-erdera-dm'
+  - who: ['%L-gcc']
+    become: 'L-gcc-dm'
 # Remote archive settings
 remote_archive:
   - name: arc01
@@ -217,6 +224,7 @@ lfs_mounts:
       - name: umcg-atd
       - name: umcg-gsad
       - name: L-erdera
+      - name: L-gcc
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm09
     pfs: umcgst07
@@ -224,6 +232,7 @@ lfs_mounts:
       - name: umcg-atd
       - name: umcg-gsad
       - name: L-erdera
+      - name: L-gcc
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env09
     pfs: umcgst07
