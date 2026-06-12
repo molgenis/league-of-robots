@@ -9,20 +9,10 @@ slurm_partitions:
   - name: regular  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: copperfist # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['regular']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['regular'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['regular'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['regular'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G"'
   - name: dragen  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: cf-dragen  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['dragen']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G" PreemptMode=off'
 slurm_qos_limit_fractions:
   regular-medium:
@@ -42,7 +32,7 @@ slurm_qos_limit_fractions:
   interactive-short:
     user: 0.5
 repo_manager: 'none'
-os_distribution: 'centos7'
+os_distribution: 'rocky9'
 figlet_font: 'ogre'
 motd: |
       =========================================================
@@ -55,21 +45,6 @@ additional_etc_hosts:
         network: vlan990
       - name: betabarrel
         network: vlan990
-#
-# Jumphosts from other stack-name infra groups.
-# We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
-#
-external_jumphosts:
-  - group: wingedhelix_cluster
-    hosts:
-      - hostname: wh-porch
-        network: vlan16
-  - group: betabarrel_cluster
-    hosts:
-      - hostname: bb-porch
-        network: vlan16
-      - hostname: az-porch
-        network: az_public
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
@@ -109,7 +84,6 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-    - "{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['address'] }}{{ betabarrel_cluster.ip_addresses['betabarrel']['vlan16']['netmask'] }}"
 cloud_image: CentOS 7
 cloud_user: centos
 availability_zone: nova
@@ -142,7 +116,6 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -151,12 +124,10 @@ iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net4'] }}"
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_outbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
-  - "{{ betabarrel_cluster.ip_addresses['az-porch']['az_public'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
@@ -399,37 +370,6 @@ ogm_servers:
       me=${trendanalysis_api_username}&password={{ ogm_api_password }}\" | grep -oP '\"to\
       ken\":\\s*\"\\K[^\"]+')\"'; userrole=3; userpk=24' https://${ogm_server}:3005/proje\
       ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?period=90 > ${prm_location}/TrendAnalysis/${ogm_server}-$(date +%F)-${stack_prefix}.csv"
-
-#
-# Local storage variables.
-#
-local_mount_subfolders:
-  - mount_point: '/groups'
-    machines: "{{ groups['data_transfer'] }}"
-    folders:
-      - rel_paths:
-          - "{{ data_transfer_only_group }}"
-        mode: '2750'
-        owner: root
-        group: "{{ data_transfer_only_group }}"
-      - rel_paths:
-          - umcg-genomescan
-          - umcg-gst
-        mode: '2770'
-        owner: root
-  - mount_point: '/staging'
-    machines: "{{ groups['dragen'] }}"
-    folders:
-      - rel_paths:
-          - development
-        mode: '0770'
-        owner: umcg-atd-ateambot
-        group: umcg-atd
-      - rel_paths:
-          - slurm
-        mode: '0755'
-        owner: root
-        group: root
 #
 # Shared storage related variables
 #

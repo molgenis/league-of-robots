@@ -1,5 +1,5 @@
 # Code of Conduct UMCG Research IT High Performance Compute Clusters
-Version 26-9-2024
+Version 28-05-2026
 
 The following is the Code of Conduct that the Investigator agrees to abide by as a user of the UMCG HPC clusters. 
 Failure to abide by any term within this Code of Conduct may result in revocation of approved access to any or 
@@ -91,16 +91,17 @@ process as economic as possible (screenshots are very welcome).
 - Clean up your home directory frequently, in particular before asking for an increase of your quota limit
 - Do not save thousands of files in a single directory. Distribute the files to subdirectories.
 - If you have any results from your computations that you want to store, do not keep them on the temporary (tmp) 
-storage systems but as the datamanager of your group to move them to the permanent (prm) filesystem. Data on the 
+storage systems but ask the datamanager of your group to move them to the permanent (prm) filesystem. Data on the 
 prm filesystem is regularly backed up to tape whereas data on tmp is not. If anything happens to the tmp 
-filesystem all data on there can be gone with no possibility to restore it.
+filesystem all data on there can be gone with no possibility to restore it. 
+- See [The life cycle of experimental data](../storage/#the-life-cycle-of-experimental-data) for all the pro tips.
 
-### Job Submission
+#### Job Submission
 - Before submitting the same job a hundred times, please verify that the job finishes
 successfully. We often experience that hundreds of jobs getting killed due to an invalid path referenced in the 
-job script.
+job script. See our [How to manage jobs on Nibbler](../analysis/#job-types) page for all the pro tips. 
 
-### Cluster Performance
+#### Cluster Performance
 - **DO NOT** run resource-intensive computations directly on the login node AKA submit
 node AKA Head node. This will have a negative impact on the performance of the whole cluster. Instead, generate a 
 job script that carries out the computations and submit this job script to the cluster using sbatch.
@@ -108,15 +109,30 @@ job script that carries out the computations and submit this job script to the c
 Such a program usually run as a background process (daemon) rather than being under the direct control of an 
 interactive user. We will immediately kill such processes.
 
-## Part 2: Rules for owners of a group on the UMCG HPC cluster:
-The rules for users (part 1 of this Code of Conduct) also apply for group owners
+## Part 2: Rules for owners of a group on the UMCG HPC cluster: 
+The rules for users (part 1 of this Code of Conduct) also apply for group owners. 
+
 Group owners are responsible for:
-  
-- the research project should be registered in the UMCG research register
-- the data inside their group
-- giving or rejecting access to their group including the end-date of acces given.
-- appointing data managers for their group
-- paying the annual costs associated with their cluster group. For this the group owner will need to provide a budget number or “kostenplaats”.
+
+- Working according to the [UMCG research code](https://researchcode.umcgresearch.org/en/), stated in the UMCG research code:
+
+	- *"The head of the department is responsible for all scientific research conducted at or from the department."*
+	
+	- *"A principal investigator is available and responsible for all aspects of a study"*
+	
+	- *"The study's research goals and methods are laid down in a high-quality and complete research protocol with a Data Management Plan (DMP)"*
+	
+- The research project should be registered in the UMCG research register [PaNaMa](https://umcg.mibris.nl/).
+
+- The data inside their group correctly documented in a DMP. For UMCG employees, login to Zenya use this link [Data Management Plan (DMP)](https://umcg.zenya.work/portal/#/document/99b46c52-2c81-4193-b688-ad5a01d1a496?scope=global&searchText=data%20management%20plan), or login to Zenya a find the DMP by pasting _8H.29619 TPL Data Management Plan (DMP) (Versie 7)_.
+
+- Giving or rejecting access to their group including the end-date of acces given.
+
+- Appointing data managers for their group.
+
+- Paying the annual costs associated with their cluster group. For this the group owner will need to provide a budget number or “kostenplaats”.
+
+- If you fail your responsibilities, we will consider your group/data as legacy data, see [when-you-want-to-leave](../new_group/#when-you-want-to-leave) for more information.
 
 ### Conclusion and signature:
 

@@ -1,0 +1,79 @@
+#
+# Creation of SSL certificates for HTTPS webservers.
+#
+---
+- name: 'Install certbot package.'
+  ansible.builtin.package:
+    name: certbot
+    state: latest
+    update_cache: true
+  become: true
+
+- name: 'Check certificate expiration date.'
+  ansible.builtin.command: >
+    openssl x509 -enddate -noout -in /etc/pki/tls/certs/localhost.crt
+  register: cert_expiry
+  failed_when: false
+  changed_when: false
+  become: true
+
+- name: 'Create certificates if certificate is missing or invalid.'
+  ansible.builtin.command: >
+         certbot certonly
+             --webroot -w "/var/www/html"
+             --server "{{ acme_server }}"
+             --eab-kid "{{ eab_kid }}"
+             --eab-hmac-key "{{ eab_hmac_key }}"
+             -d "{{ fqdn }}"
+             --agree-tos
+             -m "{{ email_address }}"
+             --non-interactive
+  when: cert_expiry.rc != 0
+  changed_when: cert_expiry.rc != 0
+  become: true
+
+- name: 'Find directory with certificates (last couple of characters of cert directory is unknown).'
+  ansible.builtin.find:
+    paths: "/etc/letsencrypt/live/"
+    file_type: directory
+    patterns: "{{ fqdn }}*"
+  register: certs_dir
+  become: true
+
+- name: 'Create symlinks from default letsencrypt folder to Linux cert folders.'
+  ansible.builtin.file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: 'root'
+    group: 'root'
+    state: link
+  loop:
+    - src: "{{ certs_dir.files[0].path }}/privkey.pem"
+      dest: "/etc/pki/tls/private/localhost.key"
+      mode: '0600'
+    - src: "{{ certs_dir.files[0].path }}/cert.pem"
+      dest: "/etc/pki/tls/certs/localhost.crt"
+      mode: '0640'
+    - src: "{{ certs_dir.files[0].path }}/chain.pem"
+      dest: "/etc/pki/tls/certs/server-chain.crt"
+      mode: '0640'
+  loop_control:
+    label: "{{ item.src }} -> {{ item.dest }}"
+  when: certs_dir.files | length > 0
+  become: true
+
+- name: 'Apply changes and enable systemd timer for auto-renewal.'
+  ansible.builtin.systemd_service:
+    name: certbot-renew.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+  become: true
+
+- name: 'Restart httpd to apply certificates.'
+  ansible.builtin.systemd_service:
+    name: httpd
+    state: restarted
+  become: true
+...

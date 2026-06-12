@@ -1,8 +1,8 @@
 ---
 ip_addresses:
   bb-dragen:
-    vlan16:
-      address: 195.169.22.42
+    vlan1336:  # Manually selected IP, because machine is not controlled by OpenStack.
+      address: 172.23.77.133
       netmask: /32
     vlan990:
       address: 192.168.1.61
@@ -36,29 +36,12 @@ ip_addresses:
       netmask: /32
       fqdn: 'bb-transfer.hpc.rug.nl'
   betabarrel:
-    vlan16:
-      address: 195.169.22.3
+    vlan1336:
+      address: 172.23.77.111
       netmask: /32
     vlan990:
-      address: 192.168.1.21
+      address: 192.168.1.178
       netmask: /32
-  az-porch:
-    az_internal_management:
-      address: 10.1.0.4
-      netmask: /32
-      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    az_public:
-      address: 74.234.160.235
-      netmask: /32
-      fqdn: 'NXDOMAIN'
-  bb_internal_management-vlan16-router:
-    bb_internal_management:
-      address: 10.10.1.1
-      netmask: /32
-    vlan16:
-      address: 195.169.22.174
-      netmask: /32
-      fqdn: 'NXDOMAIN'
   vlan1336-vlan16-router:
     vlan1336:
       address: 172.23.77.1

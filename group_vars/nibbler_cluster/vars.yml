@@ -9,38 +9,18 @@ slurm_partitions:
   - name: cpu_r6515  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-a[01-05]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r6515']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['cpu_r6515'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: gpu_a40  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['gpu_a40']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['gpu_a40'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.260G,GRES/gpu=3.75" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: "{{ stack_prefix }}-node-c[01-11]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r630']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['cpu_r630'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: 1
-    max_cores_per_node: 1
-    max_mem_per_node: 1024
-    local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
 slurm_qos_limit_fractions:
   regular-medium:
@@ -230,10 +210,24 @@ remote_archive:
       - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
     archive_remote_top_dir: '/archive/umcg-hpc-lifelines'
     recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+  - name: arc04
+    local_top_level_mount: '/groups'
+    groups:
+      - 'umcg-wijmenga'
+      - 'umcg-gdio'
+    archive_user: 'umcg-hpc-groups'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-hpc-groups'
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
 regular_groups:
   - name: "{{ data_transfer_only_group }}"
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
+  - name: 'umcg-adorable'
+    sponsor: umcg-research-it
   - name: 'umcg-as'
     sponsor: umcg-research-it
   - name: 'umcg-atd'
@@ -253,6 +247,8 @@ regular_groups:
   - name: 'umcg-erdera'
     sponsor: umcg-research-it
   - name: 'umcg-fg'
+    sponsor: umcg-research-it
+  - name: 'umcg-forcespe'
     sponsor: umcg-research-it
   - name: 'umcg-franke-scrna'
     sponsor: umcg-research-it
@@ -277,6 +273,8 @@ regular_groups:
   - name: 'umcg-gsad'
     sponsor: umcg-research-it
   - name: 'umcg-hematology'
+    sponsor: umcg-research-it
+  - name: 'umcg-hgsvc'
     sponsor: umcg-research-it
   - name: 'umcg-hlhs'
     sponsor: umcg-research-it
@@ -349,6 +347,8 @@ regular_groups:
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
+  - name: 'umcg-adorable-dm'
+    groups: ['umcg-adorable']
   - name: 'umcg-vipbot'
     groups: ['umcg-as']
   - name: 'umcg-as-dm'
@@ -373,6 +373,8 @@ regular_users:
     groups: ['umcg-erdera']
   - name: 'umcg-fg-dm'
     groups: ['umcg-fg']
+  - name: 'umcg-forcespe-dm'
+    groups: ['umcg-forcespe']
   - name: 'umcg-franke-scrna-dm'
     groups: ['umcg-franke-scrna']
   - name: 'umcg-fu-dm'
@@ -399,6 +401,8 @@ regular_users:
     groups: ['umcg-gsad']
   - name: 'umcg-hematology-dm'
     groups: ['umcg-hematology']
+  - name: 'umcg-hgsvc-dm'
+    groups: ['umcg-hgsvc']
   - name: 'umcg-hlhs-dm'
     groups: ['umcg-hlhs']
   - name: 'umcg-immunogenetics-dm'
@@ -470,6 +474,8 @@ regular_users:
   - name: 'umcg-wijmenga-dm'
     groups: ['umcg-wijmenga']
 sudoers:
+  - who: ['%umcg-adorable-dms']
+    become: 'umcg-adorable-dm'
   - who: ['%umcg-as']
     become: 'umcg-capicebot'
   - who: ['%umcg-as']
@@ -498,6 +504,8 @@ sudoers:
     become: 'umcg-gcc-dm'
   - who: ['%umcg-fg-dms']
     become: 'umcg-fg-dm'
+  - who: ['%umcg-forcespe-dms']
+    become: 'umcg-forcespe-dm'
   - who: ['%umcg-franke-scrna-dms']
     become: 'umcg-franke-scrna-dm'
   - who: ['%umcg-fu-dms']
@@ -526,6 +534,8 @@ sudoers:
     become: 'umcg-gsad-dm'
   - who: ['%umcg-hematology-dms']
     become: 'umcg-hematology-dm'
+  - who: ['%umcg-hgsvc-dms']
+    become: 'umcg-hgsvc-dm'
   - who: ['%umcg-hlhs-dms']
     become: 'umcg-hlhs-dm'
   - who: ['%umcg-immunogenetics-dms']
@@ -609,6 +619,7 @@ local_mount_subfolders:
         owner: root
         group: "{{ data_transfer_only_group }}"
       - rel_paths:
+          - umcg-adorable
           - umcg-as
           - umcg-atd
           - umcg-biogen
@@ -618,9 +629,9 @@ local_mount_subfolders:
           - umcg-datateam
           - umcg-endocrinology
           - umcg-fg
+          - umcg-forcespe
           - umcg-franke-scrna
           - umcg-fu
-          - umcg-gaf
           - umcg-gap
           - umcg-gastrocol
           - umcg-gcc
@@ -631,6 +642,7 @@ local_mount_subfolders:
           - umcg-grip
           - umcg-gsad
           - umcg-hematology
+          - umcg-hgsvc
           - umcg-impact
           - umcg-intercept
           - umcg-lifelines
@@ -700,6 +712,7 @@ lfs_mounts:
     pfs: umcgst04/slice2
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -709,6 +722,7 @@ lfs_mounts:
       - name: umcg-datateam
       - name: umcg-endocrinology
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -721,6 +735,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -760,6 +775,7 @@ lfs_mounts:
     pfs: umcgst01
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -770,6 +786,7 @@ lfs_mounts:
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -782,6 +799,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -819,6 +837,7 @@ lfs_mounts:
     pfs: umcgst02
     type: bind
     groups:
+      - name: umcg-adorable
       - name: umcg-as
       - name: umcg-atd
       - name: umcg-biogen
@@ -829,6 +848,7 @@ lfs_mounts:
       - name: umcg-endocrinology
       - name: umcg-erdera
       - name: umcg-fg
+      - name: umcg-forcespe
       - name: umcg-franke-scrna
       - name: umcg-fu
       - name: umcg-gap
@@ -841,6 +861,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
@@ -897,6 +918,7 @@ lfs_mounts:
       - name: umcg-grip
       - name: umcg-gsad
       - name: umcg-hematology
+      - name: umcg-hgsvc
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact

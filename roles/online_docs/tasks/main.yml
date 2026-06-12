@@ -108,29 +108,6 @@
     - 'restart_httpd'
   become: true
 
-- name: 'Install the private key, certificate and chain files.'
-  ansible.builtin.copy:  # noqa risky-file-permissions
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-    owner: 'root'
-    group: 'root'
-  loop:
-    - dest: '/etc/pki/tls/private/localhost.key'
-      src: "{{ https_private_key_file }}"
-      mode: '0600'
-    - dest: '/etc/pki/tls/certs/localhost.crt'
-      src: "{{ https_certificate_file }}"
-      mode: '0640'
-    - dest: '/etc/pki/tls/certs/server-chain.crt'
-      src: "{{ https_chain_file }}"
-      mode: '0640'
-  loop_control:
-    label: "{{ item.dest }} -> {{ item.src }}"
-  notify:
-    - 'restart_httpd'
-  become: true
-
 - name: 'Configure SSL options in /etc/httpd/conf.d/ssl.conf'
   ansible.builtin.lineinfile:
     path: '/etc/httpd/conf.d/ssl.conf'

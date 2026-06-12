@@ -20,7 +20,10 @@
   loop:
     # Kernel
     - name: kernel.yama.ptrace_scope
-      value: 1
+      # value: 1
+      # Mitigation for CVE-2026-46333 a.k.a. ssh-keysign-pwn
+      # https://almalinux.org/blog/2026-05-15-ssh-keysign-pwn-cve-2026-46333/
+      value: 2
     - name: kernel.kptr_restrict
       value: 1
     - name: kernel.randomize_va_space

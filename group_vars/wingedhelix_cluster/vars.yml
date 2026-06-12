@@ -9,20 +9,10 @@ slurm_partitions:
   - name: regular_big_vm  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: "{{ stack_prefix }}-node-a01"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['regular_big_vm']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['regular_big_vm'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['regular_big_vm'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['regular_big_vm'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['regular_big_vm'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: 1
-    max_cores_per_node: 1
-    max_mem_per_node: 1024
-    local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
 slurm_qos_limit_fractions:
   regular-medium:
@@ -49,31 +39,10 @@ motd: |
           Welcome to {{ slurm_cluster_name | capitalize }}
       =========================================================
 additional_etc_hosts:
-  - group: docs_library
-    nodes:
-      - name: docs-on-bateleur
-        network: external
-  - group: betabarrel_cluster
-    nodes:
-      - name: betabarrel
-        network: vlan16
   - group: copperfist_cluster
     nodes:
       - name: copperfist
         network: vlan16
-#
-# Jumphosts from other stack-name infra groups.
-# We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
-#
-external_jumphosts:
-  - group: betabarrel_cluster
-    hosts:
-      - hostname: bb-porch
-        network: vlan16
-  - group: copperfist_cluster
-    hosts:
-      - hostname: cf-porch
-        network: external
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
@@ -423,24 +392,6 @@ ogm_servers:
       me=${trendanalysis_api_username}&password={{ ogm_api_password }}\" | grep -oP '\"to\
       ken\":\\s*\"\\K[^\"]+')\"'; userrole=3; userpk=24' https://${ogm_server}:3005/proje\
       ctbrowser/bnx/bnx_app/api/downloadQcMetricsCSV?period=90 > ${prm_location}/TrendAnalysis/${ogm_server}-$(date +%F)-${stack_prefix}.csv"
-
-#
-# Local storage variables.
-#
-local_mount_subfolders:
-  - mount_point: '/groups'
-    machines: "{{ groups['data_transfer'] }}"
-    folders:
-      - rel_paths:
-          - "{{ data_transfer_only_group }}"
-        mode: '2750'
-        owner: root
-        group: "{{ data_transfer_only_group }}"
-      - rel_paths:
-          - umcg-genomescan
-          - umcg-gst
-        mode: '2770'
-        owner: root
 #
 # Shared storage related variables
 #

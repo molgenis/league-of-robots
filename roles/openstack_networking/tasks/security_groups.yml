@@ -144,23 +144,25 @@
         - protocol: icmp
           port: -1  # ICMP protocol does not have any ports.
       when: groups['jumphost'] | default([]) | length >= 1
-    - name: "Add rules to {{ security_group_name }} security group: allow inbound SSH from external jumphosts."
+    - name: "Add rule to {{ security_group_name }} security group: allow inbound traffic from external cluster machines."
       openstack.cloud.security_group_rule:
         security_group: "{{ security_group_name }}"
         direction: ingress
-        protocol: tcp
-        port_range_min: 22
-        port_range_max: 22
-        remote_ip_prefix: "{{ remote_ip_address }}{{ remote_ip_netmask }}"
+        protocol: "{{ item.1 }}"
+        port_range_min: -1  # For TCP and UDP port range min -1 & max -1 equals min 1 & max 65535, but the latter is not idempotent due to a known bug.
+        port_range_max: -1  # ICMP protocol does not have any ports.
+        remote_ip_prefix: "{{ item.0 }}"
         wait: true
         timeout: "{{ openstack_api_timeout }}"
       vars:
-        remote_ip_address: "{{ lookup('vars', item.0.group)['ip_addresses'][item.1.hostname][item.1.network]['address'] }}"
-        remote_ip_netmask: "{{ lookup('vars', item.0.group)['ip_addresses'][item.1.hostname][item.1.network]['netmask'] }}"
-      with_subelements:
-        - "{{ external_jumphosts }}"
-        - hosts
-      when: external_jumphosts | default([]) | length >= 1
+        security_group_allow_ingress: "{{ security_group_mods
+            | default([])
+            | selectattr('name', 'equalto', security_group_name)
+            | rejectattr('allow_ingress', 'undefined')
+            | map(attribute='allow_ingress')
+            | flatten }}"
+      loop: "{{ security_group_allow_ingress | product(['tcp', 'udp', 'icmp']) | list }}"
+      when: security_group_allow_ingress | length >= 1
     - name: "Add rules to {{ security_group_name }} security group: allow inbound traffic from machines in the same security group."
       openstack.cloud.security_group_rule:
         security_group: "{{ security_group_name }}"

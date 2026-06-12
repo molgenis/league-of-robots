@@ -91,6 +91,15 @@
     - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 ) or
       (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 
+- name: Create /etc/ssh/sshd_config.d/ directory.
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
 - name: Find extra config files we do not want in /etc/ssh/sshd_config.d/.
   ansible.builtin.find:
     paths: '/etc/ssh/sshd_config.d/'
@@ -131,15 +140,6 @@
     mode: '0600'
     validate: '/usr/sbin/sshd -T -C user=root -C host=localhost -C addr=localhost -C lport=22 -f %s'
   notify: restart_sshd
-  become: true
-
-- name: Create /etc/ssh/sshd_config.d if it does not exist
-  ansible.builtin.file:
-    path: /etc/ssh/sshd_config.d
-    state: directory
-    owner: root
-    group: root
-    mode: '0655'
   become: true
 
 - name: Deploy extra sshd config to use patched system wide crypto policy.

@@ -42,18 +42,52 @@ This must be performed on a _DAI_ with configured ```rpmbuild```.
 
 The following packages should be already installed on the DAI, but run ```yum```/```dnf``` as root to make sure they are there and up to date:
 
-##### On RHEL <= 7.x
-
-```
-yum install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix
-```
-
 ##### On RHEL >= 8.x
 
 Note: Slurm has support for both ```cgroups``` v1 and v2, but support for v2 is only compiled if the dbus development files are present.
 
+The following packages are required to compile Slurm
+ * These packages should be already present on Deploy Admin Interface (DAI) machines 
+ * On Dragen machines they must be added manually
+
 ```
-dnf install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix dbus-devel
+dnf install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix dbus-devel rpm-build autoconf automake
+```
+
+This installs on an Oracle 8.x Dragen machine:
+
+```
+[root@bb-dragen]# dnf install munge-devel munge-libs mysql-devel pam-devel pkgconfig readline-devel lua lua-devel lua-posix dbus-devel rpm-build autoconf automake
+Package munge-libs-0.5.13-2.el8.x86_64 is already installed.
+Package pkgconf-pkg-config-1.4.2-1.el8.x86_64 is already installed.
+Package lua-5.3.4-12.el8.x86_64 is already installed.
+======================================================================
+ Package                        Architecture    Repository            
+======================================================================
+Installing:
+ autoconf                       noarch          ol8_appstream         
+ automake                       noarch          ol8_appstream         
+ dbus-devel                     x86_64          ol8_appstream         
+ lua-devel                      x86_64          ol8_codeready_builder 
+ lua-posix                      x86_64          ol8_codeready_builder 
+ munge-devel                    x86_64          ol8_codeready_builder 
+ mysql-devel                    x86_64          ol8_appstream         
+ pam-devel                      x86_64          ol8_baseos_latest     
+ readline-devel                 x86_64          ol8_baseos_latest     
+ rpm-build                      x86_64          ol8_appstream         
+Upgrading:
+ munge                          x86_64          ol8_appstream         
+ munge-libs                     x86_64          ol8_appstream         
+ mysql-common                   x86_64          ol8_appstream         
+ mysql-libs                     x86_64          ol8_appstream         
+ pam                            x86_64          ol8_baseos_latest     
+Installing dependencies:
+ cmake-filesystem               x86_64          ol8_appstream         
+ elfutils                       x86_64          ol8_baseos_latest     
+ ncurses-c++-libs               x86_64          ol8_baseos_latest     
+ ncurses-devel                  x86_64          ol8_baseos_latest     
+ zstd                           x86_64          ol8_appstream         
+======================================================================
 ```
 
 ### 2. Download and unpack Slurm
@@ -63,7 +97,6 @@ wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2
 tar -xvjf slurm-${SLURM_VERSION}.tar.bz2
 ```
 
-
 ### 3. Patching slurmd source
 
 Disabled UID check in **_rpc_stat_jobacct** function of
@@ -71,26 +104,7 @@ Disabled UID check in **_rpc_stat_jobacct** function of
 slurm-${SLURM_VERSION}/src/slurmd/slurmd/req.c
 ```
 to allow all users to retrieve job stats for all jobs with ```sstat```.
-In Slurm versions <= `22.05.x`:
-```
-    /*
-     * check that requesting user ID is the SLURM UID or root
-     * DISABLED to allow sstat to retrieve job stats for all running jobs of all users.
-     * This may have a negative impact on highly parallellized apps or large clusters.
-     */
-    /*if ((req_uid != uid) && (!_slurm_authorized_user(req_uid))) {
-    *    error("stat_jobacct from uid %ld for job %u " 
-    *             "owned by uid %ld",
-    *             (long) req_uid, req->job_id, (long) uid);
-    *
-    *    if (msg->conn_fd >= 0) {
-    *               slurm_send_rc_msg(msg, ESLURM_USER_ID_MISSING);
-    *               close(fd);
-    *               return ESLURM_USER_ID_MISSING;
-    *    }
-    }*/
-```
-In Slurm versions >= ```23.02.x```:
+
 ```
 	/*
 	 * check that requesting user ID is the Slurm UID or root
@@ -118,11 +132,11 @@ Patch the SLURM ```slurm-${SLURM_VERSION}/slurm.spec``` file.
    Example for Slurm 18.08.8 where the patch level (last number) is ```8```:
    Change:
    ```
-       Release: 8%{?dist}
+       Release:        %{rel}%{?extraver}%{?dist}
    ```
    into:
    ```
-       Release: 8%{?dist}.umcg
+       Release:        %{rel}%{?extraver}%{?dist}.umcg
    ```
    The patch level number may be different for other releases.
  * Change:
@@ -139,22 +153,24 @@ Patch the SLURM ```slurm-${SLURM_VERSION}/slurm.spec``` file.
        %global slurm_source_dir %{name}-%{version}-%{rel}.umcg
    ```
 
-Make sure to also add the ```.umcg``` suffix to the folder name:
+Make sure to also add the ```%{rel}``` and ```.umcg``` suffix to the folder name.
+E.g. when ```%{rel}``` is 1, then:
 
 ```
-mv slurm-${SLURM_VERSION} slurm-${SLURM_VERSION}.umcg
+SLURM_REL=1
+mv slurm-${SLURM_VERSION} slurm-${SLURM_VERSION}-${SLURM_REL}.umcg
 ```
 
 ### 5. Create new tar.bz2 source code archive with patched code
 
 ```
-tar -cvjf ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}.umcg.tar.bz2  slurm-${SLURM_VERSION}.umcg
+tar -cvjf ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}-${SLURM_REL}.umcg.tar.bz2  slurm-${SLURM_VERSION}-${SLURM_REL}.umcg
 ```
 
 ### 6. Build patched RPMs
 
 ```
-rpmbuild -ta --with lua --with mysql ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}.umcg.tar.bz2
+rpmbuild -ta --with lua --with mysql ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}-${SLURM_REL}.umcg.tar.bz2
 ```
 When successful, add the patched RPMs to our custom repo on the Pulp repo servers for the corresponding infra stacks.
 Don't forget to create a new Pulp publication for the updated repo version and then update the Pulp distribution 
@@ -180,6 +196,10 @@ and **not** the ```${NHC_VERSION}.tar.gz``` files, which are automatically gener
 rpmbuild -ta --define 'rel 1' ~/rpmbuild/SOURCES/lbnl-nhc-${NHC_VERSION}.tar.gz
 ```
 
-When successful, add the patched RPMs to our custom repo on the Pulp repo servers for the corresponding infra stacks.
-Don't forget to create a new Pulp publication for the updated repo version and then update the Pulp distribution 
-to serve the new Pulp publication. See [Configuring_Pulp](Configuring_Pulp.md) for details.
+When successful, add the patched RPMs
+ * Either - for clusters that use repo servers - to our custom repo on the _Pulp repo server_ for the corresponding infra stack.  
+   Don't forget to create a new Pulp _publication_ for the updated repo version
+   and then update the Pulp _distribution_ to serve the new Pulp _publication_.  
+   See [Configuring_Pulp](Configuring_Pulp.md) for details.
+ * Or - for clusters that do not use repo servers - to the local _yum repo_ on all machines of the correspnding stack that need Slurm.  
+   See `roles/yum_local/README.md` for details.

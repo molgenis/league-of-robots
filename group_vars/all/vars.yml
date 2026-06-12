@@ -15,13 +15,11 @@ ssh_host_signer_hostnames: "{{ inventory_hostname }}\
        | map(attribute='hostname') %}\
       ,{{ external_jumphost }}+{{ inventory_hostname }}\
     {% endfor %}"
-slurm_database_name: "{{ stack_prefix }}_slurm_accounting"
 ai_jumphost: "{{ lookup('env','AI_PROXY') }}"
 #
 # Local volume size (root partition) for all instances
 #
 local_volume_size_root: 33
-
 #
 # Public keys of all local admins.
 #
@@ -29,7 +27,6 @@ public_keys_of_local_admins: "{{ local_admin_users | map('extract', auth_users) 
     | rejectattr('pub_keys', 'none') | rejectattr('pub_keys', 'undefined') \
     | map(attribute='pub_keys') \
     | map('regex_findall', '^([^\\n]+)', 'multiline=True') | flatten }}"
-
 #
 # Local group specs.
 # Note:

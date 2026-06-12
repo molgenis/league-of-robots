@@ -1,0 +1,4 @@
+---
+envsync_ssh_key_type: ed25519
+envsync_key_file_path: /home/{{ envsync_user }}/.ssh/id_{{ envsync_ssh_key_type }}
+...

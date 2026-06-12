@@ -40,6 +40,7 @@ iptables_allow_https_inbound:
   - "{{ all.ip_addresses['github']['hooks2'] }}"
   - "{{ all.ip_addresses['github']['hooks3'] }}"
   - "{{ all.ip_addresses['github']['hooks4'] }}"
+fqdn: jenkins.gcc.rug.nl
 #
 # Enforce that jenkins servers use `yum_repos` for defining repositories, since they cannot use Pulp.
 #

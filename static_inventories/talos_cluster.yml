@@ -4,7 +4,6 @@ all:
     controller_api:
       hosts:
         localhost:
-          ansible_python_interpreter: /usr/bin/env python
     jumphost:
       hosts:
         reception:
@@ -123,7 +122,6 @@ all:
           slurm_cores_per_socket: 1
           slurm_real_memory: 7681
           slurm_local_disk: 0
-          slurm_features: 'prm08,tmp08'
     compute_node:
       children:
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -170,10 +168,7 @@ all:
               slurm_sockets: 2
               slurm_cores_per_socket: 14
               slurm_real_memory: 257317
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
-              slurm_features: 'tmp08'
         cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-b01:
@@ -215,10 +210,7 @@ all:
               slurm_sockets: 1
               slurm_cores_per_socket: 64
               slurm_real_memory: 514857
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 3002000
-              slurm_features: 'tmp08'
         cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             tl-node-c01:
@@ -241,10 +233,7 @@ all:
               slurm_sockets: 4
               slurm_cores_per_socket: 1
               slurm_real_memory: 7680
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 256 }}"
               slurm_local_disk: 900
-              slurm_features: 'tmp08'
     chaperone:
       hosts:
         tl-chaperone:
