@@ -30,7 +30,7 @@ check_if_token_is_valid() {
          echo "Token expired $(( -remaining / 60 )) minutes ago"
          return 1
       else
-         echo "Token valid for $(( remaining / 60 )) minutes"
+         echo "Existing token still valid for next $(( remaining / 60 )) minutes"
          return 0
       fi
     } || return 1

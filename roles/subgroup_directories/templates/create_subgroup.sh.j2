@@ -6,7 +6,7 @@ sudo /usr/local/sbin/get_lsaai_token.sh
 TOKEN_DIR="${HOME}/.cache/lsaai/"
 TOKEN_FILE="${TOKEN_DIR}/token"
 MAX_SUB_LEVELS=3
-
+_LIST_OF_ALL_GROUPS=""
 sleep 0.5
 
 if test -r "${TOKEN_FILE}"; then
@@ -22,6 +22,11 @@ _defaultexpirationdays=365
 
 DEBUG=false
 DEBUG2=false
+
+# Prepare to suppres extra information if not debugging
+exec 3>/dev/null
+${DEBUG} && exec 3>&1
+
 [[ " ${UID}" -eq 0 ]] && echo -e "\033[31mRunning under root!\033[0m"
 
 [[ ${2:-} == '-v' ]] && DEBUG=true
@@ -99,6 +104,11 @@ make_new_subgroup(){
    ${DEBUG} && echo "Adding admin user $USER_ID to group $new_group_id"
    curl_it "$BASE_URL/groupsManager/addAdmin" \
        "{\"group\": \"$new_group_id\", \"user\": \"$USER_ID\"}"
+
+   # Add regular user
+   ${DEBUG} && echo "Adding user as a regular user $USER_ID to group $new_group_id"
+   curl_it "$BASE_URL/groupsManager/addMember" \
+       "{\"group\": \"$new_group_id\", \"member\": \"$MEMBER_ID\"}"
 
    # Set membership expiration attribute
    ${DEBUG} && echo "Adding expiration attribute: +${expirationdays}d"
@@ -228,10 +238,7 @@ print_all_my_groups() {
            [[ -z "$current" || "$current" == "null" ]] && break
        done
    done < <(echo "$all_groups" | jq -c '.[]?')
-
-   echo "|----------------------------------------------------------------------------|"
-   echo "|  You are manager or admin of following groups                              |"
-   echo "$all_groups" | jq -c '.[]?' | while IFS= read -r g; do
+   _LIST_OF_ALL_GROUPS="$(echo "${all_groups}" | jq -c '.[]?' | while IFS= read -r g; do
       gid=$(echo "$g" | jq -r '.id')
       name=$(echo "$g" | jq -r '.name')
       shortName=$(echo "$g" | jq -r '.shortName')
@@ -239,11 +246,17 @@ print_all_my_groups() {
       if [[ -n "${indirect_groups[$gid]:-}" ]]; then
          via=$(echo "${indirect_groups[$gid]}" | jq -r '._via')
          inherited=$(echo "${indirect_groups[$gid]}" | jq -r '.inherited // ""')
-         printf "| %-35s %-17s %-20s |\n" "${name//\:/\-}" "$inherited" "$via"
+         printf "  %-35s %-17s %-20s\n" "${name//\:/\-}" "$inherited" "$via"
       elif echo "$direct_ids" | jq -e --argjson id "$gid" 'index($id) != null' > /dev/null; then
-         printf "| %-35s direct manager                         |\n" "$name"
+         printf "%-35s direct manager\n" "$name"
       fi
-   done
+   done)"
+   # awk gsub is part of posix
+   _LIST_OF_MAIN_GROUPS="$(awk '{c=gsub(/-/,"-",$1); if(c==1) print $1}' <<< "${_LIST_OF_ALL_GROUPS}")"
+
+   echo "|----------------------------------------------------------------------------|"
+   echo "   You are manager or admin of following groups"
+   echo "${_LIST_OF_ALL_GROUPS}"
    echo "|----------------------------------------------------------------------------|"
 }
 
@@ -253,6 +266,12 @@ new_project (){
    echo '    New PROJECT creation'
    echo '    Projects are stored under [main group]-prj.'
    echo '    (name must be 2-8 characters, only letters, digits, and underscore)'
+   echo '    You have following main groups:'
+   echo "${_LIST_OF_MAIN_GROUPS}" | sed 's/^/      /g'
+   while read -rp '  > Name main group which will contain new release: ' _parentname; do
+      grep -qxF "${_parentname}" <<< "${_LIST_OF_MAIN_GROUPS}" && break
+   done
+   _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    read -rp '  > Name your project: ' _subgroupname
    while ( [[ ! "${_subgroupname}" =~ ^[0-9a-zA-Z_]+$ ]] || [[ "${_subgroupname}" == "dms" ]] ) ||
          ( [[ "${UID}" -eq 0 ]] && ( [[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]])); do
@@ -261,7 +280,7 @@ new_project (){
    done
    read -p "    (Default Membership Expiration: (set by default to ${_defaultexpirationdays} days)" _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
-   make_new_subgroup "${_main_group}-prj" "${_subgroupname}" "${_expirationdays}"
+   make_new_subgroup "${_main_group}-prj" "${_subgroupname}" "${_expirationdays}" >&3
 }
 
 new_release (){
@@ -271,6 +290,12 @@ new_release (){
    echo '      [dataset name]_v[0-9]'
    echo '    first part names dataset and can have 2-12 characters of letters and digits'
    echo '    second part names version and can have 2-6 characters of letters and digits'
+   echo '    You have following main groups:'
+   echo "${_LIST_OF_MAIN_GROUPS}" | sed 's/^/      /g'
+   while read -rp '  > Name main group which will contain new release: ' _parentname; do
+      grep -qxF "${_parentname}" <<< "${_LIST_OF_MAIN_GROUPS}" && break
+   done
+   _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    read -rp '  > ( 1/2 ) Name the dataset: ' _dataset
    while [[ ${#_dataset} -lt 2 ]] || \
          [[ ${#_dataset} -gt 12 ]] || \
@@ -291,15 +316,17 @@ new_release (){
    _subgroupname="${_dataset}_${_version}"
    read -p "    (Default Membership Expiration: (set by default to ${_defaultexpirationdays} days)" _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
-   make_new_subgroup "${_main_group}-rel" "${_subgroupname}" "${_expirationdays}"
+   make_new_subgroup "${_main_group}-rel" "${_subgroupname}" "${_expirationdays}" >&3
 }
 
 new_hierarchical_subgroup(){
    echo '    Hierarchical SUB-groups can be multiple levels deep. They are all stored under [main group]-sub.'
    read -rp '  > Parent group name: ' _parentname
+   _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    while ( [[ "${UID}" -ne 0 ]] && [[ ! "${_parentname}" =~ ^"${_main_group}-sub" || $(awk -F'-' '{print NF-1}' <<< "${_parentname}") -ge "$((MAX_SUB_LEVELS + 2))" ]] ); do
-      echo "    ! Error: you can create a hierarchical group only inside '[main group]-sub' subfolder - try again!"
+      echo "    ! Error: you can create a hierarchical group only inside '[main group]-sub' subfolder and your can have groups inside 'sub' group only ${MAX_SUB_LEVELS} levels deep - try again!"
       read -rp '  > Full name of parent group: ' _parentname
+      _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    done
    read -rp '    Subgroup name: ' _subgroupname
    while ([[ ! "${_subgroupname}" =~ ^[0-9A-Za-z_]+$ ]] || [[ "${_subgroupname}" == "dms" ]]) ||
@@ -310,7 +337,7 @@ new_hierarchical_subgroup(){
    _defaultexpirationdays=365
    read -p "    (Default Membership Expiration: (set by default to ${_defaultexpirationdays} days)" _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
-   make_new_subgroup "${_parentname}" "${_subgroupname}" "${_expirationdays}"
+   make_new_subgroup "${_parentname}" "${_subgroupname}" "${_expirationdays}" >&3
 }
 
 echo 'Would you like to create a new [P]roject, [R]elease versioned dataset or hierarchical [S]ubgroup?'
@@ -320,24 +347,22 @@ while [[ "${_subgroup_type}" != [PRS] ]]; do
    read -N1 -rp '  > ' _subgroup_type
 done
 echo ''
-read -rp '  > Name the main group: ' _main_group
-_main_group_count_dashes="${_main_group//[^-]}"
-while [[ ${#_main_group_count_dashes} -ne 1 ]]; do
-   echo '    ! Error - this is not a main group, try again!'
-   read -rp '  > Name the main group: ' _main_group
-   _main_group_count_dashes="${_main_group//[^-]}"
-done
 case "${_subgroup_type}" in
    P) new_project ;;
    R) new_release ;;
    S) new_hierarchical_subgroup ;;
 esac
 
-echo ''
-echo 'Subgroup was successfully created: but it will available on the cluster'
-echo 'only after you add users to it. But existing users must first log out of'
-echo 'of the cluster (and make sure all session connections are also killed)'
-echo 'then login back again in order to get the access to the new group (users'
-echo 'can check group membership with 'id' command which should list the new'
-echo 'group as well - if their account has been added to it.'
+echo ""
+echo ""
+echo ""
+echo -e "New group was \033[1;32msuccessfully created\033[0m and you have been added as a"
+echo -e "group mamber. You may edit group membership of the group at the:"
+echo ""
+echo -e "  https://perun.aai.lifescience-ri.eu/organizations/3363/groups/${new_group_id}/members"
+echo ""
+echo -e "Users added to the new group, which are currently logged"
+echo -e "in the cluster, must first log out (and clean all connection sessions)"
+echo -e "and then login back - in order to get the access to the new groups."
+echo -e "Users can check group membership with command 'id'."
 {% endraw %}

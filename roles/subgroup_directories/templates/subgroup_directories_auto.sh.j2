@@ -58,25 +58,17 @@ for _main_group in ${_main_groups}; do
             echo "main: missing folder ${_main_group_path}"
             continue
          fi
-         # make sure top subfolders exist in main group
-         # for _subgrp_type in "rel:releases" "prj:projects" "sub:subgroups"; do
-         #    local _each_short="${_subgrp_type%%\:*}"
-         #    local _each_long="${_subgrp_type##*\:}"
 
-         # # Make top level directories
-         # for _subgrp_type in "rel" "prj" "sub"; do
-         #    if ! getent group "${_main_group}-${_subgrp_type}" &>/dev/null; then
-         #       test -d "${_main_group_path}/${_subgrp_type}" && continue
-         #       echo "  subdir: creating directory ${_main_group_path}/${_subgrp_type}"
-         #       mkdir "${_main_group_path}/${_subgrp_type}"
-         #    fi
-         #    if  [[ "$(stat -c '%U:%G' ${_main_group_path}/${_subgrp_type})" != "${_main_group}-dm:${_main_group}" ]]; then
-         #       echo "  subdir: change ${_main_group_path}/${_subgrp_type} ownership to ${_main_group}-dm:${_main_group} (0770)"
-         #       chown "${_main_group}-dm:${_main_group}" "${_main_group_path}/${_subgrp_type}"
-         #       chmod 0770 "${_main_group_path}/${_subgrp_type}"
-         #    fi
-         # done
-         # install -d "${_main_group_path}" -o root -g "${_main_group}" -m 0770
+         # Apply ACLs on main group folder
+         # for both -dm user and -dms group
+         if ! getfacl -p "${_main_group_path}" | grep -q "^default:user:${_main_group}-dm:rwx" || \
+            ! getfacl -p "${_main_group_path}" | grep -q "^default:group:${_main_group}-dms:rwx"; then
+            echo "    ACL applying default RW permissions for ${_main_group}-dm user and ${_main_group}-dms group on ${_main_group_path}"
+            setfacl -R -d -m u:${_main_group}-dm:rwx "${_main_group_path}"   # set default ACL rwx for user on dir + all subfolders (applies to future files/dirs)
+            setfacl -R -d -m g:${_main_group}-dms:rwx "${_main_group_path}"  # set default ACL rwx for group on dir + all subfolders
+            setfacl -R -m u:${_main_group}-dm:rwx "${_main_group_path}"      # apply rwx ACL for user on existing files/dirs recursively
+            setfacl -R -m g:${_main_group}-dms:rwx "${_main_group_path}"     # apply rwx ACL for group on existing files/dirs recursively
+         fi
 
          # Now create all the rest of the groups
          for _each_group in ${_all_groups_sorted}; do
