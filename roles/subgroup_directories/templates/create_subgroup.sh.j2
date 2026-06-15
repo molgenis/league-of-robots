@@ -272,92 +272,92 @@ print_all_my_groups
 new_project (){
    echo '    New PROJECT creation'
    echo '    Projects are stored under [main group]-prj.'
-   echo '    (name must be 2-8 characters, only letters, digits, and underscore)'
-   echo '    You have following main groups:'
+   echo '    (Name must be 2-8 characters: letters, digits, and underscores only.)'
+   echo '    You have access to the following main groups:'
    echo "${_LIST_OF_MAIN_GROUPS}" | sed 's/^/      /g'
-   while read -rp '  > Name main group which will contain new release: ' _parentname; do
+   while read -rp '  > Name of the main group that will contain the new project: ' _parentname; do
       grep -qxF "${_parentname}" <<< "${_LIST_OF_MAIN_GROUPS}" && break
    done
    _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    read -rp '  > Name your project: ' _subgroupname
    while ( [[ ! "${_subgroupname}" =~ ^[0-9a-zA-Z_]+$ ]] || [[ "${_subgroupname}" == "dms" ]] ) ||
          ( [[ "${UID}" -eq 0 ]] && ( [[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]])); do
-      echo '   > Invalid: must be 2-8 characters, only letters, digits, and underscore, and group cannot be named >dms<, try again!'
+      echo '   ! Invalid: must be 2-8 characters (letters, digits, underscores), and cannot be named "dms" - please try again!'
       read -rp '  > Name your project: ' _subgroupname
    done
-   read -p "    Default Membership Expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
+   read -p "    Default membership expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
    make_new_subgroup "${_main_group}-prj" "${_subgroupname}" "${_expirationdays}" >&3
 }
 
 new_release (){
-   echo '    New RELEASE of dataset and version!'
+   echo '    New RELEASE of a dataset and version!'
    echo '    Releases are stored under [main group]-rel'
-   echo '    Name consists two parts'
+   echo '    The name consists of two parts:'
    echo '      [dataset name]_v[0-9]'
-   echo '    first part names dataset and can have 2-12 characters of letters and digits'
-   echo '    second part names version and can have 2-6 characters of letters and digits'
-   echo '    You have following main groups:'
+   echo '    The first part names the dataset (2-12 letters/digits).'
+   echo '    The second part names the version (2-6 letters/digits).'
+   echo '    You have access to the following main groups:'
    echo "${_LIST_OF_MAIN_GROUPS}" | sed 's/^/      /g'
-   while read -rp '  > Name main group which will contain new release: ' _parentname; do
+   while read -rp '  > Name of the main group that will contain the new release: ' _parentname; do
       grep -qxF "${_parentname}" <<< "${_LIST_OF_MAIN_GROUPS}" && break
    done
    _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
 
    _defaultexpirationdays=365
-   read -p "    Default Membership Expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
+   read -p "    Default membership expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
 
-   read -rp '  > ( 1/2 ) Name the dataset: ' _dataset
+   read -rp '  > (1/2) Name the dataset: ' _dataset
    while [[ ${#_dataset} -lt 2 ]] || \
          [[ ${#_dataset} -gt 12 ]] || \
-         [[ ! "${_dataset}" =~ ^[0-9a-zA-Z]+$ ]] || \
+         [[ ! "${_dataset}" =~ ^[0-9a-zA-Z_]+$ ]] || \
          [[ "${_dataset}" == "dms" ]]; do
-      echo '    > Invalid: must be 2-8 characters, only letters, digits, and cannot be named >dms<, try again!'
-      read -rp '  > ( 1/2 ) Name the dataset: ' _dataset
+      echo '    ! Invalid: must be 2-12 characters (letters, digits and _), and cannot be named "dms" - please try again!'
+      read -rp '  > (1/2) Name the dataset: ' _dataset
    done
 
    # check if L-erdera-rel-${_dataset} exists, if not, create one
-   if grep -qxF "${_parentname}-rel-${_dataset}" <<< "${_LIST_OF_ALL_GROUPS}"; then
+   if ! grep -qxF "${_parentname}-rel-${_dataset}" <<< "${_LIST_OF_ALL_GROUPS}"; then
       make_new_subgroup "${_main_group}-rel" "${_dataset}" "${_expirationdays}" >&3
    fi
 
-   read -rp '  > ( 2/2 ) Name the version: ' _version
+   read -rp '  > (2/2) Name the version: ' _version
    while [[ ${#_version} -lt 2 ]] || \
          [[ ${#_version} -gt 6 ]] || \
-         [[ ! "${_version}" =~ ^[0-9a-zA-Z]+$ ]] || \
+         [[ ! "${_version}" =~ ^[0-9a-zA-Z_]+$ ]] || \
          [[ "${_version}" == "dms" ]]; do
-      echo '    ! Invalid: must be 2-6 characters, only letters, digits, and cannot be named >dms<, try again!'
-      read -rp '  > ( 2/2 ) Name the version: ' _version
+      echo '    ! Invalid: must be 2-6 characters (letters, digits and _), and cannot be named "dms" - please try again!'
+      read -rp '  > (2/2) Name the version: ' _version
    done
    make_new_subgroup "${_parentname}-rel-${_dataset}" "${_version}" "${_expirationdays}" >&3
 }
 
 new_hierarchical_subgroup(){
-   echo '    Hierarchical SUB-groups can be multiple levels deep. They are all stored under [main group]-sub.'
+   echo '    Hierarchical SUB-groups can be nested multiple levels deep. They are all stored under [main group]-sub.'
    read -rp '  > Parent group name: ' _parentname
    _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    while ( [[ "${UID}" -ne 0 ]] && [[ ! "${_parentname}" =~ ^"${_main_group}-sub" || $(awk -F'-' '{print NF-1}' <<< "${_parentname}") -ge "$((MAX_SUB_LEVELS + 2))" ]] ); do
-      echo "    ! Error: you can create a hierarchical group only inside '[main group]-sub' subfolder and your can have groups inside 'sub' group only ${MAX_SUB_LEVELS} levels deep - try again!"
+      echo "    ! Error: hierarchical groups can only be created inside a '[main group]-sub' folder, up to ${MAX_SUB_LEVELS} levels deep - please try again!"
       read -rp '  > Full name of parent group: ' _parentname
       _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    done
    read -rp '    Subgroup name: ' _subgroupname
    while ([[ ! "${_subgroupname}" =~ ^[0-9A-Za-z_]+$ ]] || [[ "${_subgroupname}" == "dms" ]]) ||
          ([[ "${UID}" -eq 0 ]] && ([[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]])); do
-      echo "    ! Error: can be only ${MAX_SUB_LEVELS} deep, name must be 2-8 characters, only letters, digits, underscore and group cannot be named 'dms' - try again!"
+      echo "    ! Error: name must be 2-8 characters (letters, digits, underscores), nesting limited to ${MAX_SUB_LEVELS} levels, and cannot be named 'dms' - please try again!"
       read -rp '    Subgroup name: ' _subgroupname
    done
    _defaultexpirationdays=365
-   read -p "    Default Membership Expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
+   read -p "    Default membership expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
    make_new_subgroup "${_parentname}" "${_subgroupname}" "${_expirationdays}" >&3
 }
 
-echo 'Would you like to create a new [P]roject, [R]elease versioned dataset or hierarchical [S]ubgroup?'
+echo 'Would you like to create a new [P]roject, [R]elease versioned dataset, or hierarchical [S]ubgroup?'
 read -N1 -rp '  > ' _subgroup_type
 while [[ "${_subgroup_type}" != [PRS] ]]; do
-   echo ' - wrong option, try again'
+   echo '  ! Invalid option - please try again'
    read -N1 -rp '  > ' _subgroup_type
 done
 echo ''
@@ -370,16 +370,16 @@ esac
 echo ""
 echo ""
 echo ""
-echo -e "New group was \033[1;32msuccessfully created\033[0m and you have been added as a"
-echo -e "group mamber. You may edit group membership of the group at the:"
+echo -e "The new group was \033[1;32msuccessfully created\033[0m, and you have been added as a"
+echo -e "group member. You can manage group membership at:"
 echo ""
 echo -e "  https://perun.aai.lifescience-ri.eu/organizations/3363/groups/${new_group_id}/members"
 echo ""
-echo -e "Users added to the new group, which are currently logged"
-echo -e "in the cluster, must first log out (and clean all connection sessions)"
-echo -e "and then login back - in order to get the access to the new groups."
-echo -e "Users can check group membership with command 'id'."
+echo -e "Users who are added to the new group and are currently logged"
+echo -e "into the cluster must first log out (closing all connection sessions)"
+echo -e "and then log back in to gain access to the new group."
+echo -e "You can check your group membership with the 'id' command."
 echo ""
-echo -e "Group propagation usually takes several minutes before available on a cluster."
+echo -e "Note: group propagation usually takes a few minutes before it's available on the cluster."
 echo ""
 {% endraw %}
