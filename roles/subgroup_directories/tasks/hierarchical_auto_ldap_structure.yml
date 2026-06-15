@@ -13,13 +13,13 @@
     - name: lsaai_auth
       path: /etc
       mode: "0640"
-    - name: get_lsaai_token.sh
+    - name: lsaai_request_token.sh
       path: /usr/local/sbin
       mode: "0750"
     - name: subgroup_directories_auto.sh
       path: /usr/local/sbin
       mode: "0750"
-    - name: create_subgroup.sh
+    - name: lsaai_subgroups.sh
       path: /usr/local/bin
       mode: "0755"
   become: true
@@ -46,14 +46,14 @@
 
 - name: Allow all users to make lsaai token request via sudo
   ansible.builtin.copy:
-    dest: /etc/sudoers.d/92-ansible-managed-get_lsaai_token
+    dest: /etc/sudoers.d/92-ansible-managed-lsaai_request_token
     owner: root
     group: root
     mode: "0440"   # sudoers files must be exactly 0440
     content: |
       # Allow any user to run reveal_secret with no password
       # NOPASSWD with full path and prevent arguments
-      ALL ALL=(root) NOPASSWD: /usr/local/sbin/get_lsaai_token.sh
+      ALL ALL=(root) NOPASSWD: /usr/local/sbin/lsaai_request_token.sh
     validate: /usr/sbin/visudo -cf %s
   become: true
   when: subgroup_directories_auto
@@ -80,11 +80,11 @@
   with_items:
     - name: lsaai_auth
       path: /etc
-    - name: get_lsaai_token.sh
+    - name: lsaai_request_token.sh
       path: /usr/local/sbin
     - name: subgroup_directories_auto.sh
       path: /usr/local/sbin
-    - name: create_subgroup.sh
+    - name: lsaai_subgroups.sh
       path: /usr/local/bin
   become: true
   when: subgroup_directories_auto is false

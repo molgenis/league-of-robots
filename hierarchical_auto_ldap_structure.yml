@@ -19,7 +19,7 @@
     - name: create-ldap-subgroups.sh
       path: /usr/local/sbin
       mode: "0750"
-    - name: create_subgroup.sh
+    - name: lsaai_subgroups.sh
       path: /usr/local/bin
       mode: "0755"
   become: true

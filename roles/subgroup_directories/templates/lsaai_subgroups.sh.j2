@@ -253,7 +253,7 @@ print_all_my_groups() {
       elif echo "${direct_ids}" | jq -e --argjson id "${gid}" 'index($id) != null' > /dev/null; then
          via="assigned manager"
       fi
-      printf "  %-50s %-15s %-20s %s\n" "${name//\:/\-}" "${inherited}" "${via}" "https://perun.aai.lifescience-ri.eu/organizations/3363/groups/${gid}"
+      printf "  %-50s %-15s %-20s %s\n" "${name//\:/\-}" "${inherited}" "${via}" "https://perun.aai.lifescience-ri.eu/organizations/3363/groups/${gid}/members"
 
    done)"
    # awk gsub is part of posix
