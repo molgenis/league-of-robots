@@ -86,15 +86,17 @@ for _main_group in ${_main_groups}; do
                # - these folders are owned by main group
                   create_chown_and_chmod "${_main_group_path}/${_sub_group_name}" "${_main_group}-dm:${_main_group}" "2770"
                
-               elif [[ "${_each_group}" =~ ^"${_main_group}"-(prj|rel)-.{1,} ]]; then
+               elif [[ "${_each_group}" =~ ^"${_main_group}"-(prj)-.{1,} ]]; then
                # inside prj/rel FLAT structure
                #  - owned by that individual group
                   _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main- > becomes > rel-dataset01-v1
                   _group_placed_flat="${_group_remove_main_group/-/\/}"  # replace first dash with slash > becomes > rel/dataset01-v1
                   create_chown_and_chmod "${_main_group_path}/${_group_placed_flat}" "${_main_group}-dm:${_each_group}" "2770"
 
-               elif [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]]; then
+               elif [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} || \
+                       "${_each_group}" =~ ^"${_main_group}"-rel-.{1,} ]]; then
                # else it is HIERARCHICAL structure and will be placed in 'sub' folder
+               # and also 'rel' folder (although they are only 2 levels deep)
                # individual folders are owned by that individual group
                   _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main-
                   _sub_group_path="${_group_remove_main_group//-/\/}"    # replace - with 	/

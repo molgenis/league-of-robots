@@ -6,7 +6,7 @@ sudo /usr/local/sbin/get_lsaai_token.sh
 TOKEN_DIR="${HOME}/.cache/lsaai/"
 TOKEN_FILE="${TOKEN_DIR}/token"
 MAX_SUB_LEVELS=3
-_LIST_OF_ALL_GROUPS=""
+_PRINT_ALL_GROUPS_AND_DMS=""
 sleep 0.5
 
 if test -r "${TOKEN_FILE}"; then
@@ -16,12 +16,15 @@ else
    exit 1
 fi
 
+DEBUG=false
+[[ "${1:-}" == "-d" ]] && DEBUG=true
+DEBUG2=false
+[[ "${1:-}" == "-dd" ]] && DEBUG2=true
+
+
 BASE_URL='https://perun-api.aai.lifescience-ri.eu/oauth/rpc/json'
 VO_ID='3363'
 _defaultexpirationdays=365
-
-DEBUG=false
-DEBUG2=false
 
 # Prepare to suppres extra information if not debugging
 exec 3>/dev/null
@@ -205,15 +208,15 @@ print_all_my_groups() {
    # Find indirect groups via role check
    declare -A indirect_groups
    while IFS= read -r group; do
-       gid=$(echo "$group" | jq -r '.id')
-       echo "$direct_ids" | jq -e --argjson id "$gid" 'index($id) != null' > /dev/null && continue
+       gid=$(echo "${group}" | jq -r '.id')
+       echo "${direct_ids}" | jq -e --argjson id "${gid}" 'index($id) != null' > /dev/null && continue
 
        for role in GROUPCREATOR GROUPMEMBERSHIPMANAGER; do
            via=$(curl_it "$BASE_URL/authzResolver/getAdminGroups" \
-               "$(jq -cn --arg r "$role" --argjson id "$gid" '{role:$r,complementaryObjectId:$id,complementaryObjectName:"Group"}')" \
-               | jq -r --argjson ids "$my_group_ids" 'map(select(.id as $i | $ids|index($i))) | .[0].name // empty')
-           if [[ -n "$via" ]]; then
-               indirect_groups[$gid]=$(echo "$group" | jq -c --arg v "$via" '. + {_via:$v}')
+               "$(jq -cn --arg r "${role}" --argjson id "${gid}" '{role:$r,complementaryObjectId:$id,complementaryObjectName:"Group"}')" \
+               | jq -r --argjson ids "${my_group_ids}" 'map(select(.id as $i | $ids|index($i))) | .[0].name // empty')
+           if [[ -n "${via}" ]]; then
+               indirect_groups[$gid]=$(echo "${group}" | jq -c --arg v "${via}" '. + {_via:$v}')
                break
            fi
        done
@@ -225,7 +228,7 @@ print_all_my_groups() {
        echo "$direct_ids" | jq -e --argjson id "$gid" 'index($id) != null' > /dev/null && continue
        [[ -n "${indirect_groups[$gid]:-}" ]] && continue
 
-       current="$group"
+       current="${group}"
        while true; do
            parent_id=$(echo "$current" | jq -r '.parentGroupId // empty')
            [[ -z "$parent_id" || "$parent_id" == "null" ]] && break
@@ -238,26 +241,30 @@ print_all_my_groups() {
            [[ -z "$current" || "$current" == "null" ]] && break
        done
    done < <(echo "$all_groups" | jq -c '.[]?')
-   _LIST_OF_ALL_GROUPS="$(echo "${all_groups}" | jq -c '.[]?' | while IFS= read -r g; do
+   _PRINT_ALL_GROUPS_AND_DMS="$(echo "${all_groups}" | jq -c '.[]?' | while IFS= read -r g; do
       gid=$(echo "$g" | jq -r '.id')
       name=$(echo "$g" | jq -r '.name')
       shortName=$(echo "$g" | jq -r '.shortName')
       [[ "${shortName}" == "dms" ]] && continue
+      via=""; inherited=""
       if [[ -n "${indirect_groups[$gid]:-}" ]]; then
          via=$(echo "${indirect_groups[$gid]}" | jq -r '._via')
          inherited=$(echo "${indirect_groups[$gid]}" | jq -r '.inherited // ""')
-         printf "  %-35s %-17s %-20s\n" "${name//\:/\-}" "$inherited" "$via"
-      elif echo "$direct_ids" | jq -e --argjson id "$gid" 'index($id) != null' > /dev/null; then
-         printf "%-35s direct manager\n" "$name"
+      elif echo "${direct_ids}" | jq -e --argjson id "${gid}" 'index($id) != null' > /dev/null; then
+         via="assigned manager"
       fi
+      printf "  %-50s %-15s %-20s %s\n" "${name//\:/\-}" "${inherited}" "${via}" "https://perun.aai.lifescience-ri.eu/organizations/3363/groups/${gid}"
+
    done)"
    # awk gsub is part of posix
-   _LIST_OF_MAIN_GROUPS="$(awk '{c=gsub(/-/,"-",$1); if(c==1) print $1}' <<< "${_LIST_OF_ALL_GROUPS}")"
+   _LIST_OF_MAIN_GROUPS="$(awk '{c=gsub(/-/,"-",$1); if(c==1) print $1}' <<< "${_PRINT_ALL_GROUPS_AND_DMS}")"
+   _LIST_OF_ALL_GROUPS="$(awk '{print $1}' <<< "${_PRINT_ALL_GROUPS_AND_DMS}")"
 
-   echo "|----------------------------------------------------------------------------|"
+   echo ""
    echo "   You are manager or admin of following groups"
-   echo "${_LIST_OF_ALL_GROUPS}"
-   echo "|----------------------------------------------------------------------------|"
+   echo "                      ----------                    ----------       ----------           ----------"
+   echo "${_PRINT_ALL_GROUPS_AND_DMS}"
+   echo "                      ----------                    ----------       ----------           ----------"
 }
 
 print_all_my_groups
@@ -278,7 +285,7 @@ new_project (){
       echo '   > Invalid: must be 2-8 characters, only letters, digits, and underscore, and group cannot be named >dms<, try again!'
       read -rp '  > Name your project: ' _subgroupname
    done
-   read -p "    (Default Membership Expiration: (set by default to ${_defaultexpirationdays} days)" _expirationdays
+   read -p "    Default Membership Expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
    make_new_subgroup "${_main_group}-prj" "${_subgroupname}" "${_expirationdays}" >&3
 }
@@ -296,6 +303,11 @@ new_release (){
       grep -qxF "${_parentname}" <<< "${_LIST_OF_MAIN_GROUPS}" && break
    done
    _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
+
+   _defaultexpirationdays=365
+   read -p "    Default Membership Expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
+   [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
+
    read -rp '  > ( 1/2 ) Name the dataset: ' _dataset
    while [[ ${#_dataset} -lt 2 ]] || \
          [[ ${#_dataset} -gt 12 ]] || \
@@ -304,19 +316,21 @@ new_release (){
       echo '    > Invalid: must be 2-8 characters, only letters, digits, and cannot be named >dms<, try again!'
       read -rp '  > ( 1/2 ) Name the dataset: ' _dataset
    done
+
+   # check if L-erdera-rel-${_dataset} exists, if not, create one
+   if grep -qxF "${_parentname}-rel-${_dataset}" <<< "${_LIST_OF_ALL_GROUPS}"; then
+      make_new_subgroup "${_main_group}-rel" "${_dataset}" "${_expirationdays}" >&3
+   fi
+
    read -rp '  > ( 2/2 ) Name the version: ' _version
    while [[ ${#_version} -lt 2 ]] || \
          [[ ${#_version} -gt 6 ]] || \
          [[ ! "${_version}" =~ ^[0-9a-zA-Z]+$ ]] || \
          [[ "${_version}" == "dms" ]]; do
       echo '    ! Invalid: must be 2-6 characters, only letters, digits, and cannot be named >dms<, try again!'
-      read -rp '  > ( 2/2 ) Name the version: ' _dataset
+      read -rp '  > ( 2/2 ) Name the version: ' _version
    done
-   _defaultexpirationdays=365
-   _subgroupname="${_dataset}_${_version}"
-   read -p "    (Default Membership Expiration: (set by default to ${_defaultexpirationdays} days)" _expirationdays
-   [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
-   make_new_subgroup "${_main_group}-rel" "${_subgroupname}" "${_expirationdays}" >&3
+   make_new_subgroup "${_parentname}-rel-${_dataset}" "${_version}" "${_expirationdays}" >&3
 }
 
 new_hierarchical_subgroup(){
@@ -335,7 +349,7 @@ new_hierarchical_subgroup(){
       read -rp '    Subgroup name: ' _subgroupname
    done
    _defaultexpirationdays=365
-   read -p "    (Default Membership Expiration: (set by default to ${_defaultexpirationdays} days)" _expirationdays
+   read -p "    Default Membership Expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
    [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
    make_new_subgroup "${_parentname}" "${_subgroupname}" "${_expirationdays}" >&3
 }
@@ -365,5 +379,7 @@ echo -e "Users added to the new group, which are currently logged"
 echo -e "in the cluster, must first log out (and clean all connection sessions)"
 echo -e "and then login back - in order to get the access to the new groups."
 echo -e "Users can check group membership with command 'id'."
+echo ""
+echo -e "Group propagation usually takes several minutes before available on a cluster."
 echo ""
 {% endraw %}
