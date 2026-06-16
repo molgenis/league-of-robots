@@ -101,7 +101,7 @@ ldap_domains:
 
 # Install auto-subgroup generate scripts
 # depending on having `ladap` in `ldap_domains`
-subgroup_directories_auto: true
+subgroup_directories_auto_enabled: true
 
 
 pam_weblogin:

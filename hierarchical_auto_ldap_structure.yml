@@ -23,7 +23,7 @@
       path: /usr/local/bin
       mode: "0755"
   become: true
-  when: subgroup_directories_auto | default(false) | bool is true
+  when: subgroup_directories_auto_enabled | default(false) | bool is true
 
 - name: Deploying systemd services for auto-generating subgroup directories
   ansible.builtin.copy:
@@ -42,7 +42,7 @@
     - ldap_structure_enable_timer
     - ldap_structure_enable_path
   become: true
-  when: subgroup_directories_auto | default(false) | bool is true
+  when: subgroup_directories_auto_enabled | default(false) | bool is true
 
 - name: Allow all users to make lsaai token request via sudo
   ansible.builtin.copy:
@@ -56,7 +56,7 @@
       ALL ALL=(root) NOPASSWD: /usr/local/sbin/get_lsaai_token.sh
     validate: /usr/sbin/visudo -cf %s
   become: true
-  when: subgroup_directories_auto | default(false) | bool is true
+  when: subgroup_directories_auto_enabled | default(false) | bool is true
 
 #
 # UN-INSTALL auto-subgroups structure scripts
@@ -72,7 +72,7 @@
     - ldap_group_structure.service
   failed_when: false
   become: true
-  when: subgroup_directories_auto | default(false) | bool is false
+  when: subgroup_directories_auto_enabled | default(false) | bool is false
 
 - name: Remove lsaai_auth config and scripts
   ansible.builtin.file:
@@ -88,7 +88,7 @@
     - name: create_subgroup.sh
       path: /usr/local/bin
   become: true
-  when: subgroup_directories_auto | default(false) | bool is false
+  when: subgroup_directories_auto_enabled | default(false) | bool is false
 
 - name: Remove systemd unit files
   ansible.builtin.file:
@@ -99,13 +99,13 @@
     - ldap_group_structure.timer
     - ldap_group_structure.service
   become: true
-  when: subgroup_directories_auto | default(false) | bool is false
+  when: subgroup_directories_auto_enabled | default(false) | bool is false
 
 - name: Reload systemd daemon to drop removed units
   ansible.builtin.systemd:
     daemon_reload: true
   become: true
-  when: subgroup_directories_auto | default(false) | bool is false
+  when: subgroup_directories_auto_enabled | default(false) | bool is false
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers

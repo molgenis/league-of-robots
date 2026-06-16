@@ -43,7 +43,7 @@ cluster_class: 'development'
 
 # Install auto-subgroup generate scripts
 # depending on having `ladap` in `ldap_domains`
-subgroup_directories_auto: true
+subgroup_directories_auto_enabled: true
 
 #
 # Ldap settings

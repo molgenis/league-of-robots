@@ -4,28 +4,4 @@
     daemon_reload: true
   listen: subgroup_directories_auto_reload_systemd
   become: true
-
-- name: Start and enable subgroup_directories_auto.service
-  ansible.builtin.service:
-    name: subgroup_directories_auto.service
-    state: started
-    enabled: true
-  listen: subgroup_directories_auto_enable_service
-  become: true
-
-- name: Start and enable subgroup_directories_auto.timer
-  ansible.builtin.service:
-    name: subgroup_directories_auto.timer
-    state: started
-    enabled: true
-  listen: subgroup_directories_auto_enable_timer
-  become: true
-
-- name: Start and enable subgroup_directories_auto.path
-  ansible.builtin.service:
-    name: subgroup_directories_auto.path
-    state: started
-    enabled: true
-  listen: subgroup_directories_auto_enable_path
-  become: true
 ...

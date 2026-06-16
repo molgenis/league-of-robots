@@ -23,7 +23,7 @@
       path: /usr/local/bin
       mode: "0755"
   become: true
-  when: subgroup_directories_auto
+  when: subgroup_directories_auto_enabled
 
 - name: Deploying systemd services for auto-generating subgroup directories
   ansible.builtin.copy:
@@ -32,17 +32,12 @@
     owner: root
     group: root
     mode: "0640"
-  with_items:
+  loop:
     - subgroup_directories_auto.path
     - subgroup_directories_auto.timer
     - subgroup_directories_auto.service
-  notify:
-    - subgroup_directories_auto_reload_systemd
-    - subgroup_directories_auto_enable_service
-    - subgroup_directories_auto_enable_timer
-    - subgroup_directories_auto_enable_path
   become: true
-  when: subgroup_directories_auto
+  when: subgroup_directories_auto_enabled
 
 - name: Allow all users to make lsaai token request via sudo
   ansible.builtin.copy:
@@ -56,23 +51,28 @@
       ALL ALL=(root) NOPASSWD: /usr/local/sbin/lsaai_request_token.sh
     validate: /usr/sbin/visudo -cf %s
   become: true
-  when: subgroup_directories_auto
+  when: subgroup_directories_auto_enabled
+
+
+- name: Flush handlers so daemon_reload happens before enabling units
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure services are having right state
+  ansible.builtin.systemd:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default(omit) }}"
+    enabled: "{{ subgroup_directories_auto_enabled }}"
+  loop:
+    - name: subgroup_directories_auto.service
+    - name: subgroup_directories_auto.timer
+      state: "{{ 'started' if subgroup_directories_auto_enabled else 'stopped' }}"
+    - name: subgroup_directories_auto.path
+      state: "{{ 'started' if subgroup_directories_auto_enabled else 'stopped' }}"
+  become: true
 
 #
 # UN-INSTALL auto-subgroups structure scripts
 #
-- name: Stop and disable subgroup_directories_auto systemd units
-  ansible.builtin.systemd:
-    name: "{{ item }}"
-    state: stopped
-    enabled: false
-  with_items:
-    - subgroup_directories_auto.service
-    - subgroup_directories_auto.path
-    - subgroup_directories_auto.timer
-  become: true
-  when: subgroup_directories_auto is false
-
 - name: Remove lsaai_auth config and scripts
   ansible.builtin.file:
     path: "{{ item.path }}/{{ item.name }}"
@@ -87,7 +87,7 @@
     - name: lsaai_subgroups.sh
       path: /usr/local/bin
   become: true
-  when: subgroup_directories_auto is false
+  when: subgroup_directories_auto_enabled is false
 
 - name: Remove systemd unit files
   ansible.builtin.file:
@@ -98,13 +98,13 @@
     - subgroup_directories_auto.timer
     - subgroup_directories_auto.service
   become: true
-  when: subgroup_directories_auto is false
+  when: subgroup_directories_auto_enabled is false
 
 - name: Reload systemd daemon to drop removed units
   ansible.builtin.systemd:
     daemon_reload: true
   become: true
-  when: subgroup_directories_auto is false
+  when: subgroup_directories_auto_enabled is false
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
