@@ -2,7 +2,7 @@
 #!/bin/bash
 set -euo pipefail
 
-sudo /usr/local/sbin/get_lsaai_token.sh
+sudo /usr/local/sbin/lsaai_request_token.sh
 TOKEN_DIR="${HOME}/.cache/lsaai/"
 TOKEN_FILE="${TOKEN_DIR}/token"
 MAX_SUB_LEVELS=3

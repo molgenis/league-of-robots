@@ -33,7 +33,10 @@ function create_chown_and_chmod(){
    fi
    if [[ "$(stat -c '%U:%G' "${1}")" != "${2}" ]]; then
       echo "  ownership changed into ${2} on ${1}"
-      chown "${2}" "${1}"
+	   # chown should not fail this script - allow it as it should never kill the service
+      if ! chown "${2}" "${1}"; then
+         echo "Warning: could not chown ${1} to ${2}"
+      fi
    fi
    # leading zero just annoys things here
    local _mode="${3#0}"
@@ -60,14 +63,11 @@ for _main_group in ${_main_groups}; do
          fi
 
          # Apply ACLs on main group folder
-         # for both -dm user and -dms group
-         if ! getfacl -p "${_main_group_path}" | grep -q "^default:user:${_main_group}-dm:rwx" || \
-            ! getfacl -p "${_main_group_path}" | grep -q "^default:group:${_main_group}-dms:rwx"; then
+         # for both -dm user (but users from dms group can access the dm user)
+         if ! getfacl -p "${_main_group_path}" | grep -q "^default:user:${_main_group}-dm:rwx"; then
             echo "    ACL applying default RW permissions for ${_main_group}-dm user and ${_main_group}-dms group on ${_main_group_path}"
             setfacl -d -m u:${_main_group}-dm:rwx "${_main_group_path}"   # set default ACL rwx for user on dir + all subfolders (applies to future files/dirs)
-            setfacl -d -m g:${_main_group}-dms:rwx "${_main_group_path}"  # set default ACL rwx for group on dir + all subfolders
             setfacl -m u:${_main_group}-dm:rwx "${_main_group_path}"      # apply rwx ACL for user on existing files/dirs recursively
-            setfacl -m g:${_main_group}-dms:rwx "${_main_group_path}"     # apply rwx ACL for group on existing files/dirs recursively
          fi
 
          # Now create all the rest of the groups
