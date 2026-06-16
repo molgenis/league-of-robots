@@ -1,7 +1,0 @@
-# Managed by Ansible League of Robots sudoers role - do not edit manually!
-# 
-# This file is read last and overwrite the secure_path variable. With it we
-# limit the number of future path changes, and enforce that the two missing
-# folders of `/usr/local/bin` and `/usr/local/sbin` are being added.
-# 
-Defaults secure_path="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"

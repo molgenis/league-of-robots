@@ -34,14 +34,14 @@ function create_chown_and_chmod(){
    if [[ "$(stat -c '%U:%G' "${1}")" != "${2}" ]]; then
       echo "  ownership changed into ${2} on ${1}"
 	   # chown should not fail this script - allow it as it should never kill the service
-      if ! chown "${2}" "${1}"; then
-         echo "Warning: could not chown ${1} to ${2}"
+      if ! chown "${2}" "${1}" 2>/dev/null; then
+         echo "  ! Warning: could not chown ${1} to ${2}"
       fi
    fi
    # leading zero just annoys things here
    local _mode="${3#0}"
    if [[ "$(stat -c '%a' "${1}")" != "${_mode}" ]]; then
-      echo "  mode changed ${_mode} on ${1}"
+      echo "    mode changed ${_mode} on ${1}"
       chmod "${_mode}" "${1}"
    fi
 }
@@ -84,7 +84,7 @@ for _main_group in ${_main_groups}; do
                if [[ "${_each_group}" =~ ^"${_main_group}"-(prj|rel|sub)$ ]]; then
                # top prj/rel/sub folders
                # - these folders are owned by main group
-                  create_chown_and_chmod "${_main_group_path}/${_sub_group_name}" "${_main_group}-dm:${_main_group}" "2770"
+                  create_chown_and_chmod "${_main_group_path}/${_sub_group_name}" "${_main_group}-dm:${_main_group}" "2750"
                
                elif [[ "${_each_group}" =~ ^"${_main_group}"-(prj)-.{1,} ]]; then
                # inside prj/rel FLAT structure
