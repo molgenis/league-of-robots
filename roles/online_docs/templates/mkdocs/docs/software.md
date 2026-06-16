@@ -238,8 +238,9 @@ When you do use _Conda_, then make sure you
  * Do **not** use the Anaconda distribution nor any of the licensed _channels_ from Anaconda, which includes:
    `defaults`, `main`, `anaconda`, `free`, `r`, `mro`, `pro`, `archive`, `mro-archive`, `msys2`
  * Specify custom locations for both
-    1. The new _Conda_ environment
-    1. The cache dir where _Conda_ caches downloaded packages
+    * The new _Conda_ environment
+    * The cache dir where _Conda_ caches downloaded packages
+   
    Failure to change the defaults for these locations means _Conda_ will use your small home dir and you will run into the storage quota limit for your home dir rather sooner than later.  
    You can change the defaults for these locations like this:  
    ```
