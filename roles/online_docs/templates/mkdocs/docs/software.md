@@ -238,6 +238,7 @@ When you do use _Conda_, then make sure you
  * Do **not** use the Anaconda distribution nor any of the licensed _channels_ from Anaconda, which includes:
    `defaults`, `main`, `anaconda`, `free`, `r`, `mro`, `pro`, `archive`, `mro-archive`, `msys2`
  * Specify custom locations for both
+   
     * The new _Conda_ environment
     * The cache dir where _Conda_ caches downloaded packages
    
