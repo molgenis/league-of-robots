@@ -343,8 +343,8 @@ new_hierarchical_subgroup(){
       _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
    done
    read -rp '    Subgroup name: ' _subgroupname
-   while ([[ ! "${_subgroupname}" =~ ^[0-9A-Za-z_]+$ ]] || [[ "${_subgroupname}" == "dms" ]]) ||
-         ([[ "${UID}" -eq 0 ]] && ([[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]])); do
+   while ([[ ! "${_subgroupname}" =~ ^[0-9A-Za-z_]+$ ]] ||
+         ([[ "${UID}" -ne 0 ]] && ([[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]] || [[ "${_subgroupname}" == "dms" ]]))); do
       echo "    ! Error: name must be 2-8 characters (letters, digits, underscores), nesting limited to ${MAX_SUB_LEVELS} levels, and cannot be named 'dms' - please try again!"
       read -rp '    Subgroup name: ' _subgroupname
    done
