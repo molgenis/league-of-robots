@@ -40,6 +40,7 @@
     follow: true
   register: local_storage_device_stat
   loop: "{{ local_mounts }}"
+  become: true
 
 - name: Create a file system on unformatted device.
   ansible.builtin.include_tasks:
