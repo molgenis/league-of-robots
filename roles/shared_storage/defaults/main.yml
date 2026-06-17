@@ -1,0 +1,6 @@
+---
+shared_storage_default_dat_lfs_mode: '2770'
+shared_storage_default_prm_lfs_mode: '2750'
+shared_storage_default_rsc_lfs_mode: '2750'
+shared_storage_default_tmp_lfs_mode: '2750'
+...
