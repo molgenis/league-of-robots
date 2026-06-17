@@ -20,7 +20,7 @@
     path: "/mnt/{{ item['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}"
     src: "{{ pfs_src }}"
     fstype: "{{ pfs_fstype }}"
-    opts: "{{ item['rw_options'] }}{{ extra_opts }}"
+    opts: "{{ pfs_opts }}{{ pfs_extra_opts }}"
     state: 'mounted'
   vars:
     pfs_src: >-
@@ -34,6 +34,12 @@
         {{ item['pfs_type'] }}
       {%- else -%}
         {{ item['type'] }}
+      {%- endif -%}
+    pfs_opts: >-
+      {%- if item['pfs_options'] is defined -%}
+        {{ item['pfs_options'] }}
+      {%- else -%}
+        {{ item['rw_options'] }}
       {%- endif -%}
     extra_cifs_opts:
       - credentials=/etc/sysconfig/{{ item['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}.cifs
