@@ -94,7 +94,7 @@ sudo -u [group]-dm bash
 **(optional) Start screen session**
 
 If you expect that the data preparation or upload will take a long time, you should consider using a `screen`.
-It provides a way for your work to be available even if you lose a connection to the cluster.
+It allows you to re-attach to a session after you lost the connection to the cluster.
 See [1](https://manned.org/screen) and [2](https://wiki.archlinux.org/title/GNU_Screen) for more information.
 
 ### 3.2. Bundling
