@@ -95,8 +95,8 @@
     path: "/mnt/{{ item[0]['pfs'] | regex_replace('\\$$', '') | regex_replace('/', '_') }}/groups/{{ item[1]['name'] }}/{{ item[0]['lfs'] }}"
     owner: "{{ item[1]['name'] }}-dm"
     group: "{{ item[1]['name'] }}"
-    mode: "{{ item[1]['mode'] | default(lfs_default_lfs_mode, true) }}"
-    state: 'directory'
+    mode: "{{ item[1]['mode'] | default(default_lfs_mode, true) }}"
+state: 'directory'
   vars:
     lfs_type: "{{ item[0]['lfs'] | regex_search('((dat)|(prm)|(rsc)|(tmp))[0-9]+$', '\\1') | first }}"
     default_lfs_mode: >-
