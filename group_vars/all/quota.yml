@@ -104,6 +104,12 @@ lfs_quota:
       umcg-gcc: 128
       umcg-gsad: 512
       umcg-sysops: 128
+  prm09:
+    quota_limits:  # All values in GB.
+      umcg-atd: 512  
+      umcg-gcc: 128
+      umcg-gsad: 512
+      umcg-sysops: 128
   rsc01:
     quota_limits:  # All values in GB.
   rsc02:
@@ -251,6 +257,14 @@ lfs_quota:
       umcg-gcc: 128
       umcg-gsad: 512
       umcg-gst: 512
+      umcg-sysops: 128
+      umcg-vipt: 512
+  tmp09:
+    quota_limits:  # All values in GB.
+      umcg-atd: 512    
+      umcg-gcc: 128
+      umcg-gsad: 512  
+      umcg-gst: 512      
       umcg-sysops: 128
       umcg-vipt: 512
 ...
