@@ -58,10 +58,8 @@
                   | selectattr('attach_port_on_instance_launch', 'undefined')
                   | map(attribute='name')
                   | list }}"
-
 - name: Gather host's facts, like os_family etc
   ansible.builtin.setup:
-
 - name: Create virtual servers.
   openstack.cloud.server:
     state: present
