@@ -215,28 +215,34 @@ Miniconda is a minimal, bootstrap version of Anaconda that includes only Conda, 
 [Bioconda](https://bioconda.github.io/) is a conda _channel/repo_ with packaged bioinformatics software.
 
 With _Conda_ you use pre-compiled binaries from a conda _channel/repo_ as opposed to compiling the code on {{ slurm_cluster_name | capitalize }}.
-This has the advantage that it is faster and in many cases easier to deploy the software.
-But the are also disadvantages:
+This has the advantage that it is faster than compiling software from source, but there are also disadvantages:
 
  * The pre-compiled binaries cannot be optimized for different CPU/GPU architectures.
-   * Either they will use a common denominator and only use instructions most generations of CPUs/GPUs understand, which may make the software slow.
-   * Or if the software does use instructions for a specific generation of it will only work on that generation, which may be different than the one for {{ slurm_cluster_name | capitalize }}.
+    * Either they will use a common denominator and only use instructions most generations of CPUs/GPUs understand, which may make the software slow.
+    * Or if the software does use instructions for a specific generation of it will only work on that generation, which may be different than the one for {{ slurm_cluster_name | capitalize }}.
  * _Conda_ makes assumptions about locations of dependencies during compile time.
    The pre-compiled binaries will crash at run time if these dependencies are missing or located elsewhere on the machine where you install them.
    Depending on the error message it can be very hard to figure out if there is a problem with the pre-compiled software
    or whether there is a problem with your input data set.
    If you compile the software from source on the cluster instead,
    you will notice during compilation if there are issues due to missing dependencies.
+ * Anaconda changed the licensing terms, which also affects academia and non-profits.  
+   **Therefore the use of the Anaconda conda distribution and all conda _channels_ maintained by Anaconda is banned on {{ slurm_cluster_name | capitalize }}**.  
+   In theory you can use an alternative free conda distribution like Miniconda or Miniforge,
+   but several popular free conda channels like Bioconda are hosted from the same site, which is blocked to prevent accidental use of the problematic channels.
 
 Therefore we strongly suggest to *only try _Conda_ as last resort when all else has failed*.
 
-When you do use _Conda_, then make sure to specify custom locations for both
+When you do use _Conda_, then make sure you
 
- * The new _Conda_ environment
- * The cache dir where _Conda_ caches downloaded packages
+ * Do **not** use the Anaconda distribution nor any of the licensed _channels_ from Anaconda, which includes:
+   `defaults`, `main`, `anaconda`, `free`, `r`, `mro`, `pro`, `archive`, `mro-archive`, `msys2`
+ * Specify custom locations for both
+    * The new _Conda_ environment
+    * The cache dir where _Conda_ caches downloaded packages
 
-Failure to do that means _Conda_ will use your small home dir and you will run into the storage quota limit for your home dir rather sooner than later.
-You can change the defaults for these locations like this:
+Failure to change the defaults for these locations means _Conda_ will use your small home dir and you will run into the storage quota limit for your home dir rather sooner than later.
+You can change the defaults for these locations like this:  
 
 ```
 export CONDA_PKGS_DIRS=/groups/${choose_one_of_your_groups}/{{ example_tmp_lfs }}/some/example/folder/conda/packages/
