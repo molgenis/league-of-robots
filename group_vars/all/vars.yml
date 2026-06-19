@@ -65,6 +65,13 @@ auth_groups:
     gid: 20013
   umcg-funad:
     gid: 20014
+  #
+  # FUNctional USers group.
+  # Used for all functional accounts on chaperone machines:
+  #  * All functional accounts must be a member of this group.
+  #  * Group is added to /etc/security/access.conf maintained by central IT dept.
+  #  * Ensures (local) functional accounts can login and use cron.
+  #
   umcg-funus:
     gid: 20015
   umcg-labgnkbh:
@@ -101,7 +108,6 @@ data_transfer_only_group: sftp-only
 # Iptables additional configurations 
 #
 iptables_extras_dir: '/etc/iptables_extras.d/'
-
 #
 # Used in static_hostname_lookup, logs_client, logs_server and logs_toprm roles
 #
