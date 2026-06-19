@@ -68,7 +68,7 @@ auth_groups:
   #
   # FUNctional USers group.
   # Used for all functional accounts on chaperone machines:
-  #  * All functional accounts must a member of this group.
+  #  * All functional accounts must be a member of this group.
   #  * Group is added to /etc/security/access.conf maintained by central IT dept.
   #  * Ensures (local) functional accounts can login and use cron.
   #
