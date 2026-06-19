@@ -15,17 +15,26 @@
     interfaces = 127.0.0.1 {{ smb_server_interfaces }}
     bind interfaces only = yes
     security = user
-    encrypt passwords = true
     obey pam restrictions = yes
     unix password sync = yes
     passwd program = /usr/bin/passwd %u
     passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccesfully* .
     pam password change = yes
+    #
+    # Enforce a secure connection
+    #
+    min protocol = SMB3
+    client signing = mandatory
+    server signing = mandatory
+    client smb encrypt = required
+    server smb encrypt = required
+    #
+    # Disable printing.
+    #
     load printers = no
     printing = bsd
     printcap name = /dev/null
     disable spoolss = yes
-    max protocol = SMB2
 
 {% for smb_share in smb_server_shares %}
 [{{ inventory_hostname }}-{{ smb_share['name'] }}]
