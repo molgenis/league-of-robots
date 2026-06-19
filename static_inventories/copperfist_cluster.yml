@@ -7,14 +7,14 @@ all:
     jumphost:
       hosts:
         cf-porch:
-          cloud_image: RockyLinux-9.3_xfs
-          ansible_python_interpreter: /usr/bin/python3
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -34,18 +34,17 @@ all:
               nodes:
                 - name: cf-dragen
                   network: vlan16
-                - name: copperfist
-                  network: vlan16
     data_transfer:
       hosts:
         cf-transfer:
-          cloud_image: RockyLinux-9.3_xfs
-          cloud_flavor: general.v1.small
+          cloud_flavor: umcg.v1.vm.1-2
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_ds"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
           local_yum_repository: true  # For nhc_standalone.
           local_volume_extra:
             - name: groups1
@@ -154,19 +153,36 @@ all:
     sys_admin_interface:
       hosts:
         copperfist:
-          os_distribution: 'centos7'
+          cloud_flavor: umcg.v2.bm.128-512-11900
+          host_type: baremetal
           host_networks:
-            - name: vlan16
-            - name: vlan990
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
-          local_yum_repository: true # enable local yum repository
+              nmstate_interface:
+                name: eno12409np1
+            - name: vlan990
+              security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: eno12399np0
+
+          local_yum_repository: true # enable local yum repository for PERC CLI utility.
+          perc_devices: true
           local_mounts:
-            - mount_point: '/mnt/local_raid'  # File system must already be available and hence created and labelled manually.
-              device: 'LABEL=local_raid'
+            - mount_point: '/mnt/local_raid'
+              device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+              label: local_raid
+              perc_controller: 0
+              perc_virtual_drive: 239
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
-              mount_options: 'defaults,nofail,x-systemd.device-timeout=10'
+              mount_options: >-
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
               type: xfs
             - mount_point: "{{ slurm_local_scratch_dir }}"
               device: '/mnt/local_raid/local'
@@ -195,30 +211,19 @@ all:
                - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
-        copperfist:
-          slurm_sockets: 2
-          slurm_cores_per_socket: 64
-          slurm_real_memory: 515456
-          slurm_local_disk: 0
-          slurm_ethernet_interfaces:
-            - em1
-            - em3
+        betabarrel:
     compute_node:
       children:
-        regular:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+        cpu_r7525:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             copperfist:
               slurm_sockets: 2
               slurm_cores_per_socket: 64
-              slurm_real_memory: 515456
+              slurm_real_memory: 515041
               slurm_local_disk: 0
-              slurm_ethernet_interfaces:
-                - em1
-                - em3
         dragen:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             cf-dragen:
-              # ansible_host: cf-porch+copperfist+cf-dragen
               os_distribution: 'oracle8'
               host_networks:
                 #
@@ -295,7 +300,7 @@ all:
                       mode: '2755'
                       owner: "{{ envsync_user }}"
                       group: "{{ envsync_group }}"
-              slurm_version: '20.11.9-1.el8.umcg'
+              slurm_version: '24.11.7-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
               slurm_threads_per_core: 2
@@ -334,7 +339,6 @@ all:
     storage_server:
       hosts:
         cf-storage:
-          cloud_image: RockyLinux-9.3_xfs
           cloud_flavor: umcg.v2.bm.20-128-894
           host_type: baremetal
           host_networks:

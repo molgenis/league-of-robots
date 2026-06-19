@@ -36,11 +36,11 @@ ip_addresses:
       netmask: /32
       fqdn: 'cf-transfer.hpc.rug.nl'
   copperfist:
-    vlan16:
-      address: 195.169.22.4
+    cf_internal_management:
+      address: 10.10.1.237
       netmask: /32
     vlan990:
-      address: 192.168.1.22
+      address: 192.168.1.141
       netmask: /32
   cf_internal_management-external-router:
     cf_internal_management:
