@@ -10,6 +10,9 @@ This role mounts parts of shared storage systems (shares a.k.a. exports) on vari
    This is how end users see and work with storage systems: _PFS_ naming is consistent and remains constant no matter on which _PFS_ the _LFS_ is located. 
    When a _PFS_ is End of Life and phased out, the data can be migrated to a different _PFS_ keeping the _LFS_ and hence the path to the data for end users exactly the same.
  * **home**: An _LFS_ for user's home directories.
+ * **dat[0-9]{2}**: An _LFS_ for exchanging data with diagnostics lab LIMS.
+   * On a file system maintained by the hospital IT staff.
+   * By design only mounted on the _Chaperone_ servers.
  * **tmp[0-9]{2}**: An _LFS_ for **t**e**mp**orary data.
    * On a file system optimized for High Performance (HP) where possible.
    * Without backups.
@@ -41,7 +44,7 @@ This role mounts parts of shared storage systems (shares a.k.a. exports) on vari
 
 An HPC cluster can have
  * Only one **home** and one **apps** _LFS_
- * Multiple **tmp[0-9]**, **prm[0-9]** and **env[0-9]** _LFS-ses_. We keep the numbers unique over all clusters.
+ * Multiple **dat[0-9]{2}**, **rsc[0-9]{2}**, **tmp[0-9]**, **prm[0-9]** and **env[0-9]** _LFS-ses_. We keep the numbers unique over all clusters.
    Hence there is only one _prm03_. If multiple machines optionally from multiple clusters have an _prm03_ _LFS_ mount,
    it must contain the same data with the same permissions.
 
@@ -58,46 +61,76 @@ An example snippet (see below for explanation of what get's mounted where based 
 #
 # Physical File Systems (PFS-ses).
 #
-pfs_mounts: [
-  { pfs: 'isilon11',
-    source: 'some-storage001.stor.local:/ifs',
-    type: 'nfs4',
-    rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime',
-    ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro' },
-  { pfs: 'lusty2',
-    source: '10.0.0.203@tcp12:10.0.0.204@tcp12:/lusty2',
-    type: 'lustre',
-    rw_options: 'defaults,_netdev,flock',
-    ro_options: 'defaults,_netdev,ro' },
-]
+pfs_mounts:
+  - pfs: 'isilon11'
+    source: 'some-storage001.stor.local:/ifs'
+    type: 'nfs4'
+    rw_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime'
+    ro_options: 'defaults,_netdev,vers=4.0,noatime,nodiratime,ro'
+  - pfs: 'lusty2'
+    source: '10.0.0.203@tcp12:10.0.0.204@tcp12:/lusty2'
+    type: 'lustre'
+    rw_options: 'defaults,_netdev,flock'
+    ro_options: 'defaults,_netdev,ro'
+  - pfs: local_raid
+    #
+    # Example of a complete PFS that is not mounted via the shared_storage role, but with the local_storage role instead.
+    # Normally the source, type and rw_options are used to mount both the complete PFS
+    # as well as LFS-ses from that PFS, but in this case we must use separate pfs_* arguments
+    # to mount the complete PFS and these must match what was specified for this local file system.
+    # The file system should have already been mounted by the local_storage role,
+    # so the pfs_* arguments are de facto only used to validate that the file system was mounted correctly
+    # and to ensure the play stops when this is not the case to prevent making sub directories
+    # for the LFS-ses in the mount point from the small OS disk as opposed to on the PFS.
+    #
+    pfs_source: LABEL=local_raid
+    pfs_type: xfs
+    pfs_options: rw,relatime,nofail,x-systemd.device-timeout=10
+    #
+    # File system source, type and mount options only used for LFS-ses from this PFS.
+    #
+    source: '/mnt'
+    type: 'none'
+    rw_options: 'bind,nofail'
+    ro_options: 'bind,ro,nofail'
+    machines: "{{ groups['sys_admin_interface'] }}"
 #
 # Logical File Systems (LFS-ses) with:
 #  * specification of what needs to get mounted where or for which groups.
 #  * on which PFS an LFS is located.
 #
-lfs_mounts: [
-  { lfs: 'home',
-    pfs: 'isilon11',
-    machines: "{{ groups['cluster'] }}" },
-  { lfs: 'env08',
-    pfs: 'isilon11',
-    machines: "{{ groups['compute_node'] + groups['user_interface'] }}" },
-  { lfs: 'tmp08',
-    pfs: 'isilon11',
-    groups: [
-        'ateam', 'colla', 'production', 'cool-project'
-      ]},
-  { lfs: 'prm05',
-    pfs: 'isilon11',
-    groups: [
-        'ateam', 'production'
-      ]},
-  { lfs: 'prm03',
-    pfs: 'lusty2',
-    groups: [
-        'colla', 'production', 'cool-project'
-      ]},
-]
+lfs_mounts:
+  - lfs: home
+    pfs: local_raid
+    rw_machines: "{{ groups['user_interface'] }}"
+  - lfs: env08
+    pfs: isilon11
+    ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
+    rw_machines: "{{ groups['deploy_admin_interface'] }}"
+  - lfs: tmp08
+    pfs: isilon11
+    type: bind
+    groups:
+      - ateam
+      - colla
+      - production
+      - cool-project
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+  - lfs: prm05
+    pfs: isilon11
+    type: bind
+    groups:
+      - ateam
+      - production
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
+  - lfs: prm03
+    pfs: lusty2
+    type: bind
+    groups:
+      - ateam
+      - colla
+      - production
+    rw_machines: "{{ groups['user_interface'] }}"
 ###################################################################################################
 #
 # Other group_vars
@@ -119,11 +152,17 @@ The **pfs_mounts** variable lists all Physical File Systems and their technical 
      This can be used when the parent dir of the subfolder contains other subfolders 
      with data from other other systems / clients
      that should **not** be mounted / available on the _SAI_.
- * **source**: device or URL for the file system as used by the ```mount``` command.
-   Will always get suffixed with the ***pfs** value.
- * **type**: file system type as used by the ```mount``` command.
+ * **source**: device or URL for the file system as used by the ```mount``` command.  
+   Will always get suffixed with the ***pfs** value.  
+   Used for mounting both _PFS-ses_ and _LFS-ses_ unless **pfs_source** is defined (see below).
+ * **type**: file system type as used by the ```mount``` command.  
+   Used for mounting both _PFS-ses_ and _LFS-ses_ unless **pfs_type** is defined (see below).
+ * **pfs_source**: optional attribute to override **source** when mounting the complete _PFS_.
+ * **pfs_type**: optional attribute to override **type** when mounting the complete _PFS_.
  * **rw_options**: mount options when mounting this _PFS_ **read-write** using the ```mount``` command.
  * **ro_options**: mount options when mounting this _PFS_ **read-only** using the ```mount``` command.
+ * **machines**:
+   * Lists the machines that should mount this _LFS_ `read-write`.
 
 The example above would result in the following _PFS_ entries in ```/etc/fstab``` only on the _SAI_:
 ```
@@ -138,24 +177,32 @@ The **lfs_mounts** variable lists all Logical File Systems, which provide the us
  * **lfs**: a label for this _LFS_
    * **env[0-9]{2}** _LFS-ses_:
       * Label is used as the mountpoint in **/mnt/** on the _Deploy Admin Interface (DAI)_.
-      * On all other machines the mountpoint is always **/apps**.
+      * On all other machines the mountpoint is always **/apps** and therefore:
+      * A specific machine can only mount one instance of this _LFS_ type.
    * **home** _LFS-ses_:
       * Mountpoint is always **/home**.
-      
-   * **tmp[0-9]{2}** and **prm[0-9]{2}** _LFS-ses_:
-      * Mountpoint per groups is always **/groups/${group}/${lfs}**.
+      * A specific machine can only mount one instance of this _LFS_ type.
+   * **dat[0-9]{2}**, **rsc[0-9]{2}**, **tmp[0-9]{2}** and **prm[0-9]{2}** _LFS-ses_:
+      * Mountpoint per group is always **/groups/{{ group }}/{{ lfs }}**.
+      * Groups may have access to multiple **dat[0-9]{2}**, **rsc[0-9]{2}**, **tmp[0-9]{2}** or **prm[0-9]{2}** _LFS-ses_.
  * **pfs**: a label for the _PFS_ that holds this _LFS_.
    * Used to lookup the technical specs required by the ```mount``` command in the ```pfs_mounts``` variable.
    * Hence for every label mentioned here there must be an entry in the list of ```pfs_mounts```.
- * **machines**: Only for **env[0-9]{2}** and **home** _LFS-ses_.
-   * Lists the machines that should use this _LFS_
+ * **type**:
+   * Optional attribute only for **dat[0-9]{2}**, **rsc[0-9]{2}**, **tmp[0-9]{2}** and **prm[0-9]{2}** _LFS-ses_.
+   * Only possible value is `bind`.
+   * When this is specified the complete PFS will be mount first and
+   * Next this role will create `bind` mounts per group.
+   * This is a workaround to create less _normal_ mounts and required when using `lustre` file systems to prevent running out of Lustre IDs.
+ * **ro_machines**:
+   * Lists the machines that should mount this _LFS_ `read-only`.
    * A cluster may use multiple _LFS-ses_ of the same type for different machines to distribute the IO load.
-   * A specific machine can only mount one instance of the same _LFS_ type and 
-     hence should not be listed for multiple **env[0-9]{2}** _LFS-ses_ nor for multiple **home** _LFS-ses_.
- * **groups**: Only for **tmp[0-9]{2}** and **prm[0-9]{2}** _LFS-ses_.
+ * **rw_machines**:
+   * Lists the machines that should mount this _LFS_ `read-write`.
+   * A cluster may use multiple _LFS-ses_ of the same type for different machines to distribute the IO load.
+ * **groups**: Only for **dat[0-9]{2}**, **rsc[0-9]{2}**, **tmp[0-9]{2}** and **prm[0-9]{2}** _LFS-ses_.
    * Lists the groups that can use this _LFS_.
    * Subfolders with correct permissions will be created automagically for the specified groups.
-   * Groups may have access to multiple **tmp[0-9]{2}** or **prm[0-9]{2}** _LFS-ses_.
  
 The example above would result in the following _LFS_ entries in ```/etc/fstab```:
  * on the _SAI_:

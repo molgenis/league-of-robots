@@ -72,4 +72,11 @@ then entries will added to `/etc/hosts` for all public IP address of the logs se
 
 ```yaml
 {{ ip_address }}    {{ logs_server_host_name }}
+
+## Global black hole list
+
+Some URLs are blocked by creating a black hole linking the URLs to the non existing IP 0.0.0.0.
+This is a hardcoded list in `templates/hosts.j2` that applies to all machines.
+See this template file for the list and reasons why certain URLs are blocked.
+
 ```
