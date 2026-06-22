@@ -6,6 +6,7 @@ lfs_quota:
       umcg-atd: 1024
       umcg-biogen: 8192
       umcg-bios: 1024
+      umcg-blister: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
       umcg-erdera: 2048
@@ -212,6 +213,7 @@ lfs_quota:
       umcg-biogen: 63488
       umcg-bionic-mdd-gwama: 1024
       umcg-bios: 1024
+      umcg-blister: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
       umcg-endocrinology: 2048
