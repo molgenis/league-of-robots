@@ -240,6 +240,8 @@ regular_groups:
     sponsor: umcg-mswertz
   - name: 'umcg-bios'
     sponsor: umcg-lfranke
+  - name: 'umcg-blister'
+    sponsor: umcg-research-it
   - name: 'umcg-dag3'
     sponsor: umcg-research-it
   - name: 'umcg-datateam'
@@ -369,6 +371,8 @@ regular_users:
     groups: ['umcg-bionic-mdd-gwama']
   - name: 'umcg-bios-dm'
     groups: ['umcg-bios']
+  - name: 'umcg-blister-dm'
+    groups: ['umcg-blister']
   - name: 'umcg-dag3-dm'
     groups: ['umcg-dag3']
   - name: 'umcg-datateam-dm'
@@ -498,6 +502,8 @@ sudoers:
     become: 'umcg-bionic-mdd-gwama-dm'
   - who: ['%umcg-bios']
     become: 'umcg-bios-dm'
+  - who: ['%umcg-blister-dms']
+    become: 'umcg-blister-dm'
   - who: ['%umcg-dag3-dms']
     become: 'umcg-dag3-dm'
   - who: ['%umcg-datateam']
@@ -672,6 +678,7 @@ lfs_mounts:
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
+      - name: umcg-blister
       - name: umcg-dag3
       - name: umcg-datateam
       - name: umcg-erdera
@@ -725,6 +732,7 @@ lfs_mounts:
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
+      - name: umcg-blister
       - name: umcg-dag3
       - name: umcg-datateam
       - name: umcg-endocrinology
