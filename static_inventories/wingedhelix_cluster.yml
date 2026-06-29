@@ -76,7 +76,7 @@ all:
               mounted_owner: root
               mounted_group: root
               mounted_mode: '0755'
-              mount_options: rw,relatime,nofail,x-systemd.device-timeout=10
+              mount_options: rw,relatime,nofail,x-systemd.device-timeout=120
               type: ext4
               md:
                 raid_level: 0
@@ -90,6 +90,21 @@ all:
                   - /dev/vdg
                   - /dev/vdh
                   - /dev/vdi
+          local_mount_subfolders:
+            - mount_point: '/groups'
+              machines: "{{ groups['data_transfer'] }}"
+              folders:
+                - rel_paths:
+                    - "{{ data_transfer_only_group }}"
+                  mode: '2750'
+                  owner: root
+                  group: "{{ data_transfer_only_group }}"
+                - rel_paths:
+                    - umcg-gap
+                    - umcg-genomescan
+                    - umcg-gst
+                  mode: '2770'
+                  owner: root
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -97,6 +112,7 @@ all:
             - "{{ all.ip_addresses['umcg']['net4'] }}"
             - "{{ all.ip_addresses['rug']['bwp_net'] }}"
             - "{{ all.ip_addresses['rug']['operator'] }}"
+            - "{{ all.ip_addresses['erasmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
@@ -113,6 +129,7 @@ all:
             - "{{ all.ip_addresses['umcg']['net4'] }}"
             - "{{ all.ip_addresses['rug']['bwp_net'] }}"
             - "{{ all.ip_addresses['rug']['operator'] }}"
+            - "{{ all.ip_addresses['erasmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
@@ -128,6 +145,7 @@ all:
             - "{{ all.ip_addresses['umcg']['net4'] }}"
             - "{{ all.ip_addresses['rug']['bwp_net'] }}"
             - "{{ all.ip_addresses['rug']['operator'] }}"
+            - "{{ all.ip_addresses['erasmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
@@ -246,8 +264,6 @@ all:
             slurm_sockets: 63
             slurm_cores_per_socket: 1
             slurm_real_memory: 491355
-            slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-            slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
             slurm_local_disk: 900
     mit_chaperone:
       hosts:

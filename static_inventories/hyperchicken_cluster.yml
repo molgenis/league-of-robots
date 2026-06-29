@@ -13,6 +13,8 @@ all:
               security_group: "{{ stack_prefix }}_jumphosts"
               assign_floating_ip: true
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
     repo:
       hosts:
         hc-repo:
@@ -21,6 +23,8 @@ all:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
     docs:
       hosts:
         docs-on-bateleur:
@@ -104,8 +108,6 @@ all:
               slurm_sockets: 4
               slurm_cores_per_socket: 1
               slurm_real_memory: 7680
-              slurm_max_cpus_per_node: "{{ slurm_sockets * slurm_cores_per_socket - 2 }}"
-              slurm_max_mem_per_node: "{{ slurm_real_memory - slurm_sockets * slurm_cores_per_socket * 512 }}"
               slurm_local_disk: 900
 administration:
   children:

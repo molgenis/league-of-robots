@@ -6,6 +6,7 @@ lfs_quota:
       umcg-atd: 1024
       umcg-biogen: 8192
       umcg-bios: 1024
+      umcg-blister: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
       umcg-erdera: 2048
@@ -104,6 +105,12 @@ lfs_quota:
       umcg-gcc: 128
       umcg-gsad: 512
       umcg-sysops: 128
+  prm09:
+    quota_limits:  # All values in GB.
+      umcg-atd: 512  
+      umcg-gcc: 128
+      umcg-gsad: 512
+      umcg-sysops: 128
   rsc01:
     quota_limits:  # All values in GB.
   rsc02:
@@ -115,10 +122,10 @@ lfs_quota:
       umcg-gdio: 1024
       umcg-grip: 1024
       umcg-hlhs: 1024
-      umcg-lifelines: 21504
+      umcg-lifelines: 41984
       umcg-solve-rd: 5120
       umcg-sysops: 1024
-      umcg-ucu: 4096
+      umcg-ucu: 5120
   rsc04:
     quota_limits:  # All values in GB.
       umcg-atd: 1024
@@ -192,7 +199,7 @@ lfs_quota:
       umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
-      umcg-ucu: 2048
+      umcg-ucu: 3072
       umcg-ugli: 1024
       umcg-verbeek: 1024
       umcg-vdakker: 1024
@@ -206,6 +213,7 @@ lfs_quota:
       umcg-biogen: 63488
       umcg-bionic-mdd-gwama: 1024
       umcg-bios: 1024
+      umcg-blister: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
       umcg-endocrinology: 2048
@@ -251,6 +259,14 @@ lfs_quota:
       umcg-gcc: 128
       umcg-gsad: 512
       umcg-gst: 512
+      umcg-sysops: 128
+      umcg-vipt: 512
+  tmp09:
+    quota_limits:  # All values in GB.
+      umcg-atd: 512    
+      umcg-gcc: 128
+      umcg-gsad: 512  
+      umcg-gst: 512      
       umcg-sysops: 128
       umcg-vipt: 512
 ...

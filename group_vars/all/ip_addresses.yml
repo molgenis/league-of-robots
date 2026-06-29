@@ -267,7 +267,7 @@ ip_addresses:
     net:
       address: '156.83.1.0'
       netmask: '/24'
-      desc: 'A.o. for data transfer using sftp/rsync.'
+      desc: 'ErasmusMC net for data transfers.'
   #
   # Globus.
   #

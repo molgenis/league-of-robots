@@ -9,20 +9,10 @@ slurm_partitions:
   - name: cpu_r7525  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: betabarrel  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r7525']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['cpu_r7525'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['cpu_r7525'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['cpu_r7525'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['cpu_r7525'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G"'
   - name: dragen  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: bb-dragen  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['dragen']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['dragen'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G" PreemptMode=off'
 slurm_qos_limit_fractions:
   regular-medium:
@@ -94,7 +84,6 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-    - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['address'] }}{{ copperfist_cluster.ip_addresses['copperfist']['vlan16']['netmask'] }}"
 cloud_image: Rocky-9.6
 availability_zone: nova
 enable_predictable_network_interface_names: true
@@ -105,14 +94,6 @@ stack_networks:
       next-hop-address: '172.23.77.1'
       external_network: vlan16
       name: vlan1336
-  - name: "{{ stack_prefix }}_internal_management"
-    cidr: '10.10.1.0/24'
-    router:
-      next-hop-address: '10.10.1.1'
-      external_network: vlan16
-    create: true
-  - name: vlan16
-    cidr: '195.169.22.0/23'
   - name: vlan990
     cidr: '192.168.1.0/24'
 security_group_mods:
@@ -170,7 +151,7 @@ data_transfer_only_group: 'umcg-sftp-only'
 envsync_user: 'umcg-envsync'
 envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
-functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
+functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf on chaperones.
 hpc_env_prefix: '/apps'
 sponsors:
   - name: umcg-gd-owners
@@ -414,11 +395,27 @@ ogm_servers:
 #
 pfs_mounts:
   - pfs: local_raid
+    #
+    # The complete PFS is not mounted via the shared_storage role; See local_storage role instead.
+    # Normally the source, type and rw_options are used to mount both the complete PFS
+    # as well as LFS-ses from that PFS, but in this case we must use separate pfs_* arguments
+    # to mount the complete PFS and these must match what was specified for this local file system.
+    # The file system should have already been mounted by the local_storage role,
+    # so the pfs_* arguments are de facto only used to validate that the file system was mounted correctly
+    # and to ensure the play stops when this is not the case to prevent making sub directories
+    # for the LFS-ses in the mount point from the small OS disk as opposed to on the PFS.
+    #
+    pfs_source: LABEL=local_raid
+    pfs_type: xfs
+    pfs_options: rw,relatime,nofail,x-systemd.device-timeout=10
+    #
+    # File system source, type and mount options only used for LFS-ses from this PFS.
+    #
     source: '/mnt'
     type: 'none'
     rw_options: 'bind,nofail'
     ro_options: 'bind,ro,nofail'
-    machines: []  # Complete PFS not mounted via shared_storage role. See local_storage role instead.
+    machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: 'medgen_zincfinger$'
     source: '//storage5.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem
@@ -481,25 +478,16 @@ lfs_mounts:
     pfs: local_raid
     groups:
       - name: umcg-atd
-        mode: '2770'
       - name: umcg-gap
-        mode: '2770'
       - name: umcg-gd
-        mode: '2770'
       - name: umcg-genomescan
-        mode: '2770'
       - name: umcg-gsad
-        mode: '2770'
       - name: umcg-gst
-        mode: '2770'
       - name: umcg-lab
       - name: umcg-labgnkbh
-        mode: '2770'
       - name: umcg-patho
-        mode: '2770'
       # - name: umcg-pr
       - name: umcg-vipt
-        mode: '2770'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: tmp15
     pfs: 'umcgst15'
@@ -511,7 +499,6 @@ lfs_mounts:
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-lab
-        mode: '2750'
       - name: umcg-labgnkbh
       - name: umcg-patho
       # - name: umcg-pr

@@ -9,38 +9,18 @@ slurm_partitions:
   - name: cpu_r750  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-a[01-04]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r750']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['cpu_r750'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.05G" DenyQos=ds-short,ds-medium,ds-long'
   - name: cpu_r6625  # Must be in sync with group listed in Ansible inventory.
     default: yes
     nodes: "{{ stack_prefix }}-node-b[01-06]"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['cpu_r6625']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['cpu_r6625'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.25G" DenyQos=ds-short,ds-medium,ds-long'
   - name: gpu_xe7745  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ stack_prefix }}-node-c01"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: "{% if slurm_allow_jobs_to_span_nodes is defined and slurm_allow_jobs_to_span_nodes is true %}{{ groups['gpu_xe7745']|list|length }}{% else %}1{% endif %}"
-    max_cores_per_node: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_max_cpus_per_node') | first }}"
-    max_mem_per_node: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_max_mem_per_node') | first }}"
-    local_disk: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['gpu_xe7745'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.1G" DenyQos=ds-short,ds-medium,ds-long'
   - name: user_interface  # Must be in sync with group listed in Ansible inventory.
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
-    max_nodes_per_job: 1
-    max_cores_per_node: 1
-    max_mem_per_node: 1024
-    local_disk: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_local_disk') | first | default(0, true) }}"
-    features: "{{ groups['user_interface'] | map('extract', hostvars, 'slurm_features') | first | default('none') }}"
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
 slurm_qos_limit_fractions:
   regular-medium:
@@ -232,6 +212,18 @@ remote_archive:
       - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
     archive_remote_top_dir: '/archive/umcg-hpc-lifelines'
     recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+  - name: arc04
+    local_top_level_mount: '/groups'
+    groups:
+      - 'umcg-wijmenga'
+      - 'umcg-gdio'
+    archive_user: 'umcg-hpc-groups'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-hpc-groups'
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
 regular_groups:
   - name: "{{ data_transfer_only_group }}"
   - name: "{{ envsync_group }}"
@@ -248,6 +240,8 @@ regular_groups:
     sponsor: umcg-mswertz
   - name: 'umcg-bios'
     sponsor: umcg-lfranke
+  - name: 'umcg-blister'
+    sponsor: umcg-research-it
   - name: 'umcg-dag3'
     sponsor: umcg-research-it
   - name: 'umcg-datateam'
@@ -377,6 +371,8 @@ regular_users:
     groups: ['umcg-bionic-mdd-gwama']
   - name: 'umcg-bios-dm'
     groups: ['umcg-bios']
+  - name: 'umcg-blister-dm'
+    groups: ['umcg-blister']
   - name: 'umcg-dag3-dm'
     groups: ['umcg-dag3']
   - name: 'umcg-datateam-dm'
@@ -506,6 +502,8 @@ sudoers:
     become: 'umcg-bionic-mdd-gwama-dm'
   - who: ['%umcg-bios']
     become: 'umcg-bios-dm'
+  - who: ['%umcg-blister-dms']
+    become: 'umcg-blister-dm'
   - who: ['%umcg-dag3-dms']
     become: 'umcg-dag3-dm'
   - who: ['%umcg-datateam']
@@ -680,6 +678,7 @@ lfs_mounts:
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
+      - name: umcg-blister
       - name: umcg-dag3
       - name: umcg-datateam
       - name: umcg-erdera
@@ -733,6 +732,7 @@ lfs_mounts:
       - name: umcg-biogen
       - name: umcg-bionic-mdd-gwama
       - name: umcg-bios
+      - name: umcg-blister
       - name: umcg-dag3
       - name: umcg-datateam
       - name: umcg-endocrinology

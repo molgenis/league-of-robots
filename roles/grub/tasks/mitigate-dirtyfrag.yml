@@ -1,0 +1,35 @@
+---
+#
+# Mitigate the DirtyFrag privilege escalation bug
+#
+# CVE-2026-43284 https://github.com/V4bel/dirtyfrag
+# Mitigation disables the
+#    esp4
+#    esp6
+#    rxrpc
+# kernel modules using a dropin in /etc/modprobe.d/
+# See also:
+#   https://gist.github.com/m3nu/c19269ef4fd6fa53b03eb388f77464da
+#   https://www.reddit.com/r/HPC/comments/1szhpav/copyfail_mitigations_in_a_hpc_cluster_environment/
+#
+- name: Unload vulnerable kernel modules.
+  ansible.builtin.command:
+    cmd: rmmod "{{ item }}"
+  loop:
+    - esp4
+    - esp6
+    - rxrpc
+  register: grub_rmmod_dirtyfrag
+  changed_when: grub_rmmod_dirtyfrag['rc'] == 0
+  failed_when: grub_rmmod_dirtyfrag['rc'] >= 2
+  become: true
+
+- name: Disable vulnerable kernel modules.
+  ansible.builtin.copy:
+    src: mitigate-dirtyfrag.conf
+    dest: /etc/modprobe.d/mitigate-dirtyfrag.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+...

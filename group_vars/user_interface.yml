@@ -19,4 +19,10 @@ slurm_features: "{%- set slurm_feature_list =
       {%- set slurm_feature_list = slurm_feature_list | default([]) | union(['gpu', gpu_type]) -%}
     {%- endif -%}
     {{ slurm_feature_list | sort | join(',') }}"
+#
+# Reserve more resources for OS / other processes when the compute node is also the UI.
+# Max resources available for jobs on a node == total node resources - spec resources.
+#
+slurm_spec_cores_per_node: "{{ [6, (slurm_sockets * slurm_cores_per_socket / 2)] | min | int }}"
+slurm_spec_mem_per_node: "{{ (slurm_spec_cores_per_node | int * 1024) | int }}"
 ...
