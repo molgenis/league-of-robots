@@ -153,7 +153,7 @@ all:
     sys_admin_interface:
       hosts:
         copperfist:
-          cloud_flavor: umcg.v2.bm.128-512-11900
+          cloud_flavor: umcg.v1.bm.128-512-11900
           host_type: baremetal
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
