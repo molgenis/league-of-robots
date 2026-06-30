@@ -64,10 +64,16 @@ for _main_group in ${_main_groups}; do
 
          # Apply ACLs on main group folder
          # for both -dm user (but users from dms group can access the dm user)
-         if ! getfacl -p "${_main_group_path}" | grep -q "^default:user:${_main_group}-dm:rwx"; then
+         _acl="$(getfacl -p "${_main_group_path}")"
+         if ! grep -q "^user::rwx" <<< "${_acl}" || \
+            ! grep -q "^group::rwx" <<< "${_acl}" || \
+            ! grep -q "^default:group::rwx" <<< "${_acl}" || \
+            ! grep -q "^default:user:${_main_group}-dm:rwx" <<< "${_acl}"; then
             echo "    ACL applying default RW permissions for ${_main_group}-dm user and ${_main_group}-dms group on ${_main_group_path}"
-            setfacl -d -m u:${_main_group}-dm:rwx "${_main_group_path}"   # set default ACL rwx for user on dir + all subfolders (applies to future files/dirs)
-            setfacl -m u:${_main_group}-dm:rwx "${_main_group_path}"      # apply rwx ACL for user on existing files/dirs recursively
+            setfacl -d -m u:${_main_group}-dm:rwx "${_main_group_path}"    # set default ACL rwx for -dm user on dir + all subfolders (applies to future files/dirs)
+            setfacl -m u:${_main_group}-dm:rwx "${_main_group_path}"       # apply rwx ACL for -dm user on existing files/dirs recursively
+            setfacl -d -m g::rwx "${_main_group_path}"                     # set default ACL rwx for group on dir + all subfolders (applies to future files/dirs)
+            setfacl -m g::rwx "${_main_group_path}"                        # apply rwx ACL for group on existing files/dirs recursively
          fi
 
          # Now create all the rest of the groups
@@ -95,12 +101,14 @@ for _main_group in ${_main_groups}; do
 
                elif [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} || \
                        "${_each_group}" =~ ^"${_main_group}"-rel-.{1,} ]]; then
-               # else it is HIERARCHICAL structure and will be placed in 'sub' folder
-               # and also 'rel' folder (although they are only 2 levels deep)
-               # individual folders are owned by that individual group
+                  # else it is HIERARCHICAL structure and will be placed in 'sub' folder
+                  # and also 'rel' folder (although they are only 2 levels deep)
+                  # individual folders are owned by that individual group
                   _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main-
                   _sub_group_path="${_group_remove_main_group//-/\/}"    # replace - with 	/
-                  create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "2770"
+                  _setmode="2750" # for -rel- subforlder
+                  [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]] && _setmode="2770" # for -sub- subfolders
+                  create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "${_setmode}"
                else
                   echo "WARNING: Group ${_each_group} cannot be placed anywhere!"
                fi
