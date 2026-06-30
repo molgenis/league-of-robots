@@ -14,7 +14,7 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp3s0
+                name: enp0s3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -153,18 +153,18 @@ all:
     sys_admin_interface:
       hosts:
         copperfist:
-          cloud_flavor: umcg.v2.bm.128-512-11900
+          cloud_flavor: umcg.v1.bm.128-512-11900
           host_type: baremetal
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: eno12409np1
+                name: eno12399np0
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: eno12399np0
+                name: eno12409np1
 
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
