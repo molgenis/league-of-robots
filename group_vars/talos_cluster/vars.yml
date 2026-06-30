@@ -167,7 +167,7 @@ data_transfer_only_group: 'umcg-sftp-only'
 envsync_user: 'umcg-envsync'
 envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
-functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf.
+functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf on chaperones.
 hpc_env_prefix: '/apps'
 sponsors:
   - name: umcg-research-it
