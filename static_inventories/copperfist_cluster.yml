@@ -113,7 +113,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
           iptables_allow_https_inbound:
             # On data_transfer servers port 443 is used for SSH too.
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -130,7 +130,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -146,7 +146,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
     docs:
       hosts:
         docs-on-bateleur:
@@ -300,7 +300,7 @@ all:
                       mode: '2755'
                       owner: "{{ envsync_user }}"
                       group: "{{ envsync_group }}"
-              slurm_version: '24.11.7-1.el8.umcg'
+              slurm_version: '24.11.7-1.el9.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
               slurm_threads_per_core: 2
