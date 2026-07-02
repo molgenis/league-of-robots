@@ -211,7 +211,7 @@ all:
                - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
-        betabarrel:
+        copperfist:
     compute_node:
       children:
         cpu_r7525:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
