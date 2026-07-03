@@ -346,11 +346,11 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens2f1np1
+                name: enp111s0f1np1 # altname ens2f1np1
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens2f0np0
+                name: enp111s0f0np0 # altname ens2f0np0
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
           local_mounts:
