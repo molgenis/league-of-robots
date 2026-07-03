@@ -300,7 +300,7 @@ all:
                       mode: '2755'
                       owner: "{{ envsync_user }}"
                       group: "{{ envsync_group }}"
-              slurm_version: '24.11.7-1.el9.umcg'
+              slurm_version: '24.11.7-1.el8.umcg'
               slurm_sockets: 2
               slurm_cores_per_socket: 16
               slurm_threads_per_core: 2
