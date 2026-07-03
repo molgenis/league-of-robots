@@ -113,7 +113,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
           iptables_allow_https_inbound:
             # On data_transfer servers port 443 is used for SSH too.
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -130,7 +130,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -146,7 +146,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
     docs:
       hosts:
         docs-on-bateleur:
@@ -211,7 +211,7 @@ all:
                - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
-        betabarrel:
+        copperfist:
     compute_node:
       children:
         cpu_r7525:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -346,11 +346,11 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens2f1np1
+                name: enp111s0f1np1 # altname ens2f1np1
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens2f0np0
+                name: enp111s0f0np0 # altname ens2f0np0
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
           local_mounts:
