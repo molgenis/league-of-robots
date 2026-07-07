@@ -243,24 +243,26 @@ all:
                 # ens3f0 altname enp134s0f0:
                 #   speed: 10 Gbit fibre
                 #   vlans:
-                #     untagged: 16
+                #     untagged: 990
                 #     tagged: 13, 16, 985, 990
                 # ens3f1 altname enp134s0f1:
                 #   speed: 10 Gbit fibre, not connected.
                 #
                 - name: vlan16
                   nmstate_interface:
-                    name: ens3f0.16
+                    name: enp134s0f0.16
                     type: vlan
                     vlan:
                       id: 16
-                      base-iface: ens3f0  # altname enp134s0f0
+                      base-iface: enp134s0f0 # altname ens3f0
                     ipv4:
                       dhcp: false
+                  nmstate_route:
+                    destination: 0.0.0.0/0
                 - name: vlan990
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: ens3f0  # altname enp134s0f0
+                    name: enp134s0f0 # altname ens3f0
                     ipv4:
                       dhcp: false
               local_mounts:
