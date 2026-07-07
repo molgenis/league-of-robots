@@ -96,6 +96,8 @@ stack_networks:
     create: true
   - name: vlan16
     cidr: '195.169.22.0/23'
+    router:
+      next-hop-address: '195.169.23.251'
   - name: vlan990
     cidr: '192.168.1.0/24'
 security_group_mods:
