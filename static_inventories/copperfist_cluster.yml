@@ -14,7 +14,7 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: enp3s0
+                name: enp0s3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -37,7 +37,7 @@ all:
     data_transfer:
       hosts:
         cf-transfer:
-          cloud_flavor: umcg.v1.vm.1-2
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_ds"
@@ -113,7 +113,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
           iptables_allow_https_inbound:
             # On data_transfer servers port 443 is used for SSH too.
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -130,7 +130,7 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -146,25 +146,25 @@ all:
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
+            - "{{ copperfist_cluster.ip_addresses['copperfist']['cf_internal_management'] }}"
     docs:
       hosts:
         docs-on-bateleur:
     sys_admin_interface:
       hosts:
         copperfist:
-          cloud_flavor: umcg.v2.bm.128-512-11900
+          cloud_flavor: umcg.v1.bm.128-512-11900
           host_type: baremetal
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: eno12409np1
+                name: eno12399np0
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: eno12399np0
+                name: eno12409np1
 
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
@@ -211,7 +211,7 @@ all:
                - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
-        betabarrel:
+        copperfist:
     compute_node:
       children:
         cpu_r7525:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
@@ -243,26 +243,39 @@ all:
                 # ens3f0 altname enp134s0f0:
                 #   speed: 10 Gbit fibre
                 #   vlans:
-                #     untagged: 16
+                #     untagged: 990
                 #     tagged: 13, 16, 985, 990
                 # ens3f1 altname enp134s0f1:
                 #   speed: 10 Gbit fibre, not connected.
                 #
                 - name: vlan16
                   nmstate_interface:
-                    name: ens3f0.16
+                    name: enp134s0f0.16
                     type: vlan
                     vlan:
                       id: 16
-                      base-iface: ens3f0  # altname enp134s0f0
+                      base-iface: enp134s0f0 # altname ens3f0
                     ipv4:
                       dhcp: false
+                  nmstate_route:
+                    destination: 0.0.0.0/0
                 - name: vlan990
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: ens3f0  # altname enp134s0f0
+                    name: enp134s0f0 # altname ens3f0
                     ipv4:
                       dhcp: false
+              additional_etc_hosts:
+                - group: betabarrel_cluster
+                  nodes:
+                    - name: bb-dragen
+                      network: vlan990
+                    - name: betabarrel
+                      network: vlan990
+                - group: copperfist_cluster
+                  nodes:
+                    - name: copperfist
+                      network: vlan990
               local_mounts:
                 - mount_point: '/staging'
                   device: 'LABEL=staging'
@@ -346,11 +359,11 @@ all:
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens2f1np1
+                name: enp111s0f1np1 # altname ens2f1np1
             - name: vlan990
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
-                name: ens2f0np0
+                name: enp111s0f0np0 # altname ens2f0np0
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
           local_mounts:
