@@ -1,21 +1,10 @@
 ---
-- name: 'Install yum-utils, which provides the "needs-restarting" utility.'
+- name: 'Install dnf versionlock command.'
   ansible.builtin.package:
-    name: yum-utils
+    name: 'dnf-command(versionlock)'
     state: latest
     update_cache: true
   become: true
-  when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] <= "7"
-
-- name: 'Enable automatic updates on EL <= 7.'
-  ansible.builtin.import_tasks:
-    file: auto_update_el7.yml
-  when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] <= "7"
-    - autoupdate_enabled | default(true) | bool
 
 - name: 'Enable automatic updates on EL >= 8.'
   ansible.builtin.import_tasks:
@@ -25,31 +14,20 @@
     - ansible_facts['distribution_major_version'] >= "8"
     - autoupdate_enabled | default(true) | bool
 
+#
+# These packages are version locked using their corresponding roles and we don't want to change that.
+#
 - name: 'Update all installed packages (except Slurm and iRODS) now.'
   ansible.builtin.package:
     name: '*'
     state: latest
     update_cache: true
-    exclude: 'slurm*,irods*' # These packages are version locked and we don't want to change that.
+    exclude: 'slurm*,irods*'
   become: true
-
-- name: 'Set correct command for testing if a reboot is needed on EL <= 7.'
-  ansible.builtin.set_fact:
-    update_needs_restarting_cmd: /bin/needs-restarting -r
-  when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] <= "7"
-
-- name: 'Set correct command for testing if a reboot is needed on EL >= 8.'
-  ansible.builtin.set_fact:
-    update_needs_restarting_cmd: dnf needs-restarting -r
-  when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
 
 - name: 'Check if we need to reboot now.'
   ansible.builtin.command:
-    cmd: "{{ update_needs_restarting_cmd }}"
+    cmd: dnf needs-restarting -r
   register: reboot_required
   changed_when: reboot_required.rc == 1
   failed_when: reboot_required.rc >= 2
