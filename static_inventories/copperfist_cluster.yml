@@ -37,7 +37,7 @@ all:
     data_transfer:
       hosts:
         cf-transfer:
-          cloud_flavor: umcg.v1.vm.1-2
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_ds"
