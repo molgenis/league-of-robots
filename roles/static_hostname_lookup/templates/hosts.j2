@@ -54,11 +54,13 @@
   {% endfor %}
 {% endfor %}
 
-{% if additional_etc_hosts is defined and additional_etc_hosts | length >= 1 %}
+{% if additional_etc_hosts | default([]) | length >= 1 or additional_etc_hosts_for_all_stacks | default([]) | length >= 1 %}
 #
-# Additional hosts.
+# Additional hosts
+# ( additional_etc_hosts defines hosts from this stack in LoR)
+# ( additional_etc_hosts_for_all_stacks defines for all stacks in LoR )
 #
-  {% for item in additional_etc_hosts %}
+  {% for item in ( additional_etc_hosts | default([]) + additional_etc_hosts_for_all_stacks | default([]) ) | unique %}
     {% for node in item['nodes'] %}
       {% set address = lookup('vars', item['group'])['ip_addresses'][node['name']][node['network']]['address'] %}
 {{ "%-15s" | format(address) }}    {{ node['name'] }}

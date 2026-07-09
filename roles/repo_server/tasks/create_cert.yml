@@ -1,0 +1,98 @@
+---
+- name: Generate private key on remote host
+  community.crypto.openssl_privatekey:
+    path: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.key"
+    type: RSA
+    size: 4096
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0600'
+  become: true
+
+- name: Generate CSR on remote host
+  community.crypto.openssl_csr:
+    path: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.csr"
+    privatekey_path: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.key"
+    subject:
+      commonName: "{{ ansible_fqdn | default(inventory_hostname) }}"
+    subject_alt_name:
+      - "DNS:{{ ansible_fqdn | default(inventory_hostname) }}"
+      - "DNS:{{ inventory_hostname }}"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0644'
+  become: true
+
+- name: Set temp_dir_local fact.
+  ansible.builtin.set_fact:
+    temp_dir_local: "{{ playbook_dir }}/temp"
+
+- name: Create local temp directory
+  ansible.builtin.file:
+    path: "{{ temp_dir_local }}/csrs"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  connection: local
+
+- name: Copy un-encrypted CA key to local temp
+  ansible.builtin.copy:
+    src: "{{ local_ca_dir }}/{{ item }}"
+    dest: "{{ temp_dir_local }}"
+    mode: '0644'
+  loop:
+    - "{{ local_ca_cert_file }}"
+    - "{{ local_ca_key_file }}"
+  delegate_to: localhost
+  connection: local
+
+- name: Fetch CSR from remote host to local machine
+  ansible.builtin.fetch:
+    src: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.csr"
+    dest: "{{ temp_dir_local }}/{{ inventory_hostname }}.csr"
+    flat: true
+  become: true
+
+- name: Ensure local directory for signed certs
+  ansible.builtin.file:
+    path: "{{ temp_dir_local }}/certs"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  connection: local
+
+- name: Sign CSR with local CA
+  community.crypto.x509_certificate:
+    path: "{{ temp_dir_local }}/{{ inventory_hostname }}.crt"
+    csr_path: "{{ temp_dir_local }}/{{ inventory_hostname }}.csr"
+    provider: ownca
+    ownca_path: "{{ temp_dir_local }}/{{ local_ca_cert_file }}"
+    ownca_privatekey_path: "{{ temp_dir_local }}/{{ local_ca_key_file }}"
+    # not_after: +1825d   # 5 years
+    mode: '0644'
+  delegate_to: localhost
+  connection: local
+
+- name: Copy signed certificate back to remote host
+  ansible.builtin.copy:
+    src: "{{ temp_dir_local }}/{{ inventory_hostname }}.crt"
+    dest: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.crt"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0644'
+  become: true
+
+- name: Enable and start nginx
+  ansible.builtin.service:
+    name: nginx
+    enabled: true
+    state: started
+  become: true
+
+- name: Delete local temp directory
+  ansible.builtin.file:
+    path: "{{ temp_dir_local }}"
+    state: absent
+  delegate_to: localhost
+  connection: local
+...

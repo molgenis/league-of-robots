@@ -1,3 +1,12 @@
 ---
 main_repo_path: /mnt/repos
+
+repo_user: repo
+repo_group: repo
+
+nginx_ssl_dir: /etc/pki/nginx/
+
+local_ca_dir: "{{ playbook_dir }}/files/logs_library/" # local CA certificate
+local_ca_cert_file: "logs_development.pem" # local CA certificate
+local_ca_key_file: "logs_development.key"  # local CA private key
 ...

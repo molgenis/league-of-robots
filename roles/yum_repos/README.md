@@ -10,24 +10,24 @@ For _Pulp_ see the `pulp_client` role instead.
 To make a repository locally (on the machine itself) check `yum_local` role instead.
 
 This role will manage all `yum` / `dnf` repos on hosts; This means:
- * Apply configs and GPG key files for repos whose repo ID is listed in the `managed_yum_repos` variable for a machine.  
+ * Apply configs and GPG key files for repos whose repo ID is listed in the `yum_repos_deployed_on_clients` variable for a machine.  
    See ```group_vars/all/vars.yml``` for defaults.
- * The repo ID listed in `managed_yum_repos` is used to lookup the config for the repo listed in the `yum_repos` variable.  
+ * The repo ID listed in `yum_repos_deployed_on_clients` is used to lookup the config for the repo listed in the `yum_repos` variable.  
    See ```group_vars/all/vars.yml``` for defaults.  
-   This allows setting `managed_yum_repos` to a subset of all repos from `yum_repos` for specific machines.
- * Unspecified options for repos listed in the `managed_yum_repos` variable will be left untouched.
+   This allows setting `yum_repos_deployed_on_clients` to a subset of all repos from `yum_repos` for specific machines.
+ * Unspecified options for repos listed in the `yum_repos_deployed_on_clients` variable will be left untouched.
  * **Delete** the `/etc/yum.repos.d/*.repo` repo config file on a machine,
-   when not a single repo listed in that file is listed in the `managed_yum_repos` variable.
+   when not a single repo listed in that file is listed in the `yum_repos_deployed_on_clients` variable.
    (Except for repos in the `local_yum.repo` file, which may be created by the `yum_local` role and which is skipped by this role.)
  * Repos will remain untouched/preserved "as is", when at least one other repo listed in the same `*.repo` config file
-   is listed in `managed_yum_repos` and therefore managed by this role.
+   is listed in `yum_repos_deployed_on_clients` and therefore managed by this role.
 
 Note:
 * We do NOT use `ansible.builtin.yum_repository` any longer as there is no `ansible.builtin.dnf_repository` equivalent for newer distros.
 * We do NOT install the _EPEL_ repo using the `epel-release` RPM with `ansible.builtin.package`,
   because on RedHat >= 8.x it will install `*.repo` files with broken links and broken paths to GPG key files.
 
-#### Example code snippets for the `managed_yum_repos` and `yum_repos` variables:
+#### Example code snippets for the `yum_repos_deployed_on_clients` and `yum_repos` variables:
 
 In the example below
 * The dict key `rocky9` must match the value of `os_distribution` in `group_vars/{{ stack_name }}/vars.yml`.  
@@ -41,7 +41,7 @@ In the example below
 #
 # Example to list which repos should be managed by this role on machines by listing all repo IDs explicitly.
 #
-managed_yum_repos:
+yum_repos_deployed_on_clients:
   rocky9:
     - baseos
     - baseos-debug
@@ -55,7 +55,7 @@ managed_yum_repos:
 # we now use a standard filter and tags to select 2 groups/collections of repos that share the same tag
 # and append 1 explicit repo ID to that list.
 #
-managed_yum_repos:
+yum_repos_deployed_on_clients:
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'contains', 'core')

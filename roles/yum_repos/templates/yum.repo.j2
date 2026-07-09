@@ -1,0 +1,29 @@
+{% for file, repos in yum_repos_by_file.items() %}
+
+# {{ file }}
+
+{% for repo in repos %}
+[{{ repo.id }}]
+name={{ repo.name | default(repo.id) }}
+
+{% if repo.baseurl is defined %}
+baseurl={{ repo.baseurl }}
+{% endif %}
+
+{% if repo.mirrorlist is defined %}
+mirrorlist={{ repo.mirrorlist }}
+{% endif %}
+
+{% if repo.metalink is defined %}
+metalink={{ repo.metalink }}
+{% endif %}
+
+enabled={{ repo.enabled | default(1) }}
+gpgcheck={{ repo.gpgcheck | default(0) }}
+
+{% if repo.gpgkeysource is defined %}
+gpgkey={{ repo.gpgkeysource }}
+{% endif %}
+
+{% endfor %}
+{% endfor %}

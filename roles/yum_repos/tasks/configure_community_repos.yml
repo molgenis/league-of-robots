@@ -1,7 +1,7 @@
 ---
 - name: "Configure options for {{ yum_repo['id'] }} in {{ yum_repos_repo_config_dir }}/{{ yum_repo['file'] }}."
   community.general.ini_file:
-    path: "{{ yum_repos_repo_config_dir }}/{{ yum_repo['file'] }}"
+    path: "{{ yum_repos_repo_config_dir }}/{{ yum_repo['id'] }}.repo"
     section: "{{ yum_repo['id'] }}"
     no_extra_spaces: true
     create: true
@@ -26,7 +26,7 @@
 
 - name: "Configure gpgkey option for {{ yum_repo['id'] }} in {{ yum_repos_repo_config_dir }}/{{ yum_repo['file'] }} if we downloaded the GPG key."
   community.general.ini_file:
-    path: "{{ yum_repos_repo_config_dir }}/{{ yum_repo['file'] }}"
+    path: "{{ yum_repos_repo_config_dir }}/{{ yum_repo['id'] }}.repo"
     section: "{{ yum_repo['id'] }}"
     no_extra_spaces: true
     create: true
