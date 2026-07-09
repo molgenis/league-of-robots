@@ -22,13 +22,13 @@
     owner: "{{ repo_user }}"
     group: "{{ repo_group }}"
   loop:
-     - "{{ main_repo_path }}"
-     - "{{ main_repo_path }}/dnf"
-     - "{{ main_repo_path }}/dnf/repos.d"
-     - "{{ main_repo_path }}/dnf/cache"
-     - "{{ main_repo_path }}/logs"
-     - "{{ main_repo_path }}/logs/dnf"
-     - "{{ main_repo_path }}/logs/scripts"
+    - "{{ main_repo_path }}"
+    - "{{ main_repo_path }}/dnf"
+    - "{{ main_repo_path }}/dnf/repos.d"
+    - "{{ main_repo_path }}/dnf/cache"
+    - "{{ main_repo_path }}/logs"
+    - "{{ main_repo_path }}/logs/dnf"
+    - "{{ main_repo_path }}/logs/scripts"
   become: true
 
 - name: "Deploy repository management scripts to {{ main_repo_path }}"
