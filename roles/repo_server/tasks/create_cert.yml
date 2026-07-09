@@ -50,7 +50,7 @@
   ansible.builtin.fetch:
     src: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.csr"
     dest: "{{ temp_dir_local }}/{{ inventory_hostname }}.csr"
-    flat: yes
+    flat: true
   become: true
 
 - name: Ensure local directory for signed certs
