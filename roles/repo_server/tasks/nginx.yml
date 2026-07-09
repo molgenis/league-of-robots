@@ -69,7 +69,7 @@
     path: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.crt"
   register: cert_info
   failed_when: false
-  when:  file_info is defined and file_info.stat.exists
+  when: file_info is defined and file_info.stat.exists
   become: true
 
 - name: Create create_cert variable
