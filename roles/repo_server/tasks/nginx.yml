@@ -78,7 +78,7 @@
 
 - name: Decide whether to create certificate
   ansible.builtin.set_fact:
-    create_cert: True
+    create_cert: true
   when: >
         file_info.stat.exists is not defined or
         cert_info is not defined or
