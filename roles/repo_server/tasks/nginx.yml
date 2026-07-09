@@ -74,7 +74,7 @@
 
 - name: Create create_cert variable
   ansible.builtin.set_fact:
-    create_cert: False
+    create_cert: false
 
 - name: Decide whether to create certificate
   ansible.builtin.set_fact:
