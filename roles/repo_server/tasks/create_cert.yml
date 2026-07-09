@@ -23,7 +23,8 @@
     mode: '0644'
   become: true
 
-- set_fact:
+- name: Set temp_dir_local fact.
+  ansible.builtin.set_fact:
     temp_dir_local: "{{ playbook_dir }}/temp"
 
 - name: Create local temp directory
