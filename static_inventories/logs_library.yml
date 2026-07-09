@@ -113,7 +113,7 @@ all:
               size: 500
           local_mounts:
             - mount_point: '/mnt/repos'
-              device: /dev/vdb # A value must be present in order to update it on-the-fly during role execution.
+              device: /dev/vdb
               label: repos
               mounted_owner: root
               mounted_group: root
