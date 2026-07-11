@@ -72,6 +72,38 @@ Update: a newer kernel update in EL 9.5 broke the 2.15.6 GA release; we need to:
       ```autogen.sh```
  * Use the procedure above to compile ```lustre-*2.15.6-2.el9.*.rpm``` RPMs.
 
+#### For EL >= 9.8 we need Lustre >= 2.15.8, because Lustre 2.15.8 will no longer compile with DKMS.
+
+Kernel security updates in EL 9.8 for the high impact Bad Epoll & Janusacape LPE bugs broke the 2.15.8 release.
+At the time this was written 2.15.9 was not yet released and we need to:
+ * Fetch the source code for 2.15.8 from https://github.com/lustre/lustre-release/releases/tag/2.15.8
+ * The macro `from_timer()` was renamed to `timer_container_of()` and this change was backported to older kernels by RedHat,
+   but the Lustre 2.15.8 release has not been updated for that change yet.
+   The main Lustre branch was updated for many changes including this one, but this has not yet been back ported to Lustre 2.15.x.
+   * For issue see: https://jira.whamcloud.com/browse/LU-20071
+   * For patch set description see: https://review.whamcloud.com/c/fs/lustre-release/+/65797
+ * Download that path set as a file that can be applied with the `patch` command.
+   * Find the download button on the patch set description page and download `c131e65.diff.zip`
+   * Unzip to get `c131e65.diff`
+ * Apply the patch
+      ```
+      tar -xvzf lustre-release-2.15.8.tar.gz
+      cd lustre-release-2.15.8
+      patch -p1 < ../c131e65.diff
+      ```
+ * Update build number 1 -> 2.
+    * In `lustre.spec.in` change:
+          ```Release: 1%{?dist}```
+      into:
+          ```Release: 2%{?dist}```
+    * In `lustre-dkms.spec.in` change:
+          ```%define buildid 1```
+      into:
+          ```%define buildid 2```
+ * Execute:
+      ```bash ./autogen.sh```
+ * Use the procedure above to compile ```lustre-*2.15.8-2.el9.*.rpm``` RPMs.
+
 ## Configuring lnet
 
 The majority of the _Lustre network (lnet)_ can be configured automatically and/or use defaults,
