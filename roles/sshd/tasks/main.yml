@@ -75,9 +75,8 @@
   notify: update-crypto-policies
   become: true
   when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
-
+    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 )
+#    or (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 #
 # Find all subpolicy files: The result should contain all the sub policy files we just deployed,
 # but may also contain additional sub policy files added by for example a security update.
@@ -89,8 +88,8 @@
     patterns: '*.pmod'
   register: sshd_found_crypto_subpolicy_files
   when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 ) or
+      (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 
 - name: Create /etc/ssh/sshd_config.d/ directory.
   ansible.builtin.file:
@@ -111,9 +110,8 @@
   register: found_extra_sshd_configs
   become: true
   when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
-
+    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 ) or
+      (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 #
 # We disable every line in extra sshd config files,
 # but do keep these files to prevent a dnf update from recreting them.
@@ -130,8 +128,8 @@
   notify: restart_sshd
   become: true
   when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 ) or
+      (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 
 - name: Deploy main sshd config.
   ansible.builtin.template:
@@ -155,8 +153,8 @@
   notify: restart_sshd
   become: true
   when:
-    - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "9"
+    - (( ansible_facts['os_family'] in "RedHat" and ansible_facts['distribution_major_version'] | int ) >= 8 ) or
+      (( ansible_facts['os_family'] in "Debian" and ansible_facts['distribution_major_version'] | int ) >= 24 )
 
 #
 # All Diffie-Hellman moduli used for diffie-hellman-group-exchange-sha256 should be at least sshd_moduli_minimum bit long.
@@ -215,7 +213,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - (ansible_facts['distribution_major_version'] | int) >= 8
 
 - name: Check if we need to update the system-wide crypto policies.
   ansible.builtin.debug:
@@ -228,7 +226,7 @@
   changed_when: item not in sshd_active_crypto_policies
   when:
     - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - (ansible_facts['distribution_major_version'] | int) >= 8
     - item not in sshd_active_crypto_policies
   notify: update-crypto-policies
 
@@ -247,7 +245,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - (ansible_facts['distribution_major_version'] | int) >= 8
 
 - name: Check if the system-wide crypto policies were configured correctly.
   ansible.builtin.debug:
@@ -261,7 +259,7 @@
   failed_when: item.result not in sshd_active_crypto_policies
   when:
     - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - (ansible_facts['distribution_major_version'] | int) >= 8
     - item not in sshd_active_crypto_policies
 
 - name: Check if the configured system-wide crypto policies were applied correctly.
@@ -274,7 +272,7 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "8"
+    - (ansible_facts['distribution_major_version'] | int) >= 8
 
 - name: Check the configured system-wide crypto policies.
   ansible.builtin.command:
@@ -286,5 +284,5 @@
   become: true
   when:
     - ansible_facts['os_family'] == "RedHat"
-    - ansible_facts['distribution_major_version'] >= "9"
+    - (ansible_facts['distribution_major_version'] | int) >= 9
 ...

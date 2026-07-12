@@ -16,6 +16,13 @@ UseDNS no
 #
 Protocol 2
 
+{% if (ansible_facts['os_family'] == "Debian" and (ansible_facts['distribution_major_version'] | int) >= 24) %}
+#
+# Minimal RSA key size
+#
+RequiredRSASize 4096
+{% endif %}
+
 #
 # Disable printing of MOTD by sshd itself,
 # which is already printed by the pluggable authentication module (PAM) motd.so

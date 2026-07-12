@@ -1,0 +1,51 @@
+#
+# Install p2solo-compute pc.
+#
+---
+- name: 'Check OS version of target host.'
+  ansible.builtin.fail:
+    msg: 'This role requires Ubun version >= 24.x'
+  when: ansible_facts['os_family'] != "Debian"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+
+- name: 'Install extra RPMs.'
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+    name: "{{ generic_deps | default([]) }}"
+  become: true
+
+- name: Download Oxford Nanopore public key
+  ansible.builtin.get_url:
+    url: "{{ oxfordnanoportal_repo_url }}"
+    dest: /etc/apt/keyrings/nanoporetech.asc
+    mode: '0644'
+  when: oxfordnanoportal_repo_url | default(false)
+  become: true
+
+- name: Add Oxford Nanopore APT repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/nanoporetech.sources
+    content: |
+      Types: deb
+      URIs: http://cdn.oxfordnanoportal.com/apt
+      Suites: noble-stable
+      Components: non-free
+      Signed-By: /etc/apt/keyrings/nanoporetech.asc
+    mode: '0644'
+  become: true
+
+- name: Update apt cache after adding repo
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+
+- name: Install ont-standalone-minknow-release
+  ansible.builtin.apt:
+    name: ont-standalone-minknow-release
+    state: present
+...

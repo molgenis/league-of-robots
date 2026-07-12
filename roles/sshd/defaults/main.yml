@@ -20,6 +20,10 @@ sshd_crypto_policies:
   rocky9:
     - CUSTOM
     - CVE-2023-48795 # Terrapin Attack: https://terrapin-attack.com/
+  Debian:
+    - DEFAULT
+  Ubuntu25:
+    - DEFAULT
 sshd_moduli_minimum: 3072
 data_transfer_only_group: sftp-only
 #
@@ -66,4 +70,5 @@ sshd_max_sessions: "\
         10 # default\
     {% endif %}"
 sshd_user_totp_config_path: "${HOME}/.ssh/totp"
+ssh_daemon_name: sshd
 ...

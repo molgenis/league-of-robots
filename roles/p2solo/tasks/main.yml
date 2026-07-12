@@ -1,0 +1,14 @@
+---
+# Install generic_deps
+- name: Install generic_deps
+  ansible.builtin.include_tasks: install-generic_deps.yml
+
+# disable automatic updates
+- name: Disable automatic updates
+  ansible.builtin.include_tasks: disable-autoupdate.yml
+
+#DISABLED by defeault, istall MinKNOW
+- name: Run backup MinKNOW installation procedure
+  ansible.builtin.include_tasks: standalone-minknow.yml
+  when: minknow_backup_install | default(false)
+...

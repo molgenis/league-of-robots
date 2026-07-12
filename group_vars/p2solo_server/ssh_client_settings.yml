@@ -1,0 +1,8 @@
+---
+ssh_client_jumphosts:
+
+ssh_client_known_hosts: "\
+  @cert-authority \
+  *p2solo_server-* \
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILAJQCmoUmCpS3PdrnrTaluBT8us8bSbULYLP6zu4h0b CA key for p2solo_server"
+...

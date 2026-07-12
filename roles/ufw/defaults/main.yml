@@ -1,0 +1,9 @@
+---
+# Firewall default ports
+firewall_allowed_ports:
+  - 22
+
+# Allow traffic on internal interfaces
+firewall_internal_interfaces:
+  - enp0s1
+ 
