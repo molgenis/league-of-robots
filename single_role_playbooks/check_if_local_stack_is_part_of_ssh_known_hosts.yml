@@ -1,0 +1,43 @@
+---
+- name: Check if local ssh known_hosts include this stack
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  run_once: true
+  tasks:
+    - name: "Include variables from a ssh-host-ca/{{ stack_name }}-ca.pub files"
+      ansible.builtin.include_vars:
+        file: "group_vars/{{ stack_name }}/ssh_client_settings.yml"
+        name: "ssh_stack_ca_pub"
+      delegate_to: localhost
+      connection: local
+    - name: "Check if CA public key is missing from {{ ansible_env.HOME }}/.ssh/known_hosts"
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.ssh/known_hosts"
+        line: "{{ ssh_stack_ca_pub['ssh_client_known_hosts'] }}"
+        state: present
+      check_mode: true
+      register: local_ssh_known_hosts_present
+      delegate_to: localhost
+      connection: local
+    - name: Assert ssh CA key exists in known_hosts
+      debug:
+        msg: |
+             #
+             #
+             #
+             # ! TODO !
+             #
+             # ssh CA public key for stack {{ stack_name }} is MISSING from known_hosts.
+             # Please add following line:
+             # {{ ssh_stack_ca_pub['ssh_client_known_hosts'] }}
+             #
+             #  to
+             #    {{ ansible_env.HOME }}/.ssh/known_hosts
+             #
+             #
+             #
+             #
+      failed_when: (local_ssh_known_hosts_present is changed) or
+                   (local_ssh_known_hosts_present is failed)
+...
