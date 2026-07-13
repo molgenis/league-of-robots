@@ -27,7 +27,8 @@ slurm_partitions:
 #
 cluster_class: 'development'
 repo_manager: 'pulp'
-os_distribution: 'rocky9'
+os_distribution: 'alma9'
+os_minorversion: '.8'
 figlet_font: 'ogre'
 motd: |
       =========================================================================

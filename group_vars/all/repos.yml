@@ -11,62 +11,31 @@ repo_servers:
 # Pulp repos.
 #
 pulp_repos:
-  centos7:
-    - name: centos7-base
-      description: 'CentOS-7 - Base.'
-      remote_url: http://vault.centos.org/centos/7/os/x86_64/
-    - name: centos7-updates
-      description: 'CentOS-7 - Updates.'
-      remote_url: http://vault.centos.org/centos/7/updates/x86_64/
-    - name: centos7-extras
-      description: 'CentOS-7 - Extras.'
-      remote_url: http://vault.centos.org/centos/7/extras/x86_64/
-    - name: epel7
-      description: 'Extra Packages for Enterprise Linux 7 (EPEL).'
-      remote_url: https://download.fedoraproject.org/pub/archive/epel/7/x86_64/
-    - name: cpel7
-      description: 'UMCG Custom Packages for Enterprise Linux 7 (CPEL).'
-      #remote_url: no remote for our homebrew packages.
-    - name: irods7
-      description: 'RENCI iRODS Repository for Enterprise Linux 7.'
-      remote_url: https://packages.irods.org/yum/pool/centos7/x86_64/
-    - name: lustre7
-      description: 'Lustre client Long Term Support (LTS) releases for Enterprise Linux 7.'
-      remote_url: https://downloads.whamcloud.com/public/lustre/latest-2.12-release/el7/client/
-    - name: e2fsprogs7  # Dependency for Lustre project quota.
-      description: 'Ext filesystem utility releases for Enterprise Linux 7.'
-      remote_url: https://downloads.whamcloud.com/public/e2fsprogs/latest/el7/
-    - name: ltb7
-      description: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 7.'
-      remote_url: https://ltb-project.org/rpm/openldap25/7/x86_64/
-    - name: rsyslog7
-      description: 'Rsyslog (Adiscon CentOS7 for x86_64)'
-      remote_url: http://rpms.adiscon.com/v8-stable/epel-7/x86_64/
-  rocky9:
+  alma9:
     - name: baseos
-      description: 'Rocky Linux 9 - BaseOS.'
-      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=BaseOS-9
+      description: 'AlmaLinux 9 - BaseOS.'
+      remote_url: https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
       acs:
-        - name: vault
-          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ rocky_vault_minorversion | default(omit) }}/BaseOS/x86_64/os/"
+        - name: "9{{ os_minorversion }}"
+          remote_url: "https://repo.almalinux.org/almalinux/9{{ os_minorversion }}/BaseOS/x86_64/os/"
     - name: appstream
-      description: 'Rocky Linux 9 - AppStream.'
-      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=AppStream-9
+      description: 'AlmaLinux 9 - AppStream.'
+      remote_url: https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
       acs:
-        - name: vault
-          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ rocky_vault_minorversion | default(omit) }}/AppStream/x86_64/os/"
+        - name: "9{{ os_minorversion }}"
+          remote_url: "https://repo.almalinux.org/almalinux/9{{ os_minorversion }}/AppStream/x86_64/os/"
     - name: crb
-      description: 'Rocky Linux 9 - CRB.'
-      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=CRB-9
+      description: 'AlmaLinux 9 - CRB.'
+      remote_url: https://repo.almalinux.org/almalinux/9/CRB/x86_64/os/
       acs:
-        - name: vault
-          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ rocky_vault_minorversion | default(omit) }}/CRB/x86_64/os/"
+        - name: "9{{ os_minorversion }}"
+          remote_url: "https://repo.almalinux.org/almalinux/9{{ os_minorversion }}/CRB/x86_64/os/"
     - name: extras
-      description: 'Rocky Linux 9 - Extras.'
-      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=extras-9
+      description: 'AlmaLinux 9 - Extras.'
+      remote_url: https://repo.almalinux.org/almalinux/9/extras/x86_64/os/
       acs:
-        - name: vault
-          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ rocky_vault_minorversion | default(omit) }}/extras/x86_64/os/"
+        - name: "9{{ os_minorversion }}"
+          remote_url: "https://repo.almalinux.org/almalinux/9{{ os_minorversion }}/extras/x86_64/os/"
     - name: epel
       description: 'Extra Packages for Enterprise Linux 9 (EPEL).'
       remote_url: https://download.fedoraproject.org/pub/epel/9/Everything/x86_64
@@ -97,97 +66,66 @@ pulp_repos:
     - name: cvmfs
       description: 'CernVM-FS repo'
       remote_url: https://cvmrepo.web.cern.ch/cvmrepo/yum/cvmfs/EL/9/x86_64/
+  rocky9:
+    - name: baseos
+      description: 'Rocky Linux 9 - BaseOS.'
+      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=BaseOS-9
+      acs:
+        - name: vault
+          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ os_minorversion }}/BaseOS/x86_64/os/"
+    - name: appstream
+      description: 'Rocky Linux 9 - AppStream.'
+      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=AppStream-9
+      acs:
+        - name: vault
+          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ os_minorversion }}/AppStream/x86_64/os/"
+    - name: crb
+      description: 'Rocky Linux 9 - CRB.'
+      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=CRB-9
+      acs:
+        - name: vault
+          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ os_minorversion }}/CRB/x86_64/os/"
+    - name: extras
+      description: 'Rocky Linux 9 - Extras.'
+      remote_url: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=extras-9
+      acs:
+        - name: vault
+          remote_url: "https://dl.rockylinux.org/vault/rocky/9{{ os_minorversion }}/extras/x86_64/os/"
+    - name: epel
+      description: 'Extra Packages for Enterprise Linux 9 (EPEL).'
+      remote_url: https://download.fedoraproject.org/pub/epel/9/Everything/x86_64
+    - name: cpel
+      description: 'UMCG Custom Packages for Enterprise Linux 9 (CPEL).'
+      #remote_url: no remote for our homebrew packages.
+    - name: ltb
+      description: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 9.'
+      remote_url: https://ltb-project.org/rpm/openldap25/9/x86_64/
+    - name: rsyslog
+      description: 'rsyslog v8 (from Adiscon) for EPEL 9.'
+      remote_url: https://rpms.adiscon.com/v8-stable/epel-9/x86_64/
+    - name: e2fsprogs  # Dependency for Lustre project quota.
+      description: 'Ext filesystem utility releases for Enterprise Linux 9.'
+      remote_url: https://downloads.whamcloud.com/public/e2fsprogs/latest/el9/
+    #
+    # Lustre packages still broken and cannot be installed on EL 9.x due to silly Python 2 dependency resulting in:
+    # "nothing provides /usr/bin/python2 needed by lustre-client-dkms-2.15.4-1.el9.noarch from lustre"
+    #
+    #- name: lustre
+    #  description: 'Lustre client leatest releases for Enterprise Linux 9.3.'
+    #  # WARNING: There is no LTS release link for el9 yet.
+    #  # WARNING: When el9.4 is released the link below for el9.3 will not get updated automatically!
+    #  remote_url: https://downloads.whamcloud.com/public/lustre/latest-release/el9.3/client/
+    - name: irods
+      description: 'RENCI iRODS for Enterprise Linux 9.'
+      remote_url: https://packages.irods.org/yum/pool/el9/x86_64/
+    - name: cvmfs
+      description: 'CernVM-FS repo'
+      remote_url: https://cvmrepo.web.cern.ch/cvmrepo/yum/cvmfs/EL/9/x86_64/
+
 #
 # List of all repos for machines that do not use Pulp.
 #
 yum_repos:
-  centos7:
-    - file: centos7-base.repo
-      id: centos7-base
-      name: 'CentOS-7 - Base.'
-      baseurl: http://vault.centos.org/centos/7/os/x86_64/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 1
-      gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
-      tags:
-        - distro
-        - core
-    - file: centos7-updates.repo
-      id: centos7-updates
-      name: 'CentOS-7 - Updates.'
-      baseurl: http://vault.centos.org/centos/7/updates/x86_64/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 1
-      gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
-      tags:
-        - distro
-        - core
-    - file: centos7-extras.repo
-      id: centos7-extras
-      name: 'CentOS-7 - Extras.'
-      baseurl: http://vault.centos.org/centos/7/extras/x86_64/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 1
-      gpgkey: 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7'
-      tags:
-        - distro
-        - extras
-    - file: epel7.repo
-      id: epel7
-      name: 'Extra Packages for Enterprise Linux 7 (EPEL).'
-      baseurl: https://download.fedoraproject.org/pub/epel/7/x86_64/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 1
-      gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7'
-      tags:
-        - epel
-    - file: irods7.repo
-      id: irods7
-      name: 'RENCI iRODS Repository for Enterprise Linux 7.'
-      baseurl: https://packages.irods.org/yum/pool/centos7/x86_64/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 0
-      tags:
-        - irods
-    - file: lustre7.repo
-      id: lustre7
-      name: 'Lustre client Long Term Support (LTS) releases for Enterprise Linux 7.'
-      baseurl: https://downloads.whamcloud.com/public/lustre/latest-2.12-release/el7/client/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 0
-      tags:
-        - lustre
-    - file: e2fsprogs7.repo
-      id: e2fsprogs7  # Dependency for Lustre project quota.
-      name: 'Ext filesystem utility releases for Enterprise Linux 7.'
-      baseurl: https://downloads.whamcloud.com/public/e2fsprogs/latest/el7/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 0
-    - file: ltb7.repo
-      id: ltb7
-      name: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 7.'
-      baseurl: https://ltb-project.org/rpm/openldap25/7/x86_64/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 0
-      tags:
-        - ltb
-    - file: rsyslog7.repo
-      id: rsyslog7
-      name: 'Rsyslog (Adiscon CentOS7 for x86_64)'
-      baseurl: http://rpms.adiscon.com/v8-stable/epel-7/x86_64/
-      enabled: 1
-      repo_server_download: True
-      gpgcheck: 0
-      tags:
-        - rsyslog
   oracle8:
     - file: oracle-linux-ol8.repo
       id: ol8_baseos_latest
@@ -450,17 +388,129 @@ yum_repos:
       name: 'Rsyslog (Adiscon for x86_64)'
       baseurl: http://rpms.adiscon.com/v8-stable/epel-8/x86_64/
       enabled: 1
-      repo_server_download: True # important, < 1 G
+      repo_server_download: true # important, < 1 G
       gpgcheck: 0
       tags:
         - rsyslog
+  alma9:
+    - id: baseos
+      name: AlmaLinux 9 - BaseOS
+      mirrorlist: https://mirrors.almalinux.org/mirrorlist/9/baseos
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
+      tags:
+        - distro
+        - core
+    - id: appstream
+      name: Rocky Linux 9 - AppStream
+      mirrorlist: https://mirrors.almalinux.org/mirrorlist/9/appstream
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
+      tags:
+        - distro
+        - core
+    - id: crb
+      name: Rocky Linux 9 - CRB
+      mirrorlist: https://mirrors.almalinux.org/mirrorlist/$releasever/crb
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
+      tags:
+        - distro
+        - core
+    - id: extras
+      name: Rocky Linux 9 - Extras
+      mirrorlist: https://mirrors.almalinux.org/mirrorlist/$releasever/extras
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
+      tags:
+        - distro
+        - extras
+    #
+    # EPEL
+    #
+    - id: epel
+      name: 'Extra Packages for Enterprise Linux 9'
+      metalink: 'https://mirrors.fedoraproject.org/metalink?repo=epel-9&arch=$basearch&infra=$infra&content=$contentdir'
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
+      tags:
+        - epel
+    #
+    # LTB
+    #
+    - id: ltb
+      name: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 9'
+      baseurl: 'https://ltb-project.org/rpm/openldap25/9/$basearch'
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkeysource: 'https://ltb-project.org/documentation/_static/RPM-GPG-KEY-LTB-PROJECT-SECURITY'
+      tags:
+        - ltb
+    #
+    # rsyslog
+    #
+    - id: rsyslog
+      name: 'rsyslog v8 (from Adiscon) for EPEL 9'
+      baseurl: 'https://rpms.adiscon.com/v8-stable/epel-9/$basearch'
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
+      tags:
+        - rsyslog
+    #
+    # perun
+    #
+    - id: perun
+      name: 'Perun IdM Slave Scripts'
+      baseurl: 'https://repo.cerit-sc.cz/el-perun/noarch/'
+      gpgkeysource: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
+      gpgcheck: 1
+      enabled: 1
+      repo_server_download: true
+      tags:
+        - perun
+    #
+    # iRODS
+    #
+    - id: irods
+      name: 'RENCI iRODS for Enterprise Linux 9'
+      baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 0
+      tags:
+        - irods
+    #
+    # Jenkins
+    #
+    - id: jenkins
+      name: "Jenkins{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
+      baseurl: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
+      enabled: 1
+      repo_server_download: true
+      gpgcheck: 1
+      gpgkeysource: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/jenkins.io-2023.key"
+      tags:
+        - jenkins
   rocky9:
     - file: rocky.repo
       id: baseos
       name: Rocky Linux 9 - BaseOS
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-9
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       tags:
         - distro
@@ -483,7 +533,7 @@ yum_repos:
       name: Rocky Linux 9 - AppStream
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-9
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       tags:
         - distro
@@ -506,7 +556,7 @@ yum_repos:
       name: Rocky Linux 9 - CRB
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-9
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       tags:
         - distro
@@ -533,7 +583,7 @@ yum_repos:
       id: rocky-release-security
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=rocky-sig-security-common-9
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       gpgkeysource: 'https://rocky-linux-europe-west1.production.gcp.mirrors.ctrliq.cloud/pub/sig/9/security/x86_64/security-common/RPM-GPG-KEY-Rocky-SIG-Security'
       tags:
@@ -700,7 +750,7 @@ yum_repos:
       name: Rocky Linux 9 - Extras
       mirrorlist: https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-9
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       tags:
         - distro
@@ -748,7 +798,7 @@ yum_repos:
       name: 'Extra Packages for Enterprise Linux 9 - $basearch'
       metalink: 'https://mirrors.fedoraproject.org/metalink?repo=epel-9&arch=$basearch&infra=$infra&content=$contentdir'
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
       tags:
@@ -809,7 +859,7 @@ yum_repos:
       name: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 9.'
       baseurl: 'https://ltb-project.org/rpm/openldap25/9/$basearch'
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       gpgkeysource: 'https://ltb-project.org/documentation/_static/RPM-GPG-KEY-LTB-PROJECT-SECURITY'
       tags:
@@ -822,7 +872,7 @@ yum_repos:
       name: 'rsyslog v8 (from Adiscon) for EPEL 9.'
       baseurl: 'https://rpms.adiscon.com/v8-stable/epel-9/$basearch'
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
       tags:
@@ -837,7 +887,7 @@ yum_repos:
       gpgkey: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
       gpgcheck: 1
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       tags:
         - perun
     #
@@ -848,7 +898,7 @@ yum_repos:
       name: 'RENCI iRODS for Enterprise Linux 9.'
       baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 0
       tags:
         - irods
@@ -860,7 +910,7 @@ yum_repos:
       name: "Jenkins{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
       baseurl: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
       enabled: 1
-      repo_server_download: True
+      repo_server_download: true
       gpgcheck: 1
       gpgkeysource: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/jenkins.io-2023.key"
       tags:
@@ -873,17 +923,16 @@ yum_repos:
 # the host_vars for a specific host or the static_inventory for a stack.
 #
 yum_repos_deployed_on_clients:
-  centos7: "{{ yum_repos['centos7']
-              | selectattr('tags', 'defined')
-              | selectattr('tags', 'intersect', ['core', 'rsyslog'])
-              | map(attribute='id') }}"
   oracle8: "{{ yum_repos['oracle8']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'uek', 'rsyslog'])
+              | map(attribute='id') }}"
+  alma9: "{{ yum_repos['alma9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'rsyslog'])
               | map(attribute='id') }}"
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'security', 'rsyslog'])
               | map(attribute='id') }}"
-
 ...

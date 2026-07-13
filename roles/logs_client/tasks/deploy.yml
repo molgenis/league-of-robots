@@ -4,8 +4,8 @@
     name:
       - gnutls
       - gnutls-utils
-      - "openssl{% if os_distribution == 'centos7' %}11{% endif %}"
-      - "openssl{% if os_distribution == 'centos7' %}11{% endif %}-devel"
+      - openssl
+      - openssl-devel
     state: latest
     update_cache: true
   become: true
@@ -21,7 +21,7 @@
     state: latest
     update_cache: true
     disablerepo: '*'
-    enablerepo: "rsyslog{% if os_distribution == 'centos7' %}7{% endif %}"
+    enablerepo: rsyslog
   become: true
   notify: client_restart_rsyslog
 

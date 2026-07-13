@@ -134,4 +134,4 @@ prereq_pip_packages:
   - xlwt==1.3.0
   - yarl==1.7.2
   - zipp==3.6.0
-os_distribution: 'centos7'
+os_distribution: 'alma9'

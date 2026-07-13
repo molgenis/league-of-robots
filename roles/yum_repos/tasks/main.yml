@@ -13,35 +13,6 @@
   notify: update-ca-trust
   become: true
 
-- name: "Find all *.repo files in {{ yum_repos_repo_config_dir }}."
-  ansible.builtin.find:
-    paths: "{{ yum_repos_repo_config_dir }}"
-    use_regex: false
-    patterns: '*.repo'
-    excludes: 'local_yum.repo'
-  register: yum_repos_find_result
-
-- name: "Compute list of .repo filenames that should exist on this host."
-  ansible.builtin.set_fact:
-    yum_repos_expected_files: >-
-      {{ yum_repos[os_distribution]
-         | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
-         | map(attribute='id')
-         | map('regex_replace', '^(.*)$', '\1.repo')
-         | list
-         | sort
-         | unique }}
-
-- name: "Remove {{ yum_repos_repo_config_dir }}/*.repo files that do not match repos configured for this host."
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop: "{{ yum_repos_find_result.files | map(attribute='path') | list }}"
-  loop_control:
-    label: "{{ item | basename }}"
-  when: (item | basename) not in yum_repos_expected_files
-  become: true
-
 - name: Fetch GPG repo keys.
   ansible.builtin.get_url:
     url: "{{ item['gpgkeysource'] }}"
@@ -53,7 +24,7 @@
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
   loop: "{{ yum_repos[os_distribution]
             | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
-            | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
+            | selectattr('gpgkeysource', 'defined') }}"
   become: true
 
 - name: Import fetched GPG repo keys.
@@ -64,15 +35,47 @@
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
   loop: "{{ yum_repos[os_distribution]
             | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
-            | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
+            | selectattr('gpgkeysource', 'defined') }}"
   become: true
 
-- name: "Configure community {{ yum_repos_repo_config_dir }}/*.repo files."
-  ansible.builtin.include_tasks: configure_community_repos.yml
+- name: "Configure {{ yum_repos_repo_config_dir }}/*.repo files."
+  ansible.builtin.template:
+    src: yum.repo.j2
+    dest: "{{ yum_repos_repo_config_dir }}/{{ yum_repo['id'] }}.repo"
+    owner: 'root'
+    group: 'root'
+    mode: '0640'
   loop_control:
-    label: "{{ yum_repo.id }}"
+    label: "{{ yum_repo['id'] }}"
     loop_var: yum_repo
   loop: "{{ yum_repos[os_distribution]
             | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
             | flatten(levels=1) }}"
+
+- name: "Find all *.repo files in {{ yum_repos_repo_config_dir }}."
+  ansible.builtin.find:
+    paths: "{{ yum_repos_repo_config_dir }}"
+    use_regex: false
+    patterns: '*.repo'
+    excludes: 'local_yum.repo'
+  register: yum_repos_find_result
+
+#
+# Delete other *.repo files only after all "new" *.repo files were deployed successfully.
+#
+# - name: "Remove {{ yum_repos_repo_config_dir }}/*.repo files that do not match repos configured for this host."
+#   ansible.builtin.file:
+#     path: "{{ item }}"
+#     state: absent
+#   loop: "{{ yum_repos_find_result['files'] | map(attribute='path') | list }}"
+#   loop_control:
+#     label: "{{ item | basename }}"
+#   when: item| basename 
+#         not in yum_repos[os_distribution]
+#                | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
+#                | map(attribute='id')
+#                | map('regex_replace', '^(.*)$', '\1.repo')
+#                | sort
+#                | unique
+#   become: true
 ...

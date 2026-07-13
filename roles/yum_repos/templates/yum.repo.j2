@@ -1,29 +1,32 @@
-{% for file, repos in yum_repos_by_file.items() %}
-
-# {{ file }}
-
-{% for repo in repos %}
-[{{ repo.id }}]
-name={{ repo.name | default(repo.id) }}
-
-{% if repo.baseurl is defined %}
-baseurl={{ repo.baseurl }}
+#jinja2: trim_blocks:True, lstrip_blocks: True
+#
+# Config file generated with yum_repos role from the league-of-robots repository.
+# Do not modify manually; update the variables or code and redeploy with Ansible instead.
+#
+[{{ yum_repo['id'] }}]
+name={{ yum_repo['name'] | default(yum_repo['id']) }}
+enabled={{ yum_repo['enabled'] | default(1) }}
+enabled_metadata={{ yum_repo['enabled'] | default(1) }}
+metadata_expire=86400
+{% if yum_repo['baseurl'] is defined %}
+baseurl={{ yum_repo['baseurl'] }}
 {% endif %}
-
-{% if repo.mirrorlist is defined %}
-mirrorlist={{ repo.mirrorlist }}
+{% if yum_repo['mirrorlist'] is defined %}
+mirrorlist={{ yum_repo['mirrorlist'] }}
 {% endif %}
-
-{% if repo.metalink is defined %}
-metalink={{ repo.metalink }}
+{% if yum_repo['metalink'] is defined %}
+metalink={{ yum_repo['metalink'] }}
 {% endif %}
-
-enabled={{ repo.enabled | default(1) }}
-gpgcheck={{ repo.gpgcheck | default(0) }}
-
-{% if repo.gpgkeysource is defined %}
-gpgkey={{ repo.gpgkeysource }}
+{% if yum_repo['gpgcheck'] | default(1) == 1 %}
+gpgcheck=1
+  {% if yum_repo['gpgkeysource'] is defined %}
+gpgkey=file://{{ yum_repos_gpgkeys_dir }}/{{ yum_repo['gpgkeysource'] | basename }}
+  {% else  %}
+gpgkey={{ yum_repo['gpgkey'] }}
+  {% endif %}
+{% else %}
+gpgcheck=0
 {% endif %}
-
-{% endfor %}
-{% endfor %}
+{% if yum_repo['countme'] is defined %}
+countme={{ yum_repo['countme'] }}
+{% endif %}
