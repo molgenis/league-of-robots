@@ -21,7 +21,7 @@
       delegate_to: localhost
       connection: local
     - name: Assert ssh CA key exists in known_hosts
-      debug:
+      ansible.builtin.debug:
         msg: |
              #
              #
