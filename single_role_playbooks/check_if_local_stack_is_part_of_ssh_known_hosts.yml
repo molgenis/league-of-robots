@@ -38,6 +38,8 @@
              #
              #
              #
+      when: (local_ssh_known_hosts_present is changed) or
+            (local_ssh_known_hosts_present is failed)
       failed_when: (local_ssh_known_hosts_present is changed) or
                    (local_ssh_known_hosts_present is failed)
 ...
