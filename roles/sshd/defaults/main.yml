@@ -20,6 +20,9 @@ sshd_crypto_policies:
   rocky9:
     - CUSTOM
     - CVE-2023-48795 # Terrapin Attack: https://terrapin-attack.com/
+  alma9:
+    - CUSTOM
+    - CVE-2023-48795 # Terrapin Attack: https://terrapin-attack.com/
 sshd_moduli_minimum: 3072
 data_transfer_only_group: sftp-only
 #

@@ -13,7 +13,7 @@ Deployment Logic
  - Remote server file structure
    - All repositroy configuration files are stored inside top directory /mnt/repos/dnf/repos.d/
    - Master Config: A `[distribution].conf` file is created at the root of the `repos.d` folder to point to the specific distribution directory.
-   - All the Repo Files for specific distrubution are stored inside `/mnt/repos/dnf/repos.d/[distribution]/` (e.g. `.../repos.d/centos7/`).
+   - All the Repo Files for specific distrubution are stored inside `/mnt/repos/dnf/repos.d/[distribution]/` (e.g. `.../repos.d/alma9/`).
 
 
 ## Configurations scripts

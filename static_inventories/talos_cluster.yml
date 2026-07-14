@@ -120,7 +120,7 @@ all:
                   auto-route-metric: 80
           slurm_sockets: 4
           slurm_cores_per_socket: 1
-          slurm_real_memory: 7681
+          slurm_real_memory: 7680
           slurm_local_disk: 0
     compute_node:
       children:
@@ -242,6 +242,8 @@ all:
             - name: vlan1337
               security_group: "{{ stack_prefix }}_cluster"
               add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
           #
           # Overrule regular users and groups compared to rest of Talos:
           #

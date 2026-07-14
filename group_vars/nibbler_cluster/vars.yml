@@ -44,8 +44,8 @@ slurm_qos_limit_fractions:
 #
 cluster_class: 'research'
 repo_manager: 'pulp'
-os_distribution: 'rocky9'
-rocky_vault_minorversion: '.6'
+os_distribution: 'alma9'
+os_minorversion: '.8'
 figlet_font: 'ogre'
 motd: |
       ===============================================================

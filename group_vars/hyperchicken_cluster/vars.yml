@@ -16,7 +16,7 @@ slurm_partitions:
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
-rocky_vault_minorversion: '.6'
+os_minorversion: '.6'
 figlet_font: 'lockergnome'
 motd: "To solve or not to solve, that's the question."
 #
