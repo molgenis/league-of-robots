@@ -5,6 +5,7 @@
     update_cache: true
     name:
       - util-linux  # Will also install util-linux-core
+  when: local_mounts | default([]) | length > 0
   become: true
 
 - name: Install tools to work with Multiple Devices a.k.a. software RAIDs.
@@ -19,7 +20,7 @@
 - name: Create Multiple Devices a.k.a. software RAIDs.
   ansible.builtin.include_tasks:
     file: md.yml
-  loop: "{{ local_mounts }}"
+  loop: "{{ local_mounts | default([]) }}"
   loop_control:
     loop_var: volume
     index_var: idx
@@ -28,7 +29,7 @@
 - name: Get unstable device name from perc cli utility and update facts.
   ansible.builtin.include_tasks:
     file: perc.yml
-  loop: "{{ local_mounts }}"
+  loop: "{{ local_mounts | default([]) }}"
   loop_control:
     loop_var: volume
     index_var: idx
@@ -39,7 +40,7 @@
     path: "{{ item.device }}"
     follow: true
   register: local_storage_device_stat
-  loop: "{{ local_mounts }}"
+  loop: "{{ local_mounts | default([]) }}"
   become: true
 
 - name: Create a file system on unformatted device.
@@ -51,7 +52,7 @@
         | map(attribute='stat')
         | map(attribute='isblk')
         | first is true
-  loop: "{{ local_mounts }}"
+  loop: "{{ local_mounts | default([]) }}"
   loop_control:
     loop_var: volume
 
@@ -60,7 +61,7 @@
     file: mount_filesystem.yml
   vars:
     volume_src: "{% if volume['label'] is defined %}LABEL={{ volume['label'] }}{% else %}{{ volume['device'] }}{% endif %}"
-  loop: "{{ local_mounts }}"
+  loop: "{{ local_mounts | default([]) }}"
   loop_control:
     loop_var: volume
     label: "Mounting {{ volume['type'] }} file system from {{ volume_src }} on {{ volume['mount_point'] }} with opts: {{ volume['mount_options'] }}}"
@@ -72,6 +73,7 @@
     mount_point: "{{ item.1.mount_point }}"
     folders: "{{ item.1.folders | list }}"
   when:
+    - local_mounts is defined
     - local_mount_subfolders is defined
     - item.0.mount_point == item.1.mount_point
     - inventory_hostname in item.1.machines
