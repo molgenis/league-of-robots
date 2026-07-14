@@ -438,7 +438,7 @@ yum_repos:
       baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
       enabled: 1
       repo_server_download: true
-      gpgcheck: 0
+      gpgcheck: 1
       gpgkeysource: 'https://packages.irods.org/irods-signing-key.asc'
       tags:
         - irods
