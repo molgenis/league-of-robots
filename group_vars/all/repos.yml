@@ -332,6 +332,7 @@ yum_repos:
       enabled: 1
       repo_server_download: true
       gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
       tags:
         - distro
         - core
@@ -341,6 +342,7 @@ yum_repos:
       enabled: 1
       repo_server_download: true
       gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
       tags:
         - distro
         - core
@@ -350,6 +352,7 @@ yum_repos:
       enabled: 1
       repo_server_download: true
       gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
       tags:
         - distro
         - core
@@ -362,7 +365,7 @@ yum_repos:
       enabled: 1
       repo_server_download: true
       gpgcheck: 1
-      gpgkeysource: 'https://rocky-linux-europe-west1.production.gcp.mirrors.ctrliq.cloud/pub/sig/9/security/x86_64/security-common/RPM-GPG-KEY-Rocky-SIG-Security'
+      gpgkeysource: 'https://dl.rockylinux.org/pub/sig/9/security/x86_64/security-common/RPM-GPG-KEY-Rocky-SIG-Security/RPM-GPG-KEY-Rocky-SIG-Security'
       tags:
         - distro
         - security
@@ -375,6 +378,7 @@ yum_repos:
       enabled: 1
       repo_server_download: true
       gpgcheck: 1
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
       tags:
         - distro
         - extras
@@ -420,7 +424,7 @@ yum_repos:
     - id: perun
       name: 'Perun IdM Slave Scripts'
       baseurl: 'https://repo.cerit-sc.cz/el-perun/noarch/'
-      gpgkeysource: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
+      gpgkeysource: 'https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub'
       gpgcheck: 1
       enabled: 1
       repo_server_download: true
@@ -435,6 +439,7 @@ yum_repos:
       enabled: 1
       repo_server_download: true
       gpgcheck: 0
+      gpgkeysource: 'https://packages.irods.org/irods-signing-key.asc'
       tags:
         - irods
     #
