@@ -365,7 +365,7 @@ yum_repos:
       enabled: 1
       repo_server_download: true
       gpgcheck: 1
-      gpgkeysource: 'https://dl.rockylinux.org/pub/sig/9/security/x86_64/security-common/RPM-GPG-KEY-Rocky-SIG-Security/RPM-GPG-KEY-Rocky-SIG-Security'
+      gpgkeysource: 'https://dl.rockylinux.org/pub/sig/9/security/x86_64/security-common/RPM-GPG-KEY-Rocky-SIG-Security'
       tags:
         - distro
         - security
