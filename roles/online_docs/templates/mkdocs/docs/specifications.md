@@ -14,7 +14,7 @@ Key ingredients of the High Performance Computing (HPC) environment of the {{ sl
  * Module system: [Lmod](https://github.com/TACC/Lmod) {{ lmod_version.stdout }}
  * Deployment of (Bioinformatics) software: [EasyBuild](https://github.com/easybuilders/easybuild)
 
-## Virtual Servers
+## Servers
 
  * Jumphosts: _{% for server in groups['jumphost'] %}{{ server}}{% if not loop.last %}, {% endif %}{% endfor %}_
  * User Interfaces (UIs): _{% for server in groups['user_interface'] %}{{ server }}{% if not loop.last %}, {% endif %}{% endfor %}_
