@@ -35,6 +35,19 @@
   become: true
   notify: update-ca-trust
 
+#
+# Make sure we always use the latest distro minor version provided by a repo:
+# drop the minor version from /etc/dnf/vars/releasever
+#
+- name: Set /etc/dnf/vars/releasever to only the major release version.
+  ansible.builtin.template:
+    src: releasever.j2
+    dest: /etc/dnf/vars/releasever
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
 - name: Flush handlers.
   ansible.builtin.meta: flush_handlers
 
