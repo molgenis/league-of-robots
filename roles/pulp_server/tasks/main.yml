@@ -210,7 +210,7 @@
     state: absent
   become: true
   become_user: "{{ repo_management_user }}"
-  when: os_distribution == 'rocky9'
+  when: os_distribution == 'alma9'
 
 - name: Read status from pulp API server and refresh API cache.
   pulp.squeezer.status:
