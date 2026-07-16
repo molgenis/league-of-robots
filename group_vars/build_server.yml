@@ -46,8 +46,4 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog', 'irods'])
               | map(attribute='id') }}"
-  rocky9: "{{ yum_repos['rocky9']
-              | selectattr('tags', 'defined')
-              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog', 'irods'])
-              | map(attribute='id') }}"
 ...
