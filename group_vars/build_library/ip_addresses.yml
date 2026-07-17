@@ -1,6 +1,6 @@
 ---
 ip_addresses:
-  rocky9-build:
+  alma9-build:
     build_internal_management:
       address: 10.10.1.249
       netmask: /32
