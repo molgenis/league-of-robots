@@ -52,8 +52,6 @@
     validate: /usr/sbin/visudo -cf %s
   become: true
   when: subgroup_directories_auto_enabled
-
-
 - name: Flush handlers so daemon_reload happens before enabling units
   ansible.builtin.meta: flush_handlers
 
