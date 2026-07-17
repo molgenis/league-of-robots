@@ -130,7 +130,10 @@ To check the driver and cuda version, run `nvidia-smi` on the compute node:
     # Increase the matrix size, so that the calulation takes long enough to capture with nvidia-smi.
     sed -i 's/maxSampleSizeInMb = 64/maxSampleSizeInMb = 1024/' matrixMultiplyPerf.cu
     srun --qos=interactive-short --gpus-per-node={{ groups['compute_node'] | map('extract', hostvars, 'gpu_type') | select('defined') | first }}:2 --mem=20G --time=01:00:00 --pty bash -i
-    ml CUDA/12.2.0          # load CUDA compiler and libraries
+    ml CUDA/13.2.0          # load CUDA compiler and libraries
+    ml CMake                # load cmake compile to prepare Makefile
+    mkdir build && cd build
+    ccmake ..               # generate makefile
     make                    # compile the current example
     # Run test on second device (note first device is '0',second is '1' etc.)
     ./UnifiedMemoryPerf -device=1 > gpu_test.log &
