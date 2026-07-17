@@ -25,7 +25,8 @@
     - role: pulp_client
       when: repo_manager == 'pulp'
     - role: yum_repos
-      when: repo_manager == 'none'
+      when: repo_manager == 'none' or
+            repo_manager == 'repo_server'
     - ssh_host_signer # update in the tasks needs this role after the repo
     - admin_users
 ...

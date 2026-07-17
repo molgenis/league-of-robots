@@ -183,22 +183,37 @@ Therefore we set ```ANSIBLE_ROLES_PATH``` and ```ANSIBLE_COLLECTIONS_PATH``` to 
 
 **Make sure you already executed `ansible-galaxy install -r requirements.yml`** (see previous step), because it installs the `requirements.txt` file required by `pip` in this step.
 
-```bash
-pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
-# requirements.txt is provided from ansible-galaxy
-_azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" 2>/dev/null)"
-pip install -r "${_azure_pip_requirements}"
-```
-
 See also Galaxy Ansible [Azure Azcollection > Documentation](https://galaxy.ansible.com/ui/repo/published/azure/azcollection/docs/)
-
-If there are issues, run (after ^) also
 
 ```bash
 pip install --upgrade pip   # needed to find newest packages
 ansible-galaxy collection install azure.azcollection --force   # forcefully reinstall collection
-pip install -r "${_azure_pip_requirements}"   # then install the rest of the dependencies
+pip install -r python.venv/ansible/ansible_collections/azure/azcollection/requirements.txt
+# now, due to the new bug the azure-cli and azcollection don't match the msal versions and therefore
+# `az login` fails. To prevent this, I use pipx to separately install `azure-cli` - which provides
+# functionality of `az login` without sharing and messing dependencies of rest of the azcollection
+pip install pipx
+pipx instal azure-cli
+# If ^ fails then use this:
+# find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" -exec pip install -r {} \;
 ```
+
+Legacy
+
+> ```bash
+> pip install azure-cli # if issues occur, try to version lock it to azure-cli==2.61.0 azure azcollection >= 2.6.0 works with it
+> # requirements.txt is provided from ansible-galaxy
+> _azure_pip_requirements="$(find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" 2>/dev/null)"
+> pip install -r "${_azure_pip_requirements}"
+> ```
+>
+> If there are issues, run (after ^) also
+>
+> ```bash
+> pip install --upgrade pip   # needed to find newest packages
+> ansible-galaxy collection install azure.azcollection --force   # forcefully reinstall collection
+> pip install -r "${_azure_pip_requirements}"   # then install the rest of the dependencies
+> ```
 
 Login to the Azure via CLI
 

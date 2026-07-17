@@ -2,26 +2,15 @@
 - name: Flush handlers.
   ansible.builtin.meta: flush_handlers
 
-- name: "Find all *.repo files in {{ yum_repos_repo_config_dir }}."
-  ansible.builtin.find:
-    paths: "{{ yum_repos_repo_config_dir }}"
-    use_regex: false
-    patterns: '*.repo'
-    excludes: 'local_yum.repo'
-  register: yum_repos_find_result
-
-- name: "Remove {{ yum_repos_repo_config_dir }}/*.repo files that do not match repos configured for this host."
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop_control:
-    label: "{{ item | basename }}"
-  loop: "{{ yum_repos_find_result.files | map(attribute='path') | list }}"
-  when: item | basename not in yum_repos[os_distribution]
-                               | selectattr('id', 'in', managed_yum_repos[os_distribution])
-                               | map(attribute='file')
-                               | sort
-                               | unique
+- name: Copy repo server certificates to repo clients.
+  ansible.builtin.copy:
+    src: "{{ repo_servers_certificate }}"
+    dest: /etc/pki/ca-trust/source/anchors/
+    owner: root
+    group: root
+    mode: '0600'
+  when: repo_manager == 'repo_server'
+  notify: update-ca-trust
   become: true
 
 - name: Fetch GPG repo keys.
@@ -34,8 +23,8 @@
   loop_control:
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
   loop: "{{ yum_repos[os_distribution]
-            | selectattr('id', 'in', managed_yum_repos[os_distribution])
-            | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
+            | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
+            | selectattr('gpgkeysource', 'defined') }}"
   become: true
 
 - name: Import fetched GPG repo keys.
@@ -45,16 +34,50 @@
   loop_control:
     label: "{{ yum_repos_gpgkeys_dir }}/{{ item['gpgkeysource'] | basename }} for {{ item['id'] }}"
   loop: "{{ yum_repos[os_distribution]
-            | selectattr('id', 'in', managed_yum_repos[os_distribution])
-            | selectattr('gpgkeysource', 'defined') | flatten(levels=1) }}"
+            | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
+            | selectattr('gpgkeysource', 'defined') }}"
   become: true
 
 - name: "Configure {{ yum_repos_repo_config_dir }}/*.repo files."
-  ansible.builtin.include_tasks: configure_repo_options.yml
+  ansible.builtin.template:
+    src: yum.repo.j2
+    dest: "{{ yum_repos_repo_config_dir }}/{{ yum_repo['id'] }}.repo"
+    owner: 'root'
+    group: 'root'
+    mode: '0640'
   loop_control:
-    label: "{{ yum_repo.id }}"
+    label: "{{ yum_repo['id'] }}"
     loop_var: yum_repo
   loop: "{{ yum_repos[os_distribution]
-            | selectattr('id', 'in', managed_yum_repos[os_distribution])
+            | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
             | flatten(levels=1) }}"
+  become: true
+
+- name: "Find all *.repo files in {{ yum_repos_repo_config_dir }}."
+  ansible.builtin.find:
+    paths: "{{ yum_repos_repo_config_dir }}"
+    use_regex: false
+    patterns: '*.repo'
+    excludes: 'local_yum.repo'
+  register: yum_repos_find_result
+
+#
+# Delete other *.repo files only after all "new" *.repo files were deployed successfully.
+#
+- name: "Remove {{ yum_repos_repo_config_dir }}/*.repo files that do not match repos configured for this host."
+  ansible.builtin.file:
+    path: "{{ repo_config_file }}"
+    state: absent
+  loop: "{{ yum_repos_find_result['files'] | map(attribute='path') }}"
+  loop_control:
+    label: "{{ repo_config_file }}"
+    loop_var: repo_config_file
+  when: repo_config_file | basename
+        not in yum_repos[os_distribution]
+               | selectattr('id', 'in', yum_repos_deployed_on_clients[os_distribution])
+               | map(attribute='id')
+               | map('regex_replace', '^(.*)$', '\\1.repo')
+               | sort
+               | unique
+  become: true
 ...

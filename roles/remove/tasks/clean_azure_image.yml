@@ -34,7 +34,7 @@
     - mde-netfilter
   become: true
 
-- name: Remove all the directories and clean al potentially claimed space
+- name: Remove all the Microsoft pre-made directories and their content
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent

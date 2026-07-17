@@ -4,7 +4,7 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'vt'
 stack_dtap_state: production
-slurm_version: '24.11.6-1.el9.umcg'
+slurm_version: '24.11.7-1.el9.umcg'
 slurm_partitions:
   - name: cpu_r750  # Must be in sync with group listed in Ansible inventory.
     default: no
@@ -44,8 +44,8 @@ slurm_qos_limit_fractions:
 #
 cluster_class: 'research'
 repo_manager: 'pulp'
-os_distribution: 'rocky9'
-rocky_vault_minorversion: '.6'
+os_distribution: 'alma9'
+os_minorversion: '.8'
 figlet_font: 'ogre'
 motd: |
       ===============================================================
@@ -66,7 +66,7 @@ additional_etc_hosts:
         network: external
   - group: build_library
     nodes:
-      - name: rocky9-build
+      - name: alma9-build
         network: vlan16
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
@@ -115,7 +115,7 @@ pam_weblogin:
   max_uid: "{{ ldap_domains['sram']['max_id'] }}"
   retries: 3
   cache_duration: 3600  # seconds
-cloud_image: Rocky-9.6
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
 enable_predictable_network_interface_names: true
 stack_networks:

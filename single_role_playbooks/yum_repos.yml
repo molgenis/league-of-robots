@@ -11,8 +11,18 @@
     - logs
     - repo
     - repo_servers
+  #
+  # Use hard coded strategy linear to disable mitogen when present,
+  # because mitogen fails to detect the ansible_python_interpreter correctly
+  # when using delegate_to, which is used in the logs_client role.
+  # There is no problem when the inventory_host for which a task is executed
+  # has the same Python as the host to which the task is delegated.
+  # But if the inventory_host's Python is missing on the delegate_to host,
+  # then the task will fail.
+  #
+  strategy: linear
   roles:
    - role: yum_repos
-     when:
-       - repo_manager == 'none'
+     when: repo_manager == 'none' or
+           repo_manager == 'repo_server'
 ...

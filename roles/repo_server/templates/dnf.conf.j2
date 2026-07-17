@@ -1,2 +1,5 @@
 [main]
-reposdir={{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}
+reposdir={{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}
+keepcache=1
+logfile={{ main_repo_path }}/logs/dnf/{{ this_distribution }}.log
+cachedir={{ main_repo_path }}/dnf/cache/{{ this_distribution }}/
