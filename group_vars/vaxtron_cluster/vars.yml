@@ -312,6 +312,8 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-nephrology'
     sponsor: umcg-research-it
+  - name: 'umcg-path-bioinformatica'
+    sponsor: umcg-research-it
   - name: 'umcg-pgx'
     sponsor: umcg-research-it
   - name: 'umcg-pmb'
@@ -445,6 +447,8 @@ regular_users:
     groups: ['umcg-neonatology']
   - name: 'umcg-nephrology-dm'
     groups: ['umcg-nephrology']
+  - name: 'umcg-path-bioinformatica-dm'
+    groups: ['umcg-path-bioinformatica']
   - name: 'umcg-pgx-dm'
     groups: ['umcg-pgx']
   - name: 'umcg-pmb-dm'
@@ -580,6 +584,8 @@ sudoers:
     become: 'umcg-neonatology-dm'
   - who: ['%umcg-nephrology-dms']
     become: 'umcg-nephrology-dm'
+  - who: ['%umcg-path-bioinformatica-dms']
+    become: 'umcg-path-bioinformatica-dm'
   - who: ['%umcg-pgx-dms']
     become: 'umcg-pgx-dm'
   - who: ['%umcg-pmb-dms']
@@ -709,6 +715,7 @@ lfs_mounts:
       - name: umcg-nawijn
       - name: umcg-neonatology
       - name: umcg-nephrology
+      - name: umcg-path-bioinformatica
       - name: umcg-pgx
       - name: umcg-pmb
       - name: umcg-rehabilitation
