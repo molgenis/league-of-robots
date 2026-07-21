@@ -9,7 +9,7 @@
     owner: root
     group: root
     mode: '0600'
-  when: repo_manager == 'repo_server'
+  when: repo_manager == 'repo_server' or repo_manager == 'pulp'
   notify: update-ca-trust
   become: true
 

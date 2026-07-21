@@ -1,9 +1,14 @@
 ---
-- name: Install grub tools.
-  ansible.builtin.package:
+- name: Install latest grub2 and shim boot packages
+  ansible.builtin.dnf:
+    name:
+      - grub2-tools
+      - grub2-tools-minimal
+      - grub2-tools-extra
+      - grub2-efi-x64
+      - shim-x64
     state: latest
     update_cache: true
-    name: 'grub2-tools'
   become: true
 
 - name: Configure GRUB_TIMEOUT in /etc/default/grub.
