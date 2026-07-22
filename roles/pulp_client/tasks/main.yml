@@ -33,7 +33,7 @@
     mode: '0600'
   with_items: "{{ groups['repo'] }}"
   become: true
-  notify: update-ca-trust
+  notify: pulp_client_update-ca-trust
 
 #
 # Make sure we always use the latest distro minor version provided by a repo:
