@@ -9,8 +9,8 @@
     owner: root
     group: root
     mode: '0600'
-  when: repo_manager == 'repo_server' or repo_manager == 'pulp'
-  notify: update-ca-trust
+  when: repo_manager == 'repo_server'
+  notify: yum_repos_update-ca-trust
   become: true
 
 - name: Fetch GPG repo keys.
