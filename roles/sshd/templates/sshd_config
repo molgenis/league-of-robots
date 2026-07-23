@@ -156,7 +156,7 @@ Match all
 #
 # On data staging servers: Restrict regular users to sftp-only on port 22.
 #
-Match Group *,!admin,!{{ data_transfer_only_group }} LocalPort 22
+Match Group *,!admin,!{{ data_transfer_only_group }}{% if functional_admin_group is defined %},!{{ functional_admin_group }}{% endif %} LocalPort 22
     AllowAgentForwarding no
     AllowTcpForwarding no
     PermitTTY no
@@ -171,7 +171,7 @@ Match Group {{ data_transfer_only_group }} LocalPort 22
 #
 # On data staging servers: Restrict regular users to rsync-only on port 443.
 #
-Match Group *,!admin,!{{ data_transfer_only_group }} LocalPort 443
+Match Group *,!admin,!{{ data_transfer_only_group }}{% if functional_admin_group is defined %},!{{ functional_admin_group }}{% endif %} LocalPort 443
     AllowAgentForwarding no
     AllowTcpForwarding no
     PermitTTY no
