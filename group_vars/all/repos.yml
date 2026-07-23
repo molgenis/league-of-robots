@@ -318,11 +318,11 @@ yum_repos:
     #
     - id: jenkins
       name: "Jenkins{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
-      baseurl: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
+      baseurl: "https://pkg.jenkins.io/rpm{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
       enabled: 1
       repo_server_download: true
       gpgcheck: 1
-      gpgkeysource: "https://pkg.jenkins.io/redhat{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/jenkins.io-2023.key"
+      gpgkeysource: "https://pkg.jenkins.io/rpm{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/repodata/repomd.xml.key"
       tags:
         - jenkins
   rocky9:
