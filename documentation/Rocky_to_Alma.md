@@ -51,7 +51,7 @@ pulp rpm remote destroy --name extras-remote
 ##### Switch back to your Ansible controller: Redeploy pulp server role to recreate repos.
 
 ```
-ansible-playbook -u ${admin} single_role_playbooks/pulp_server.yml -l repo --start-at-task 'Manage repos.' 
+ansible-playbook -u ${admin} single_role_playbooks/pulp_server.yml -l repo --start-at-task 'Manage repos.'
 ```
 
 ##### Switch back to repo server: Update all repos on pulp server.
@@ -66,8 +66,9 @@ cd
 . ./pulp-cli.venv/bin/activate
 . ./pulp-init.bash
 #
-pulp-sync-publish-distribute all
 pulp-refresh-acs
+pulp-sync-publish-distribute all
+
 ```
 
 ## Update all other machines: both Pulp clients and machines linked directly to the Alma repos.
@@ -97,10 +98,6 @@ ansible 'cpu_r630:!nb-node-c01' -u "${admin}" --become -m ansible.builtin.shell 
 ansible 'cpu_r630:!nb-node-c01' -u "${admin}" --become -m ansible.builtin.shell -a 'cd; echo ${PWD}; curl -O https://raw.githubusercontent.com/AlmaLinux/almalinux-deploy/master/almalinux-deploy.sh'
 ansible 'cpu_r630:!nb-node-c01' -u "${admin}" --become -m ansible.builtin.shell -a 'cd; echo ${PWD}; bash ./almalinux-deploy.sh'
 ```
-
-ansible-playbook -u ${admin} single_group_playbooks/cluster_part1.yml -l compute_node
-ansible-playbook -u ${admin} single_group_playbooks/cluster_part2.yml -l compute_node
-ansible-playbook -u ${admin} single_group_playbooks/compute_node.yml -l compute_node
 
 ##### On the Ansible controller: rerun all playbooks.
 
