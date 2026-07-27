@@ -23,6 +23,7 @@
     cmd: |
          java -jar {{ jenkins_cli_dest }} \
          -s {{ jenkins_url }} \
+         -http \
          -auth {{ jenkins_admin_username }}:{{ jenkins_admin_api_token }} \
          list-jobs
   register: existing_jenkins_jobs
@@ -32,6 +33,7 @@
     cmd: |
          java -jar {{ jenkins_cli_dest }} \
          -s {{ jenkins_url }} \
+         -http \
          -auth {{ jenkins_admin_username }}:{{ jenkins_admin_api_token }} \
          update-job "{{ item }}" < "{{ jenkins_xml_dest }}/{{ item }}_config.xml"
   loop: "{{ jenkins_projects }}"
@@ -43,6 +45,7 @@
     cmd: |
          java -jar {{ jenkins_cli_dest }} \
          -s {{ jenkins_url }} \
+         -http \
          -auth {{ jenkins_admin_username }}:{{ jenkins_admin_api_token }} \
          create-job "{{ item }}" < "{{ jenkins_xml_dest }}/{{ item }}_config.xml"
   loop: "{{ jenkins_projects }}"
