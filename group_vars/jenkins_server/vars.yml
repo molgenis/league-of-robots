@@ -1,10 +1,9 @@
 ---
 stack_prefix: 'jenkins'
 stack_name: "{{ stack_prefix }}_server"  # stack_name must match the name of the folder that contains this vars.yml file.
-cloud_image: RockyLinux-9.3_xfs
-cloud_user: cloud-user
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
-os_distribution: 'rocky9'
+os_distribution: 'alma9'
 repo_manager: 'none'
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
@@ -67,37 +66,37 @@ external_jumphosts:
 jenkins_plugins:
   - warnings-ng
   - name: git
-    version: 5.9.0
+    version: 5.10.1
   - name: branch-api
-    version: 2.1268.v044a_87612da_8
+    version: 2.1280.v0d4e5b_b_460ef
   - name: cloudbees-folder
-    version: 6.1073.va_7888eb_dd514
+    version: 6.1100.ve9eed61d16c4
   - name: github-branch-source
-    version: 1917.v9ee8a_39b_3d0d
+    version: 1967.1970.vd86979736546
   - name: analysis-model-api
-    version: 13.18.0-935.v784ca_107400a_
+    version: 14.14.0-1004.vf53c9efb_f455
   - name: github-api
     version: 1.330-492.v3941a_032db_2a_
   - name: git-client
-    version: 6.5.0
+    version: 6.6.1
   - name: github
-    version: 1.45.0
+    version: 1.47.0
   - name: matrix-auth
-    version: 3.2.9
+    version: 3.3
   - name: workflow-api
-    version: 1384.vdc05a_48f535f
+    version: 1413.v2ff1a_5e720fa_
   - name: workflow-job
-    version: 1571.vb_423c255d6d9
+    version: 1590.v49101d088542
   - name: workflow-multibranch
     version: 821.vc3b_4ea_780798
   - name: workflow-basic-steps
     version: 1098.v808b_fd7f8cf4
   - name: workflow-durable-task-step
-    version: 1464.v2d3f5c68f84c
+    version: 1479.v56e587f413a_7
   - name: workflow-scm-step
     version: 466.va_d69e602552b_
   - name: pipeline-stage-step
-    version: 322.vecffa_99f371c
+    version: 345.va_96187909426
 jenkins_plugins_install_dependencies: true
 jenkins_prefer_lts: true
 jenkins_shellcheck_version: 0.8.0

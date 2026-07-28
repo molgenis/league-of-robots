@@ -1,5 +1,5 @@
 ---
-os_distribution: 'rocky9'
+os_distribution: 'alma9'
 #
 # Enforce that docs servers use `yum_repos` for defining repositories, since they cannot use Pulp.
 #
@@ -15,10 +15,6 @@ yum_repos_deployed_on_clients:
   alma9: "{{ yum_repos['alma9']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog'])
-              | map(attribute='id') }}"
-  rocky9: "{{ yum_repos['rocky9']
-              | selectattr('tags', 'defined')
-              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
               | map(attribute='id') }}"
 #
 # Firewall configuration.
@@ -54,5 +50,4 @@ fqdn: docs.gcc.rug.nl
 https_certificate_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.pem"
 https_private_key_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/{{ fqdn }}.key"
 https_chain_file: "{{ playbook_dir }}/files/{{ inventory_hostname }}/HARICA-GEANT-TLS-ECC-Certificate-bundle.pem"
-
 ...

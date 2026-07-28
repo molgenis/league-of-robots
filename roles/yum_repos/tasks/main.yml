@@ -1,7 +1,4 @@
 ---
-- name: Flush handlers.
-  ansible.builtin.meta: flush_handlers
-
 - name: Copy repo server certificates to repo clients.
   ansible.builtin.copy:
     src: "{{ repo_servers_certificate }}"
@@ -10,7 +7,7 @@
     group: root
     mode: '0600'
   when: repo_manager == 'repo_server'
-  notify: update-ca-trust
+  notify: yum_repos_update-ca-trust
   become: true
 
 - name: Fetch GPG repo keys.
@@ -80,4 +77,20 @@
                | sort
                | unique
   become: true
+
+#
+# Make sure we always use the latest distro minor version provided by a repo:
+# drop the minor version from /etc/dnf/vars/releasever
+#
+- name: Set /etc/dnf/vars/releasever to only the major release version.
+  ansible.builtin.template:
+    src: releasever.j2
+    dest: /etc/dnf/vars/releasever
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
 ...

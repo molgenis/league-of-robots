@@ -306,7 +306,7 @@ all:
                   type: ext4
               slurm_sockets: 1
               slurm_cores_per_socket: 64
-              slurm_real_memory: 256809
+              slurm_real_memory: 256800
               slurm_local_disk: 1420000
               slurm_weight: 10
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml

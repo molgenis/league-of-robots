@@ -88,7 +88,6 @@ all:
         cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             hc-node-a01:
-              repo_manager: 'repo_server'
               cloud_flavor: umcg.v1.vm.4-8
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"

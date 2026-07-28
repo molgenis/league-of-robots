@@ -131,15 +131,11 @@ pip3 install wheel
 pip3 install setuptools  # No longer part of default Python >= 3.12.x, but we need it.
 pip3 install ruamel.yaml
 pip3 install netaddr
+pip3 install passlib
 #
 # Package dnspython is required for Ansible lookup plugin community.general.dig
 #
 pip3 install dnspython
-#
-# On macOS only to prevent this error:
-# crypt.crypt not supported on Mac OS X/Darwin, install passlib python module.
-#
-pip3 install passlib
 #
 # Optional: install Ansible and the Ansible linter with pip.
 # You may skip this step if you already installed Ansible by other means.
@@ -163,7 +159,7 @@ pip3 install mitogen
 
 ```bash
 pip3 install openstacksdk
-pip3 install openstackclient
+pip3 install python-openstackclient
 ```
 
 #### 2. Import the required roles and collections for the playbooks.
