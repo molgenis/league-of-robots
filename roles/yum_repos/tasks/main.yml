@@ -1,7 +1,4 @@
 ---
-- name: Flush handlers.
-  ansible.builtin.meta: flush_handlers
-
 - name: Copy repo server certificates to repo clients.
   ansible.builtin.copy:
     src: "{{ repo_servers_certificate }}"
@@ -93,4 +90,7 @@
     group: root
     mode: '0644'
   become: true
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
 ...
