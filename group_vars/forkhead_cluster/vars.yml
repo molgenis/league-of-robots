@@ -62,8 +62,8 @@ iptables_allow_ssh_outbound:
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 main_backup_folder: '/mnt/pssd_backup/'
-local_backups: # list of folders for cron to make daily backup
-  - name: apps # don't modify after once deployed!
+backups:
+  - name: apps # Name == ID for cronjob; don't modify after deployment!
     src_path: '/apps'
     frequency:
      - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }

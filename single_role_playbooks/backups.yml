@@ -1,0 +1,7 @@
+---
+- name: Configure backups.
+  hosts:
+    - deploy_admin_interface
+  roles:
+    - backups
+...

@@ -1,0 +1,35 @@
+---
+- name: Install backup cronjob script
+  ansible.builtin.template:
+    src: "templates/backup_cronjob.sh.j2"
+    dest: '/root/backup_cronjob.sh'
+    owner: 'root'
+    group: 'root'
+    mode: '0700'
+  become: true
+
+- name: Create subdirectories for backups
+  ansible.builtin.file:
+    path: "{{ item['dest'] }}/{{ item['name'] }}/"
+    state: directory
+    owner: 'root'
+    group: 'root'
+    mode: '0700'
+  become: true
+  loop: "{{ backups }}"
+
+- name: Create cron jobs for backups
+  ansible.builtin.cron:
+    name: "{{ item[0]['name'] }}-{{ item[1]['name'] }} - do not change it manually!"
+    hour: "{{ item[1]['hour'] }}"
+    minute: "{{ item[1]['minute'] }}"
+    month: "{{ item[1]['month'] }}"
+    weekday: "{{ item[1]['weekday'] }}"
+    user: 'root'
+    disabled: "{{ item[1]['disabled'] | default('false') }}"
+    job: >
+      /root/backup_cronjob.sh '{{ item.0.name }}' '{{ item.1.name }}' '{{ item.1.keep }}'
+      '{{ item.0.src_path }}' '{{ main_backup_folder | default("/backups/", true) }}'
+  loop: '{{ backups | subelements("frequency") }}'
+  become: true
+...

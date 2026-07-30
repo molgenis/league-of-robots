@@ -1,5 +1,0 @@
----
-dependencies:
-    - role: rsync
-      when: local_backups is defined and backup_clist | default([]) | length > 0
-...

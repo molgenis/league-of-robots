@@ -165,7 +165,6 @@ all:
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: eno12409np1
-
           local_yum_repository: true # enable local yum repository for PERC CLI utility.
           perc_devices: true
           local_mounts:
@@ -203,12 +202,6 @@ all:
     deploy_admin_interface:
       hosts:
         copperfist:
-          main_backup_folder: '/mnt/local_raid/local_backups/'
-          local_backups: # list of folders for cron to make daily backup
-            - name: apps # Name == ID; don't modify after deployed!
-              src_path: '/apps'
-              frequency:
-               - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
         copperfist:
@@ -381,6 +374,19 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
+          backups:
+            - name: apps # Name == ID for cronjob; don't modify after deployment!
+              src: 'copperfist:/apps'
+              dest: '/mnt/umcgst16/copperfist_backups/'
+              keep: 60            # Minimum number of successful backups to keep.
+              retention_time: 60  # Minimal retention time in days.
+              crontab:
+                hour: 5
+                minute: 47
+                day: '*'
+                weekday: '*'
+                month: '*'
+                disabled: false
     smb_server:
       hosts:
         copperfist:

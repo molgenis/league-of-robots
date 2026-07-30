@@ -1,5 +1,0 @@
----
-- name: Install and configure local backup using cron.
-  ansible.builtin.include_tasks: crons.yml
-  when: local_backups is defined and local_backups | default([]) | length > 0
-...
