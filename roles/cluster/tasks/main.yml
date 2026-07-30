@@ -19,14 +19,14 @@
 - name: Create sub dirs in /etc/skel/.
   ansible.builtin.file:
     path: "/etc/skel/{{ item['path'] }}"
-    owner: 'root'
-    group: 'root'
+    owner: root
+    group: root
     mode: "{{ item['mode'] }}"
-    state: 'directory'
+    state: directory
   loop:
-    - path: '.ssh'
+    - path: .ssh
       mode: '0700'
-    - path: '.ssh/tmp'
+    - path: .ssh/tmp
       mode: '0700'
   become: true
 
@@ -34,17 +34,17 @@
   ansible.builtin.copy:
     src: "skel/{{ item['path'] }}"
     dest: "/etc/skel/{{ item['path'] }}"
-    owner: 'root'
-    group: 'root'
+    owner: root
+    group: root
     mode: "{{ item['mode'] }}"
   loop:
-    - path: '.bashrc'
+    - path: .bashrc
       mode: '0644'
-    - path: '.screenrc'
+    - path: .screenrc
       mode: '0644'
-    - path: '.ssh/config'
+    - path: .ssh/config
       mode: '0600'
-    - path: '.ssh/tmp/README'
+    - path: .ssh/tmp/README
       mode: '0600'
   become: true
 ...
