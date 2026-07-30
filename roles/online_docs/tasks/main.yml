@@ -192,8 +192,10 @@
   ansible.posix.synchronize:
     src: "{{ playbook_dir }}/roles/online_docs/files/index//./{{ item.src }}"
     dest: "/var/www/html/"
-    owner: 'no'
-    group: 'no'
+    owner: false  # Do not sync owner from Ansible control host to inventory host.
+    group: false  # Do not sync group from Ansible control host to inventory host.
+    times: false  # Do not sync time stamps from Ansible control host to inventory host.
+    checksum: true  # Determine if files are different based on checksums as opposed to combination of timestamp and size.
     # Temporarily disabled as it is broken in Mitogen 0.3.3. Fix is already merged and will be in next Mitogen version.
     # use_ssh_args: true
     ssh_connection_multiplexing: true
@@ -238,8 +240,10 @@
   ansible.posix.synchronize:
     src: "{{ playbook_dir }}/roles/online_docs/files/mkdocs/docs/./{{ item.src }}"
     dest: "/srv/mkdocs/{{ slurm_cluster_name }}/docs/"
-    owner: 'no'
-    group: 'no'
+    owner: false  # Do not sync owner from Ansible control host to inventory host.
+    group: false  # Do not sync group from Ansible control host to inventory host.
+    times: false  # Do not sync time stamps from Ansible control host to inventory host.
+    checksum: true  # Determine if files are different based on checksums as opposed to combination of timestamp and size.
     # Temporarily disabled as it is broken in Mitogen 0.3.3. Fix is already merged and will be in next Mitogen version.
     # use_ssh_args: true
     ssh_connection_multiplexing: true
@@ -277,8 +281,10 @@
   ansible.posix.synchronize:
     src: "{{ playbook_dir }}/roles/online_docs/files/attachments/{{ item.src }}/./"
     dest: "/srv/mkdocs/{{ slurm_cluster_name }}/tmp/{{ item.dest }}"
-    owner: 'no'
-    group: 'no'
+    owner: false  # Do not sync owner from Ansible control host to inventory host.
+    group: false  # Do not sync group from Ansible control host to inventory host.
+    times: false  # Do not sync time stamps from Ansible control host to inventory host.
+    checksum: true  # Determine if files are different based on checksums as opposed to combination of timestamp and size.
     # Temporarily disabled as it is broken in Mitogen 0.3.3. Fix is already merged and will be in next Mitogen version.
     # use_ssh_args: true
     ssh_connection_multiplexing: true
