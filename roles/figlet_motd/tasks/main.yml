@@ -7,20 +7,12 @@
   become: true
 
 - name: 'Install custom figlet fonts.'
-  ansible.posix.synchronize:
-    src: "files/{{ item }}"
+  ansible.builtin.copy:
+    src: "{{ item }}"
     dest: "/usr/share/figlet/{{ item }}"
-    owner: false
-    group: false
-    # Temporarily disabled as it is broken in Mitogen 0.3.3. Fix is already merged and will be in next Mitogen version.
-    # use_ssh_args: true
-    ssh_connection_multiplexing: true
-    rsync_opts:
-      - '--omit-dir-times'
-      - '--omit-link-times'
-      - '--chmod=Fu=rw,Fgo=r'
-      - '--perms'
-      - '--force'
+    owner: root
+    group: root
+    mode: '0644'
   with_items:
     - 'cyberlarge.flf'
     - 'doh.flf'
