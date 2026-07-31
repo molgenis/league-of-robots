@@ -114,6 +114,7 @@ local_admin_users:
   - 'pieter'
   - 'robin'
   - 'sandi'
+  - 'steven'
   - 'wim'
   - 'wouter'
 envsync_user: 'umcg-envsync'

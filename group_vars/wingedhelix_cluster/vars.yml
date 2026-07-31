@@ -159,6 +159,7 @@ local_admin_users:
   - 'pieter'
   - 'robin'
   - 'sandi'
+  - 'steven'
   - 'wim'
   - 'wouter'
 data_transfer_only_group: 'umcg-sftp-only'
