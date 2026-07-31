@@ -21,7 +21,6 @@ export TMPDIR="${TMPDIR:-/tmp}" # Default to /tmp if $TMPDIR was not defined.
 SCRIPT_NAME="$(basename "${0}")"
 SCRIPT_NAME="${SCRIPT_NAME%.*sh}"
 LOG_DIR="/var/log/${SCRIPT_NAME}/"
-HOSTNAME_SHORT="$(hostname -s)"
 ROLE_USER="$(whoami)"
 REAL_USER="$(logname 2>/dev/null || echo 'no login name')"
 
@@ -40,6 +39,7 @@ function trapSig() {
 	done
 }
 
+# shellcheck disable=SC2329
 function trapHandler() {
 	local _signal="${1}"
 	local _line="${2}"
@@ -240,7 +240,7 @@ declare source=''
 declare keep=''
 declare retention_time=''
 declare user=''
-while getopts ":d:s:k:r:u:h" opt; do
+while getopts ":d:s:k:r:u:l:h" opt; do
 	case "${opt}" in
 		h)
 			showHelp
@@ -281,22 +281,22 @@ done
 #
 if [[ -z "${destination:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify destination where to store the backup with -d. Try $(basename "${0}") -h for help."
-elif [[ "${destination}" =~ ^[a-zA-Z0-9_/.-]+$ ]]; then
+elif [[ ! "${destination}" =~ ^[a-zA-Z0-9_/.-]+$ ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Destination where to store the backup contains invalid characters. Try $(basename "${0}") -h for help."
 fi
 if [[ -z "${source:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify source data to backup with -s. Try $(basename "${0}") -h for help."
-elif [[ "${source}" =~ ^[a-zA-Z0-9_/.:@-]+$ ]]; then
+elif [[ ! "${source}" =~ ^[a-zA-Z0-9_/.:@-]+$ ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Source data to backup contains invalid characters. Try $(basename "${0}") -h for help."
 fi
 if [[ -z "${keep:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify the minimal number of successful backups to keep with -k. Try $(basename "${0}") -h for help."
-elif [[ "${keep}" =~ ^[0-9]+$ ]]
+elif [[ ! "${keep}" =~ ^[0-9]+$ ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Number of backups to keep must be an integer. Try $(basename "${0}") -h for help."
 fi
 if [[ -z "${retention_time:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '0' "Must specify the minimal retention time with -r. Try $(basename "${0}") -h for help."
-elif [[ "${retention_time}" =~ ^[0-9]+$ ]]
+elif [[ ! "${retention_time}" =~ ^[0-9]+$ ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Retention time in days must be an integer. Try $(basename "${0}") -h for help."
 fi
 if [[ -z "${user:-}" ]]; then
@@ -324,6 +324,7 @@ log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written 
 hashed_source="$(printf '%s' "${source}" | md5sum | awk '{print $1}')"
 lock_file="${LOG_DIR}/${SCRIPT_NAME}-${hashed_source}.lock"
 thereShallBeOnlyOne "${lock_file}"
+printf 'This lock file is used for making backups of %s.\n' "${source}" > "${lock_file}"
 
 #
 # Ensure destination dir exists.
@@ -348,15 +349,19 @@ mkdir -p -m 700 "${destination}/"  || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-
 # -q quiet; suppress non-error messages.
 #
 backup_start_ts="$(date "+%Y-%m-%d-T%H%M")"
+if [[ -e "${destination}/${backup_start_ts}" ]]; then
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup ${destination}/${backup_start_ts} already exists."
+fi
+printf 'Working on backup of %s to %s ... ' "${source}" "${destination}/${backup_start_ts}" >> "${lock_file}"
 rsync_log="${LOG_DIR}/${SCRIPT_NAME}-${hashed_source}-rsync-${backup_start_ts}.log"
 set +e
-if [[ -L "${detination}/latest_rsync" ]]; then
+if [[ -L "${destination}/latest_rsync" ]]; then
 	#
 	# Use Rsync's --link-dest feature to create multiple hard links to the same files 
 	# if they have not changed since the previous backup.
 	# This prevents redundancy and hence saves precious backup disk space.
 	#
-	rsync -rlptgoAHXcsSq --link-dest="${destination}"/latest \
+	rsync -rlptgoAHXcsSq --link-dest="${destination}/latest" \
 	"${source}" \
 	"${destination}/${backup_start_ts}_in_flux" \
 	>> "${rsync_log}" 2>&1
@@ -391,9 +396,11 @@ else
 	touch "${destination}/${backup_start_ts}_in_flux/backup.finished"
 	mv "${destination}/${backup_start_ts}"{_in_flux,}
 	cd "${destination}"
-	ln -s -f "${backup_start_ts}" latest
+	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Creating symlink in $(pwd) latest -> ${backup_start_ts}."
+	ln -s -f -n "${backup_start_ts}" latest
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Backup of ${source} completed successfully!"
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "${destination}/${backup_start_ts} is now marked as 'latest' backup."
+	printf 'done.\n' >> "${lock_file}"
 fi
 
 #
@@ -404,16 +411,22 @@ fi
 #
 # Due to rounding issues we define the age in day+1 when looking for good/outdated backups.
 #
-log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Deleting outdated ${source} backups from ${destinaton} ..."
+log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Deleting outdated ${source} backups from ${destination} ..."
 retention_time="$(("${retention_time}" + 1))"
 recent_good_backups="$(find "${destination}/" -mindepth 1 -maxdepth 2 -type f -name backup.finished -mtime "-${retention_time}" | wc -l)"
-log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Found ${recent_good_backups} not outdated and successful backups."
-if [ "${recent_good_backups}" -ge "${keep}" ]; then
-	outdated_backups_count="$(find "${destination}/" -maxdepth 1 -mtime "+${retention_time}" | wc -l)"
-	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Minimal amount of not outdated and successful backups (${keep}) present; Removing ${outdated_backups_count} outdated backup(s) ..."
-	find "${destination}/" -maxdepth 1 -mtime "+${retention_time}" -type d -exec rm -Rf '{}' \;
-	find "${LOG_DIR}/" -mtime "+${retention_time}" -name '*.log' -exec rm -f'{}' \;
-	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "    done."
+outdated_backups_count="$(find "${destination}/" -maxdepth 1 -mtime "+${retention_time}" | wc -l)"
+log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Found ${recent_good_backups} not outdated and successful backups."
+log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Found ${outdated_backups_count} outdated backup(s)."
+if [[ "${recent_good_backups}" -ge "${keep}" ]]; then
+	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Minimal amount of not outdated and successful backups (${keep}) present."
+	if [[ "${outdated_backups_count}" -ge 1 ]]; then
+		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Removing ${outdated_backups_count} outdated backup(s) ..."
+		find "${destination}/" -maxdepth 1 -mtime "+${retention_time}" -type d -exec rm -Rf '{}' \;
+		find "${LOG_DIR}/" -mtime "+${retention_time}" -name '*.log' -exec rm -f'{}' \;
+		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "    done."
+	else
+		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "There are no outdated backups to remove."
+	fi
 else
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Minimal amount of not outdated and successful backups (${keep}) not yet reached; No outdated backups will be removed."
 fi
