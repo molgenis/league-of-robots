@@ -239,63 +239,34 @@ regular_users:
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd']
-    become: 'umcg-atd-ateambot'
-  - who: ['%umcg-atd']
-    become: 'umcg-atd-dm'
+    become: ['umcg-atd-ateambot', 'umcg-atd-dm']
   - who: ['%umcg-gap,!charbonb,!hendriksend']
-    become: 'umcg-gap-ateambot'
-  - who: ['%umcg-gap,!charbonb,!hendriksend']
-    become: 'umcg-gap-dm'
+    become: ['umcg-gap-ateambot', 'umcg-gap-dm']
   - who: ['%umcg-gd,!charbonb,!hendriksend']
-    become: 'umcg-gd-ateambot'
-  - who: ['%umcg-gd,!charbonb,!hendriksend']
-    become: 'umcg-gd-dm'
+    become: ['umcg-gd-ateambot', 'umcg-gd-dm']
   - who: ['%umcg-genomescan']
-    become: 'umcg-genomescan-ateambot'
-  - who: ['%umcg-genomescan']
-    become: 'umcg-genomescan-dm'
+    become: ['umcg-genomescan-ateambot', 'umcg-genomescan-dm']
   - who: ['%umcg-gsad,!charbonb,!hendriksend']
-    become: 'umcg-gsad-ateambot'
-  - who: ['%umcg-gsad,!charbonb,!hendriksend']
-    become: 'umcg-gsad-dm'
+    become: ['umcg-gsad-ateambot', 'umcg-gsad-dm']
   - who: ['%umcg-gst']
-    become: 'umcg-gst-ateambot'
-  - who: ['%umcg-gst']
-    become: 'umcg-gst-dm'
+    become: ['umcg-gst-ateambot', 'umcg-gst-dm']
   - who: ['%umcg-lab-dms']
-    become: 'umcg-lab-ateambot'
-  - who: ['%umcg-lab-dms']
-    become: 'umcg-lab-dm'
+    become: ['umcg-lab-ateambot', 'umcg-lab-dm']
   - who: ['%umcg-labgnkbh']
-    become: 'umcg-labgnkbh-ateambot'
-  - who: ['%umcg-labgnkbh']
-    become: 'umcg-labgnkbh-dm'
+    become: ['umcg-labgnkbh-ateambot', 'umcg-labgnkbh-dm']
   - who: ['%umcg-logstorpm']
     become: 'umcg-logstoprm-dm'
   - who: ['%umcg-ogm']
     become: 'umcg-ogm-dm'
   - who: ['%umcg-patho']
-    become: 'umcg-patho-ateambot'
-  - who: ['%umcg-patho']
-    become: 'umcg-patho-dm'
+    become: ['umcg-patho-ateambot', 'umcg-patho-dm']
   - who: ['%umcg-pgx']
-    become: 'umcg-pgx-ateambot'
-  - who: ['%umcg-pgx']
-    become: 'umcg-pgx-dm'
+    become: ['umcg-pgx-ateambot', 'umcg-pgx-dm']
   - who: ['%umcg-pr']
-    become: 'umcg-pr-ateambot'
-  - who: ['%umcg-pr']
-    become: 'umcg-pr-dm'
+    become: ['umcg-pr-ateambot', 'umcg-pr-dm']
   - who: ['%umcg-vipt']
     become: 'umcg-vipt-dm'
 remote_users_in_local_groups:
-  - name: 'benjaminsm'
-    groups: [
-        "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
-        'umcg-gap', 'umcg-gd', 'umcg-genomescan',
-        'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
-    ]
   - name: 'bijlsmam'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',

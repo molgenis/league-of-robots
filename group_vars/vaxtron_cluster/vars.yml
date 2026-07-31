@@ -491,15 +491,9 @@ sudoers:
   - who: ['%umcg-adorable-dms']
     become: 'umcg-adorable-dm'
   - who: ['%umcg-as']
-    become: 'umcg-capicebot'
-  - who: ['%umcg-as']
-    become: 'umcg-vipbot'
-  - who: ['%umcg-as']
-    become: 'umcg-as-dm'
+    become: ['umcg-capicebot', 'umcg-vipbot', 'umcg-as-dm']
   - who: ['%umcg-atd']
-    become: 'umcg-atd-ateambot'
-  - who: ['%umcg-atd']
-    become: 'umcg-atd-dm'
+    become: ['umcg-atd-ateambot', 'umcg-atd-dm']
   - who: ['%umcg-biogen-dms']
     become: 'umcg-biogen-dm'
   - who: ['%umcg-bionic-mdd-gwama-dms']
@@ -526,10 +520,8 @@ sudoers:
     become: 'umcg-franke-scrna-dm'
   - who: ['%umcg-fu-dms']
     become: 'umcg-fu-dm'
-  - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
-    become: 'umcg-gap-ateambot'
-  - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
-    become: 'umcg-gap-dm'
+  - who: ['%umcg-gap-dms']
+    become: ['umcg-gap-ateambot', 'umcg-gap-dm']
   - who: ['%umcg-gastrocol-dms']
     become: 'umcg-gastrocol-dm'
   - who: ['%umcg-gcc']
@@ -537,9 +529,7 @@ sudoers:
   - who: ['%umcg-gdi-dms']
     become: 'umcg-gdi-dm'
   - who: ['%umcg-gdio-dms']
-    become: 'umcg-gdio-dm'
-  - who: ['%umcg-gdio-dms']
-    become: 'umcg-gridion-dm'
+    become: ['umcg-gdio-dm', 'umcg-gridion-dm']
   - who: ['%umcg-gonl-dms']
     become: 'umcg-gonl-dm'
   - who: ['%umcg-griac-dms']
@@ -590,7 +580,7 @@ sudoers:
     become: 'umcg-pgx-dm'
   - who: ['%umcg-pmb-dms']
     become: 'umcg-pmb-dm'
-  - who: ['umcg-gvdvries,umcg-kdelange,umcg-mbenjamins,umcg-mbijlsma,umcg-pneerincx,umcg-rkanninga']
+  - who: ['%umcg-radicon-dms']
     become: 'umcg-radicon-dm'
   - who: ['%umcg-rad-dms']
     become: 'umcg-rad-dm'
