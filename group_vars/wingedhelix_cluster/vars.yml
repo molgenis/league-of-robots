@@ -33,6 +33,7 @@ slurm_qos_limit_fractions:
     user: 0.5
 repo_manager: 'pulp'
 os_distribution: 'rocky9'
+os_minorversion: '.4'
 figlet_font: 'ogre'
 motd: |
       =========================================================
