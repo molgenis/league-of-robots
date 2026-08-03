@@ -2,8 +2,7 @@
 stack_prefix: 'docs'
 stack_domain: 'gcc.rug.nl'
 stack_name: "{{ stack_prefix }}_library"  # stack_name must match the name of the folder that contains this vars.yml file.
-cloud_image: RockyLinux-9.3_xfs
-cloud_user: cloud-user
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"

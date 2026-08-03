@@ -31,7 +31,7 @@ ip_addresses:
       {% set fqdn = public_ip_results['publicipaddresses'][0]['dns_settings']['fqdn'] %}
       fqdn: '{{ fqdn }}'
       {% else %}
-      fqdn: 'WARNING: Check manually for DNS CNAME records a.k.a. aliases: we cannot reverse lookup an alias automagically.' %}
+      fqdn: 'NXDOMAIN'
       {% endif %}
     {% endif %}
     {% endfor %}

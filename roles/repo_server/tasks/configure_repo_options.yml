@@ -1,17 +1,19 @@
 ---
 - name: "Create the repo folder structure for {{ this_distribution }}"
   ansible.builtin.file:
-    path: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}"
+    path: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}"
     state: directory
     mode: '0750'
-    owner: 'root'
-    group: 'root'
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
   become: true
 
 - name: "Configure main configurations for /{{ this_distribution }}"
   ansible.builtin.template:
     src: templates/dnf.conf.j2
-    dest: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}.conf"
+    dest: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}.conf"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
     force: true
     mode: '0644'
   become: true
@@ -33,7 +35,7 @@
     path: "{{ local_temp_repo_dir }}"
     state: directory
     mode: '0755'
-  changed_when: false # local files are only temporary, the actual change occurs in next task
+  changed_when: false # local files are only temporary, the actual change occurs in following tasks
   delegate_to: localhost
   connection: local
 
@@ -58,18 +60,18 @@
       - mirrorlist
       - metalink
   when:
-    - item.0.enabled | default(1) | int == 1
+    - item.0.repo_server_download | bool | default(False)
     - item.0[item.1] is defined
   delegate_to: localhost
   connection: local
   changed_when: false # local files are only temporary, the actual change occurs in next task
 
-- name: "Copy repo files to repo_server"
+- name: "Copy repo files to repo_servers"
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}/"
-    owner: root
-    group: root
+    dest: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
     mode: '0644'
   loop: "{{ lookup('fileglob', local_temp_repo_dir + '/*', wantlist=True) }}"
   become: true
@@ -82,18 +84,10 @@
 
 - name: "Get list of remote repo files"
   ansible.builtin.find:
-    paths: "{{ main_repo_path }}/dnf.repos.d/{{ this_distribution }}/"
+    paths: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
     patterns: "*.repo"
   register: remote_repos
   become: true
-
-# - name: local files
-#   debug:
-#     msg: "{{ local_files }}"
-#
-# - name: remote files
-#   debug:
-#     msg: "{{ remote_repos.files }}"
 
 - name: "Delete remote repo files not in local list"
   ansible.builtin.file:

@@ -1,0 +1,91 @@
+---
+- name: Install nginx and python3-cryptography
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: latest
+    update_cache: true
+  loop:
+    - nginx
+    - python3-cryptography
+  become: true
+
+- name: Ensure content directory exists
+  ansible.builtin.file:
+    path: "{{ main_repo_path }}/2deploy"
+    state: directory
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0755'
+  become: true
+
+- name: Ensure cert directory exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/nginx/
+    - /etc/nginx/conf.d
+  become: true
+
+- name: Deploy main nginx config
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: '0644'
+  notify: "nginx_reload"
+  become: true
+
+- name: Deploy SSL site config
+  ansible.builtin.template:
+    src: nginx.site.conf.j2
+    dest: /etc/nginx/conf.d/ssl.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: "nginx_reload"
+  become: true
+
+- name: Ensure cert directory exists
+  ansible.builtin.file:
+    path: "{{ nginx_ssl_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Get file information
+  ansible.builtin.stat:
+    path: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.crt"
+  register: file_info
+  failed_when: false
+  become: true
+
+- name: Get certificate information
+  community.crypto.x509_certificate_info:
+    path: "{{ nginx_ssl_dir }}/{{ inventory_hostname }}.crt"
+  register: cert_info
+  failed_when: false
+  when: file_info is defined and file_info.stat.exists
+  become: true
+
+- name: Create create_cert variable
+  ansible.builtin.set_fact:
+    create_cert: false
+
+- name: Decide whether to create certificate
+  ansible.builtin.set_fact:
+    create_cert: true
+  when: >
+        file_info.stat.exists is not defined or
+        cert_info is not defined or
+        cert_info.not_after is not defined or
+        ( cert_info.not_after is defined and cert_info.not_after < ansible_date_time.iso8601 )
+
+- name: "Create nginx certificate for {{ inventory_hostname }}"
+  ansible.builtin.include_tasks: create_cert.yml
+  when: create_cert
+...

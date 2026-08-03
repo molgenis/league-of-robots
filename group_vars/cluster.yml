@@ -16,14 +16,14 @@ basic_security_fail2ban_enabled: false
 #     group_vars/all/repos.yml
 # will be applied to the machine, which can include instructions for both enabling or disabling a repo.
 #
-managed_yum_repos:
-  centos7: "{{ yum_repos['centos7']
-              | selectattr('tags', 'defined')
-              | selectattr('tags', 'intersect', ['distro', 'epel', 'rsyslog', 'irods'])
-              | map(attribute='id') }}"
+yum_repos_deployed_on_clients:
   oracle8: "{{ yum_repos['oracle8']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'uek', 'rsyslog'])
+              | map(attribute='id') }}"
+  alma9: "{{ yum_repos['alma9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog', 'irods'])
               | map(attribute='id') }}"
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')

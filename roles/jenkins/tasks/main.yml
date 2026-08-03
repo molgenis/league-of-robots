@@ -151,35 +151,6 @@
   delay: 2
   become: true
 
-#
-# The *.pem file with crt as well as key must be copied to the server manually.
-#
-- name: 'Check if SSL certificate was installed on server.'
-  ansible.builtin.file:
-    path: '/etc/pki/tls/private/wildcard_crt_and_key.pem'
-    state: file
-    owner: root
-    group: root
-    mode: '0600'
-  notify:
-    - restart_httpd
-  become: true
-
-- name: 'Create symlinks for Apache httpd, so it can find the cert & key in the SSL certificate file.'
-  ansible.builtin.file:  # noqa risky-file-permissions
-    src: '/etc/pki/tls/private/wildcard_crt_and_key.pem'
-    dest: "{{ item }}"
-    state: link
-    owner: root
-    group: root
-    force: true
-  with_items:
-    - '/etc/pki/tls/private/localhost.key'
-    - '/etc/pki/tls/certs/localhost.crt'
-  notify:
-    - restart_httpd
-  become: true
-
 - name: 'Configure Apache webserver.'
   ansible.builtin.template:
     src: "templates/apache/{{ item }}"

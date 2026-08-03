@@ -1,0 +1,50 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
+#!/bin/bash
+
+set -ueo pipefail
+_main="{{ main_repo_path }}"
+
+{% raw %}
+#!/bin/bash
+
+! test -d "${_main}/1versions" && { echo "No ${_main}/1versions directory found, exiting ..."; exit 1; }
+! test -d "${_main}/2deploy" && { echo "No ${_main}/2deploy directory found, exiting ..."; exit 1; }
+
+_all_versions="$(find ${_main}/1versions/* -mindepth 2 -maxdepth 2 -type d | sed "s|${_main}/1versions/||" | sort)"
+_all_links="$(find ${_main}/2deploy/* -mindepth 1 -maxdepth 1 -type l \! -path "${_main}/2deploy/all/*" | xargs -I{} readlink {} | sed "s|../../1versions/||" | sort)"
+_unused_versions="$(comm -23 <(echo "${_all_versions}") <(echo "${_all_links}"))"
+
+# print unused versions
+echo "Unused versions are:"
+i=0
+# ANSI color codes
+RESET="\033[0m"
+COLOR="\033[48;5;236m"  # dark gray
+for _each_version in ${_unused_versions}; do
+   (( i % 2 == 0 )) && echo -en "${COLOR}"
+   echo -e "#${i} $(du -s ${_main}/1versions/${_each_version})${RESET}"
+   i=$((i+1))
+done | column -t
+echo -en "${RESET}"
+
+_del_version=x
+while [[ ! "${_del_version}" =~ ^[0-9]+$ ]]; do
+   read -p '> Delete unused version: #' _del_version
+done
+
+d=0
+for _delete_version in ${_unused_versions}; do
+   if [[ "${_del_version}" -eq "${d}" ]]; then
+      echo " deleting ${_main}/1versions/${_delete_version}"
+      read -p "> delete? [y/N]" _confirm
+      if [[ "${_confirm}" == "y" ]]; then
+         echo "deleting ... "
+         rm -rf "${_main}/1versions/${_delete_version}"
+         echo "done"
+      else echo Skipping...
+      fi
+   fi
+   d=$((d+1))
+done
+
+{% endraw %}

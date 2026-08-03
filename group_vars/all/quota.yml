@@ -187,7 +187,7 @@ lfs_quota:
       umcg-muhas: 1024
       umcg-nawijn: 4096
       umcg-neonatology: 6144
-      umcg-nephrology: 1024
+      umcg-nephrology: 3072
       umcg-pgx: 1024
       umcg-pmb: 8192
       umcg-rad: 1024
@@ -243,6 +243,7 @@ lfs_quota:
       umcg-nawijn: 4096
       umcg-neonatology: 3072
       umcg-nephrology: 1024
+      umcg-path-bioinformatica: 1024
       umcg-pgx: 1024
       umcg-pmb: 1024
       umcg-rehabilitation: 1024
