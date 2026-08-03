@@ -54,21 +54,6 @@ function create_chown_and_chmod(){
    local _group_acl_write="r-x"                          # default acl is read-only
    [[ "${_group_write_permission}" == "7" ]] && _group_acl_write='rwx' # but if mode is 7>7<0 then acl is read-write
    local _group_name="${2##*:}"                          # take group name from $2='user:group'
-# we don't use ACLs on SUBDIRS! #   local _acl_needed=1
-# we don't use ACLs on SUBDIRS! #   if grep -q "^group:${_group_name}:${_group_acl_write}" <<< "${_acl}"; then
-# we don't use ACLs on SUBDIRS! #      if [[ "${4:-}" != "default" ]] || grep -q "^default:group:${_group_name}:${_group_acl_write}" <<< "${_acl}"; then
-# we don't use ACLs on SUBDIRS! #         _acl_needed=0
-# we don't use ACLs on SUBDIRS! #      fi
-# we don't use ACLs on SUBDIRS! #   fi
-# we don't use ACLs on SUBDIRS! #   if [[ "${_acl_needed}" == "1" ]]; then
-# we don't use ACLs on SUBDIRS! #      echo "    ACL applying '${_group_acl_write}' permissions for '${_main_group}-dm' user and '${_main_group}' group on '${_main_group_path}'"
-# we don't use ACLs on SUBDIRS! #      # setfacl -m "g::${_group_acl_write}" "${1}"                        # default group also has write permission according to the mode
-# we don't use ACLs on SUBDIRS! #      #     ^ commented out, because defualt group already has permission according to the unix mode
-# we don't use ACLs on SUBDIRS! #      setfacl -m "g:${_group_name}:${_group_acl_write}" "${1}"          # apply rwx ACL for group on existing files/dirs recursively
-# we don't use ACLs on SUBDIRS! #      if [[ "${4:-}" == "default" ]]; then
-# we don't use ACLs on SUBDIRS! #         setfacl -d -m "g:${_group_name}:${_group_acl_write}" "${1}"    # set default ACL rwx for group on dir + all subfolders (applies to future files/dirs)
-# we don't use acls on subdirs! #      fi
-# we don't use acls on subdirs! #   fi
 }
 
 # For now only groups starting with 'L-'
@@ -115,8 +100,6 @@ for _main_group in ${_main_groups}; do
                if [[ "${_each_group}" =~ ^"${_main_group}"-(prj|rel|sub)$ ]]; then
                # top prj/rel/sub folders
                # - these folders are owned by main group
-# we don't use acls on subdirs! #               # - no "default" arg here: main-group's r-x must NOT become an inheritable default ACL,
-# we don't use acls on subdirs! #               #   otherwise every subgroup folder created below would inherit main-group read access
                   create_chown_and_chmod "${_main_group_path}/${_sub_group_name}" "${_main_group}-dm:${_main_group}" "2750"
                
                elif [[ "${_each_group}" =~ ^"${_main_group}"-(prj)-.{1,} ]]; then
@@ -124,7 +107,6 @@ for _main_group in ${_main_groups}; do
                #  - owned by that individual group
                   _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main- > becomes > rel-dataset01-v1
                   _group_placed_flat="${_group_remove_main_group/-/\/}"  # replace first dash with slash > becomes > rel/dataset01-v1
-# we don't use acls on subdirs! #                  create_chown_and_chmod "${_main_group_path}/${_group_placed_flat}" "${_main_group}-dm:${_each_group}" "2770" "default"
                   create_chown_and_chmod "${_main_group_path}/${_group_placed_flat}" "${_main_group}-dm:${_each_group}" "2770"
 
                elif [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} || \
@@ -136,7 +118,6 @@ for _main_group in ${_main_groups}; do
                   _sub_group_path="${_group_remove_main_group//-/\/}"    # replace - with 	/
                   _setmode="2750" # for -rel- subforlder
                   [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]] && _setmode="2770" # for -sub- subfolders
-# we don't use acls on subdirs! #                  create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "${_setmode}" "default"
                   create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "${_setmode}"
                else
                   echo "WARNING: Group ${_each_group} cannot be placed anywhere!"
