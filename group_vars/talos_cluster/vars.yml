@@ -81,9 +81,29 @@ ldap_domains:
     group_object_class: groupofnames
     # listserv_mailinglist: Be careful not to use a production mailinglist for testing!
 
-# Install auto-subgroup generate scripts
-# depending on having `ladap` in `ldap_domains`
-subgroup_directories_auto_enabled: true
+# # For now we don't enable LSAAI on Talos
+#  ladap:
+#    # must be FQDN or certificate authentication with LDAP server fails
+#    uri: ldaps://ladap.westeurope.cloudapp.azure.com
+#    base: dc=donbot_azure,dc=local
+#    # rfc2307bis for LADAP, because group members are stored in each group and
+#    # not in the user profile
+#    schema: rfc2307bis
+#    min_id: 37800000
+#    max_id: 37999999
+#    user_object_class: posixAccount
+#    user_name: mail
+#    user_ssh_public_key: sshPublicKey
+#    user_member_of: member
+#    group_object_class: groupofnames
+#    group_member: member
+#    # Path of the home directory should not be depending on the username (as it
+#    # can change). Instead we use %U to make it stable, unique (/home/[uid])
+#    # and persistent across systems
+#    override_homedir: '/home/%U'
+# # Install auto-subgroup generate scripts
+# # depending on having `ladap` in `ldap_domains`
+# subgroup_directories_auto_enabled: true
 
 
 pam_weblogin:
