@@ -23,15 +23,10 @@ _lfs_by_pfs["{{ pfs }}"]="
 
 {% raw %}
 
-# $1 = path
-# $2 = owner:group
-# $3 = mode
-# $4 = "default" (optional) - also set the group ACL as a default/inheritable ACL,
-#      so it applies to future files/dirs created below this one. Only pass this for
-#      folders whose subgroup ACL should propagate downward (e.g. individual
-#      project/dataset/hierarchy folders). Omit it for the top prj/rel/sub folders,
-#      so the main group's access is not inherited into the subgroup folders below.
 function create_chown_and_chmod(){
+   # $1 = path
+   # $2 = owner:group
+   # $3 = mode
    if ! test -d "${1}"; then
       echo "  creating ${1}"
       mkdir "${1}"
