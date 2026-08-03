@@ -88,7 +88,6 @@ ldap_domains:
     user_member_of: groupMembership
     user_expiration_date: loginExpirationTime
     group_member: memberUid
-    group_object_class: groupofnames
 cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
 enable_predictable_network_interface_names: true
