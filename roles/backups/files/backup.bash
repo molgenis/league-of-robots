@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# shellcheck disable=SC2004
+
 #
 ##
 ### Environment and Bash sanity.
@@ -87,7 +89,7 @@ function log4Bash() {
 	#
 	# Validate params.
 	#
-	if [[ ! "${#}" -eq 5 ]]; then
+	if [[ "${#}" -ne 5 ]]; then
 		echo "WARN: should have passed 5 arguments to ${FUNCNAME[0]}: log_level, LINENO, FUNCNAME, (Exit) STATUS and log_message."
 	fi
 	#
@@ -329,6 +331,7 @@ printf 'This lock file is used for making backups of %s.\n' "${source}" > "${loc
 #
 # Ensure destination dir exists.
 #
+# shellcheck disable=SC2174
 mkdir -p -m 700 "${destination}/"  || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "$?" "Cannot create ${destination}."
 
 #
@@ -354,6 +357,7 @@ if [[ -e "${destination}/${backup_start_ts}" ]]; then
 fi
 printf 'Working on backup of %s to %s ... ' "${source}" "${destination}/${backup_start_ts}" >> "${lock_file}"
 rsync_log="${LOG_DIR}/${SCRIPT_NAME}-${hashed_source}-rsync-${backup_start_ts}.log"
+log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Using rsync log file ${rsync_log}."
 set +e
 if [[ -L "${destination}/latest_rsync" ]]; then
 	#
@@ -396,7 +400,8 @@ else
 	touch "${destination}/${backup_start_ts}_in_flux/backup.finished"
 	mv "${destination}/${backup_start_ts}"{_in_flux,}
 	cd "${destination}"
-	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Creating symlink in $(pwd) latest -> ${backup_start_ts}."
+	current_dir="$(pwd)"
+	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Creating symlink in ${current_dir} latest -> ${backup_start_ts}."
 	ln -s -f -n "${backup_start_ts}" latest
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Backup of ${source} completed successfully!"
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "${destination}/${backup_start_ts} is now marked as 'latest' backup."
@@ -406,29 +411,37 @@ fi
 #
 # Remove old backups that exceed retention time limit.
 #
-# We need to check not only mtime, but also if there are a minimal amount of good backups left.
-# If the backup jobs failed for some time, the last remaining good backups may be older than mtime...
-#
-# Due to rounding issues we define the age in day+1 when looking for good/outdated backups.
+# We need to check not only modification time, but also if there is a minimal amount of good backups.
+# If the backup jobs failed for some time, the last remaining *good* backups may be older than the specified retention time.
 #
 log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Deleting outdated ${source} backups from ${destination} ..."
-retention_time="$(("${retention_time}" + 1))"
-recent_good_backups="$(find "${destination}/" -mindepth 1 -maxdepth 2 -type f -name backup.finished -mtime "-${retention_time}" | wc -l)"
-outdated_backups_count="$(find "${destination}/" -maxdepth 1 -mtime "+${retention_time}" | wc -l)"
-log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Found ${recent_good_backups} not outdated and successful backups."
-log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Found ${outdated_backups_count} outdated backup(s)."
-if [[ "${recent_good_backups}" -ge "${keep}" ]]; then
-	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Minimal amount of not outdated and successful backups (${keep}) present."
+declare -a good_backups
+readarray -t good_backups < <(find "${destination}/" -mindepth 1 -maxdepth 2 -type f -name backup.finished | sort -n -r)
+if [[ "${#good_backups[@]}" -gt "${keep}" ]]; then
+	log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Number of good backups (${#good_backups[@]}) exceeds number of backups to keep (${keep})."
+	now_in_seconds="$(date '+%s')"
+	mod_in_seconds="$(date -r "${good_backups[${keep}]}" '+%s')"
+	delta_in_seconds="$((${now_in_seconds}-${mod_in_seconds}))"
+	age_in_days="$((${delta_in_seconds}/86400))"
+	if [[ "${age_in_days}" -gt "${retention_time}" ]]; then
+		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Age in days of the last good backup that must by kept (${age_in_days}) is more than the retention time in days (${retention_time})."
+		retention_time="${age_in_days}"
+		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Using updated retention time: ${retention_time}."
+	else
+		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Age in days of the last good backup that must by kept (${age_in_days}) is less than the retention time in days (${retention_time})."
+		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Using retention time: ${retention_time}."
+	fi
+	outdated_backups_count="$(find "${destination}/" -mindepth 1 -maxdepth 1 -mtime "+${retention_time}" -type d | wc -l)"
 	if [[ "${outdated_backups_count}" -ge 1 ]]; then
 		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Removing ${outdated_backups_count} outdated backup(s) ..."
-		find "${destination}/" -maxdepth 1 -mtime "+${retention_time}" -type d -exec rm -Rf '{}' \;
+		find "${destination}/" -mindepth 1 -maxdepth 1 -mtime "+${retention_time}" -type d -exec rm -Rf '{}' \;
 		find "${LOG_DIR}/" -mtime "+${retention_time}" -name '*.log' -exec rm -f'{}' \;
 		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "    done."
 	else
 		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "There are no outdated backups to remove."
 	fi
 else
-	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Minimal amount of not outdated and successful backups (${keep}) not yet reached; No outdated backups will be removed."
+	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Number of successful backups (${#good_backups[@]}) does not exceed the minimal amount of successful backups to keep(${keep}); No outdated backups will be removed."
 fi
 
 #
