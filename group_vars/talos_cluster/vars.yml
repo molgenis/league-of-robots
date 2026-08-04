@@ -99,12 +99,9 @@ ldap_domains:
     group_member: memberUid
     group_object_class: groupofnames
     # listserv_mailinglist: Be careful not to use a production mailinglist for testing!
-
 # Install auto-subgroup generate scripts
 # depending on having `ladap` in `ldap_domains`
 subgroup_directories_auto_enabled: true
-
-
 pam_weblogin:
   machines: "{{ groups['jumphost'] }}"
   excluded:
@@ -235,7 +232,7 @@ regular_users:
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%L-gcc']
-    become: 'L-gcc-dm'
+    become: ['L-gcc-dm']
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
     become: ['umcg-molgenis']
   - who: ['%umcg-atd']
