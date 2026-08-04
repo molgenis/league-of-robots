@@ -155,6 +155,8 @@ regular_users:
   - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
+  - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+    become: ['umcg-molgenis']
   - who: ['%umcg-atd']
     become: ['umcg-atd-dm']
   - who: ['%umcg-gsad']
