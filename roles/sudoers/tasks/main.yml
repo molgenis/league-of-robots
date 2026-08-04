@@ -26,17 +26,17 @@
 - name: "Create {{ ansible_managed_sudoers_filename_tag }} tagged files in /etc/sudoers.d/ for configured sudoers."
   ansible.builtin.template:
     src: "templates/92-{{ ansible_managed_sudoers_filename_tag }}"
-    dest: "/etc/sudoers.d/92-{{ ansible_managed_sudoers_filename_tag }}-{{ name | default(become) }}"
+    dest: "/etc/sudoers.d/92-{{ ansible_managed_sudoers_filename_tag }}-{{ sudoers_name | default(sudoers_become) }}"
     owner: 'root'
     group: 'root'
     mode: '0440'
     validate: '/usr/sbin/visudo -cf %s'
   loop: "{{ sudoers | default([]) | subelements('become') }}"
   vars:
-    sudoers-name: "{{ item[0]['name'] }}"
-    sudoers-who: "{{ item[0]['who'] }}"
-    sudoers-become: "{{ item[1] }}"
-    sudoers-command: "{{ item[0]['command'] | default('ALL') }}"
+    sudoers_name: "{{ item[0]['name'] }}"
+    sudoers_who: "{{ item[0]['who'] }}"
+    sudoers_become: "{{ item[1] }}"
+    sudoers_command: "{{ item[0]['command'] | default('ALL') }}"
   tags:
     - groups
   become: true
