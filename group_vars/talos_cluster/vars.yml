@@ -234,7 +234,7 @@ regular_users:
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%L-gcc']
-    become: 'L-gcc-dm'
+    become: ['L-gcc-dm']
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
     become: 'umcg-molgenis'
   - who: ['%umcg-atd']

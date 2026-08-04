@@ -167,9 +167,9 @@ regular_users:
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
   - who: ['%L-erdera']
-    become: 'L-erdera-dm'
+    become: ['L-erdera-dm']
   - who: ['%L-gcc']
-    become: 'L-gcc-dm'
+    become: ['L-gcc-dm']
   - who: ['%umcg-atd']
     become: 'umcg-atd-dm'
   - who: ['%umcg-gsad']
