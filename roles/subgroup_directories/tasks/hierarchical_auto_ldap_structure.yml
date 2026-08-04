@@ -41,7 +41,7 @@
 
 - name: Allow all users to make lsaai token request via sudo
   ansible.builtin.copy:
-    dest: /etc/sudoers.d/92-ansible-managed-lsaai_request_token
+    dest: /etc/sudoers.d/93-ansible-managed-lsaai_request_token
     owner: root
     group: root
     mode: "0440"   # sudoers files must be exactly 0440
