@@ -67,18 +67,20 @@ for _main_group in ${_main_groups}; do
             continue
          fi
 
-         # Apply ACLs on main group folder
+         # Apply ACLs on main LFS folders
          # for both -dm user (but users from dms group can access the dm user)
          _acl="$(getfacl -p "${_main_group_path}")"
          if ! grep -q "^user::rwx" <<< "${_acl}" || \
             ! grep -q "^group::r-x" <<< "${_acl}" || \
+            ! grep -q "^default:group::rwx" <<< "${_acl}" || \
             ! grep -q "^default:user:${_main_group}-dm:rwx" <<< "${_acl}"; then
             echo "    ACL applying default RW permissions for '${_main_group}-dm' user and '${_main_group}' group on '${_main_group_path}'"
-            setfacl -m g::r-x "${_main_group_path}"                        # apply rwx ACL for group on existing files/dirs recursively
-            # setfacl -d -m g:${_main_group}:r-x "${_main_group_path}"       # set default ACL rwx for group on dir + all subfolders (applies to future files/dirs)
-            #     ^ this is too much - L-edera should have only read permission for TOP group and later have defined their own rules
-            setfacl -m u:${_main_group}-dm:rwx "${_main_group_path}"       # apply rwx ACL for -dm user on existing files/dirs recursively
-            setfacl -d -m u:${_main_group}-dm:rwx "${_main_group_path}"    # set default ACL rwx for -dm user on dir + all subfolders (applies to future files/dirs)
+            setfacl -m "u::rwx" "${_main_group_path}"                        # apply rwx ACL for group on existing files/dirs recursively
+            setfacl -d -m "u::rwx" "${_main_group_path}"                     # ! set default group ACL rwx - posix wins if has lower permissions
+            setfacl -m "g::r-x" "${_main_group_path}"                        # apply rwx ACL for group on existing files/dirs recursively
+            setfacl -d -m "g::rwx" "${_main_group_path}"                     # ! set default group ACL rwx - posix wins if has lower permissions
+            setfacl -m "u:${_main_group}-dm:rwx" "${_main_group_path}"       # apply rwx ACL for -dm user on existing files/dirs recursively
+            setfacl -d -m "u:${_main_group}-dm:rwx" "${_main_group_path}"    # set default ACL rwx for -dm user on dir + all subfolders (applies to future files/dirs)
          fi
 
          # Now create all the rest of the groups
