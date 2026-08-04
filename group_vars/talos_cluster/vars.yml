@@ -99,7 +99,6 @@ ldap_domains:
     group_member: memberUid
     group_object_class: groupofnames
     # listserv_mailinglist: Be careful not to use a production mailinglist for testing!
-
 # Install auto-subgroup generate scripts
 # depending on having `ladap` in `ldap_domains`
 subgroup_directories_auto_enabled: true
