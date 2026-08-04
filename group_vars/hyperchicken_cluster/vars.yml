@@ -156,9 +156,9 @@ regular_users:
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
   - who: ['%umcg-atd']
-    become: 'umcg-atd-dm'
+    become: ['umcg-atd-dm']
   - who: ['%umcg-gsad']
-    become: 'umcg-gsad-dm'
+    become: ['umcg-gsad-dm']
 # Remote archive settings
 remote_archive:
   - name: arc01

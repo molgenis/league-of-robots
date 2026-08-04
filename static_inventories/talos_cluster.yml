@@ -292,7 +292,7 @@ all:
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
           sudoers:
             - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
-              become: 'umcg-molgenis'
+              become: ['umcg-molgenis']
             - who: ['%umcg-atd']
               become: ['umcg-atd-dm', 'umcg-atd-ateambot']
             - who: ['%umcg-gsad']
@@ -300,7 +300,7 @@ all:
             - who: ['%umcg-gst']
               become: ['umcg-gst-ateambot', 'umcg-gst-dm']
             - who: ['%umcg-vipt']
-              become: 'umcg-vipt-dm'
+              become: ['umcg-vipt-dm']
           ssh_client_configs:
             - logs_library
           lfs_mounts: []  # Overrule the list of network shares; we use local storage instead.

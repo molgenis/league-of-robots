@@ -210,19 +210,19 @@ regular_users:
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
-    become: 'umcg-molgenis'
+    become: ['umcg-molgenis']
   - who: ['%umcg-atd']
     become: ['umcg-atd-dm', 'umcg-atd-ateambot']
   - who: ['%umcg-gcc']
-    become: 'umcg-gcc-dm'
+    become: ['umcg-gcc-dm']
   - who: ['%umcg-gsad']
     become: ['umcg-gsad-ateambot', 'umcg-gsad-dm']
   - who: ['%umcg-gst']
     become: ['umcg-gst-ateambot', 'umcg-gst-dm']
   - who: ['%umcg-sysops']
-    become: 'umcg-sysops-dm'
+    become: ['umcg-sysops-dm']
   - who: ['%umcg-vipt']
-    become: 'umcg-vipt-dm'
+    become: ['umcg-vipt-dm']
 #
 # Shared storage related variables
 #

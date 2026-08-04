@@ -258,15 +258,15 @@ sudoers:
   - who: ['%umcg-labgnkbh']
     become: ['umcg-labgnkbh-ateambot', 'umcg-labgnkbh-dm']
   - who: ['%umcg-logstorpm']
-    become: 'umcg-logstoprm-dm'
+    become: ['umcg-logstoprm-dm']
   - who: ['%umcg-ogm']
-    become: 'umcg-ogm-dm'
+    become: ['umcg-ogm-dm']
   - who: ['%umcg-patho']
     become: ['umcg-patho-ateambot', 'umcg-patho-dm']
   - who: ['%umcg-pr']
     become: ['umcg-pr-ateambot', 'umcg-pr-dm']
   - who: ['%umcg-vipt']
-    become: 'umcg-vipt-dm'
+    become: ['umcg-vipt-dm']
 remote_users_in_local_groups:
   - name: 'bijlsmam'
     groups: [
