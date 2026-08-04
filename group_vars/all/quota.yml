@@ -53,7 +53,6 @@ lfs_quota:
   prm03:
     quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
-      umcg-adorable: 1024
       umcg-atd: 1024
       umcg-biogen: 17408
       umcg-bionic-mdd-gwama: 13312
@@ -149,7 +148,6 @@ lfs_quota:
   tmp02:
     quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
-      umcg-adorable: 1024
       umcg-as: 1024
       umcg-atd: 1024
       umcg-biogen: 20480
