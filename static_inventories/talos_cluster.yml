@@ -274,8 +274,6 @@ all:
               groups: ['umcg-gst', "{{ functional_users_group }}"]
             - name: 'umcg-vipt-dm'
               groups: ['umcg-vipt', "{{ functional_users_group }}"]
-            - name: 'mbenjamins'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
             - name: 'mbijlsma'
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
             - name: 'bcharbon'
@@ -294,21 +292,15 @@ all:
               groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
           sudoers:
             - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
-              become: 'umcg-molgenis'
+              become: ['umcg-molgenis']
             - who: ['%umcg-atd']
-              become: 'umcg-atd-dm'
-            - who: ['%umcg-atd']
-              become: 'umcg-atd-ateambot'
+              become: ['umcg-atd-dm', 'umcg-atd-ateambot']
             - who: ['%umcg-gsad']
-              become: 'umcg-gsad-ateambot'
-            - who: ['%umcg-gsad']
-              become: 'umcg-gsad-dm'
+              become: ['umcg-gsad-ateambot', 'umcg-gsad-dm']
             - who: ['%umcg-gst']
-              become: 'umcg-gst-ateambot'
-            - who: ['%umcg-gst']
-              become: 'umcg-gst-dm'
+              become: ['umcg-gst-ateambot', 'umcg-gst-dm']
             - who: ['%umcg-vipt']
-              become: 'umcg-vipt-dm'
+              become: ['umcg-vipt-dm']
           ssh_client_configs:
             - logs_library
           lfs_mounts: []  # Overrule the list of network shares; we use local storage instead.

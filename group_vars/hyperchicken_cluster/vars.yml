@@ -124,6 +124,7 @@ local_admin_users:
   - 'pieter'
   - 'robin'
   - 'sandi'
+  - 'steven'
   - 'wim'
   - 'wouter'
 envsync_user: 'umcg-envsync'
@@ -161,19 +162,15 @@ regular_users:
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
   - name: 'scimerman'
     groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - name: 'mbenjamins'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
   - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
-  - who: ['%L-erdera']
-    become: 'L-erdera-dm'
-  - who: ['%L-gcc']
-    become: 'L-gcc-dm'
+  - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+    become: ['umcg-molgenis']
   - who: ['%umcg-atd']
-    become: 'umcg-atd-dm'
+    become: ['umcg-atd-dm']
   - who: ['%umcg-gsad']
-    become: 'umcg-gsad-dm'
+    become: ['umcg-gsad-dm']
 # Remote archive settings
 remote_archive:
   - name: arc01
