@@ -101,7 +101,7 @@ ldap_domains:
     # listserv_mailinglist: Be careful not to use a production mailinglist for testing!
 # Install auto-subgroup generate scripts
 # depending on having `ladap` in `ldap_domains`
-subgroup_directories_auto_enabled: true
+subgroup_directories_auto_is_enabled: true
 pam_weblogin:
   machines: "{{ groups['jumphost'] }}"
   excluded:
