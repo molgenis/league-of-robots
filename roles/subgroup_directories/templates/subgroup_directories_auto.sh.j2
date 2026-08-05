@@ -116,6 +116,12 @@ for _main_group in ${_main_groups}; do
                   _setmode="2750" # for -rel- subforlder
                   [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]] && _setmode="2770" # for -sub- subfolders
                   create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "${_setmode}"
+                  [[ "${_each_group}" =~ ^"${_main_group}"-rel-.{1,} ]] && {
+                     getfacl "${_main_group_path}/${_sub_group_path}" 2>/dev/null | grep -q "default:mask::rwx" && {
+                        echo "   removing write (ACL) permissions on the 'rel-' subfolders for '${_main_group_path}/${_sub_group_path}'"
+                        setfacl -d -m "mask::r-x" "${_main_group_path}/${_sub_group_path}"
+                     }
+                  }
                else
                   echo "WARNING: Group ${_each_group} cannot be placed anywhere!"
                fi

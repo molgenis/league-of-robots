@@ -2,7 +2,7 @@
 #
 # INSTALL auto-subgroups structure scripts
 #
-- name: Deploy lsaai_auth secrets into /etc/lsaai_auth
+- name: Deploy LSAAI configurations and scripts
   ansible.builtin.template:
     src: "{{ item.name }}.j2"
     dest: "{{ item.path }}/{{ item.name }}"
