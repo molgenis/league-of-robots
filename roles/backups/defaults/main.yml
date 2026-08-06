@@ -1,13 +1,4 @@
 ---
-# Example values:
-# backups:
-#   - name: apps # don't modify after once deployed!
-#     src: '/apps'
-#     dest: '/some/path/to/backups/'
-#     frequency:
-#      - { name: 'daily', hour: '*', minute: '*', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
-#      - { name: 'weekly', hour: '*', minute: '*/3', day: '*', weekday: '*', month: '*', keep: '20', disabled: 'false' }
-
-# By default an empty list
+# By default an empty list, which will result in the role getting skipped.
 backups: []
 ...

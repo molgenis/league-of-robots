@@ -378,15 +378,13 @@ all:
             - name: apps # Name == ID for cronjob; don't modify after deployment!
               src: 'copperfist:/apps'
               dest: '/mnt/umcgst16/copperfist_backups/'
+              user: umcg-envsync
+              group: umcg-depad
               keep: 60            # Minimum number of successful backups to keep.
               retention_time: 60  # Minimal retention time in days.
               crontab:
-                hour: 5
                 minute: 47
-                day: '*'
-                weekday: '*'
-                month: '*'
-                disabled: false
+                hour: 5
     smb_server:
       hosts:
         copperfist:

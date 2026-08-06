@@ -386,8 +386,13 @@ all:
             - name: apps # Name == ID for cronjob; don't modify after deployment!
               src: 'betabarrel:/apps'
               dest: '/mnt/umcgst15/betabarrel_backups/'
-              frequency:
-               - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
+              user: umcg-envsync
+              group: umcg-depad
+              keep: 60            # Minimum number of successful backups to keep.
+              retention_time: 60  # Minimal retention time in days.
+              crontab:
+                minute: 47
+                hour: 5
     smb_server:
       hosts:
         betabarrel:

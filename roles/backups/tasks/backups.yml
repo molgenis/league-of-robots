@@ -1,35 +1,53 @@
 ---
-- name: Install backup cronjob script
-  ansible.builtin.template:
-    src: "templates/backup_cronjob.sh.j2"
-    dest: '/root/backup_cronjob.sh'
+- name: Install backup script.
+  ansible.builtin.copy:
+    src: backup.bash
+    dest: '/usr/local/bin/backup'
     owner: 'root'
     group: 'root'
-    mode: '0700'
+    mode: '0755'
   become: true
 
-- name: Create subdirectories for backups
+- name: Create main directories for backups.
   ansible.builtin.file:
-    path: "{{ item['dest'] }}/{{ item['name'] }}/"
+    path: "{{ item['dest'] }}/"
     state: directory
     owner: 'root'
     group: 'root'
-    mode: '0700'
-  become: true
+    mode: '0755'
   loop: "{{ backups }}"
+  become: true
+
+- name: Create sub directories for backups.
+  ansible.builtin.file:
+    path: "{{ item['dest'] }}/{{ item['name'] }}/"
+    state: directory
+    owner: "{{ item['user'] }}"
+    group: "{{ item['group'] }}"
+    mode: '0750'
+  loop: "{{ backups }}"
+  become: true
 
 - name: Create cron jobs for backups
   ansible.builtin.cron:
-    name: "{{ item[0]['name'] }}-{{ item[1]['name'] }} - do not change it manually!"
-    hour: "{{ item[1]['hour'] }}"
-    minute: "{{ item[1]['minute'] }}"
-    month: "{{ item[1]['month'] }}"
-    weekday: "{{ item[1]['weekday'] }}"
-    user: 'root'
-    disabled: "{{ item[1]['disabled'] | default('false') }}"
-    job: >
-      /root/backup_cronjob.sh '{{ item.0.name }}' '{{ item.1.name }}' '{{ item.1.keep }}'
-      '{{ item.0.src_path }}' '{{ main_backup_folder | default("/backups/", true) }}'
-  loop: '{{ backups | subelements("frequency") }}'
+    name: "{{ item['name'] }} - Unique ID for this cron job: do not change!"
+    minute: "{{ item['crontab']['minute'] | default('*') }}"
+    hour: "{{ item['crontab']['hour'] | default('*') }}"
+    day: "{{ item['crontab']['day'] | default('*') }}"
+    month: "{{ item['crontab']['month'] | default('*') }}"
+    weekday: "{{ item['crontab']['weekday'] | default('*') }}"
+    user: "{{ item['user'] }}"
+    disabled: "{{ item['disabled'] | default(omit) }}"
+    job: /usr/bin/sg '{{ item['group'] }}'
+           -c '/bin/bash 
+             -c "/usr/local/bin/backup
+                   -s '{{ item['src'] }}'
+                   -d '{{ item['dest'] }}/{{ item['name'] }}/'
+                   -k '{{ item['keep'] }}'
+                   -r '{{ item['retention_time'] }}'
+                   -u '{{ item['user'] }}'
+                   -l 'ERROR'
+                 | /bin/logger"'
+  loop: "{{ backups }}"
   become: true
 ...

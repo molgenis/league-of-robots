@@ -1,7 +1,8 @@
 ---
 - name: Configure backups.
   hosts:
-    - deploy_admin_interface
+    - all,!controller_api
   roles:
-    - backups
+    - role: backups
+      when: backups is defined and backups | default([]) | length > 0
 ...

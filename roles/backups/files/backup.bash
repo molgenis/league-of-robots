@@ -125,13 +125,9 @@ function log4Bash() {
 			_log_line="${_log_line} (Exit status = ${_status})"
 		fi
 		#
-		# Log to STDOUT (low prio <= 'WARN') or STDERR (high prio >= 'ERROR').
+		# Log to STDOUT.
 		#
-		if [[ "${_log_level_prio}" -ge "${l4b_log_levels['ERROR']}" || "${_status}" -ne 0 ]]; then
-			printf '%s\n' "${_log_line}" 1>&2
-		else
-			printf '%s\n' "${_log_line}"
-		fi
+		printf '%s\n' "${_log_line}"
 	fi
 	#
 	# Exit if this was a FATAL error.
@@ -351,7 +347,7 @@ mkdir -p -m 700 "${destination}/"  || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-
 # -S handle sparse files efficiently
 # -q quiet; suppress non-error messages.
 #
-backup_start_ts="$(date "+%Y-%m-%d-T%H%M")"
+backup_start_ts="$(date "+%Y-%m-%d-T%H%M%S")"  # ISO 8601 compliant
 if [[ -e "${destination}/${backup_start_ts}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup ${destination}/${backup_start_ts} already exists."
 fi
@@ -419,6 +415,10 @@ declare -a good_backups
 readarray -t good_backups < <(find "${destination}/" -mindepth 1 -maxdepth 2 -type f -name backup.finished | sort -n -r)
 if [[ "${#good_backups[@]}" -gt "${keep}" ]]; then
 	log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Number of good backups (${#good_backups[@]}) exceeds number of backups to keep (${keep})."
+	#
+	# Get age of the oldest successful backup that should be kept based on the number of backups to keep.
+	# Use the age of that backup in days as retention time if it is older than the retentention time in days specified with -r.
+	#
 	now_in_seconds="$(date '+%s')"
 	mod_in_seconds="$(date -r "${good_backups[${keep}]}" '+%s')"
 	delta_in_seconds="$((${now_in_seconds}-${mod_in_seconds}))"
