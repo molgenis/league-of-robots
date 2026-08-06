@@ -325,8 +325,6 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-sommer'
     sponsor: umcg-research-it
-  - name: 'umcg-surg'
-    sponsor: umcg-research-it
   - name: 'umcg-sysops'
     sponsor: umcg-research-it
   - name: 'umcg-tifn'
@@ -454,8 +452,6 @@ regular_users:
     groups: ['umcg-solve-rd']
   - name: 'umcg-sommer-dm'
     groups: ['umcg-sommer']
-  - name: 'umcg-surg-dm'
-    groups: ['umcg-surg']
   - name: 'umcg-sysops-dm'
     groups: ['umcg-sysops']
   - name: 'umcg-tifn-dm'
@@ -577,8 +573,6 @@ sudoers:
     become: ['umcg-solve-rd-dm']
   - who: ['%umcg-sommer-dms']
     become: ['umcg-sommer-dm']
-  - who: ['%umcg-surg-dms']
-    become: ['umcg-surg-dm']
   - who: ['%umcg-sysops-dms']
     become: ['umcg-sysops-dm']
   - who: ['%umcg-tifn-dms']
@@ -655,7 +649,6 @@ local_mount_subfolders:
           - umcg-reki
           - umcg-solve-rd
           - umcg-sommer
-          - umcg-surg
           - umcg-sysops
           - umcg-tifn
           - umcg-ucu
@@ -749,7 +742,6 @@ lfs_mounts:
       - name: umcg-reki
       - name: umcg-solve-rd
       - name: umcg-sommer
-      - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
@@ -811,7 +803,6 @@ lfs_mounts:
       - name: umcg-respire
       - name: umcg-solve-rd
       - name: umcg-sommer
-      - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
@@ -871,7 +862,6 @@ lfs_mounts:
       - name: umcg-reki
       - name: umcg-solve-rd
       - name: umcg-sommer
-      - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
@@ -927,7 +917,6 @@ lfs_mounts:
       - name: umcg-reki
       - name: umcg-solve-rd
       - name: umcg-sommer
-      - name: umcg-surg
       - name: umcg-sysops
       - name: umcg-tifn
       - name: umcg-ucu
