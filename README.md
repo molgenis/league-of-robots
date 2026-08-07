@@ -159,7 +159,8 @@ pip3 install mitogen
 
 ```bash
 pip3 install openstacksdk
-pip3 install python-openstackclient
+pip3 install openstackclient # for python <= 3.12
+pip3 install python-openstackclient # for python >= 3.13
 ```
 
 #### 2. Import the required roles and collections for the playbooks.
