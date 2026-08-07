@@ -6,4 +6,4 @@
 #
 # Allow specific users or groups to run specific commands
 #
-{% if functional_admin_group is defined and functional_admin_group | length %}%{{ functional_admin_group | regex_replace(' ', '\\ ') }},{% endif %}{% for user_group in item.who %}{{user_group}}{{ "," if not loop.last else "" }}{% endfor %}    ALL=({{ item.become }})    NOPASSWD:{{ item.command | default('ALL') }}
+{% if functional_admin_group is defined and functional_admin_group | length %}%{{ functional_admin_group | regex_replace(' ', '\\ ') }},{% endif %}{% for user_group in sudoers_who %}{{user_group}}{{ "," if not loop.last else "" }}{% endfor %}    ALL=({{ sudoers_become }})    NOPASSWD:{{ sudoers_command }}
