@@ -39,7 +39,7 @@
     user: "{{ item['user'] }}"
     disabled: "{{ item['disabled'] | default(omit) }}"
     job: /usr/bin/sg '{{ item['group'] }}'
-           -c '/bin/bash 
+           -c '/bin/bash
              -c "/usr/local/bin/backup
                    -s '{{ item['src'] }}'
                    -d '{{ item['dest'] }}/{{ item['name'] }}/'
