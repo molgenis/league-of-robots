@@ -189,7 +189,7 @@ pip install -r python.venv/ansible/ansible_collections/azure/azcollection/requir
 # `az login` fails. To prevent this, I use pipx to separately install `azure-cli` - which provides
 # functionality of `az login` without sharing and messing dependencies of rest of the azcollection
 pip install pipx
-pipx instal azure-cli
+pipx install azure-cli
 # If ^ fails then use this:
 # find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" -exec pip install -r {} \;
 ```
