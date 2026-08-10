@@ -31,16 +31,16 @@
 - name: Configure groups for making backups.
   ansible.builtin.include_tasks:
     file: groups.yml
-  loop: "{{ backups | map('group') | sort | unique }}"
+  loop: "{{ backups | map(attribute='group') | sort | unique }}"
   vars:
     backups_group: "{{ item }}"
 
 - name: Configure users for making backups.
   ansible.builtin.include_tasks:
     file: users.yml
-  loop: "{{ backups }}"
+  loop: "{{ backups | map(attribute='user') | sort | unique }}"
   vars:
-    backups_user: "{{ item | map('user') | sort | unique }}"
+    backups_user: "{{ item }}"
 
 - name: Configure keys for making backups of remote sources.
   ansible.builtin.include_tasks:
@@ -48,14 +48,13 @@
   loop: "{{ backups | selectattr('src', 'search', ':') }}"
   vars:
     backups_user: "{{ item['user'] }}"
-    backups_key_file_path: "{{ backups_key_file_path_template | replace('USER', backups_user) }}"
+    backups_user_key_file_path: "{{ backups_key_file_path_template | replace('USER', backups_user) }}"
     backups_remote_user: |-
       {%- if item['src'] is search '@' -%}
         {{ item['src'] | regex_replace('(.*)@.*', '\1') }}
       {%- else -%}
         {{ item['user'] }}
       {%- endif -%}
-    backups_remote_key_file_path: "{{ backups_key_file_path_template | replace('USER', backups_remote_user) }}"
     backups_remote_host: "{{ item['src'] | regex_replace('(.*@)*([^@:]+):.*', '\\2') }}"
 
 - name: Create cron jobs for backups
