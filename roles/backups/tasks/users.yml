@@ -1,0 +1,37 @@
+---
+#
+# We only check if the account used to make backups exists; Hence we DO NOT create it here!
+# Depending on wether this account comes from an LDAP or is a local account,
+# it must have been created earlier on in the play using the regular_users role.
+#
+- name: "Check if {{ backups_user }} user is present (without creating one if not existing yet)."
+  block:
+    - name: 'Check if {{ backups_user }} user is present assuming all its groups are either local or from an LDAP.'
+      ansible.builtin.user:
+        name: "{{ backups_user }}"
+        group: "{{ backups_user }}"
+        groups: "{{ regular_users | selectattr('name', 'equalto', backups_user) | map(attribute='groups') | flatten | unique }}"
+        home: "/home/{{ backups_user }}"
+        create_home: false
+        append: false
+      become: false
+  rescue:
+    - name: 'Fallback check if {{ backups_user }} user and only its primary group are present.'
+      #
+      # This fallback option will not check for other groups.
+      # Required for example when some of the secondary groups come from an LDAP while user & primary group are local.
+      #
+      ansible.builtin.user:
+        name: "{{ backups_user }}"
+        group: "{{ backups_user }}"
+        home: "/home/{{ backups_user }}"
+        create_home: false
+      become: false
+
+- name: "Initialize {{ backups_user }} account creating home dir if it did not exist yet."
+  ansible.builtin.command:
+    cmd: |
+         /sbin/mkhomedir_helper '{{ backups_user }}' 0077
+    creates: "/home/{{ backups_user }}"
+  become: true
+...

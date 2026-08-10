@@ -1,4 +1,6 @@
 ---
 # By default an empty list, which will result in the role getting skipped.
 backups: []
+backups_ssh_key_type: ed25519
+backups_key_file_path_template: "/home/USER/.ssh/id_{{ backups_ssh_key_type }}"
 ...
