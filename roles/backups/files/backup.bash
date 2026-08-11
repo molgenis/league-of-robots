@@ -22,7 +22,6 @@ umask 0027
 export TMPDIR="${TMPDIR:-/tmp}" # Default to /tmp if $TMPDIR was not defined.
 SCRIPT_NAME="$(basename "${0}")"
 SCRIPT_NAME="${SCRIPT_NAME%.*sh}"
-LOG_DIR="/var/log/${SCRIPT_NAME}/"
 ROLE_USER="$(whoami)"
 REAL_USER="$(logname 2>/dev/null || echo 'no login name')"
 
@@ -200,6 +199,8 @@ Options:
 	-l	[level]
 		Log level.
 		Must be one of TRACE, DEBUG, INFO (default), WARN, ERROR or FATAL.
+	-n	[name]
+	    Name for the backup set. Used for logging.
 	-s	[source]
 		Source data to be backupped.
 		May be local data or data from a remote machine.
@@ -233,15 +234,19 @@ EOH
 # Get commandline arguments.
 #
 log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Parsing commandline arguments ..."
+declare name=''
 declare destination=''
 declare source=''
 declare keep=''
 declare retention_time=''
 declare user=''
-while getopts ":d:s:k:r:u:l:h" opt; do
+while getopts ":n:d:s:k:r:u:l:h" opt; do
 	case "${opt}" in
 		h)
 			showHelp
+			;;
+		n)
+			name="${OPTARG}"
 			;;
 		d)
 			destination="${OPTARG}"
@@ -277,25 +282,33 @@ done
 #
 # Check commandline options.
 #
+if [[ -z "${name:-}" ]]; then
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify a name for the backup set with -n. Try $(basename "${0}") -h for help."
+elif [[ ! "${name}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Name for the backup set can only contain [a-zA-Z0-9_-]."
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the name for the backup set."
+fi
 if [[ -z "${destination:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify destination where to store the backup with -d. Try $(basename "${0}") -h for help."
 elif [[ ! "${destination}" =~ ^[a-zA-Z0-9_/.-]+$ ]]; then
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Destination where to store the backup contains invalid characters. Try $(basename "${0}") -h for help."
+	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Destination where to store the backup can only contain [a-zA-Z0-9_/.-]."
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the destination where to store the backup."
 fi
 if [[ -z "${source:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify source data to backup with -s. Try $(basename "${0}") -h for help."
 elif [[ ! "${source}" =~ ^[a-zA-Z0-9_/.:@-]+$ ]]; then
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Source data to backup contains invalid characters. Try $(basename "${0}") -h for help."
+	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Source data to backup can only contain [a-zA-Z0-9_/.:@-]."
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the source data to backup."
 fi
 if [[ -z "${keep:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify the minimal number of successful backups to keep with -k. Try $(basename "${0}") -h for help."
 elif [[ ! "${keep}" =~ ^[0-9]+$ ]]; then
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Number of backups to keep must be an integer. Try $(basename "${0}") -h for help."
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Number of backups to keep must be an integer."
 fi
 if [[ -z "${retention_time:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '0' "Must specify the minimal retention time with -r. Try $(basename "${0}") -h for help."
 elif [[ ! "${retention_time}" =~ ^[0-9]+$ ]]; then
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Retention time in days must be an integer. Try $(basename "${0}") -h for help."
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Retention time in days must be an integer."
 fi
 if [[ -z "${user:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '0' "Must specify the username for the account that will create the backups with -u. Try $(basename "${0}") -h for help."
@@ -308,9 +321,10 @@ fi
 #
 # Create log dir
 #
+log_dir="/var/log/${SCRIPT_NAME}/${name}/"
 # shellcheck disable=SC2174
-mkdir -m 700 -p "${LOG_DIR}/" || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "$?" "Cannot create ${LOG_DIR}."
-log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written to ${LOG_DIR} ..."
+mkdir -m 700 -p "${log_dir}" || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "$?" "Cannot create ${log_dir}."
+log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written to ${log_dir}/ ..."
 
 #
 # Make sure only one copy of this script runs simultaneously per source to backup.
@@ -320,7 +334,7 @@ log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written 
 # We write the ${source} down in the lock file to make it easier to detect which ${source} the lock file is for.
 #
 hashed_source="$(printf '%s' "${source}" | md5sum | awk '{print $1}')"
-lock_file="${LOG_DIR}/${SCRIPT_NAME}-${hashed_source}.lock"
+lock_file="${log_dir}/${SCRIPT_NAME}-${hashed_source}.lock"
 thereShallBeOnlyOne "${lock_file}"
 printf 'This lock file is used for making backups of %s.\n' "${source}" > "${lock_file}"
 
@@ -328,7 +342,7 @@ printf 'This lock file is used for making backups of %s.\n' "${source}" > "${loc
 # Ensure destination dir exists.
 #
 # shellcheck disable=SC2174
-mkdir -p -m 700 "${destination}/"  || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "$?" "Cannot create ${destination}."
+mkdir -p -m 700 "${destination}/" || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" "$?" "Cannot create ${destination}."
 
 #
 # Create backup with rsync
@@ -352,7 +366,7 @@ if [[ -e "${destination}/${backup_start_ts}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup ${destination}/${backup_start_ts} already exists."
 fi
 printf 'Working on backup of %s to %s ... ' "${source}" "${destination}/${backup_start_ts}" >> "${lock_file}"
-rsync_log="${LOG_DIR}/${SCRIPT_NAME}-${hashed_source}-rsync-${backup_start_ts}.log"
+rsync_log="${log_dir}/${SCRIPT_NAME}-${hashed_source}-rsync-${backup_start_ts}.log"
 log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Using rsync log file ${rsync_log}."
 set +e
 if [[ -L "${destination}/latest_rsync" ]]; then
@@ -435,7 +449,7 @@ if [[ "${#good_backups[@]}" -gt "${keep}" ]]; then
 	if [[ "${outdated_backups_count}" -ge 1 ]]; then
 		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Removing ${outdated_backups_count} outdated backup(s) ..."
 		find "${destination}/" -mindepth 1 -maxdepth 1 -mtime "+${retention_time}" -type d -exec rm -Rf '{}' \;
-		find "${LOG_DIR}/" -mtime "+${retention_time}" -name '*.log' -exec rm -f'{}' \;
+		find "${log_dir}/" -mtime "+${retention_time}" -name '*.log' -exec rm -f'{}' \;
 		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "    done."
 	else
 		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "There are no outdated backups to remove."

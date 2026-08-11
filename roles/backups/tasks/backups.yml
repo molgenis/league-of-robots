@@ -2,18 +2,37 @@
 - name: Install backup script.
   ansible.builtin.copy:
     src: backup.bash
-    dest: '/usr/local/bin/backup'
-    owner: 'root'
-    group: 'root'
+    dest: /usr/local/bin/backup
+    owner: root
+    group: root
     mode: '0755'
+  become: true
+
+- name: Create main directory for logs.
+  ansible.builtin.file:
+    path: /var/log/backup
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Create sub directories for logs.
+  ansible.builtin.file:
+    path: "/var/log/backup/{{ item['name'] }}/"
+    state: directory
+    owner: "{{ item['user'] }}"
+    group: "{{ item['group'] }}"
+    mode: '0700'
+  loop: "{{ backups }}"
   become: true
 
 - name: Create main directories for backups.
   ansible.builtin.file:
     path: "{{ item['dest'] }}/"
     state: directory
-    owner: 'root'
-    group: 'root'
+    owner: root
+    group: root
     mode: '0755'
   loop: "{{ backups }}"
   become: true
@@ -70,6 +89,7 @@
     job: /usr/bin/sg '{{ item['group'] }}'
            -c '/bin/bash
              -c "/usr/local/bin/backup
+                   -n '{{ item['name'] }}'
                    -s '{{ item['src'] }}'
                    -d '{{ item['dest'] }}/{{ item['name'] }}/'
                    -k '{{ item['keep'] }}'

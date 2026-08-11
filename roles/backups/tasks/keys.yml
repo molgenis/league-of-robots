@@ -45,7 +45,7 @@
   register: backups_user_base64_encoded_public_key
   become: true
 
-- name: "Check if the public key for {{ backups_user }}@{{ inventory_hostname }} was added to {{ backups_remote_user }} in the LDAP for {{ backups_remote_host }}."
+- name: "Check if public key was added to the authorized keys for {{ backups_remote_user }}@{{ backups_remote_host }}."
   ansible.builtin.shell:
     cmd: |
          set -o pipefail
@@ -58,7 +58,7 @@
   when:
     - use_ldap | default(true) | bool
 
-- name: "Fail when the ssh public key for the {{ backups_remote_user }} user is missing on {{ backups_remote_host }}."
+- name: "Fail when the public key is missing in the list of authorized keys for {{ backups_remote_user }}@{{ backups_remote_host }}."
   ansible.builtin.debug:
     msg: |
          ***********************************************************************************************************
