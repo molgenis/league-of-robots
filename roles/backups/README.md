@@ -81,13 +81,14 @@ all:
 
 ## Backup procedure
 
+1. Create & check folder for the logs, which will be `/var/log/backup/{{ name }}/`.
 1. Create & check destination folder.
-2. Check if a `latest` symlink exists
-3. Use `rsync` to create
+1. Check if a `latest` symlink exists
+1. Use `rsync` to create
    * either a new first backup
    * or a new subsequent backup with `--link-dest="${destination}/latest"`.
-4. Update the `latest` symlink to point to the new backup if the backup completed successfully.
-5. Delete outdated backups.
+1. Update the `latest` symlink to point to the new backup if the backup completed successfully.
+1. Delete outdated backups and logs.
 
 ## Manually executing
 
@@ -104,14 +105,20 @@ so it gets captured by the system logs in `/var/log/messages`.
 
 ## Tested
 
-With `ansible-lint v6.5.0` and `shellcheck v0.8.0`.
+With `ansible-lint 26.6.0` and `shellcheck v0.8.0`.
 
 ## Limitations
 
 The `backup` command cannot be executed more than once per second and per backup `src`;
-Therefore it uses a lock file in /var/log/backups/ per `src`, which is hashed for the filename of the lock file.
+Therefore it uses a lock file in `/var/log/backups/{{ name }}/` with the hashed `src` in the filename of the lock file.
 When an instance of the `backup` command cannot get a lock on the lock file,
 it will log a `FATAL` error and return with exit code `1`.
+
+For backups of a remote source this role
+ * will create a key pair
+ * and check if the public key was added to the account used for the backups on the source machine.
+ * cannot add the public key to an account management system like an LDAP
+ * and will fail if the public key is not part of the list of authorized keys.
 
 Do not use this backup methods for
 
