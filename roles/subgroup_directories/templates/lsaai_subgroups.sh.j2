@@ -67,21 +67,20 @@ $DEBUG && jq -r '.[]' <<< "$my_member_groups"
 # $2 subgroupname
 # $3 expirationdays
 make_new_subgroup(){
+   local parentNameClean="${1}"
    local parentName="${1//\-/\:}"
-   local subgroupname="${2}"
+   local subgroupname="${2//\-/\_}"
    local expirationdays="${3}"
-   parentNameClean=$(echo "$parentName" | tr ':' '-')
-   subgroupname=$(echo "$subgroupname" | tr '-' '_')
 
    all_groups=$(curl_it "$BASE_URL/groupsManager/getAllGroups" "{\"vo\":\"$VO_ID\"}")
-   parentId=$(echo "$all_groups" | jq -r --arg name "$parentName" 'map(select(.name==$name)) | .[0].id')
+   parentId=$(echo "${all_groups}" | jq -r --arg name "${parentName}" 'map(select(.name==$name)) | .[0].id')
 
    if [[ -z "$parentId" || "$parentId" == "null" ]]; then
-       echo "Error: could not find group '${parentName//\:/-}'"
+       echo "Error: could not find group '${parentNameClean}'"
        exit 1
    fi
 
-   echo "Resolved parent '$parentName' -> id: $parentId"
+   echo "Resolved parent '${parentName}' -> id: ${parentId}"
 
    # find dms group by walk up from parentId
    dms_group_id=""
