@@ -327,8 +327,6 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-respire'
     sponsor: umcg-research-it
-  - name: 'umcg-solve-rd'
-    sponsor: umcg-mswertz
   - name: 'umcg-sommer'
     sponsor: umcg-research-it
   - name: 'umcg-sysops'
@@ -458,8 +456,6 @@ regular_users:
     groups: ['umcg-reki']
   - name: 'umcg-respire-dm'
     groups: ['umcg-respire']
-  - name: 'umcg-solve-rd-dm'
-    groups: ['umcg-solve-rd']
   - name: 'umcg-sommer-dm'
     groups: ['umcg-sommer']
   - name: 'umcg-sysops-dm'
@@ -581,8 +577,6 @@ sudoers:
     become: ['umcg-reki-dm']
   - who: ['%umcg-respire-dms']
     become: ['umcg-respire-dm']
-  - who: ['%umcg-solve-rd-dms']
-    become: ['umcg-solve-rd-dm']
   - who: ['%umcg-sommer-dms']
     become: ['umcg-sommer-dm']
   - who: ['%umcg-sysops-dms']
@@ -757,7 +751,6 @@ lfs_mounts:
       - name: umcg-rehabilitation
       - name: umcg-reki
       - name: umcg-respire
-      - name: umcg-solve-rd
       - name: umcg-sommer
       - name: umcg-sysops
       - name: umcg-tifn
@@ -816,7 +809,6 @@ lfs_mounts:
       - name: umcg-radicon
       - name: umcg-rehabilitation
       - name: umcg-reki
-      - name: umcg-solve-rd
       - name: umcg-sommer
       - name: umcg-sysops
       - name: umcg-tifn
@@ -841,7 +833,6 @@ lfs_mounts:
       - name: umcg-hlhs
       - name: umcg-lifelines
       - name: umcg-monitor-connect
-      - name: umcg-solve-rd
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env04
