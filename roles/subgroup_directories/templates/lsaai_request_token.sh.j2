@@ -81,7 +81,7 @@ token_request(){
    echo "Checking if token is created (every ${interval}s, for maximum ${MAX_WAIT}s) ..."
    
    while (( elapsed < MAX_WAIT )); do
-      sleep "$interval"
+      sleep "${interval}"
       elapsed=$(( elapsed + interval ))
    
       token_response=$(curl -sf -X POST "${TOKEN_ENDPOINT}" \
