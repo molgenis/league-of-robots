@@ -30,7 +30,7 @@ _defaultexpirationdays=365
 exec 3>/dev/null
 ${DEBUG} && exec 3>&1
 
-[[ " ${UID}" -eq 0 ]] && echo -e "\033[31mRunning under root!\033[0m"
+[[ "${UID}" -eq 0 ]] && echo -e "\033[31mRunning under root!\033[0m"
 
 [[ ${2:-} == '-v' ]] && DEBUG=true
 [[ ${2:-} == '-vv' ]] && { DEBUG2=true; DEBUG=true; }
