@@ -375,6 +375,7 @@ if [[ -L "${destination}/latest" ]]; then
 	# if they have not changed since the previous backup.
 	# This prevents redundancy and hence saves precious backup disk space.
 	#
+	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Making snapshot backup of differences compared to ${destination}/latest."
 	rsync -rlptgoAHXcsSq --link-dest="${destination}/latest" \
 	"${source}" \
 	"${destination}/${backup_start_ts}_in_flux" \
@@ -384,6 +385,7 @@ else
 	#
 	# This is the first backup.
 	#
+	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Making new full backup."
 	rsync -rlptgoAHXcsSq \
 	"${source}" \
 	"${destination}/${backup_start_ts}_in_flux" \
