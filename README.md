@@ -159,7 +159,8 @@ pip3 install mitogen
 
 ```bash
 pip3 install openstacksdk
-pip3 install python-openstackclient
+pip3 install openstackclient # for python <= 3.12
+pip3 install python-openstackclient # for python >= 3.13
 ```
 
 #### 2. Import the required roles and collections for the playbooks.
@@ -189,7 +190,7 @@ pip install -r python.venv/ansible/ansible_collections/azure/azcollection/requir
 # `az login` fails. To prevent this, I use pipx to separately install `azure-cli` - which provides
 # functionality of `az login` without sharing and messing dependencies of rest of the azcollection
 pip install pipx
-pipx instal azure-cli
+pipx install azure-cli
 # If ^ fails then use this:
 # find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" -exec pip install -r {} \;
 ```
