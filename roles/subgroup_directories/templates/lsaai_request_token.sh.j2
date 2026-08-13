@@ -84,7 +84,7 @@ token_request(){
       sleep "$interval"
       elapsed=$(( elapsed + interval ))
    
-      token_response=$(curl -sf -X POST "$TOKEN_ENDPOINT" \
+      token_response=$(curl -sf -X POST "${TOKEN_ENDPOINT}" \
          -H "Content-Type: application/x-www-form-urlencoded" \
          -d "client_id=$CLIENT_ID" \
          -d "client_secret=$CLIENT_SECRET" \
