@@ -48,10 +48,10 @@ token_request(){
    
    echo "Requesting device code..."
    response=$(curl -sf -X POST \
-               -d "client_id=$CLIENT_ID" \
-               -d "client_secret=$CLIENT_SECRET" \
-               -d "scope=$SCOPE" \
-               "$DEVICE_AUTHORIZATION_ENDPOINT" \
+               -d "client_id=${CLIENT_ID}" \
+               -d "client_secret=${CLIENT_SECRET}" \
+               -d "scope=${SCOPE}" \
+               "${DEVICE_AUTHORIZATION_ENDPOINT}" \
             ) || {
                echo "ERROR: Failed to reach device authorization endpoint." >&2
                exit 1
