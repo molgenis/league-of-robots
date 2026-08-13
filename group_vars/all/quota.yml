@@ -40,7 +40,6 @@ lfs_quota:
       umcg-rehabilitation: 1024
       umcg-reki: 1024
       umcg-respire: 1024
-      umcg-solve-rd: 1024
       umcg-sommer: 2048
       umcg-sysops: 1024
       umcg-tifn: 6144
@@ -89,7 +88,6 @@ lfs_quota:
       umcg-pgx: 1024
       umcg-pmb: 5120
       umcg-radicon: 5120
-      umcg-solve-rd: 8192
       umcg-sysops: 1024
       umcg-tifn: 5120
       umcg-ucu: 1024
@@ -121,7 +119,6 @@ lfs_quota:
       umcg-grip: 1024
       umcg-hlhs: 1024
       umcg-lifelines: 41984
-      umcg-solve-rd: 5120
       umcg-sysops: 1024
       umcg-ucu: 5120
   rsc04:
@@ -135,7 +132,6 @@ lfs_quota:
       umcg-grip: 1024
       umcg-hlhs: 1024
       umcg-lifelines: 40960
-      umcg-solve-rd: 5120
   rsc08:
     quota_limits:  # All values in GB.
       umcg-atd: 512
@@ -191,7 +187,6 @@ lfs_quota:
       umcg-radicon: 1024
       umcg-rehabilitation: 1024
       umcg-reki: 1024
-      umcg-solve-rd: 1024
       umcg-sommer: 2048
       umcg-sysops: 1024
       umcg-tifn: 2048
