@@ -97,9 +97,9 @@ token_request(){
       access_token=$(echo "$token_response" | jq -r '.access_token // empty')
    
       # Success
-      if [[ -n "$access_token" ]]; then
-         refresh_token=$(echo "$token_response" | jq -r '.refresh_token // empty')
-         expires_in=$(echo "$token_response"   | jq -r '.expires_in   // "unknown"')
+      if [[ -n "${access_token}" ]]; then
+         refresh_token=$(echo "${token_response}" | jq -r '.refresh_token // empty')
+         expires_in=$(echo "${token_response}"   | jq -r '.expires_in   // "unknown"')
          echo "${access_token}" > "${TOKEN_FILE}"
          chmod 600 "${TOKEN_FILE}"
          chown "${SUDO_UID}:${SUDO_GID}" "${TOKEN_FILE}"
