@@ -128,7 +128,7 @@ token_request(){
             ;;
          *)
             echo "ERROR: Unexpected error: $error" >&2
-            echo "Full response: $token_response" >&2
+            echo "Full response: ${token_response}" >&2
             exit 1
             ;;
       esac
