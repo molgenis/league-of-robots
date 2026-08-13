@@ -369,7 +369,7 @@ printf 'Working on backup of %s to %s ... ' "${source}" "${destination}/${backup
 rsync_log="${log_dir}/${SCRIPT_NAME}-${hashed_source}-rsync-${backup_start_ts}.log"
 log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Using rsync log file ${rsync_log}."
 set +e
-if [[ -L "${destination}/latest_rsync" ]]; then
+if [[ -L "${destination}/latest" ]]; then
 	#
 	# Use Rsync's --link-dest feature to create multiple hard links to the same files 
 	# if they have not changed since the previous backup.
