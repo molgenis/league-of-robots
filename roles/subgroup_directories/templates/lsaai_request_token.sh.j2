@@ -106,7 +106,7 @@ token_request(){
          echo ""
          echo "Token obtained successfully! (expires in ${expires_in}s)"
          echo ""
-         [[ -n "$refresh_token" ]] && echo "REFRESH_TOKEN : $refresh_token" && echo ""
+         [[ -n "${refresh_token}" ]] && echo "REFRESH_TOKEN : ${refresh_token}" && echo ""
          return 0
       fi
       error=$(echo "$token_response" | jq -r '.error // "unknown_error"')
