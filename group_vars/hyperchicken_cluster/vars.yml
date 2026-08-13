@@ -134,24 +134,22 @@ regular_groups:
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
-  - name: 'solve-rd-dm'
-    groups: ['solve-rd']
   - name: 'umcg-atd-dm'
     groups: ['umcg-atd']
   - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad']
   - name: 'gvdvries'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'mbijlsma'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'mswertz'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'pneerincx'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'rkanninga'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'scimerman'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
