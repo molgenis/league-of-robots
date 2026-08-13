@@ -86,9 +86,9 @@ token_request(){
    
       token_response=$(curl -sf -X POST "${TOKEN_ENDPOINT}" \
          -H "Content-Type: application/x-www-form-urlencoded" \
-         -d "client_id=$CLIENT_ID" \
-         -d "client_secret=$CLIENT_SECRET" \
-         -d "device_code=$device_code" \
+         -d "client_id=${CLIENT_ID}" \
+         -d "client_secret=${CLIENT_SECRET}" \
+         -d "device_code=${device_code}" \
          -d "grant_type=urn:ietf:params:oauth:grant-type:device_code") || {
          echo "Still no token, retrying in ${interval}s ... " >&2
          continue
