@@ -26,7 +26,7 @@ check_if_token_is_valid() {
       fi
       local now=$(date +%s)
       local remaining=$(( exp - now ))
-      if [[ $remaining -le 0 ]]; then
+      if [[ "${remaining}" -le 0 ]]; then
          echo "Token expired $(( -remaining / 60 )) minutes ago"
          return 1
       else
