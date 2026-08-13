@@ -57,14 +57,14 @@ token_request(){
                exit 1
             }
    
-   device_code=$(echo "$response"             | jq -r '.device_code')
-   user_code=$(echo "$response"               | jq -r '.user_code')
-   verification_uri_complete=$(echo "$response" | jq -r '.verification_uri_complete')
-   interval=$(echo "$response"                | jq -r '.interval // 5')  # default 5 s
+   device_code=$(echo "${response}"             | jq -r '.device_code')
+   user_code=$(echo "${response}"               | jq -r '.user_code')
+   verification_uri_complete=$(echo "${response}" | jq -r '.verification_uri_complete')
+   interval=$(echo "${response}"                | jq -r '.interval // 5')  # default 5 s
    
-   if [[ -z "$device_code" || "$device_code" == "null" ]]; then
+   if [[ -z "${device_code}" || "${device_code}" == "null" ]]; then
        echo "ERROR: Did not receive a device_code. Server response:" >&2
-       echo "$response" >&2
+       echo "${response}" >&2
        exit 1
    fi
    
