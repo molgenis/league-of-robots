@@ -10,7 +10,7 @@ _PRINT_ALL_GROUPS_AND_DMS=""
 sleep 0.5
 
 if test -r "${TOKEN_FILE}"; then
-   TOKEN=$(cat "${TOKEN_FILE}")
+   TOKEN="$(<"${TOKEN_FILE}")"
 else
    echo "ERROR, could not read token!"
    exit 1
