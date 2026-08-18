@@ -208,6 +208,8 @@ Options:
 			/path/to/source/data
 			hostname:/path/to/source/data
 			fully.qualified.domain.name:/path/to/source/data
+	-e	[path]
+		Path to an exclude file containing patterns in rsync syntax to exclude from the backup.
 	-d	[destination]
 		Destination on local storage of the backup server where the baskup will be stored.
 	-k	Minimum number of successful backups to keep.
@@ -237,10 +239,11 @@ log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Parsing commandline argume
 declare name=''
 declare destination=''
 declare source=''
+declare exclude_from=''
 declare keep=''
 declare retention_time=''
 declare user=''
-while getopts ":n:d:s:k:r:u:l:h" opt; do
+while getopts ":n:s:e:d:k:r:u:l:h" opt; do
 	case "${opt}" in
 		h)
 			showHelp
@@ -248,11 +251,14 @@ while getopts ":n:d:s:k:r:u:l:h" opt; do
 		n)
 			name="${OPTARG}"
 			;;
-		d)
-			destination="${OPTARG}"
-			;;
 		s)
 			source="${OPTARG}"
+			;;
+		e)
+			exclude_from="${OPTARG}"
+			;;
+		d)
+			destination="${OPTARG}"
 			;;
 		k)
 			keep="${OPTARG}"
@@ -299,6 +305,15 @@ if [[ -z "${source:-}" ]]; then
 elif [[ ! "${source}" =~ ^[a-zA-Z0-9_/.:@-]+$ ]]; then
 	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Source data to backup can only contain [a-zA-Z0-9_/.:@-]."
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the source data to backup."
+fi
+if [[ -z "${exclude_from:-}" ]]; then
+	if [[ -e "${exclude_from:-}" && -r "${exclude_from:-}" ]]; then
+		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${exclude_from} exists and is readable."
+	else
+		log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "${exclude_from} missing or not readable."
+	fi
+else
+	log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "No exclude file specified."
 fi
 if [[ -z "${keep:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify the minimal number of successful backups to keep with -k. Try $(basename "${0}") -h for help."
@@ -376,21 +391,39 @@ if [[ -L "${destination}/latest" ]]; then
 	# This prevents redundancy and hence saves precious backup disk space.
 	#
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Making snapshot backup of differences compared to ${destination}/latest."
-	rsync -rlptgoAHXcsSq --link-dest="${destination}/latest" \
-	"${source}" \
-	"${destination}/${backup_start_ts}_in_flux" \
-	>> "${rsync_log}" 2>&1
-	return_value="${?}"
+	if [[ -z "${exclude_from:-}" ]]; then
+		rsync -rlptgoAHXcsSq --link-dest="${destination}/latest" \
+		"${source}" \
+		"${destination}/${backup_start_ts}_in_flux" \
+		>> "${rsync_log}" 2>&1
+		return_value="${?}"
+	else
+		rsync -rlptgoAHXcsSq --link-dest="${destination}/latest" \
+		--exclude-from="${exclude_from}" \
+		"${source}" \
+		"${destination}/${backup_start_ts}_in_flux" \
+		>> "${rsync_log}" 2>&1
+		return_value="${?}"
+	fi
 else
 	#
 	# This is the first backup.
 	#
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Making new full backup."
-	rsync -rlptgoAHXcsSq \
-	"${source}" \
-	"${destination}/${backup_start_ts}_in_flux" \
-	>> "${rsync_log}" 2>&1
-	return_value="${?}"
+	if [[ -z "${exclude_from:-}" ]]; then
+		rsync -rlptgoAHXcsSq \
+		"${source}" \
+		"${destination}/${backup_start_ts}_in_flux" \
+		>> "${rsync_log}" 2>&1
+		return_value="${?}"
+	else
+		rsync -rlptgoAHXcsSq \
+		--exclude-from="${exclude_from}" \
+		"${source}" \
+		"${destination}/${backup_start_ts}_in_flux" \
+		>> "${rsync_log}" 2>&1
+		return_value="${?}"
+	fi
 fi
 set -e
 if [[ "${return_value}" -ne 0 && "${return_value}" -ne 24 ]]; then
