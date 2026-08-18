@@ -203,7 +203,7 @@ lfs_quota:
       umcg-atd: 5120
       umcg-biogen: 63488
       umcg-bionic-mdd-gwama: 1024
-      umcg-bios: 1024
+      umcg-bios: 4096
       umcg-blister: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
