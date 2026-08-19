@@ -76,30 +76,6 @@
       {%- endif -%}
     backups_remote_host: "{{ item['src'] | regex_replace('(.*@)*([^@:]+):.*', '\\2') }}"
 
-# - name: Create cron jobs for backups
-#   ansible.builtin.cron:
-#     name: "{{ item['name'] }} - Unique ID for this cron job: do not change!"
-#     minute: "{{ item['crontab']['minute'] | default('*') }}"
-#     hour: "{{ item['crontab']['hour'] | default('*') }}"
-#     day: "{{ item['crontab']['day'] | default('*') }}"
-#     month: "{{ item['crontab']['month'] | default('*') }}"
-#     weekday: "{{ item['crontab']['weekday'] | default('*') }}"
-#     user: "{{ item['user'] }}"
-#     disabled: "{{ item['disabled'] | default(omit) }}"
-#     job: /usr/bin/sg '{{ item['group'] }}'
-#            -c '/bin/bash
-#              -c "/usr/local/bin/backup
-#                    -n '{{ item['name'] }}'
-#                    -s '{{ item['src'] }}'
-#                    -d '{{ item['dest'] }}/{{ item['name'] }}/'
-#                    -k '{{ item['keep'] }}'
-#                    -r '{{ item['retention_time'] }}'
-#                    -u '{{ item['user'] }}'
-#                    -l 'ERROR'
-#                  | /bin/logger"'
-#   loop: "{{ backups }}"
-#   become: true
-
 - name: Create cron jobs for backups
   ansible.builtin.cron:
     name: "{{ item['name'] }} - Unique ID for this cron job: do not change!"

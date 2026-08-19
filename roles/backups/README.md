@@ -37,7 +37,7 @@ all:
         inventory_hostname:
           backups:
             - name: data_set # Name == ID for cronjob; don't modify after deployment!
-              src: 'fully.qualified.domain.name:/path/to/source_data/'
+              src: 'fully.qualified.domain.name:/path/to/./my/source_data/'
               dest: '/path/to/fully.qualified.domain.name_backups/'
               user: name
               group: name
@@ -58,6 +58,18 @@ all:
    * `fully.qualified.domain.name:/path/to/source_data/`: for remote path starting with FQDN `hostname` that can be resolved on the backup server.
    * `another_user@hostname:/path/to/source_data/` for a remote path starting with short `hostname` that can be resolved on the backup server and where a different account name must be used to access the source data.
    * `anaother_user@fully.qualified.domain.name:/path/to/source_data/`: for remote path starting with FQDN `hostname` that can be resolved on the backup server and where a different account name must be used to access the source data.
+ * `src` supports specifying multiple paths in a space separated list. E.g.
+   * `hostname:/path/to/source_data/ :/path/to/other_source_data`
+ * `src` supports rsync "_dot dir_" syntax to specify that a partial directory structure must be transferred to the destination.
+   * E.g. `src: 'hostname:/path/to/./my/source_data/'` combined with `dest: '/path/to/backup'` will result in `/path/to/backup/my/source_data/`
+   * This can be used to exclude sub directories/paths without introducing the complexity of exclude patterns. E.g. when you have:  
+      `/apps/.tmp`  
+      `/apps/data`  
+      `/apps/modules`  
+      `/apps/software`  
+      `/apps/sources`  
+     on the machine `hostname` and want to backup everything except the `.tmp` sub dir, then you can use:  
+      `hostname:/./apps/sources :/./apps/data :/./apps/software :/./apps/modules`
  * The `backup` command will store the backups in `{{ dest }}/{{ name }}/` owned by `{{ user }}` in the group `{{ group }}` with
    * read-write POSIX permissions for `{{ user }}` and
    * read-only POSIX permissons for `{{ group }}` and
