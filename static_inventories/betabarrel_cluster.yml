@@ -384,7 +384,7 @@ all:
               type: xfs
           backups:
             - name: apps # Name == ID for cronjob; don't modify after deployment!
-              src: 'betabarrel:/apps'
+              src: 'betabarrel:/./apps/sources :/./apps/data :/./apps/software :/./apps/modules'
               dest: '/mnt/umcgst15/betabarrel_backups/'
               user: umcg-envsync
               group: umcg-depad

@@ -1,24 +1,4 @@
 ---
-- name: DEBUG 0
-  debug:
-    msg: "{{ job }}"
-  vars:
-    job: /usr/bin/sg '{{ item['group'] }}'
-           -c '/bin/bash
-             -c "/usr/local/bin/backup
-                   -n '{{ item['name'] }}'
-                   -s '{{ item['src'] }}'
-                   {% for backups_filter in item['filters'] | default([]) -%}
-                   -f '{{ backups_filter }}'
-                   {% endfor -%}
-                   -d '{{ item['dest'] }}/{{ item['name'] }}/'
-                   -k '{{ item['keep'] }}'
-                   -r '{{ item['retention_time'] }}'
-                   -u '{{ item['user'] }}'
-                   -l 'ERROR'
-                 | /bin/logger"'
-  loop: "{{ backups }}"
-
 - name: Install backup script.
   ansible.builtin.copy:
     src: backup.bash
@@ -111,9 +91,6 @@
 #              -c "/usr/local/bin/backup
 #                    -n '{{ item['name'] }}'
 #                    -s '{{ item['src'] }}'
-#                    {% for backups_filter in item['filters'] | default([]) -%}
-#                    -f '{{ backups_filter }}'
-#                    {% endfor -%}
 #                    -d '{{ item['dest'] }}/{{ item['name'] }}/'
 #                    -k '{{ item['keep'] }}'
 #                    -r '{{ item['retention_time'] }}'
@@ -133,16 +110,16 @@
     weekday: "{{ item['crontab']['weekday'] | default('*') }}"
     user: "{{ item['user'] }}"
     disabled: "{{ item['disabled'] | default(omit) }}"
-    job: /usr/bin/sg '{{ item['group'] }}'
-             -c "/usr/local/bin/backup
-                   -n '{{ item['name'] }}'
-                   -s '{{ item['src'] }}'
-                   -d '{{ item['dest'] }}/{{ item['name'] }}/'
-                   -k '{{ item['keep'] }}'
-                   -r '{{ item['retention_time'] }}'
-                   -u '{{ item['user'] }}'
-                   -l 'ERROR'
-                 | /bin/logger"
+    job: /usr/bin/sg '{{ item['group'] }}' -c
+            "/usr/local/bin/backup
+                -n '{{ item['name'] }}'
+                -s '{{ item['src'] }}'
+                -d '{{ item['dest'] }}/{{ item['name'] }}/'
+                -k '{{ item['keep'] }}'
+                -r '{{ item['retention_time'] }}'
+                -u '{{ item['user'] }}'
+                -l 'ERROR'
+              | /bin/logger"
   loop: "{{ backups }}"
   become: true
 ...

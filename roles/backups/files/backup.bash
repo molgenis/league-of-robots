@@ -201,17 +201,19 @@ Options:
 		Must be one of TRACE, DEBUG, INFO (default), WARN, ERROR or FATAL.
 	-n	[name]
 	    Name for the backup set. Used for logging.
-	-s	[source]
+	-s	[sources]
 		Source data to be backupped.
 		May be local data or data from a remote machine.
+		May be a single source or multiple space separated source paths.
 		E.g.:
-			/path/to/source/data
-			hostname:/path/to/source/data
-			fully.qualified.domain.name:/path/to/source/data
-	-e	[path]
-		Path to an exclude file containing patterns in rsync syntax to exclude from the backup.
+			-s '/path/to/source/data'
+			-s 'hostname:/path/to/source/data'
+			-s 'fully.qualified.domain.name:/path/to/source/data'
+			-s '/path/to/source/data /another/path'
+			-s 'hostname:/path/to/source/data :/path/to/another_source_on_the_same_hostname'
+			-s 'fully.qualified.domain.name:/path/to/source/data :/path/to/another_source_on_the_same_fqdn'
 	-d	[destination]
-		Destination on local storage of the backup server where the baskup will be stored.
+		Destination on local storage of the backup server where the backup will be stored.
 	-k	Minimum number of successful backups to keep.
 	-r	Minimal retention time for backups.
 	-u	User: the account used to create the backups.
@@ -237,13 +239,12 @@ EOH
 #
 log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Parsing commandline arguments ..."
 declare name=''
+declare -a sources=()
 declare destination=''
-declare source=''
-declare exclude_from=''
 declare keep=''
 declare retention_time=''
 declare user=''
-while getopts ":n:s:e:d:k:r:u:l:h" opt; do
+while getopts ":n:s:d:k:r:u:l:h" opt; do
 	case "${opt}" in
 		h)
 			showHelp
@@ -252,10 +253,7 @@ while getopts ":n:s:e:d:k:r:u:l:h" opt; do
 			name="${OPTARG}"
 			;;
 		s)
-			source="${OPTARG}"
-			;;
-		e)
-			exclude_from="${OPTARG}"
+			read -r -a sources <<< "${OPTARG}"
 			;;
 		d)
 			destination="${OPTARG}"
@@ -288,32 +286,30 @@ done
 #
 # Check commandline options.
 #
+declare regex='^[a-zA-Z0-9_-]+$'
 if [[ -z "${name:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify a name for the backup set with -n. Try $(basename "${0}") -h for help."
-elif [[ ! "${name}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Name for the backup set can only contain [a-zA-Z0-9_-]."
+elif [[ ! "${name}" =~ ${regex} ]]; then
+	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Name for the backup must match regex ${regex}."
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the name for the backup set."
 fi
+regex='^[a-zA-Z0-9_/.-]+$'
 if [[ -z "${destination:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify destination where to store the backup with -d. Try $(basename "${0}") -h for help."
-elif [[ ! "${destination}" =~ ^[a-zA-Z0-9_/.-]+$ ]]; then
-	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Destination where to store the backup can only contain [a-zA-Z0-9_/.-]."
+elif [[ ! "${destination}" =~ ${regex} ]]; then
+	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Destination where to store the backup must match regex ${regex}."
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the destination where to store the backup."
 fi
-if [[ -z "${source:-}" ]]; then
+regex='^[a-zA-Z0-9_/.@:-]+$'
+if [[ "${#sources[@]}" -lt 1 ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify source data to backup with -s. Try $(basename "${0}") -h for help."
-elif [[ ! "${source}" =~ ^[a-zA-Z0-9_/.:@-]+$ ]]; then
-	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Source data to backup can only contain [a-zA-Z0-9_/.:@-]."
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the source data to backup."
-fi
-if [[ -z "${exclude_from:-}" ]]; then
-	if [[ -e "${exclude_from:-}" && -r "${exclude_from:-}" ]]; then
-		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${exclude_from} exists and is readable."
-	else
-		log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "${exclude_from} missing or not readable."
-	fi
 else
-	log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "No exclude file specified."
+	for source in "${sources[@]}"; do
+		if [[ ! "${source}" =~ ${regex} ]]; then
+			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Source data to backup must match regex ${regex}."
+			log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Found invalid characters in the source data to backup."
+		fi
+	done
 fi
 if [[ -z "${keep:-}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Must specify the minimal number of successful backups to keep with -k. Try $(basename "${0}") -h for help."
@@ -345,13 +341,13 @@ log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written 
 # Make sure only one copy of this script runs simultaneously per source to backup.
 #
 # As servernames and folders may contain various characters that would require escaping in (lock) file names,
-# we compute a hash of ${source} to append to the ${SCRIPT_NAME} for creating unique lock file.
-# We write the ${source} down in the lock file to make it easier to detect which ${source} the lock file is for.
+# we compute a hash of ${sources[*]} to append to the ${SCRIPT_NAME} for creating unique lock file.
+# We write the ${sources[*]} down in the lock file to make it easier to detect which ${sources[*]} the lock file is for.
 #
-hashed_source="$(printf '%s' "${source}" | md5sum | awk '{print $1}')"
+hashed_source="$(printf '%s' "${sources[*]}" | md5sum | awk '{print $1}')"
 lock_file="${log_dir}/${SCRIPT_NAME}-${hashed_source}.lock"
 thereShallBeOnlyOne "${lock_file}"
-printf 'This lock file is used for making backups of %s.\n' "${source}" > "${lock_file}"
+printf 'This lock file is used for making backups of %s.\n' "${sources[*]}" > "${lock_file}"
 
 #
 # Ensure destination dir exists.
@@ -363,6 +359,13 @@ mkdir -p -m 700 "${destination}/" || log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-m
 # Create backup with rsync
 #
 # -r recursive
+# -R relative: In combination with a "/./" a.k.a. "dot dir" in the source, this argument recreates a partial dir structure on the destination relative to the /./ dir.
+#              E.g. when
+#              "source_server:some/path/not/created/on/destination/./path/created/on/destination/some_file"
+#              is transferred with rsync to
+#              "/local/disk/"
+#              you will get
+#              "/local/disk/path/created/on/destination/some_file"
 # -l preserve symlinks
 # -p preserve permissions
 # -t preserve modification times
@@ -380,7 +383,7 @@ backup_start_ts="$(date "+%Y-%m-%d-T%H%M%S")"  # ISO 8601 compliant
 if [[ -e "${destination}/${backup_start_ts}" ]]; then
 	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup ${destination}/${backup_start_ts} already exists."
 fi
-printf 'Working on backup of %s to %s ... ' "${source}" "${destination}/${backup_start_ts}" >> "${lock_file}"
+printf 'Working on backup of %s to %s ... ' "${sources[*]}" "${destination}/${backup_start_ts}" >> "${lock_file}"
 rsync_log="${log_dir}/${SCRIPT_NAME}-${hashed_source}-rsync-${backup_start_ts}.log"
 log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Using rsync log file ${rsync_log}."
 set +e
@@ -391,52 +394,34 @@ if [[ -L "${destination}/latest" ]]; then
 	# This prevents redundancy and hence saves precious backup disk space.
 	#
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Making snapshot backup of differences compared to ${destination}/latest."
-	if [[ -z "${exclude_from:-}" ]]; then
-		rsync -rlptgoAHXcsSq --link-dest="${destination}/latest" \
-		"${source}" \
-		"${destination}/${backup_start_ts}_in_flux" \
-		>> "${rsync_log}" 2>&1
-		return_value="${?}"
-	else
-		rsync -rlptgoAHXcsSq --link-dest="${destination}/latest" \
-		--exclude-from="${exclude_from}" \
-		"${source}" \
-		"${destination}/${backup_start_ts}_in_flux" \
-		>> "${rsync_log}" 2>&1
-		return_value="${?}"
-	fi
+	rsync -rRlptgoAHXcsSq --link-dest="${destination}/latest" \
+	"${sources[@]}" \
+	"${destination}/${backup_start_ts}_in_flux" \
+	>> "${rsync_log}" 2>&1
+	return_value="${?}"
 else
 	#
 	# This is the first backup.
 	#
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Making new full backup."
-	if [[ -z "${exclude_from:-}" ]]; then
-		rsync -rlptgoAHXcsSq \
-		"${source}" \
-		"${destination}/${backup_start_ts}_in_flux" \
-		>> "${rsync_log}" 2>&1
-		return_value="${?}"
-	else
-		rsync -rlptgoAHXcsSq \
-		--exclude-from="${exclude_from}" \
-		"${source}" \
-		"${destination}/${backup_start_ts}_in_flux" \
-		>> "${rsync_log}" 2>&1
-		return_value="${?}"
-	fi
+	rsync -rRlptgoAHXcsSq \
+	"${sources[@]}" \
+	"${destination}/${backup_start_ts}_in_flux" \
+	>> "${rsync_log}" 2>&1
+	return_value="${?}"
 fi
 set -e
 if [[ "${return_value}" -ne 0 && "${return_value}" -ne 24 ]]; then
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup failed for ${source} -> ${destination}/${backup_start_ts}_in_flux."
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup failed for ${sources[*]} -> ${destination}/${backup_start_ts}_in_flux."
 fi
 
 #
 # Sanity check: rsync log should exist and should be empty.
 #
 if [[ ! -f "${rsync_log}" ]]; then
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup failed for ${source} -> ${destination}/${backup_start_ts}: log file ${rsync_log} missing."
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup failed for ${sources[*]} -> ${destination}/${backup_start_ts}: log file ${rsync_log} missing."
 elif [[ -s "${rsync_log}" ]]; then
-	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup failed for ${source} -> ${destination}/${backup_start_ts}: log file ${rsync_log} not empty!"
+	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Backup failed for ${sources[*]} -> ${destination}/${backup_start_ts}: log file ${rsync_log} not empty!"
 else
 	#
 	# Cleanup and signal success.
@@ -448,7 +433,7 @@ else
 	current_dir="$(pwd)"
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Creating symlink in ${current_dir} latest -> ${backup_start_ts}."
 	ln -s -f -n "${backup_start_ts}" latest
-	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Backup of ${source} completed successfully!"
+	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Backup of ${sources[*]} completed successfully!"
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "${destination}/${backup_start_ts} is now marked as 'latest' backup."
 	printf 'done.\n' >> "${lock_file}"
 fi
@@ -459,7 +444,7 @@ fi
 # We need to check not only modification time, but also if there is a minimal amount of good backups.
 # If the backup jobs failed for some time, the last remaining *good* backups may be older than the specified retention time.
 #
-log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Deleting outdated ${source} backups from ${destination} ..."
+log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" "${?}" "Deleting outdated ${sources[*]} backups from ${destination} ..."
 declare -a good_backups
 readarray -t good_backups < <(find "${destination}/" -mindepth 1 -maxdepth 2 -type f -name backup.finished | sort -n -r)
 if [[ "${#good_backups[@]}" -gt "${keep}" ]]; then
