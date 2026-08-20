@@ -1,0 +1,8 @@
+---
+- name: Configure backups.
+  hosts:
+    - all,!controller_api
+  roles:
+    - role: backups
+      when: backups is defined and backups | default([]) | length > 0
+...

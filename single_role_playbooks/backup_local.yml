@@ -1,7 +1,0 @@
----
-- name: Configure backup of local files to local storage.
-  hosts:
-    - deploy_admin_interface
-  roles:
-    - backup_local
-...
