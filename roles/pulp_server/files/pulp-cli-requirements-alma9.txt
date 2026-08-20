@@ -12,5 +12,5 @@ PyYAML==6.0.2
 requests==2.31.0
 schema==0.7.7
 toml==0.10.2
-urllib3==2.2.3
+urllib3==2.7.0
 zipp==3.20.2
