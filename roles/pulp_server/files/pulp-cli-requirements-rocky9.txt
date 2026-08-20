@@ -7,7 +7,7 @@ importlib_metadata==7.0.2
 packaging==23.2
 pulp-cli==0.28.4
 pulp-glue==0.28.4
-Pygments==2.18.0
+Pygments==2.20.0
 PyYAML==6.0.2
 requests==2.31.0
 schema==0.7.7
