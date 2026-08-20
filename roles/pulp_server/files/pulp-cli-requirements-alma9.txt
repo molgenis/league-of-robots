@@ -9,7 +9,7 @@ pulp-cli==0.28.4
 pulp-glue==0.28.4
 Pygments==2.18.0
 PyYAML==6.0.2
-requests==2.31.0
+requests==2.33.0
 schema==0.7.7
 toml==0.10.2
 urllib3==2.2.3
