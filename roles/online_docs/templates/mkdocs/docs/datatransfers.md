@@ -24,8 +24,7 @@ Your options to move data to/from the {{ slurm_cluster_name | capitalize }} HPC 
 ## 1. Push to or pull from cluster UI via jumphost
 
   * via [GUI on Windows](../datatransfers-windows/)
-  * via [GUI on macOS](../datatransfers-macos/)
-  * via the commandline: see below for _rsync_ over SSH
+  * via the commandline on macOS, Linux or UNIX systems: see below for _rsync_ over SSH
 
 ### Using rsync over SSH
 
