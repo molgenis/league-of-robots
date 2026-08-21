@@ -1,0 +1,5 @@
+---
+- name: Configure backups using rsync and cron.
+  ansible.builtin.include_tasks: backups.yml
+  when: backups is defined and backups | default([]) | length > 0
+...

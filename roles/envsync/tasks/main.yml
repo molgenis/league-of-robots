@@ -185,8 +185,8 @@
   ansible.builtin.cron:
     name: Verify and fix permissions for HPC environment.
     weekday: '*'
-    hour: '04'
-    minute: '04'
+    hour: '3'
+    minute: '3'
     user: 'root'
     job: |
          /bin/bash -c '/root/hpc-environment-permissions.bash | /bin/logger'
@@ -197,8 +197,8 @@
   ansible.builtin.cron:
     name: Synchronise HPC environment.
     weekday: '*'
-    hour: '05'
-    minute: '05'
+    hour: '4'
+    minute: '4'
     user: "{{ envsync_user }}"
     job: |
          /usr/bin/sg '{{ envsync_group }}' -c '/bin/bash -c "export SOURCE_HPC_ENV="True"; . ~/.bashrc; hpc-environment-sync.bash -a | /bin/logger"'

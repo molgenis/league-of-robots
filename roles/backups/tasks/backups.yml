@@ -1,0 +1,101 @@
+---
+- name: Install backup script.
+  ansible.builtin.copy:
+    src: backup.bash
+    dest: /usr/local/bin/backup
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Create main directory for logs.
+  ansible.builtin.file:
+    path: /var/log/backup
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Create sub directories for logs.
+  ansible.builtin.file:
+    path: "/var/log/backup/{{ item['name'] }}/"
+    state: directory
+    owner: "{{ item['user'] }}"
+    group: "{{ item['group'] }}"
+    mode: '0700'
+  loop: "{{ backups }}"
+  become: true
+
+- name: Create main directories for backups.
+  ansible.builtin.file:
+    path: "{{ item['dest'] }}/"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ backups }}"
+  become: true
+
+- name: Create sub directories for backups.
+  ansible.builtin.file:
+    path: "{{ item['dest'] }}/{{ item['name'] }}/"
+    state: directory
+    owner: "{{ item['user'] }}"
+    group: "{{ item['group'] }}"
+    mode: '0750'
+  loop: "{{ backups }}"
+  become: true
+
+- name: Configure groups for making backups.
+  ansible.builtin.include_tasks:
+    file: groups.yml
+  loop: "{{ backups | map(attribute='group') | sort | unique }}"
+  vars:
+    backups_group: "{{ item }}"
+
+- name: Configure users for making backups.
+  ansible.builtin.include_tasks:
+    file: users.yml
+  loop: "{{ backups | map(attribute='user') | sort | unique }}"
+  vars:
+    backups_user: "{{ item }}"
+
+- name: Configure keys for making backups of remote sources.
+  ansible.builtin.include_tasks:
+    file: keys.yml
+  loop: "{{ backups | selectattr('src', 'search', ':') }}"
+  vars:
+    backups_user: "{{ item['user'] }}"
+    backups_user_key_file_path: "{{ backups_key_file_path_template | replace('USER', backups_user) }}"
+    backups_remote_user: |-
+      {%- if item['src'] is search '@' -%}
+        {{ item['src'] | regex_replace('(.*)@.*', '\1') }}
+      {%- else -%}
+        {{ item['user'] }}
+      {%- endif -%}
+    backups_remote_host: "{{ item['src'] | regex_replace('(.*@)*([^@:]+):.*', '\\2') }}"
+
+- name: Create cron jobs for backups
+  ansible.builtin.cron:
+    name: "{{ item['name'] }} - Unique ID for this cron job: do not change!"
+    minute: "{{ item['crontab']['minute'] | default('*') }}"
+    hour: "{{ item['crontab']['hour'] | default('*') }}"
+    day: "{{ item['crontab']['day'] | default('*') }}"
+    month: "{{ item['crontab']['month'] | default('*') }}"
+    weekday: "{{ item['crontab']['weekday'] | default('*') }}"
+    user: "{{ item['user'] }}"
+    disabled: "{{ item['disabled'] | default(omit) }}"
+    job: /usr/bin/sg '{{ item['group'] }}' -c
+            "/usr/local/bin/backup
+                -n '{{ item['name'] }}'
+                -s '{{ item['src'] }}'
+                -d '{{ item['dest'] }}/{{ item['name'] }}/'
+                -k '{{ item['keep'] }}'
+                -r '{{ item['retention_time'] }}'
+                -u '{{ item['user'] }}'
+                -l 'ERROR'
+              | /bin/logger"
+  loop: "{{ backups }}"
+  become: true
+...
