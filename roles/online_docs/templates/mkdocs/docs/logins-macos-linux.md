@@ -22,7 +22,7 @@ We've compiled a Bash script to configure your SSH client, which will:
  * Append to an existing config leaving the config for other servers/machines untouched.
  * Update the config for {{ slurm_cluster_name | capitalize }} if the script is executed again.
 
-First, open a terminal. On macOS you will find the ```Terminal.app``` under ```Applications``` -> ```Utilities```.  
+First, open a terminal. (On macOS you will find the ```Terminal.app``` under ```Applications``` -> ```Utilities```.)  
 Next, you can download and execute the ```ssh-client-config-for-{{ slurm_cluster_name }}.bash``` script by pasting this command at the prompt in your terminal:
 
 ```bash
