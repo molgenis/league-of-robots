@@ -4,7 +4,7 @@ stack_domain: 'hpc.rug.nl'
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'hc'
 stack_dtap_state: development
-slurm_version: '24.11.6-1.el9.umcg'
+slurm_version: '24.11.7-1.el9.umcg'
 slurm_partitions:
   - name: cpu_vm  # Must be in sync with group listed in Ansible inventory.
     default: yes
@@ -15,8 +15,8 @@ slurm_partitions:
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
 repo_manager: 'pulp'
-os_distribution: 'rocky9'
-rocky_vault_minorversion: '.6'
+os_distribution: 'alma9'
+os_minorversion: '.8'
 figlet_font: 'lockergnome'
 motd: "To solve or not to solve, that's the question."
 #
@@ -79,7 +79,7 @@ ldap_domains:
 #    user_expiration_date: loginExpirationTime
 #    group_member: memberUid
 #    group_object_class: groupofnames
-cloud_image: Rocky-9.6
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
 enable_predictable_network_interface_names: true
 stack_networks:
@@ -114,6 +114,7 @@ local_admin_users:
   - 'pieter'
   - 'robin'
   - 'sandi'
+  - 'steven'
   - 'wim'
   - 'wouter'
 envsync_user: 'umcg-envsync'
@@ -133,33 +134,31 @@ regular_groups:
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}"]
-  - name: 'solve-rd-dm'
-    groups: ['solve-rd']
   - name: 'umcg-atd-dm'
     groups: ['umcg-atd']
   - name: 'umcg-gsad-dm'
     groups: ['umcg-gsad']
   - name: 'gvdvries'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'mbijlsma'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'mswertz'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'pneerincx'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'rkanninga'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'scimerman'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
-  - name: 'mbenjamins'
-    groups: ['users', "{{ envsync_group }}", 'umcg-atd', 'solve-rd']
+    groups: ['users', "{{ envsync_group }}", 'umcg-atd']
   - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
+  - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+    become: ['umcg-molgenis']
   - who: ['%umcg-atd']
-    become: 'umcg-atd-dm'
+    become: ['umcg-atd-dm']
   - who: ['%umcg-gsad']
-    become: 'umcg-gsad-dm'
+    become: ['umcg-gsad-dm']
 # Remote archive settings
 remote_archive:
   - name: arc01

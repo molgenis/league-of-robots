@@ -7,11 +7,11 @@ The ```sudo``` permissions can be listed in a ```sudoers``` variable in ```group
 ```yaml
 sudoers:
   - who: ['%some-group']
-    become: 'ALL'
+    become: ['ALL']
     name: 'apptainer'
     command: '/bin/apptainer'
   - who: ['%some-group']
-    become: 'some-group-dm'
+    become: ['some-group-dm']
 ```
 
 * The ```who``` and ```become``` attributes are _required_.

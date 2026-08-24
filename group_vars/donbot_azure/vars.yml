@@ -12,6 +12,10 @@ repo_manager: 'none'
 # will be applied to the machine, which can include instructions for both enabling or disabling a repo.
 #
 yum_repos_deployed_on_clients:
+  alma9: "{{ yum_repos['alma9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog', 'ltb', 'perun'])
+              | map(attribute='id') }}"
   rocky9: "{{ yum_repos['rocky9']
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog', 'ltb', 'perun'])
@@ -42,7 +46,6 @@ local_admin_users:
 use_ldap: false
 create_ldap: false
 use_sssd: true
-
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.

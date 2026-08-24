@@ -10,7 +10,7 @@ This should give ample of time to catch and edit the boot options upon booting.
 
 ## GRUB_DEFAULT
 
-In Rocky 9.3 the system can fail to automatically activate a new kernel update after
+In RHEL/Alma/Rocky 9.3 the system can fail to automatically activate a new kernel update after
 
 ```
 dnf update kernel

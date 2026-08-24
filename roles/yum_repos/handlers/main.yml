@@ -4,5 +4,5 @@
     cmd: update-ca-trust extract
   changed_when: true
   become: true
-  listen: update-ca-trust
+  listen: yum_repos_update-ca-trust
 ...

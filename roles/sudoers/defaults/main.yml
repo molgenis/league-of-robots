@@ -12,14 +12,14 @@ ansible_managed_sudoers_filename_tag: ansible-managed
 #
 #     sudoers:
 #       - who: ['%some-group']
-#         become: 'ALL'
+#         become: ['ALL']
 #         name: 'apptainer'
 #         command: '/bin/apptainer'
 #       - who: ['%some-group']
-#         become: 'some-group-dm'
+#         become: ['some-group-dm']
 #
 # will result in name 'apptainer' for the first entry and 'some-group-dm' for the second entry
 #
 configured_ansible_managed_sudoers: "{{ sudoers | default([]) | selectattr('name', 'defined') | map(attribute='name') | list +
-                                        sudoers | default([]) | selectattr('name', 'undefined') | map(attribute='become') | list }}"
+                                        sudoers | default([]) | selectattr('name', 'undefined') | map(attribute='become') | flatten | list }}"
 ...

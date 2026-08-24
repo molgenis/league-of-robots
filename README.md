@@ -131,15 +131,11 @@ pip3 install wheel
 pip3 install setuptools  # No longer part of default Python >= 3.12.x, but we need it.
 pip3 install ruamel.yaml
 pip3 install netaddr
+pip3 install passlib
 #
 # Package dnspython is required for Ansible lookup plugin community.general.dig
 #
 pip3 install dnspython
-#
-# On macOS only to prevent this error:
-# crypt.crypt not supported on Mac OS X/Darwin, install passlib python module.
-#
-pip3 install passlib
 #
 # Optional: install Ansible and the Ansible linter with pip.
 # You may skip this step if you already installed Ansible by other means.
@@ -163,7 +159,8 @@ pip3 install mitogen
 
 ```bash
 pip3 install openstacksdk
-pip3 install openstackclient
+pip3 install openstackclient # for python <= 3.12
+pip3 install python-openstackclient # for python >= 3.13
 ```
 
 #### 2. Import the required roles and collections for the playbooks.
@@ -193,7 +190,7 @@ pip install -r python.venv/ansible/ansible_collections/azure/azcollection/requir
 # `az login` fails. To prevent this, I use pipx to separately install `azure-cli` - which provides
 # functionality of `az login` without sharing and messing dependencies of rest of the azcollection
 pip install pipx
-pipx instal azure-cli
+pipx install azure-cli
 # If ^ fails then use this:
 # find "${VIRTUAL_ENV}" -path "*/azure/azcollection/requirements.txt" -exec pip install -r {} \;
 ```

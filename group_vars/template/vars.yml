@@ -1,30 +1,5 @@
 ---
-# Slurm database user
-slurm_storage_user:
 slurm_cluster_name: examplebot
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'eb'
-sockets: 1
-CoresPerSocket: 9
-ThreadsPerCore: 1
-RealMemory: 20000
-Feature: centos7 
-nodes: |
-    #
-    # Partitions
-    #
-    EnforcePartLimits=YES
-    PartitionName=DEFAULT State=UP DefMemPerCPU=2000
-    PartitionName=tl-ds  Nodes=talos MaxTime=10-00:00:00 DefaultTime=00:30:00 DenyQos=regular,regularlong SelectTypeParameters=CR_Core_Memory  TRESBillingWeights="CPU=1.0,Mem=0.1875G" Default=NO
-    PartitionName=regular  Nodes=tl-vcompute01,tl-vcompute02,tl-vcompute03 MaxTime=10-00:00:00 DefaultTime=00:30:00 AllowQOS=regular,regularlong SelectTypeParameters=CR_Core_Memory  TRESBillingWeights="CPU=1.0,Mem=0.1875G" Default=YES
-
-    #
-    # COMPUTE NODES
-    #
-    GresTypes=gpu
-    NodeName=talos      Sockets=1 CoresPerSocket=1 ThreadsPerCore=1 State=IDLE RealMemory=3000  Feature=centos7
-    NodeName=tl-vcompute01 Sockets=1 CoresPerSocket=9 ThreadsPerCore=1 State=IDLE RealMemory=20000 Feature=centos7
-    NodeName=tl-vcompute02 Sockets=1 CoresPerSocket=9 ThreadsPerCore=1 State=IDLE RealMemory=20000 Feature=centos7
-    NodeName=tl-vcompute03 Sockets=1 CoresPerSocket=9 ThreadsPerCore=1 State=IDLE RealMemory=20000 Feature=centos7
-
-
+...

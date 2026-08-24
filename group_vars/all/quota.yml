@@ -40,20 +40,16 @@ lfs_quota:
       umcg-rehabilitation: 1024
       umcg-reki: 1024
       umcg-respire: 1024
-      umcg-solve-rd: 1024
       umcg-sommer: 2048
-      umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 6144
       umcg-ugli: 2048
       umcg-verbeek: 1024
       umcg-vdakker: 1024
       umcg-weersma: 40960
-      umcg-wijmenga: 22528
   prm03:
     quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
-      umcg-adorable: 1024
       umcg-atd: 1024
       umcg-biogen: 17408
       umcg-bionic-mdd-gwama: 13312
@@ -91,14 +87,12 @@ lfs_quota:
       umcg-pgx: 1024
       umcg-pmb: 5120
       umcg-radicon: 5120
-      umcg-solve-rd: 8192
       umcg-sysops: 1024
       umcg-tifn: 5120
       umcg-ucu: 1024
       umcg-ugli: 6144
       umcg-vdakker: 1024
       umcg-weersma: 8192
-      umcg-wijmenga: 3072
   prm08:
     quota_limits:  # All values in GB.
       umcg-atd: 512
@@ -123,7 +117,6 @@ lfs_quota:
       umcg-grip: 1024
       umcg-hlhs: 1024
       umcg-lifelines: 41984
-      umcg-solve-rd: 5120
       umcg-sysops: 1024
       umcg-ucu: 5120
   rsc04:
@@ -137,7 +130,6 @@ lfs_quota:
       umcg-grip: 1024
       umcg-hlhs: 1024
       umcg-lifelines: 40960
-      umcg-solve-rd: 5120
   rsc08:
     quota_limits:  # All values in GB.
       umcg-atd: 512
@@ -149,7 +141,6 @@ lfs_quota:
   tmp02:
     quota_pid_increment: 0  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
-      umcg-adorable: 1024
       umcg-as: 1024
       umcg-atd: 1024
       umcg-biogen: 20480
@@ -187,16 +178,14 @@ lfs_quota:
       umcg-muhas: 1024
       umcg-nawijn: 4096
       umcg-neonatology: 6144
-      umcg-nephrology: 1024
+      umcg-nephrology: 3072
       umcg-pgx: 1024
       umcg-pmb: 8192
       umcg-rad: 1024
       umcg-radicon: 1024
       umcg-rehabilitation: 1024
       umcg-reki: 1024
-      umcg-solve-rd: 1024
       umcg-sommer: 2048
-      umcg-surg: 1024
       umcg-sysops: 1024
       umcg-tifn: 2048
       umcg-ucu: 3072
@@ -212,7 +201,7 @@ lfs_quota:
       umcg-atd: 5120
       umcg-biogen: 63488
       umcg-bionic-mdd-gwama: 1024
-      umcg-bios: 1024
+      umcg-bios: 4096
       umcg-blister: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024
@@ -243,6 +232,7 @@ lfs_quota:
       umcg-nawijn: 4096
       umcg-neonatology: 3072
       umcg-nephrology: 1024
+      umcg-path-bioinformatica: 1024
       umcg-pgx: 1024
       umcg-pmb: 1024
       umcg-rehabilitation: 1024

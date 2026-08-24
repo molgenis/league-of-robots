@@ -88,8 +88,7 @@ all:
         cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             hc-node-a01:
-              repo_manager: 'repo_server'
-              cloud_flavor: umcg.v1.vm.4-8
+              cloud_flavor: umcg.v1.vm.8-16
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
@@ -105,9 +104,9 @@ all:
               local_volume_extra:
                 - name: local
                   size: 1
-              slurm_sockets: 4
+              slurm_sockets: 8
               slurm_cores_per_socket: 1
-              slurm_real_memory: 7680
+              slurm_real_memory: 15731
               slurm_local_disk: 900
 administration:
   children:

@@ -6,6 +6,7 @@
     name:
       - 'iptables'
       - 'iptables-services'
+      - 'initscripts-service'
       #### ToDo: fail2ban
   notify: restart_iptables
   become: true
