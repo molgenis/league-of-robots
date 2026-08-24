@@ -759,7 +759,6 @@ lfs_mounts:
       - name: umcg-verbeek
       - name: umcg-vdakker
       - name: umcg-weersma
-      - name: umcg-wijmenga
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
@@ -817,7 +816,6 @@ lfs_mounts:
       - name: umcg-verbeek
       - name: umcg-vdakker
       - name: umcg-weersma
-      - name: umcg-wijmenga
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: rsc04
     pfs: umcgst05
