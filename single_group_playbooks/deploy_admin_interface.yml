@@ -13,7 +13,7 @@
   roles:
     - build_environment
     - envsync
-    - backup_local
+    - backups
     - nhc_standalone
     - module_usage_tracking
 ...

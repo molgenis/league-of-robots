@@ -1,0 +1,5 @@
+---
+dependencies:
+    - role: rsync
+      when: backups is defined and backups | default([]) | length > 0
+...
