@@ -742,7 +742,6 @@ lfs_mounts:
       - name: umcg-vdakker
       - name: umcg-visclasataxia
       - name: umcg-weersma
-      - name: umcg-wijmenga
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm02
     pfs: umcgst01
@@ -801,7 +800,6 @@ lfs_mounts:
       - name: umcg-verbeek
       - name: umcg-vdakker
       - name: umcg-weersma
-      - name: umcg-wijmenga
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm03
     pfs: umcgst02
@@ -859,7 +857,6 @@ lfs_mounts:
       - name: umcg-verbeek
       - name: umcg-vdakker
       - name: umcg-weersma
-      - name: umcg-wijmenga
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: rsc02
     pfs: umcgst04/slice3
@@ -914,7 +911,6 @@ lfs_mounts:
       - name: umcg-vdakker
       - name: umcg-visclasataxia
       - name: umcg-weersma
-      - name: umcg-wijmenga
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env02

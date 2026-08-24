@@ -47,7 +47,6 @@ lfs_quota:
       umcg-verbeek: 1024
       umcg-vdakker: 1024
       umcg-weersma: 40960
-      umcg-wijmenga: 22528
   prm03:
     quota_pid_increment: 200000  # Value added to GID to create unique PID for a group on the PFS hosting this LFS.
     quota_limits:  # All values in GB.
@@ -94,7 +93,6 @@ lfs_quota:
       umcg-ugli: 6144
       umcg-vdakker: 1024
       umcg-weersma: 8192
-      umcg-wijmenga: 3072
   prm08:
     quota_limits:  # All values in GB.
       umcg-atd: 512
@@ -203,7 +201,7 @@ lfs_quota:
       umcg-atd: 5120
       umcg-biogen: 63488
       umcg-bionic-mdd-gwama: 1024
-      umcg-bios: 1024
+      umcg-bios: 4096
       umcg-blister: 1024
       umcg-dag3: 1024
       umcg-datateam: 1024

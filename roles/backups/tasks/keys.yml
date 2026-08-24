@@ -1,0 +1,90 @@
+---
+#
+# Work around to prevent
+#   "Error while setting attributes: /home/{{ backups_user }}/.ssh/id_ed25519.pub: Operation not permitted"
+#   "msg: chattr failed"
+# See
+#   https://github.com/ansible-collections/community.crypto/issues/416
+#   https://github.com/ansible/ansible/issues/77217
+#
+- name: 'Touch key pair files as workround for chattr bug in ansible core.'
+  ansible.builtin.shell: |
+      set -e
+      set -u
+      set -o pipefail
+      if [[ ! -e '{{ backups_user_key_file_path }}' ]]; then
+          $(umask 0077 \
+            && touch '{{ backups_user_key_file_path }}' \
+            && chown '{{ backups_user }}:{{ backups_user }}' '{{ backups_user_key_file_path }}')
+          echo 'Touched {{ backups_user_key_file_path }}'
+      fi
+      if [[ ! -e '{{ backups_user_key_file_path }}.pub' ]]; then
+          $(umask 0077 \
+            && touch '{{ backups_user_key_file_path }}.pub' \
+            && chown '{{ backups_user }}:{{ backups_user }}' '{{ backups_user_key_file_path }}.pub')
+          echo 'Touched {{ backups_user_key_file_path }}.pub'
+      fi
+  register: backups_touch_key_pair
+  changed_when: "'Touched' in backups_touch_key_pair.stdout"
+  become: true
+
+- name: "Create ssh key pair for the {{ backups_user }}@{{ inventory_hostname }}."
+  community.crypto.openssh_keypair:
+    path: "{{ backups_user_key_file_path }}"
+    type: "{{ backups_ssh_key_type }}"
+    comment: "{{ backups_user }}@{{ inventory_hostname }}"
+    regenerate: full_idempotence
+    owner: "{{ backups_user }}"
+    group: "{{ backups_user }}"
+    mode: '0600'
+  become: true
+
+- name: "Get content of the public key for the {{ backups_user }}@{{ inventory_hostname }} user."
+  ansible.builtin.slurp:
+    src: "{{ backups_user_key_file_path }}.pub"
+  register: backups_user_base64_encoded_public_key
+  become: true
+
+- name: "Check if public key was added to the authorized keys for {{ backups_remote_user }}@{{ backups_remote_host }}."
+  ansible.builtin.shell:
+    cmd: |
+         set -o pipefail
+         "{{ get_public_keys_command }}" "{{ backups_remote_user }}" \
+         | fgrep '{{ backups_user_base64_encoded_public_key['content'] | b64decode | trim }}'
+  register: backups_remote_user_authorized_public_keys
+  changed_when: false
+  failed_when: false
+  delegate_to: "{{ backups_remote_host }}"
+  when:
+    - use_ldap | default(true) | bool
+
+- name: "Fail when the public key is missing in the list of authorized keys for {{ backups_remote_user }}@{{ backups_remote_host }}."
+  ansible.builtin.debug:
+    msg: |
+         ***********************************************************************************************************
+         IMPORTANT: Manual work!
+         ***********************************************************************************************************
+         Ansible created:
+             {{ inventory_hostname }}:{{ backups_user_key_file_path }}.pub
+         But that public key is not yet available for the {{ backups_remote_user }}@{{ backups_remote_host }} user
+         in the output of the {{ get_public_keys_command }} command:
+             stdout: {{ backups_remote_user_authorized_public_keys['stdout'] }}
+             stderr: {{ backups_remote_user_authorized_public_keys['stderr'] }}
+         Please check the account management system, add the public key for the user and re-run this role.
+         ***********************************************************************************************************
+  failed_when:
+    - backups_remote_user_authorized_public_keys['rc'] >= 1
+  when:
+    - use_ldap | default(true) | bool
+    - backups_remote_user_authorized_public_keys['rc'] >= 1
+
+- name: "Assign ssh public key to ~/.ssh/authorized_keys for the {{ backups_remote_user }}@{{ backups_remote_host }} user."
+  ansible.posix.authorized_key:
+    user: "{{ backups_remote_user }}"
+    key: "{{ backups_user_base64_encoded_public_key['content'] | b64decode }}"
+    state: present
+  delegate_to: "{{ backups_remote_host }}"
+  when:
+    - not use_ldap | default(true) | bool
+  become: true
+...

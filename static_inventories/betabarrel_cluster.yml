@@ -206,12 +206,6 @@ all:
     deploy_admin_interface:
       hosts:
         betabarrel:
-          main_backup_folder: '/mnt/local_raid/local_backups/'
-          local_backups: # list of folders for cron to make daily backup
-            - name: apps # Name == ID; don't modify after deployed!
-              src_path: '/apps'
-              frequency:
-               - { name: 'daily', hour: '5', minute: '47', day: '*', weekday: '*', month: '*', keep: '60', disabled: 'false' }
     user_interface:
       hosts:
         betabarrel:
@@ -388,6 +382,17 @@ all:
                   ,nofail,x-systemd.device-timeout=10
                 {%- endif -%}
               type: xfs
+          backups:
+            - name: apps # Name == ID for cronjob; don't modify after deployment!
+              src: 'betabarrel:/./apps/sources :/./apps/data :/./apps/software :/./apps/modules'
+              dest: '/mnt/umcgst15/betabarrel_backups/'
+              user: umcg-envsync
+              group: umcg-depad
+              keep: 60            # Minimum number of successful backups to keep.
+              retention_time: 60  # Minimal retention time in days.
+              crontab:
+                minute: 47
+                hour: 5
     smb_server:
       hosts:
         betabarrel:

@@ -1,0 +1,12 @@
+---
+#
+# We only check if the group used to make backups exists; Hence we DO NOT create it here!
+# Depending on wether this group comes from an LDAP or is a local group,
+# it must have been created earlier on in the play using the regular_users role.
+#
+- name: "Check if {{ backups_group }} group is present (without creating one if not existing yet)."
+  ansible.builtin.group:
+    name: "{{ backups_group }}"
+    state: present
+  become: false
+...
