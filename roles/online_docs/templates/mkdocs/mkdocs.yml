@@ -25,9 +25,7 @@ nav:
   - Logins:
     - 'Jumphosts, UIs and sessions': 'logins.md'
     - 'SSH config & login for Windows clients': 'logins-windows.md'
-    - 'SSH config for macOS clients': 'logins-macos-config.md'
-    - 'SSH config for Linux clients': 'logins-linux-config.md'
-    - 'SSH login for macOS & Linux clients': 'logins-macos-linux.md'
+    - 'SSH config & login for macOS & Linux clients': 'logins-macos-linux.md'
     - 'Customize your environment': 'custom-environment.md'
   - Storage:
     - 'Keep - What is stored where on {{ slurm_cluster_name | capitalize }}': 'storage.md'
