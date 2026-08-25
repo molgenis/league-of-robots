@@ -8,15 +8,16 @@
 To submit jobs, check their status, test scripts, etc. you need to login on a _**User Interface (UI)**_ server using SSH.
 Each cluster has its own _**UI**_ and the one for the {{ slurm_cluster_name | capitalize }} HPC cluster is named _**{{ groups['user_interface'] | first }}**_.
 The UI and various other servers that make up the cluster receive updates during scheduled maintenance, 
-but as this disrupts the processing of jobs, scheduled maintenance is planned only ~twice a year.
+but as this disrupts the processing of jobs, scheduled maintenance is planned only ~ twice a year.
 
 Not applying updates for several months could become a serious security risk for machines that are directly accessible via the internet.
 Therefore the servers of the {{ slurm_cluster_name | capitalize }} cluster are on an internal network that is not directly accessible from the internet.
 In order to access the UI you will need to hop via a _**Jumphost**_, 
-which is a security hardened machine that is not in any way involved in the processing of jobs nor in storing data and does receive daily (security) updates.
-In order to apply/activate security patches the _Jumphost_ may be temporarily unavailable, which means you cannot login to the _UI_ and hence cannot manage jobs nor create new ones, 
+which is a security hardened machine that is not in any way involved in the processing of jobs nor in storing data.
+The _Jumphost_ automatically receives daily (security) updates and may be rebooted automatically too when this is required to activate security patches for the kernel.
+Therefore the _Jumphost_ may be temporarily unavailable, which means you cannot login to the _UI_ and hence cannot manage jobs nor create new ones, 
 but existing jobs (running or queued) won't be affected and the cluster will continue to process those.
-The _**Jumphost**_ for the {{ slurm_cluster_name | capitalize }} HPC cluster is named _**{{ groups['jumphost'] | first }}**_
+The _**Jumphost**_ for the {{ slurm_cluster_name | capitalize }} HPC cluster is named _**{{ groups['jumphost'] | first }}**_.
 
 ## Request an account
 
@@ -27,12 +28,10 @@ First make sure you have an account. If you are new, please [follow these instru
 Configure your SSH client with the instructions for your operating system:
 
  * Configuration and login instructions for [Windows clients](../logins-windows/).
- * Configuration instructions for [macOS clients](../logins-macos-config/).
- * Configuration instructions for [Linux/Unix clients](../logins-linux-config/).
- * Login instructions for [macOS/Linux/Unix clients](../logins-macos-linux/).
+ * Configuration and login instructions for [macOS/Linux/Unix clients](../logins-macos-linux/).
 
 {% if totp.machines is defined %}
 ## Configure 2-Factor-Authentication
 
-Make sure you have working account and configured SSH client first, then [follow 2-factor-authentication instructions](../2FA/).
+Make sure you have a working account and configured SSH client first, then follow the [2-factor-authentication instructions](../2FA/).
 {% endif %}

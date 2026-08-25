@@ -112,8 +112,8 @@
   ansible.builtin.lineinfile:
     path: '/etc/httpd/conf.d/ssl.conf'
     insertafter: '^<VirtualHost.*>'
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
+    regexp: "{{ item['regexp'] }}"
+    line: "{{ item['line'] }}"
     owner: 'root'
     group: 'root'
     mode: '0644'
@@ -132,7 +132,7 @@
     - regexp: '^#?SSLProtocol .*'
       line: 'SSLProtocol  all -SSLv3 -TLSv1 -TLSv1.1 -TLSv1.2'
   loop_control:
-    label: "{{ item.line }}"
+    label: "{{ item['line'] }}"
   notify:
     - 'restart_httpd'
   become: true
@@ -168,15 +168,13 @@
 
 - name: 'Create base directories for MarkDown and HTML files.'
   ansible.builtin.file:
-    path: "{{ item.path }}"
+    path: "{{ item['path'] }}"
     state: 'directory'
     owner: 'root'
     group: 'root'
-    mode: "{{ item.mode }}"
+    mode: "{{ item['mode'] }}"
   with_items:
     - path: "/srv/mkdocs/{{ slurm_cluster_name }}/"
-      mode: '0750'
-    - path: "/srv/mkdocs/{{ slurm_cluster_name }}/tmp/"
       mode: '0750'
     - path: "/srv/mkdocs/{{ slurm_cluster_name }}/docs/"
       mode: '0750'
@@ -190,7 +188,7 @@
 
 - name: 'Create static files for index in document root.'
   ansible.posix.synchronize:
-    src: "{{ playbook_dir }}/roles/online_docs/files/index//./{{ item.src }}"
+    src: "{{ playbook_dir }}/roles/online_docs/files/index//./{{ item['src'] }}"
     dest: "/var/www/html/"
     owner: false  # Do not sync owner from Ansible control host to inventory host.
     group: false  # Do not sync group from Ansible control host to inventory host.
@@ -225,7 +223,7 @@
 
 - name: 'Create sub directory structure for MarkDown files.'
   ansible.builtin.file:
-    path: "/srv/mkdocs/{{ slurm_cluster_name }}/{{ item.path }}"
+    path: "/srv/mkdocs/{{ slurm_cluster_name }}/{{ item['path'] }}"
     state: 'directory'
     owner: 'root'
     group: 'root'
@@ -238,7 +236,7 @@
 
 - name: 'Create static files for MarkDown.'
   ansible.posix.synchronize:
-    src: "{{ playbook_dir }}/roles/online_docs/files/mkdocs/docs/./{{ item.src }}"
+    src: "{{ playbook_dir }}/roles/online_docs/files/mkdocs/docs/./{{ item['src'] }}"
     dest: "/srv/mkdocs/{{ slurm_cluster_name }}/docs/"
     owner: false  # Do not sync owner from Ansible control host to inventory host.
     group: false  # Do not sync group from Ansible control host to inventory host.
@@ -277,85 +275,34 @@
     - 'build_mkdocs'
   become: true
 
-- name: 'Create skeleton for AppleScript apps.'
-  ansible.posix.synchronize:
-    src: "{{ playbook_dir }}/roles/online_docs/files/attachments/{{ item.src }}/./"
-    dest: "/srv/mkdocs/{{ slurm_cluster_name }}/tmp/{{ item.dest }}"
-    owner: false  # Do not sync owner from Ansible control host to inventory host.
-    group: false  # Do not sync group from Ansible control host to inventory host.
-    times: false  # Do not sync time stamps from Ansible control host to inventory host.
-    checksum: true  # Determine if files are different based on checksums as opposed to combination of timestamp and size.
-    # Temporarily disabled as it is broken in Mitogen 0.3.3. Fix is already merged and will be in next Mitogen version.
-    # use_ssh_args: true
-    ssh_connection_multiplexing: true
-    recursive: 'yes'
-    rsync_opts:
-      - '--relative'
-      - '--omit-dir-times'
-      - '--omit-link-times'
-      - '--chmod=Du=rwx,Dg=rx,Do-rwx,Fu=rwX,Fg=rX,Fo-rwx'
-      - '--perms'
-      - '--force'
-  with_items:
-    - src: 'ssh-client-config.app'
-      dest: "ssh-client-config-for-{{ slurm_cluster_name }}.app"
-    - src: 'mount-cluster-drives.app'
-      dest: 'mount-cluster-drives.app'
-  notify:
-    - 'zip_attachments'
-    - 'build_mkdocs'
-  become: true
-
-- name: 'Make sure main script of AppleScript apps are executable.'
-  ansible.builtin.file:
-    path: "/srv/mkdocs/{{ slurm_cluster_name }}/tmp/{{ item }}/Contents/MacOS/applet"
-    state: 'file'
-    owner: 'root'
-    group: 'root'
-    mode: '0750'
-  with_items:
-    - "ssh-client-config-for-{{ slurm_cluster_name }}.app"
-    - 'mount-cluster-drives.app'
-  notify:
-    - 'zip_attachments'
-    - 'build_mkdocs'
-  become: true
-
-- name: 'Create files for attachments based on templates.'
+- name: 'Create attachments based on templates.'
   ansible.builtin.template:
-    src: "attachments/{{ item.src }}"
-    dest: "/srv/mkdocs/{{ slurm_cluster_name }}/tmp/{{ item.dest }}"
+    src: "attachments/{{ item['src'] }}"
+    dest: "/srv/mkdocs/{{ slurm_cluster_name }}/docs/attachments/{{ item['dest'] }}"
     owner: 'root'
     group: 'root'
-    mode: "{{ item.mode }}"
+    mode: "{{ item['mode'] }}"
   with_items:
     #
-    # For macOS users we inject the configuration script for this cluster into the AppleScript app skeleton.
-    #
-    - src: 'ssh-client-config.bash'
-      dest: "ssh-client-config-for-{{ slurm_cluster_name }}.app/Contents/MacOS/ssh-client-config.command"
-      mode: '0750'
-    #
-    # For Linux/Unix users: just generate a bare Bash script.
+    # For macOS, Linux and Unix users: generate a bare Bash script.
     #
     - src: 'ssh-client-config.bash'
       dest: "ssh-client-config-for-{{ slurm_cluster_name }}.bash"
       mode: '0750'
   notify:
-    - 'zip_attachments'
     - 'build_mkdocs'
   become: true
 
 - name: 'Create MarkDown files based on templates.'
   ansible.builtin.template:
-    src: "{{ item.src }}"
-    dest: "/srv/mkdocs/{{ slurm_cluster_name }}/{{ item.path }}"
+    src: "{{ item['src'] }}"
+    dest: "/srv/mkdocs/{{ slurm_cluster_name }}/{{ item['path'] }}"
     owner: 'root'
     group: 'root'
     mode: '0640'
   with_community.general.filetree: "{{ playbook_dir }}/roles/online_docs/templates/mkdocs"
   # Exclude temporary *.html preview files, which are also exlcuded in .gitignore and should not be transferred.
-  when: item.state == 'file' and '.md.html' not in item.path
+  when: item['state'] == 'file' and '.md.html' not in item['path']
   notify:
     - 'build_mkdocs'
   become: true
