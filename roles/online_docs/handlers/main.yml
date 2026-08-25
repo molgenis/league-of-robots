@@ -13,24 +13,6 @@
   become: true
   listen: 'restart_httpd'
 
-- name: 'Zip the scripted tools from the tmp subfolder and save the archives in the attachments subfolder.'
-  community.general.archive:
-    path: "/srv/mkdocs/{{ slurm_cluster_name }}/tmp/{{ item.path }}"
-    dest: "/srv/mkdocs/{{ slurm_cluster_name }}/docs/attachments/{{ item.dest }}"
-    format: 'zip'
-    owner: 'root'
-    group: 'root'
-    mode: '0640'
-  with_items:
-    - path: "ssh-client-config-for-{{ slurm_cluster_name }}.app"
-      dest: "ssh-client-config-for-{{ slurm_cluster_name }}-macos.zip"
-    - path: "ssh-client-config-for-{{ slurm_cluster_name }}.bash"
-      dest: "ssh-client-config-for-{{ slurm_cluster_name }}-linux.zip"
-    - path: 'mount-cluster-drives.app'
-      dest: 'mount-cluster-drives-macos.zip'
-  become: true
-  listen: 'zip_attachments'
-
 - name: 'Re/build webpages.'
   ansible.builtin.shell: |
          cd /srv/mkdocs/{{ slurm_cluster_name }}/
