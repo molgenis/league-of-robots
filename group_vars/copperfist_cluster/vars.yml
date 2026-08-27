@@ -185,6 +185,8 @@ regular_groups:
     # No sponsor as this group does not use Slurm.
   - name: 'umcg-ogm'
     sponsor: umcg-gd-owners
+  - name: 'umcg-pgx'
+    sponsor: umcg-gd-owners
   - name: 'umcg-patho'
     sponsor: umcg-gd-owners
   - name: 'umcg-pr'
@@ -235,6 +237,10 @@ regular_users:
     groups: ['umcg-patho', "{{ functional_users_group }}"]
   - name: 'umcg-patho-dm'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
+  - name: 'umcg-pgx-ateambot'
+    groups: ['umcg-pgx', "{{ functional_users_group }}"]
+  - name: 'umcg-pgx-dm'
+    groups: ['umcg-pgx', "{{ functional_users_group }}"]
   - name: 'umcg-pr-ateambot'
     groups: ['umcg-pr', "{{ functional_users_group }}"]
   - name: 'umcg-pr-dm'
@@ -264,6 +270,8 @@ sudoers:
     become: ['umcg-ogm-dm']
   - who: ['%umcg-patho']
     become: ['umcg-patho-ateambot', 'umcg-patho-dm']
+  - who: ['%umcg-pgx']
+    become: ['umcg-pgx-ateambot', 'umcg-pgx-dm']
   - who: ['%umcg-pr']
     become: ['umcg-pr-ateambot', 'umcg-pr-dm']
   - who: ['%umcg-vipt']
@@ -274,52 +282,52 @@ remote_users_in_local_groups:
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - name: 'charbonb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
-        'umcg-gap', 'umcg-gd', 'umcg-vipt',
+        'umcg-pgx', 'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
   - name: 'cimermans'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - name: 'hendriksend'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
-        'umcg-gap', 'umcg-gd', 'umcg-vipt',
+        'umcg-pgx', 'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
   - name: 'langek'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - name: 'kanningaroj'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - name: 'neerincxp'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
   - name: 'vriesgb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
     ]
 #
 ## Limit the storage for specific folder, by using a loop mount of formatted file
@@ -461,6 +469,7 @@ lfs_mounts:
       - name: umcg-lab
       - name: umcg-labgnkbh
       - name: umcg-patho
+      - name: umcg-pgx
       # - name: umcg-pr
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
@@ -476,6 +485,7 @@ lfs_mounts:
       - name: umcg-lab
       - name: umcg-labgnkbh
       - name: umcg-patho
+      - name: umcg-pgx
       # - name: umcg-pr
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
@@ -487,6 +497,7 @@ lfs_mounts:
       - name: umcg-gd
       - name: umcg-gsad
       - name: umcg-logstoprm
+      - name: umcg-pgx
       - name: umcg-vipt
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat05
@@ -508,6 +519,7 @@ lfs_mounts:
       - name: umcg-gd
       - name: umcg-gsad
       - name: umcg-logstoprm
+      - name: umcg-pgx
       - name: umcg-vipt
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat06
@@ -529,6 +541,7 @@ lfs_mounts:
       - name: umcg-gd
       - name: umcg-gsad
       - name: umcg-logstoprm
+      - name: umcg-pgx
       - name: umcg-vipt
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat07
