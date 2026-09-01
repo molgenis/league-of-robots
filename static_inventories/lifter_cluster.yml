@@ -1,0 +1,365 @@
+---
+all:
+  children:
+    controller_api:
+      hosts:
+        localhost:
+    jumphost:
+      hosts:
+        lt-portal:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_jumphosts"
+              assign_floating_ip: true
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
+          basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
+          local_yum_repository: true
+    repo:
+      hosts:
+        lt-repo:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_repo"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
+          swap_file_size: 2
+    data_transfer:
+      hosts:
+        lt-transfer:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_ds"
+              assign_floating_ip: false
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
+          local_yum_repository: true  # For nhc_standalone.
+          local_volume_extra:
+            - name: groups
+              size: 100
+          local_mount_subfolders:
+            - mount_point: '/groups'
+              machines: "{{ groups['data_transfer'] }}"
+              folders:
+                - rel_paths:
+                    - "{{ data_transfer_only_group }}"
+                  mode: '2750'
+                  owner: root
+                  group: "{{ data_transfer_only_group }}"
+                - rel_paths:
+                    - umcg-atd
+                    - umcg-gsad
+                    - umcg-gst
+                  mode: '2770'
+                  owner: root
+    docs:
+      hosts:
+        docs-on-bateleur:
+    sys_admin_interface:
+      hosts:
+        lt-sai:
+          cloud_flavor: umcg.v1.vm.4-8
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp4s0
+            - name: umcg-1068
+              security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
+              lnet:
+                name: tcp20
+    deploy_admin_interface:
+      hosts:
+        lt-dai:
+          cloud_flavor: umcg.v1.vm.4-8
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp4s0
+            - name: umcg-1068
+              security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp3s0
+              lnet:
+                name: tcp20
+          local_volume_extra:
+            - name: apps
+              size: 300
+    user_interface:
+      hosts:
+        lifter:
+          cloud_flavor: umcg.v1.vm.4-8
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
+            - name: umcg-1068
+              security_group: "{{ stack_prefix }}_storage"
+              nmstate_interface:
+                name: enp4s0
+              lnet:
+                name: tcp20
+          slurm_sockets: 4
+          slurm_cores_per_socket: 1
+          slurm_real_memory: 7680
+          slurm_local_disk: 0
+    compute_node:
+      children:
+        cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            lt-node-a01:
+              cloud_flavor: umcg.v1.bm.28-256-0
+              host_type: baremetal
+              host_networks:
+                - name: "{{ stack_prefix }}_internal_management"
+                  security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp130s0f1
+                - name: umcg-1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  nmstate_interface:
+                    name: enp130s0f0
+                  lnet:
+                    name: tcp20
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: dynamic  # A value must be present in order to update it on-the-fly during role execution.
+                  label: local
+                  perc_controller: 0
+                  perc_virtual_drive: 1
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              slurm_sockets: 2
+              slurm_cores_per_socket: 14
+              slurm_real_memory: 257317
+              slurm_local_disk: 3002000
+        cpu_r6515:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            lt-node-b01:
+              cloud_flavor: umcg.v1.bm.64-512-0
+              host_type: baremetal
+              host_networks:
+                - name: "{{ stack_prefix }}_internal_management"
+                  security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: eno2
+                - name: umcg-1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  nmstate_interface:
+                    name: enp65s0np0
+                  lnet:
+                    name: tcp20
+              perc_devices: true
+              local_mounts:
+                - mount_point: "{{ slurm_local_scratch_dir }}"
+                  device: '/dev/nvme0n1'
+                  mounted_owner: root
+                  mounted_group: root
+                  mounted_mode: '0755'
+                  mount_options: >-
+                    rw,relatime
+                    {%- if ansible_facts['os_family'] == 'RedHat' and
+                           ansible_facts['distribution_major_version'] >= '8' -%}
+                      ,nofail,x-systemd.device-timeout=10
+                    {%- endif -%}
+                  type: ext4
+              slurm_sockets: 1
+              slurm_cores_per_socket: 64
+              slurm_real_memory: 514857
+              slurm_local_disk: 3002000
+        cpu_vm:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
+          hosts:
+            lt-node-c01:
+              cloud_flavor: umcg.v1.vm.4-8
+              host_networks:
+                - name: "{{ stack_prefix }}_internal_management"
+                  security_group: "{{ stack_prefix }}_cluster"
+                  add_hostname_to_ip_address: true
+                  nmstate_interface:
+                    name: enp3s0
+                - name: umcg-1068
+                  security_group: "{{ stack_prefix }}_storage"
+                  nmstate_interface:
+                    name: enp4s0
+                  lnet:
+                    name: tcp20
+              local_volume_extra:
+                - name: local
+                  size: 1
+              slurm_sockets: 4
+              slurm_cores_per_socket: 1
+              slurm_real_memory: 7680
+              slurm_local_disk: 900
+    chaperone:
+      hosts:
+        lt-chaperone:
+          cloud_flavor: umcg.v1.vm.1-2
+          host_networks:
+            - name: "{{ stack_prefix }}_internal_management"
+              security_group: "{{ stack_prefix }}_cluster"
+              add_hostname_to_ip_address: true
+              nmstate_interface:
+                name: enp3s0
+          #
+          # Overrule regular users and groups compared to rest of Lifter:
+          #
+          use_ldap: false
+          use_sssd: false
+          regular_groups:
+            - name: "{{ envsync_group }}"
+            - name: "{{ functional_admin_group }}"
+            - name: "{{ functional_users_group }}"
+            - name: 'umcg-atd'
+            - name: 'umcg-gsad'
+            - name: 'umcg-gst'
+            - name: 'umcg-vipt'
+          regular_users:
+            - name: "{{ envsync_user }}"
+              groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
+            - name: 'umcg-molgenis'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', "{{ functional_users_group }}"]
+            - name: 'umcg-atd-ateambot'
+              groups: ['umcg-atd', "{{ functional_users_group }}"]
+            - name: 'umcg-atd-dm'
+              groups: ['umcg-atd', "{{ functional_users_group }}"]
+            - name: 'umcg-gsad-ateambot'
+              groups: ['umcg-gsad', "{{ functional_users_group }}"]
+            - name: 'umcg-gsad-dm'
+              groups: ['umcg-gsad', "{{ functional_users_group }}"]
+            - name: 'umcg-gst-dm'
+              groups: ['umcg-gst', "{{ functional_users_group }}"]
+            - name: 'umcg-vipt-dm'
+              groups: ['umcg-vipt', "{{ functional_users_group }}"]
+            - name: 'mbijlsma'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - name: 'bcharbon'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
+            - name: 'scimerman'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - name: 'dhendriksen'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
+            - name: 'kdelange'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - name: 'rkanninga'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - name: 'pneerincx'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+            - name: 'gvdvries'
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+          sudoers:
+            - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+              become: ['umcg-molgenis']
+            - who: ['%umcg-atd']
+              become: ['umcg-atd-dm', 'umcg-atd-ateambot']
+            - who: ['%umcg-gsad']
+              become: ['umcg-gsad-ateambot', 'umcg-gsad-dm']
+            - who: ['%umcg-gst']
+              become: ['umcg-gst-ateambot', 'umcg-gst-dm']
+            - who: ['%umcg-vipt']
+              become: ['umcg-vipt-dm']
+          ssh_client_configs:
+            - logs_library
+          lfs_mounts: []  # Overrule the list of network shares; we use local storage instead.
+          local_volume_extra: # The extra virtual disk for dat* and prm*
+            - name: groups
+              size: 200
+          local_mounts:
+            - mount_point: '/groups'
+              device: '/dev/vdb'
+              mounted_owner: root
+              mounted_group: root
+              mounted_mode: '0755'
+              mount_options: >-
+                rw,relatime
+                {%- if ansible_facts['os_family'] == 'RedHat' and
+                       ansible_facts['distribution_major_version'] >= '8' -%}
+                  ,nofail,x-systemd.device-timeout=10
+                {%- endif -%}
+              type: ext4
+          local_mount_subfolders:
+            - mount_point: '/groups'
+              machines: "{{ groups['chaperone'] }}"
+              folders:
+                - rel_paths:
+                    - umcg-atd
+                  mode: '0755'
+                  owner: root
+                  group: root
+                - rel_paths:
+                    - umcg-atd/dat08
+                  mode: '2770'
+                  owner: umcg-atd-dm
+                  group: umcg-atd
+                - rel_paths:
+                    - umcg-atd/prm08
+                  mode: '2750'
+                  owner: umcg-atd-dm
+                  group: umcg-atd
+                - rel_paths:
+                    - umcg-gsad
+                  mode: '0755'
+                  owner: root
+                  group: root
+                - rel_paths:
+                    - umcg-gsad/dat08
+                  mode: '2770'
+                  owner: umcg-gsad-dm
+                  group: umcg-gsad
+                - rel_paths:
+                    - umcg-gsad/prm08
+                  mode: '2750'
+                  owner: umcg-gsad-dm
+                  group: umcg-gsad
+                - rel_paths:
+                    - umcg-gst
+                  mode: '0755'
+                  owner: root
+                  group: root
+                - rel_paths:
+                    - umcg-gst/dat08
+                  mode: '2770'
+                  owner: umcg-gst-dm
+                  group: umcg-gst
+administration:
+  children:
+    sys_admin_interface:
+    deploy_admin_interface:
+    user_interface:
+cluster:
+  children:
+    compute_node:
+    administration:
+lifter_cluster:
+  children:
+    controller_api:
+    jumphost:
+    repo:
+    cluster:
+    chaperone:
+    data_transfer:
+    docs:
+...

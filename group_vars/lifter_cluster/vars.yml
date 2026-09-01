@@ -1,0 +1,270 @@
+---
+slurm_cluster_name: 'lifter'
+stack_domain: 'hpc.rug.nl'
+stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
+stack_prefix: 'lt'
+stack_dtap_state: development
+slurm_version: '25.11.7-1.el9.umcg'
+slurm_partitions:
+  - name: cpu_r630  # Must be in sync with group listed in Ansible inventory.
+    default: yes
+    nodes: "{{ stack_prefix }}-node-a01"  # Must be in sync with Ansible hostnames listed in inventory.
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_r6515  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-b01"  # Must be in sync with Ansible hostnames listed in inventory.
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.125G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: cpu_vm  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ stack_prefix }}-node-c01"  # Must be in sync with Ansible hostnames listed in inventory.
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=0.5G" DenyQos=ds-short,ds-medium,ds-long'
+  - name: user_interface  # Must be in sync with group listed in Ansible inventory.
+    default: no
+    nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
+    extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
+#
+# Remote logging settings - for diagnostics servers
+#
+cluster_class: 'development'
+repo_manager: 'pulp'
+os_distribution: 'alma9'
+os_minorversion: '.8'
+figlet_font: 'ogre'
+motd: |
+      =========================================================================
+      !!! WARNING: {{ slurm_cluster_name | capitalize }} is a {{ stack_dtap_state }} cluster
+      =========================================================================
+          This cluster may be redeployed from scratch,
+          which may result in complete data loss of all file systems!!!
+      =========================================================================
+additional_etc_hosts:
+  - group: docs_library
+    nodes:
+      - name: docs-on-bateleur
+        network: external
+  - group: donbot_azure
+    nodes:
+      - name: ladap
+        network: donbot_external_network
+#
+# Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
+#
+ssh_client_configs:
+  - hyperchicken_cluster
+use_ldap: true
+create_ldap: false
+use_sssd: true
+ldap_domains:
+  sram:
+    uri: ldaps://sv-sram.id.rug.nl
+    base: ou=sram-umcg,ou=users,o=id
+    schema: rfc2307bis
+    min_id: 70000000
+    max_id: 72999999
+    user_object_class: posixAccount
+    user_name: uid
+    user_ssh_public_key: sshPublicKey
+    user_member_of: groupMembership
+    group_member: member
+  idvault:
+    uri: ldaps://svrs.id.rug.nl
+    base: ou=umcg,o=asds
+    schema: rfc2307
+    min_id: 50100000
+    max_id: 55999999
+    user_object_class: posixAccount
+    user_name: uid
+    user_ssh_public_key: sshPublicKey
+    user_member_of: groupMembership
+    user_expiration_date: loginExpirationTime
+    group_member: memberUid
+    group_object_class: groupofnames
+    # listserv_mailinglist: Be careful not to use a production mailinglist for testing!
+pam_weblogin:
+  machines: "{{ groups['jumphost'] }}"
+  excluded:
+    - 'LOCAL'
+    - "{{ all.ip_addresses['umcg']['net1']['address'] }}{{ all.ip_addresses['umcg']['net1']['netmask'] }}"
+    - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
+    - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
+    - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
+  url: https://sram.surf.nl/pam-weblogin
+  user_name: email
+  min_uid: "{{ ldap_domains['sram']['min_id'] }}"
+  max_uid: "{{ ldap_domains['sram']['max_id'] }}"
+  retries: 3
+  cache_duration: 3600  # seconds
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
+availability_zone: nova
+enable_predictable_network_interface_names: true
+stack_networks:
+  - name: "{{ stack_prefix }}_internal_management"
+    cidr: '10.10.1.0/24'
+    router:
+      next-hop-address: '10.10.1.1'
+      external_network: external-v4
+    create: true
+    mtu_size: '1450'
+  - name: umcg-1068  # Private Lustre
+    cidr: '172.23.60.0/24'
+security_group_mods:
+  - name: "{{ stack_prefix }}_storage"
+    allow_ingress:
+      - 172.23.60.161/32  # Lustre server
+      - 172.23.60.162/32  # Lustre server
+      - 172.23.60.163/32  # Lustre server
+      - 172.23.60.164/32  # Lustre server
+nameservers: [
+  '8.8.4.4',  # Google DNS.
+  '8.8.8.8',  # Google DNS.
+]
+local_admin_groups:
+  - 'admin'
+local_admin_users:
+  - 'ger'
+  - 'gerben'
+  - 'henkjan'
+  - 'kim'
+  - 'marieke'
+  - 'max'
+  - 'morris'
+  - 'pieter'
+  - 'robin'
+  - 'sandi'
+  - 'steven'
+  - 'wim'
+  - 'wouter'
+data_transfer_only_group: 'umcg-sftp-only'
+envsync_user: 'umcg-envsync'
+envsync_group: 'umcg-depad'
+functional_admin_group: 'umcg-funad'
+functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf on chaperones.
+hpc_env_prefix: '/apps'
+sponsors:
+  - name: umcg-research-it
+    slurm_shares: 570
+  - name: umcg-cvandiemen
+    slurm_shares: 112
+  - name: umcg-lfranke
+    slurm_shares: 136
+  - name: umcg-mswertz
+    slurm_shares: 570
+# Remote archive settings
+remote_archive:
+  - name: arc01
+    local_top_level_mount: '/groups'
+    groups:
+      - 'umcg-atd'
+      - 'umcg-gcc'
+    archive_user: 'umcg-atd-dm'
+    archive_system: 'archive.surfsara.nl'
+    archive_system_fingerprints:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZilfH5KJk9dbYshGS9fnK+rkkIreVNEHqZatHjKGBm
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH+jkWREUSjl/NyAPcFBzLvJsDgN1ZupeCYvQ9LkoI1SZGVsIrH2W1eRhb8vMgn3noNfKclaXEiX4DR+lNBrLOA=
+    archive_remote_top_dir: '/archive/umcg-atd-dm/groups'
+    recall_cron_script: 'cron_surf.sh.j2' # a cron script to trigger remote exectuion. Can be different for different types of remote archive.
+regular_groups:
+  # Note, for chaperone machines this is controlled in the static_inventories.
+  - name: "{{ data_transfer_only_group }}"
+  - name: "{{ envsync_group }}"
+  - name: "{{ functional_admin_group }}"
+  - name: 'umcg-atd'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gcc'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gsad'
+    sponsor: umcg-mswertz
+  - name: 'umcg-gst'
+    sponsor: umcg-mswertz
+  - name: 'umcg-sysops'
+    sponsor: umcg-research-it
+  - name: 'umcg-vipt'
+    sponsor: umcg-mswertz
+regular_users:
+  # Note, for chaperone machines this is controlled in the static_inventories.
+  - name: "{{ envsync_user }}"
+    groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
+  - name: 'umcg-atd-ateambot'
+    groups: ['umcg-atd', "{{ functional_users_group }}"]
+  - name: 'umcg-atd-dm'
+    groups: ['umcg-atd', "{{ functional_users_group }}"]
+  - name: 'umcg-gcc-dm'
+    groups: ['umcg-gcc', "{{ functional_users_group }}"]
+  - name: 'umcg-gsad-ateambot'
+    groups: ['umcg-gsad', "{{ functional_users_group }}"]
+  - name: 'umcg-gsad-dm'
+    groups: ['umcg-gsad', "{{ functional_users_group }}"]
+  - name: 'umcg-gst-ateambot'
+    groups: ['umcg-gst', "{{ functional_users_group }}"]
+  - name: 'umcg-gst-dm'
+    groups: ['umcg-gst', "{{ functional_users_group }}"]
+  - name: 'umcg-sysops-dm'
+    groups: ['umcg-sysops', "{{ functional_users_group }}"]
+  - name: 'umcg-vipt-dm'
+    groups: ['umcg-vipt', "{{ functional_users_group }}"]
+sudoers:
+  - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
+    become: ['umcg-molgenis']
+  - who: ['%umcg-atd']
+    become: ['umcg-atd-dm', 'umcg-atd-ateambot']
+  - who: ['%umcg-gcc']
+    become: ['umcg-gcc-dm']
+  - who: ['%umcg-gsad']
+    become: ['umcg-gsad-ateambot', 'umcg-gsad-dm']
+  - who: ['%umcg-gst']
+    become: ['umcg-gst-ateambot', 'umcg-gst-dm']
+  - who: ['%umcg-sysops']
+    become: ['umcg-sysops-dm']
+  - who: ['%umcg-vipt']
+    become: ['umcg-vipt-dm']
+#
+# Shared storage related variables
+#
+pfs_mounts:
+  - pfs: umcgst04/slice6
+    source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
+    type: lustre
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    machines: "{{ groups['sys_admin_interface'] }}"
+  - pfs: umcgst04/slice7
+    source: '172.23.60.161@tcp20:172.23.60.162@tcp20:/'
+    type: lustre
+    rw_options: 'defaults,_netdev,flock,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    ro_options: 'defaults,_netdev,ro,x-systemd.requires=lnet.service,x-systemd.device-timeout=60'
+    machines: "{{ groups['sys_admin_interface'] }}"
+lfs_mounts:
+  - lfs: home
+    pfs: umcgst04/slice6
+    rw_machines: "{{ groups['cluster'] }}"
+  - lfs: tmp08
+    pfs: umcgst04/slice7
+    type: bind
+    groups:
+      - name: umcg-atd
+      - name: umcg-gcc
+      - name: umcg-gsad
+      - name: umcg-gst
+      - name: umcg-sysops
+      - name: umcg-vipt
+    rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
+  - lfs: rsc08
+    pfs: umcgst04/slice7
+    type: bind
+    groups:
+      - name: umcg-gcc
+      - name: umcg-sysops
+    ro_machines: "{{ groups['compute_node'] }}"
+    rw_machines: "{{ groups['user_interface'] }}"
+  - lfs: prm08
+    pfs: umcgst04/slice7
+    type: bind
+    groups:
+      - name: umcg-gcc
+      - name: umcg-sysops
+    rw_machines: "{{ groups['user_interface'] }}"
+  - lfs: env08
+    pfs: umcgst04/slice6
+    ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
+    rw_machines: "{{ groups['deploy_admin_interface'] }}"
+...
