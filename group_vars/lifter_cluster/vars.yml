@@ -102,10 +102,10 @@ stack_networks:
     cidr: '10.10.1.0/24'
     router:
       next-hop-address: '10.10.1.1'
-      external_network: external_unfiltered
+      external_network: external-v4
     create: true
     mtu_size: '1450'
-  - name: vlan1068  # Private Lustre
+  - name: umcg-1068  # Private Lustre
     cidr: '172.23.60.0/24'
 security_group_mods:
   - name: "{{ stack_prefix }}_storage"
@@ -235,10 +235,10 @@ pfs_mounts:
     machines: "{{ groups['sys_admin_interface'] }}"
 lfs_mounts:
   - lfs: home
-    pfs: umcgst04/slice4
+    pfs: umcgst04/slice6
     rw_machines: "{{ groups['cluster'] }}"
   - lfs: tmp08
-    pfs: umcgst04/slice5
+    pfs: umcgst04/slice7
     type: bind
     groups:
       - name: umcg-atd
@@ -249,7 +249,7 @@ lfs_mounts:
       - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
-    pfs: umcgst04/slice5
+    pfs: umcgst04/slice7
     type: bind
     groups:
       - name: umcg-gcc
@@ -257,14 +257,14 @@ lfs_mounts:
     ro_machines: "{{ groups['compute_node'] }}"
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: prm08
-    pfs: umcgst04/slice5
+    pfs: umcgst04/slice7
     type: bind
     groups:
       - name: umcg-gcc
       - name: umcg-sysops
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env08
-    pfs: umcgst04/slice4
+    pfs: umcgst04/slice6
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
 ...

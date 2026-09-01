@@ -71,7 +71,7 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
-            - name: vlan1068
+            - name: umcg-1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp3s0
@@ -87,7 +87,7 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp4s0
-            - name: vlan1068
+            - name: umcg-1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp3s0
@@ -106,7 +106,7 @@ all:
               add_hostname_to_ip_address: true
               nmstate_interface:
                 name: enp3s0
-            - name: vlan1068
+            - name: umcg-1068
               security_group: "{{ stack_prefix }}_storage"
               nmstate_interface:
                 name: enp4s0
@@ -128,11 +128,11 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: enp130s0f0
-                - name: vlan1068
+                    name: enp130s0f1
+                - name: umcg-1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: enp130s0f0.1068
+                    name: enp130s0f0
                   lnet:
                     name: tcp20
               perc_devices: true
@@ -166,11 +166,11 @@ all:
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: enp65s0np0
-                - name: vlan1068
+                    name: eno2
+                - name: umcg-1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
-                    name: enp65s0np0.1068
+                    name: enp65s0np0
                   lnet:
                     name: tcp20
               perc_devices: true
@@ -201,7 +201,7 @@ all:
                   add_hostname_to_ip_address: true
                   nmstate_interface:
                     name: enp3s0
-                - name: vlan1068
+                - name: umcg-1068
                   security_group: "{{ stack_prefix }}_storage"
                   nmstate_interface:
                     name: enp4s0
