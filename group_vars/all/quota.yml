@@ -25,6 +25,7 @@ lfs_quota:
       umcg-hematology: 5120
       umcg-hlhs: 3072
       umcg-immunogenetics: 10240
+      umcg-integralezorg: 1024
       umcg-lifelines: 28672
       umcg-lld: 15360
       umcg-llnext: 10240
@@ -224,6 +225,7 @@ lfs_quota:
       umcg-hlhs: 5120
       umcg-immunogenetics: 2048
       umcg-impact: 1024
+      umcg-integralezorg: 1024
       umcg-lifelines: 40960
       umcg-lld: 8192
       umcg-llnext: 2048
