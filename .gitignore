@@ -26,5 +26,6 @@ ssh-host-ca/*production*
 # For debugging locally only
 #
 debug.yml
+debug_included.yml
 roles/custom_debug
 .ansible
