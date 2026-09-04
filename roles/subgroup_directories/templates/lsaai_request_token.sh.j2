@@ -37,14 +37,14 @@ check_if_token_is_valid() {
 }
 
 token_request(){ 
-   CLIENT_ID="$(awk '$1 ~ /CLIENT_ID/ { print $2 }' /etc/lsaai_auth)"
-   CLIENT_SECRET="$(awk '$1 ~ /CLIENT_SECRET/ { print $2 }' /etc/lsaai_auth)"
-   DEVICE_AUTHORIZATION_ENDPOINT="https://login.aai.lifescience-ri.eu/oidc/devicecode"
-   TOKEN_ENDPOINT="https://login.aai.lifescience-ri.eu/oidc/token"
-   SCOPE="openid perun_api"
+   local CLIENT_ID="$(awk '$1 ~ /CLIENT_ID/ { print $2 }' /etc/lsaai_auth)"
+   local CLIENT_SECRET="$(awk '$1 ~ /CLIENT_SECRET/ { print $2 }' /etc/lsaai_auth)"
+   local DEVICE_AUTHORIZATION_ENDPOINT="https://login.aai.lifescience-ri.eu/oidc/devicecode"
+   local TOKEN_ENDPOINT="https://login.aai.lifescience-ri.eu/oidc/token"
+   local SCOPE="openid perun_api"
    
-   MAX_WAIT=300 # in seconds
-   elapsed=0
+   local MAX_WAIT=300 # in seconds
+   local elapsed=0
    
    echo "Requesting device code..."
    response=$(curl -sf -X POST \
