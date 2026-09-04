@@ -1,0 +1,7 @@
+---
+- name: Force systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: true
+  listen: subgroup_directories_auto_reload_systemd
+  become: true
+...

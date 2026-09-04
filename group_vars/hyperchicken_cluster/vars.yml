@@ -23,6 +23,11 @@ motd: "To solve or not to solve, that's the question."
 # Cluster classification (used by `logs` and `login` roles)
 #
 cluster_class: 'development'
+
+# Install auto-subgroup generate scripts
+# depending on having `ladap` in `ldap_domains`
+subgroup_directories_auto_is_enabled: true
+
 #
 # Ldap settings
 #
@@ -41,6 +46,25 @@ ldap_domains:
 #    user_member_of: memberOf
 #    group_member: member
 #    create_ldap: true
+  ladap:
+    # must be FQDN or certificate authentication with LDAP server fails
+    uri: ldaps://ladap.westeurope.cloudapp.azure.com
+    base: dc=donbot_azure,dc=local
+    # rfc2307bis for LADAP, because group members are stored in each group and
+    # not in the user profile
+    schema: rfc2307bis
+    min_id: 37800000
+    max_id: 37999999
+    user_object_class: posixAccount
+    user_name: mail
+    user_ssh_public_key: sshPublicKey
+    user_member_of: member
+    group_object_class: groupofnames
+    group_member: member
+    # Path of the home directory should not be depending on the username (as it
+    # can change). Instead we use %U to make it stable, unique (/home/[uid])
+    # and persistent across systems
+    override_homedir: '/home/%U'
   sram:
     uri: ldaps://sv-sram.id.rug.nl
     base: ou=sram-umcg,ou=users,o=id
@@ -65,20 +89,6 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
-#  ladap:
-#    uri: ldaps://ladap.westeurope.cloudapp.azure.com
-#    base: dc=donbot_azure,dc=local
-#    schema: rfc2307
-#    min_id: 37800000
-#    max_id: 37899999
-#    user_object_class: posixAccount
-#    #user_name: uid
-#    user_name: mail
-#    user_ssh_public_key: sshPublicKey
-#    user_member_of: groupMembership
-#    user_expiration_date: loginExpirationTime
-#    group_member: memberUid
-#    group_object_class: groupofnames
 cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
 enable_predictable_network_interface_names: true
@@ -153,6 +163,10 @@ regular_users:
   - name: 'umcg-molgenis'
     groups: ['users', 'umcg-atd', 'umcg-gsad']
 sudoers:
+  - who: ['%L-erdera']
+    become: ['L-erdera-dm']
+  - who: ['%L-gcc']
+    become: ['L-gcc-dm']
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
     become: ['umcg-molgenis']
   - who: ['%umcg-atd']
@@ -192,12 +206,16 @@ lfs_mounts:
     groups:
       - name: umcg-atd
       - name: umcg-gsad
+      - name: L-erdera
+      - name: L-gcc
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm09
     pfs: umcgst07
     groups:
       - name: umcg-atd
       - name: umcg-gsad
+      - name: L-erdera
+      - name: L-gcc
     rw_machines: "{{ groups['user_interface'] }}"
   - lfs: env09
     pfs: umcgst07

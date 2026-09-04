@@ -1,0 +1,10 @@
+[Unit]
+Description=Run subgroup_directories_auto.service every 5 minutes
+
+[Timer]
+OnBootSec=15min
+OnUnitInactiveSec=5m
+RandomizedDelaySec=60s
+
+[Install]
+WantedBy=timers.target

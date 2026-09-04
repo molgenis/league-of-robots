@@ -1,0 +1,134 @@
+#!/bin/bash
+set -euo pipefail
+
+{%- set filtered_mounts = lfs_mounts | selectattr('lfs', 'match', '^(prm|tmp|arc|rsc)0[0-9]+$') | list %}
+{%- set unique_pfs = filtered_mounts | map(attribute='pfs') | map('regex_replace', '\\$$', '') | map('regex_replace', '/', '_') | unique | list %}
+
+# All unique pfs values
+_pfs_list=(
+{%- for pfs in unique_pfs %}
+  "{{ pfs }}"
+{%- endfor %}
+)
+
+# All lfs values per pfs, space-separated
+declare -A _lfs_by_pfs
+{% for pfs in unique_pfs %}
+_lfs_by_pfs["{{ pfs }}"]="
+  {%- for item in filtered_mounts %}
+    {%- set pfs_clean = item.pfs | regex_replace('\\$$', '') | regex_replace('/', '_') %}
+    {%- if pfs_clean == pfs %}{{ item.lfs }} {% endif %}
+  {%- endfor %}"
+{%- endfor %}
+
+{% raw %}
+
+function create_chown_and_chmod(){
+   # $1 = path
+   # $2 = owner:group
+   # $3 = mode
+   if ! test -d "${1}"; then
+      echo "  creating ${1}"
+      mkdir "${1}"
+   fi
+   if [[ "$(stat -c '%U:%G' "${1}")" != "${2}" ]]; then
+      echo "  ownership changed into ${2} on ${1}"
+	   # chown should not fail this script - allow it as it should never kill the service
+      if ! chown "${2}" "${1}" 2>/dev/null; then
+         echo "  ! Warning: could not chown ${1} to ${2}"
+      fi
+   fi
+   _group_write_permission="${3:(-2):1}" # take the number before last -> 5 out of 0750
+   # leading zero just annoys things here
+   local _mode="${3#0}"
+   if [[ "$(stat -c '%a' "${1}")" != "${_mode}" ]]; then
+      echo "    mode changed ${_mode} on ${1}"
+      chmod "${_mode}" "${1}"
+   fi
+   local _acl="$(getfacl -p "${1}")"
+   local _group_acl_write="r-x"                          # default acl is read-only
+   [[ "${_group_write_permission}" == "7" ]] && _group_acl_write='rwx' # but if mode is 7>7<0 then acl is read-write
+   local _group_name="${2##*:}"                          # take group name from $2='user:group'
+}
+
+# For now only groups starting with 'L-'
+_all_groups="$(getent group 2>/dev/null | awk -F':' '{print $1}' | grep -E "(^L-)")"
+_main_groups="$(grep -xE "^L-[^-]+" <<< "${_all_groups}")"
+_all_groups_sorted="$(sort -V -u <<< "${_all_groups}")"
+
+for _main_group in ${_main_groups}; do
+   # Iterate over all pfs, then all lfs per pfs
+   for pfs in "${_pfs_list[@]}"; do
+      for lfs in ${_lfs_by_pfs["${pfs}"]}; do
+         #Check if main group exists
+         _main_group_path="/groups/${_main_group}/${lfs}"
+         if ! test -d "${_main_group_path}"; then
+            echo "main: missing folder ${_main_group_path}"
+            continue
+         fi
+
+         # Apply ACLs on main LFS folders
+         # for both -dm user (but users from dms group can access the dm user)
+         _acl="$(getfacl -p "${_main_group_path}")"
+         if ! grep -q "^user::rwx" <<< "${_acl}" || \
+            ! grep -q "^group::r-x" <<< "${_acl}" || \
+            ! grep -q "^default:group::rwx" <<< "${_acl}" || \
+            ! grep -q "^default:user:${_main_group}-dm:rwx" <<< "${_acl}"; then
+            echo "    ACL applying default RW permissions for '${_main_group}-dm' user and '${_main_group}' group on '${_main_group_path}'"
+            setfacl -m "u::rwx" "${_main_group_path}"                        # apply user rwx ACL
+            setfacl -d -m "u::rwx" "${_main_group_path}"                     # ! set default user ACL rwx - posix wins if has lower permissions
+            setfacl -m "g::r-x" "${_main_group_path}"                        # apply group w-x (no WRITE) ACL
+            setfacl -d -m "g::rwx" "${_main_group_path}"                     # ! set default group ACL rwx - posix wins if has lower permissions
+            setfacl -m "u:${_main_group}-dm:rwx" "${_main_group_path}"       # apply user rwx ACL for -dm user
+            setfacl -d -m "u:${_main_group}-dm:rwx" "${_main_group_path}"    # set default ACL rwx for -dm user
+         fi
+
+         # Now create all the rest of the groups
+         for _each_group in ${_all_groups_sorted}; do
+            #echo Making sub group
+            [[ "${_each_group}" == "${_main_group}" ]] && continue # skip main groups
+            # continue subgroups
+            if [[ "${_each_group}" =~ ^"${_main_group}" ]]; then
+               _sub_group_name="${_each_group##*-}"
+
+               # skip dms group
+               [[ "${_sub_group_name}" == "dms" ]] && continue
+
+               if [[ "${_each_group}" =~ ^"${_main_group}"-(prj|rel|sub)$ ]]; then
+               # top prj/rel/sub folders
+               # - these folders are owned by main group
+                  create_chown_and_chmod "${_main_group_path}/${_sub_group_name}" "${_main_group}-dm:${_main_group}" "2750"
+               
+               elif [[ "${_each_group}" =~ ^"${_main_group}"-(prj)-.{1,} ]]; then
+               # inside prj FLAT structure
+               #  - owned by that individual group
+                  _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main- > becomes > rel-dataset01-v1
+                  _group_placed_flat="${_group_remove_main_group/-/\/}"  # replace first dash with slash > becomes > rel/dataset01-v1
+                  create_chown_and_chmod "${_main_group_path}/${_group_placed_flat}" "${_main_group}-dm:${_each_group}" "2770"
+
+               elif [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} || \
+                       "${_each_group}" =~ ^"${_main_group}"-rel-.{1,} ]]; then
+                  # else it is HIERARCHICAL structure and will be placed in 'sub' folder
+                  # and also 'rel' folder (although they are only 2 levels deep)
+                  # individual folders are owned by that individual group
+                  _group_remove_main_group="${_each_group/${_main_group}-}" # remove L-main-
+                  _sub_group_path="${_group_remove_main_group//-/\/}"    # replace - with 	/
+                  _setmode="2750" # for -rel- subforlder
+                  [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]] && _setmode="2770" # for -sub- subfolders
+                  create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "${_setmode}"
+                  [[ "${_each_group}" =~ ^"${_main_group}"-rel-.{1,} ]] && {
+                     getfacl "${_main_group_path}/${_sub_group_path}" 2>/dev/null | grep -q "default:mask::rwx" && {
+                        echo "   removing write (ACL) permissions on the 'rel-' subfolders for '${_main_group_path}/${_sub_group_path}'"
+                        setfacl -d -m "mask::r-x" "${_main_group_path}/${_sub_group_path}"
+                     }
+                  }
+               else
+                  echo "WARNING: Group ${_each_group} cannot be placed anywhere!"
+               fi
+            fi
+         done
+      done
+   done
+done
+{% endraw %}
+

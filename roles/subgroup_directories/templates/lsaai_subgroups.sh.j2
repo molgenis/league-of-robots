@@ -1,0 +1,384 @@
+{% raw %}
+#!/bin/bash
+set -euo pipefail
+
+sudo /usr/local/sbin/lsaai_request_token.sh
+TOKEN_DIR="${HOME}/.cache/lsaai/"
+TOKEN_FILE="${TOKEN_DIR}/token"
+MAX_SUB_LEVELS=3
+_PRINT_ALL_GROUPS_AND_DMS=""
+sleep 0.5
+
+if test -r "${TOKEN_FILE}"; then
+   TOKEN="$(<"${TOKEN_FILE}")"
+else
+   echo "ERROR, could not read token!"
+   exit 1
+fi
+
+DEBUG=false
+[[ "${1:-}" == "-d" ]] && DEBUG=true
+DEBUG2=false
+[[ "${1:-}" == "-dd" ]] && DEBUG2=true
+
+
+BASE_URL='https://perun-api.aai.lifescience-ri.eu/oauth/rpc/json'
+VO_ID='3363'
+_defaultexpirationdays=365
+
+# Prepare to suppres extra information if not debugging
+exec 3>/dev/null
+${DEBUG} && exec 3>&1
+
+[[ "${UID}" -eq 0 ]] && echo -e "\033[31mRunning under root!\033[0m"
+
+[[ ${2:-} == '-v' ]] && DEBUG=true
+[[ ${2:-} == '-vv' ]] && { DEBUG2=true; DEBUG=true; }
+
+curl_it() {
+    local url="${1}"
+    local json="${2:-}"
+    local -a args=(-s -H "Authorization: Bearer ${TOKEN}")
+
+    if [[ -n "${json}" ]]; then
+        args+=(-X POST -H "Content-Type: application/json" -d "${json}")
+    fi
+
+    args+=("${url}")
+    curl "${args[@]}"
+}
+
+USER_ALL_INFO="$(curl_it "${BASE_URL}/authzResolver/getPerunPrincipal")"
+USER_ID="$(echo "${USER_ALL_INFO}" | jq '.user.id')"
+$DEBUG && echo "  >> USER_ID >$USER_ID< <<"
+
+MEMBER_ID="$(curl_it "$BASE_URL/membersManager/getMemberByUser" \
+    "$(jq -n --argjson user "$USER_ID" --argjson vo "$VO_ID" '{user: $user, vo: $vo}')" \
+    | jq -r '.id')"
+$DEBUG && echo "  >> MEMBER_ID >${MEMBER_ID}< <<"
+
+my_admin_groups=$(curl_it "${BASE_URL}/usersManager/getGroupsWhereUserIsAdmin" "{\"user\": ${USER_ID}, \"vo\": ${VO_ID} }")
+
+my_member_groups="$(curl_it "$BASE_URL/groupsManager/getMemberGroups" "{\"member\": ${MEMBER_ID} }")"
+
+$DEBUG && jq -r '.[]' <<< "$my_member_groups"
+
+# $1 parentName
+# $2 subgroupname
+# $3 expirationdays
+make_new_subgroup(){
+   local parentNameClean="${1}"
+   local parentName="${1//\-/\:}"
+   local subgroupname="${2//\-/\_}"
+   local expirationdays="${3}"
+
+   all_groups=$(curl_it "$BASE_URL/groupsManager/getAllGroups" "{\"vo\":\"$VO_ID\"}")
+   parentId=$(echo "${all_groups}" | jq -r --arg name "${parentName}" 'map(select(.name==$name)) | .[0].id')
+
+   if [[ -z "$parentId" || "$parentId" == "null" ]]; then
+       echo "Error: could not find group '${parentNameClean}'"
+       exit 1
+   fi
+
+   echo "Resolved parent '${parentName}' -> id: ${parentId}"
+
+   # find dms group by walk up from parentId
+   dms_group_id=""
+   current_id="$parentId"
+   while [[ -n "$current_id" && "$current_id" != "null" ]]; do
+       dms_group_id=$(echo "$all_groups" | jq -r --argjson pid "$current_id" \
+           'map(select(.shortName=="dms" and .parentGroupId==$pid)) | .[0].id // empty')
+       [[ -n "$dms_group_id" ]] && break
+       current_id=$(echo "$all_groups" | jq -r --argjson id "$current_id" \
+           'map(select(.id==$id)) | .[0].parentGroupId // empty')
+   done
+
+   ${DEBUG} && echo "dms group id: $dms_group_id"
+
+   # Create group
+   new_group=$(curl_it "$BASE_URL/groupsManager/createGroup" \
+      "{\"parentGroup\": $parentId, \"group\": {\"name\": \"$subgroupname\"}}")
+   ${DEBUG2} && echo "createGroup raw response: $new_group"
+   new_group_id=$(echo "$new_group" | jq -r '.id')
+   ${DEBUG} && echo "new_group_id: $new_group_id"
+
+   # Add admin user
+   ${DEBUG} && echo "Adding admin user $USER_ID to group $new_group_id"
+   curl_it "$BASE_URL/groupsManager/addAdmin" \
+       "{\"group\": \"$new_group_id\", \"user\": \"$USER_ID\"}"
+
+   # Add regular user
+   ${DEBUG} && echo "Adding user as a regular user $USER_ID to group $new_group_id"
+   curl_it "$BASE_URL/groupsManager/addMember" \
+       "{\"group\": \"$new_group_id\", \"member\": \"$MEMBER_ID\"}"
+
+   # Set membership expiration attribute
+   ${DEBUG} && echo "Adding expiration attribute: +${expirationdays}d"
+   curl_it "$BASE_URL/attributesManager/setAttributes" \
+       "{\"attributes\":[{\"namespace\":\"urn:perun:group:attribute-def:def\",\"type\":\"java.util.LinkedHashMap\",\"id\":3375,\"friendlyName\":\"groupMembershipExpirationRules\",\"value\":{\"period\":\"+${expirationdays}d\"}}],\"group\":\"$new_group_id\"}"
+
+   # Set unix group name attribute
+   ${DEBUG} && echo "Adding unix attribute: $parentNameClean-$subgroupname"
+   curl_it "$BASE_URL/attributesManager/setAttribute" \
+       "{\"attribute\":{\"id\":3691,\"friendlyName\":\"unixGroupName-namespace:ggcc\",\"namespace\":\"urn:perun:group:attribute-def:def\",\"type\":\"java.lang.String\",\"displayName\":\"Unix group name in ggcc\",\"value\":\"$parentNameClean-$subgroupname\"},\"group\":$new_group_id}"
+
+   # Create application form and items
+   ${DEBUG} && echo "Creating application form for group $new_group_id"
+   curl_it "$BASE_URL/registrarManager/createApplicationForm" "{\"group\":$new_group_id}"
+
+   ${DEBUG} && echo "Updating form items for group $new_group_id"
+   curl_it "$BASE_URL/registrarManager/updateFormItems" "$(jq -cn \
+       --argjson gid "$new_group_id" '{
+           group: $gid,
+           items: [
+               {
+                   applicationTypes: ["INITIAL","EXTENSION"],
+                   ordnum: 0, type: "HEADING", shortname: "title",
+                   required: false, updatable: true, disabled: "NEVER", hidden: "NEVER",
+                   i18n: { en: { label: "Join the group", help: "", errorMessage: "" } }
+               },
+               {
+                   applicationTypes: ["INITIAL","EXTENSION"],
+                   ordnum: 1, type: "AUTO_SUBMIT_BUTTON", shortname: "autosubmit",
+                   required: false, updatable: true, disabled: "NEVER", hidden: "NEVER",
+                   i18n: { en: { label: "", help: "", errorMessage: "" } }
+               }
+           ]
+       }')"
+
+   # Add application mail notification
+   ${DEBUG} && echo "Adding application mail for group $new_group_id"
+   curl_it "$BASE_URL/registrarManager/addApplicationMail" "$(jq -cn \
+       --argjson gid "$new_group_id" \
+       --arg vo "$VO_ID" '{
+           group: $gid,
+           mail: {
+               appType: "INITIAL", formId: 10475,
+               mailType: "APP_CREATED_USER", send: true,
+               message: {
+                   en: {
+                       locale: "en", htmlFormat: false,
+                       subject: "There is a pending application for {groupName} membership",
+                       text: "User {firstName} {lastName} (re)applied for membership.\nYou can approve or reject the request at the following URL\nhttps://perun.aai.lifescience-ri.eu/organizations/\($vo)/groups/\($gid)/applications\ndisplayName {displayName}\nmail {mail}\n\nappG {appGuiUrl}\nextSource {extSource}\nfromApp-itemName {fromApp-itemName}\n\nmailFooter {mailFooter}\n"
+                   },
+                   cs: { locale: "cs", htmlFormat: false, subject: "", text: "" }
+               },
+               htmlMessage: {
+                   en: { locale: "en", htmlFormat: true, subject: "", text: "" },
+                   cs: { locale: "cs", htmlFormat: true, subject: "", text: "" }
+               }
+           }
+       }')"
+
+   # # Obsolete due to deciding to test use dms approach in next step
+   # # Assign roles to user
+   # for role in GROUPCREATOR GROUPMEMBERSHIPMANAGER; do
+   #     echo "Assigning $role to user $USER_ID on group $new_group_id"
+   #     curl_it "$BASE_URL/authzResolver/setRole" \
+   #         "{\"role\":\"$role\",\"user\":$USER_ID,\"complementaryObject\":{\"id\":$new_group_id,\"beanName\":\"Group\"}}"
+   # done
+
+   # Assign dms group as GROUPCREATOR and GROUPMEMBERSHIPMANAGER
+   if [[ -n "$dms_group_id" ]]; then
+       for role in GROUPCREATOR GROUPMEMBERSHIPMANAGER; do
+           ${DEBUG} && echo "Assigning $role to dms group $dms_group_id on group $new_group_id"
+           curl_it "$BASE_URL/authzResolver/setRole" "$(jq -cn \
+               --arg role "$role" \
+               --argjson ag "$dms_group_id" \
+               --argjson gid "$new_group_id" \
+               '{role:$role, authorizedGroup:$ag, complementaryObject:{id:$gid, beanName:"Group"}}')"
+       done
+   else
+       ${DEBUG} && echo "Warning: dms group not found for this branch, skipping."
+   fi
+
+   # Remove GROUPADMIN
+   ${DEBUG} && echo "Removing GROUPADMIN from user $USER_ID on group $new_group_id"
+   curl_it "$BASE_URL/authzResolver/unsetRole" \
+       "{\"role\":\"GROUPADMIN\",\"user\":$USER_ID,\"complementaryObject\":{\"id\":$new_group_id,\"beanName\":\"Group\"}}"
+}
+
+print_all_my_groups() {
+   all_groups=$(curl_it "$BASE_URL/groupsManager/getAllGroups" "{\"vo\":\"$VO_ID\"}")
+   member_id=$(curl_it "$BASE_URL/membersManager/getMemberByUser" "{\"user\":\"$USER_ID\", \"vo\":\"$VO_ID\"}" | jq -r 'if type=="array" then .[0].id else .id end')
+   my_group_ids=$(curl_it "$BASE_URL/groupsManager/getMemberGroups" "{\"member\":\"$member_id\"}" | jq '[.[].id]')
+   direct_ids=$(curl_it "$BASE_URL/usersManager/getGroupsWhereUserIsAdmin" "{\"user\":\"$USER_ID\", \"vo\":\"$VO_ID\"}" | jq '[.[].id]')
+
+   # Find indirect groups via role check
+   declare -A indirect_groups
+   while IFS= read -r group; do
+       gid=$(echo "${group}" | jq -r '.id')
+       echo "${direct_ids}" | jq -e --argjson id "${gid}" 'index($id) != null' > /dev/null && continue
+
+       for role in GROUPCREATOR GROUPMEMBERSHIPMANAGER; do
+           via=$(curl_it "$BASE_URL/authzResolver/getAdminGroups" \
+               "$(jq -cn --arg r "${role}" --argjson id "${gid}" '{role:$r,complementaryObjectId:$id,complementaryObjectName:"Group"}')" \
+               | jq -r --argjson ids "${my_group_ids}" 'map(select(.id as $i | $ids|index($i))) | .[0].name // empty')
+           if [[ -n "${via}" ]]; then
+               indirect_groups[$gid]=$(echo "${group}" | jq -c --arg v "${via}" '. + {_via:$v}')
+               break
+           fi
+       done
+   done < <(echo "$all_groups" | jq -c '.[]?')
+
+   # Add all subgroups of indirect groups (walk up tree to check ancestry)
+   while IFS= read -r group; do
+       gid=$(echo "$group" | jq -r '.id')
+       echo "$direct_ids" | jq -e --argjson id "$gid" 'index($id) != null' > /dev/null && continue
+       [[ -n "${indirect_groups[$gid]:-}" ]] && continue
+
+       current="${group}"
+       while true; do
+           parent_id=$(echo "$current" | jq -r '.parentGroupId // empty')
+           [[ -z "$parent_id" || "$parent_id" == "null" ]] && break
+           if [[ -n "${indirect_groups[$parent_id]:-}" ]]; then
+               via=$(echo "${indirect_groups[$parent_id]}" | jq -r '._via')
+               indirect_groups[$gid]=$(echo "$group" | jq -c --arg v "$via" '. + {_via:$v, inherited:"inherited via"}')
+               break
+           fi
+           current=$(echo "$all_groups" | jq -c --argjson pid "$parent_id" 'first(.[]?|select(.id==$pid))')
+           [[ -z "$current" || "$current" == "null" ]] && break
+       done
+   done < <(echo "$all_groups" | jq -c '.[]?')
+   _PRINT_ALL_GROUPS_AND_DMS="$(echo "${all_groups}" | jq -c '.[]?' | while IFS= read -r g; do
+      gid=$(echo "$g" | jq -r '.id')
+      name=$(echo "$g" | jq -r '.name')
+      shortName=$(echo "$g" | jq -r '.shortName')
+      [[ "${shortName}" == "dms" ]] && continue
+      via=""; inherited=""
+      if [[ -n "${indirect_groups[$gid]:-}" ]]; then
+         via=$(echo "${indirect_groups[$gid]}" | jq -r '._via')
+         inherited=$(echo "${indirect_groups[$gid]}" | jq -r '.inherited // ""')
+      elif echo "${direct_ids}" | jq -e --argjson id "${gid}" 'index($id) != null' > /dev/null; then
+         via="assigned manager"
+      fi
+      printf "  %-50s %-15s %-20s %s\n" "${name//\:/\-}" "${inherited}" "${via}" "https://perun.aai.lifescience-ri.eu/organizations/3363/groups/${gid}/members"
+
+   done)"
+   # awk gsub is part of posix
+   _LIST_OF_MAIN_GROUPS="$(awk '{c=gsub(/-/,"-",$1); if(c==1) print $1}' <<< "${_PRINT_ALL_GROUPS_AND_DMS}")"
+   _LIST_OF_ALL_GROUPS="$(awk '{print $1}' <<< "${_PRINT_ALL_GROUPS_AND_DMS}")"
+
+   echo ""
+   echo "   You are manager or admin of following groups"
+   echo "                      ----------                    ----------       ----------           ----------"
+   echo "${_PRINT_ALL_GROUPS_AND_DMS}"
+   echo "                      ----------                    ----------       ----------           ----------"
+}
+
+print_all_my_groups
+
+new_project (){
+   echo '    New PROJECT creation'
+   echo '    Projects are stored under [main group]-prj.'
+   echo '    (Name must be 2-8 characters: letters, digits, and underscores only.)'
+   echo '    You have access to the following main groups:'
+   echo "${_LIST_OF_MAIN_GROUPS}" | sed 's/^/      /g'
+   while read -rp '  > Name of the main group that will contain the new project: ' _parentname; do
+      grep -qxF "${_parentname}" <<< "${_LIST_OF_MAIN_GROUPS}" && break
+   done
+   _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
+   read -rp '  > Name your project: ' _subgroupname
+   while ( [[ ! "${_subgroupname}" =~ ^[0-9a-zA-Z_]+$ ]] || [[ "${_subgroupname}" == "dms" ]] ) ||
+         ( [[ "${UID}" -eq 0 ]] && ( [[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]])); do
+      echo '   ! Invalid: must be 2-8 characters (letters, digits, underscores), and cannot be named "dms" - please try again!'
+      read -rp '  > Name your project: ' _subgroupname
+   done
+   read -p "    Default membership expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
+   [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
+   make_new_subgroup "${_main_group}-prj" "${_subgroupname}" "${_expirationdays}" >&3
+}
+
+new_release (){
+   echo '    New RELEASE of a dataset and version!'
+   echo '    Releases are stored under [main group]-rel'
+   echo '    The name consists of two parts:'
+   echo '      [dataset name]_v[0-9]'
+   echo '    The first part names the dataset (2-12 letters/digits).'
+   echo '    The second part names the version (2-6 letters/digits).'
+   echo '    You have access to the following main groups:'
+   echo "${_LIST_OF_MAIN_GROUPS}" | sed 's/^/      /g'
+   while read -rp '  > Name of the main group that will contain the new release: ' _parentname; do
+      grep -qxF "${_parentname}" <<< "${_LIST_OF_MAIN_GROUPS}" && break
+   done
+   _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
+
+   _defaultexpirationdays=365
+   read -p "    Default membership expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
+   [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
+
+   read -rp '  > (1/2) Name the dataset: ' _dataset
+   while [[ ${#_dataset} -lt 2 ]] || \
+         [[ ${#_dataset} -gt 12 ]] || \
+         [[ ! "${_dataset}" =~ ^[0-9a-zA-Z_]+$ ]] || \
+         [[ "${_dataset}" == "dms" ]]; do
+      echo '    ! Invalid: must be 2-12 characters (letters, digits and _), and cannot be named "dms" - please try again!'
+      read -rp '  > (1/2) Name the dataset: ' _dataset
+   done
+
+   # check if L-erdera-rel-${_dataset} exists, if not, create one
+   if ! grep -qxF "${_parentname}-rel-${_dataset}" <<< "${_LIST_OF_ALL_GROUPS}"; then
+      make_new_subgroup "${_main_group}-rel" "${_dataset}" "${_expirationdays}" >&3
+   fi
+
+   read -rp '  > (2/2) Name the version: ' _version
+   while [[ ${#_version} -lt 2 ]] || \
+         [[ ${#_version} -gt 6 ]] || \
+         [[ ! "${_version}" =~ ^[0-9a-zA-Z_]+$ ]] || \
+         [[ "${_version}" == "dms" ]]; do
+      echo '    ! Invalid: must be 2-6 characters (letters, digits and _), and cannot be named "dms" - please try again!'
+      read -rp '  > (2/2) Name the version: ' _version
+   done
+   make_new_subgroup "${_parentname}-rel-${_dataset}" "${_version}" "${_expirationdays}" >&3
+}
+
+new_hierarchical_subgroup(){
+   echo '    Hierarchical SUB-groups can be nested multiple levels deep. They are all stored under [main group]-sub.'
+   read -rp '  > Parent group name: ' _parentname
+   _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
+   while ( [[ "${UID}" -ne 0 ]] && [[ ! "${_parentname}" =~ ^"${_main_group}-sub" || $(awk -F'-' '{print NF-1}' <<< "${_parentname}") -ge "$((MAX_SUB_LEVELS + 2))" ]] ); do
+      echo "    ! Error: hierarchical groups can only be created inside a '[main group]-sub' folder, up to ${MAX_SUB_LEVELS} levels deep - please try again!"
+      read -rp '  > Full name of parent group: ' _parentname
+      _main_group="$(cut -d'-' -f1,2 <<< ${_parentname})"
+   done
+   read -rp '    Subgroup name: ' _subgroupname
+   while ([[ ! "${_subgroupname}" =~ ^[0-9A-Za-z_]+$ ]] ||
+         ([[ "${UID}" -ne 0 ]] && ([[ ${#_subgroupname} -lt 2 ]] || [[ ${#_subgroupname} -gt 8 ]] || [[ "${_subgroupname}" == "dms" ]]))); do
+      echo "    ! Error: name must be 2-8 characters (letters, digits, underscores), nesting limited to ${MAX_SUB_LEVELS} levels, and cannot be named 'dms' - please try again!"
+      read -rp '    Subgroup name: ' _subgroupname
+   done
+   _defaultexpirationdays=365
+   read -p "    Default membership expiration (in days, default ${_defaultexpirationdays}): " _expirationdays
+   [[ -z "${_expirationdays}" ]] && _expirationdays="${_defaultexpirationdays}"
+   make_new_subgroup "${_parentname}" "${_subgroupname}" "${_expirationdays}" >&3
+}
+
+echo 'Would you like to create a new [P]roject, [R]elease versioned dataset, or hierarchical [S]ubgroup?'
+read -N1 -rp '  > ' _subgroup_type
+while [[ "${_subgroup_type}" != [PRS] ]]; do
+   echo '  ! Invalid option - please try again'
+   read -N1 -rp '  > ' _subgroup_type
+done
+echo ''
+case "${_subgroup_type}" in
+   P) new_project ;;
+   R) new_release ;;
+   S) new_hierarchical_subgroup ;;
+esac
+
+echo ""
+echo ""
+echo ""
+echo -e "The new group was \033[1;32msuccessfully created\033[0m, and you have been added as a"
+echo -e "group member. You can manage group membership at:"
+echo ""
+echo -e "  https://perun.aai.lifescience-ri.eu/organizations/3363/groups/${new_group_id}/members"
+echo ""
+echo -e "Users who are added to the new group and are currently logged"
+echo -e "into the cluster must first log out (closing all connection sessions)"
+echo -e "and then log back in to gain access to the new group."
+echo -e "You can check your group membership with the 'id' command."
+echo ""
+echo -e "Note: group propagation usually takes a few minutes before it's available on the cluster."
+echo ""
+{% endraw %}

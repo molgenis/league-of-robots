@@ -22,7 +22,7 @@ for _each_ldap in "${domain_names[@]}"; do
    ## Check if this weeks backup has been made and if not, make it
    if ! test -e "${_destination}/weekly-$(date +%Y%U).ldif.gz"; then
       # Make a copy of the _latest backup as a weekly backup
-      _latest=$(ls -1 "${_destination}"/*.ldif.gz | tail -n 1)
+      _latest=$(find "${_destination}" -maxdepth 1 -type f -name '*.ldif.gz' -printf '%T@ %p\0' | awk -v RS='\0' 'BEGIN{max=-1} $1>max {max=$1; sub(/^[^ ]+ /,""); file=$0} END {print file}')
       logger -t ldap_backup "${0}: Making WEEKLY backup (weekly-$(date +%Y%U).ldif.gz) out of today's backup"
       cp "${_destination}/daily-$(date +%u).ldif.gz" "${_destination}/weekly-$(date +%Y%U).ldif.gz"
    fi

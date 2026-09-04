@@ -1,0 +1,9 @@
+[Unit]
+Description=Create LDAP subdirectories every now and then
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/subgroup_directories_auto.sh
+
+[Install]
+WantedBy=multi-user.target
