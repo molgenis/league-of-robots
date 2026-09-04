@@ -84,7 +84,7 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-cloud_image: Rocky-9.6
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
 enable_predictable_network_interface_names: true
 stack_networks:

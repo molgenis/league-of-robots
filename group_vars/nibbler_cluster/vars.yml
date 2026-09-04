@@ -283,6 +283,8 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-impact'
     sponsor: umcg-research-it
+  - name: umcg-integralezorg
+    sponsor: umcg-research-it
   - name: 'umcg-intercept'
     sponsor: umcg-research-it
   - name: 'umcg-lifelines'
@@ -406,6 +408,8 @@ regular_users:
     groups: ['umcg-immunogenetics']
   - name: 'umcg-impact-dm'
     groups: ['umcg-impact']
+  - name: 'umcg-integralezorg-dm'
+    groups: ['umcg-integralezorg']
   - name: 'umcg-intercept-dm'
     groups: ['umcg-intercept']
   - name: 'umcg-lifelines-dm'
@@ -475,7 +479,7 @@ sudoers:
     become: ['umcg-biogen-dm']
   - who: ['%umcg-bionic-mdd-gwama-dms']
     become: ['umcg-bionic-mdd-gwama-dm']
-  - who: ['%umcg-bios']
+  - who: ['%umcg-bios-dms']
     become: ['umcg-bios-dm']
   - who: ['%umcg-blister-dms']
     become: ['umcg-blister-dm']
@@ -523,9 +527,11 @@ sudoers:
     become: ['umcg-hlhs-dm']
   - who: ['%umcg-immunogenetics-dms']
     become: ['umcg-immunogenetics-dm']
-  - who: ['%umcg-impact']
+  - who: ['%umcg-impact-dms']
     become: ['umcg-impact-dm']
-  - who: ['%umcg-intercept']
+  - who: ['%umcg-integralezorg-dms']
+    become: ['umcg-integralezorg-dm']
+  - who: ['%umcg-intercept-dms']
     become: ['umcg-intercept-dm']
   - who: ['%umcg-lifelines-dms']
     become: ['umcg-lifelines-dm']
@@ -541,7 +547,7 @@ sudoers:
     become: ['umcg-mmbimg-dm']
   - who: ['%umcg-monitor-connect-dms']
     become: ['umcg-monitor-connect-dm']
-  - who: ['%umcg-msb']
+  - who: ['%umcg-msb-dms']
     become: ['umcg-msb-dm']
   - who: ['%umcg-muhas-dms']
     become: ['umcg-muhas-dm']
@@ -575,7 +581,7 @@ sudoers:
     become: ['umcg-ucu-dm']
   - who: ['%umcg-ugli-dms']
     become: ['umcg-ugli-dm']
-  - who: ['%umcg-verbeek']
+  - who: ['%umcg-verbeek-dms']
     become: ['umcg-verbeek-dm']
   - who: ['%umcg-vdakker-dms']
     become: ['umcg-vdakker-dm']
@@ -774,6 +780,7 @@ lfs_mounts:
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
+      - name: umcg-integralezorg
       - name: umcg-intercept
       - name: umcg-lifelines
       - name: umcg-lld
