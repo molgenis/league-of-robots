@@ -109,7 +109,7 @@ token_request(){
          [[ -n "${refresh_token}" ]] && echo "REFRESH_TOKEN : ${refresh_token}" && echo ""
          return 0
       fi
-      error=$(echo "$token_response" | jq -r '.error // "unknown_error"')
+      error=$(echo "${token_response}" | jq -r '.error // "unknown_error"')
       case "${error}" in
          authorization_pending)
             echo "  [${elapsed}s] Waiting for user authorization..."
