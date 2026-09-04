@@ -740,7 +740,7 @@ lfs_mounts:
       - name: umcg-hlhs
       - name: umcg-immunogenetics
       - name: umcg-impact
-      - nmae: umcg-integralezorg
+      - name: umcg-integralezorg
       - name: umcg-intercept
       - name: umcg-lifelines
       - name: umcg-lld
