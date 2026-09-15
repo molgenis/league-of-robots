@@ -310,5 +310,5 @@ nhc_cron_checks:
     lookback: 10
     service: "CROND"
     machines: "{{ groups['chaperone'] }}"
-    pattern: "FAILED|exit code|backup FAILED
+    pattern: "FAILED|exit code|backup FAILED"
 ...
