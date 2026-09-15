@@ -299,4 +299,16 @@ lfs_mounts:
     pfs: umcgst04/slice4
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
+
+nhc_cron_checks:
+  - user: "root"
+    lookback: 15
+    service: "CROND"
+    machines: "{{ groups['deploy_admin_interface'] }}"
+
+  - user: "umcg-ogm-dm"
+    lookback: 10
+    service: "CROND"
+    machines: "{{ groups['chaperone'] }}"
+    pattern: "FAILED|exit code|backup FAILED
 ...
