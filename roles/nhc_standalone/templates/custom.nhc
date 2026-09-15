@@ -85,7 +85,6 @@ function check_journalctl()
 		return 1
 	fi
 
-	die 1 "$FUNCNAME:  CRON_OK: no errors detected in last ${LOOKBACK_MIN} min"
-
+	log "$FUNCNAME:  CRON_OK: no errors detected in last ${LOOKBACK_MIN} min"
 	return 0
 }

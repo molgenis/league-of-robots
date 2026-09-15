@@ -87,6 +87,15 @@
       mode: '0755'
   become: true
 
+- name: 'Deploy custom nhc file.'
+  ansible.builtin.copy:
+    src: "templates/custom.nhc"
+    dest: "/etc/nhc/scripts/custom.nhc"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
 - name: Remove check where number of free inodes are not reported
   ansible.builtin.replace:
     path: /etc/nhc/scripts/lbnl_fs.nhc
