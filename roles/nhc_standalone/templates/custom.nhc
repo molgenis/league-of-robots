@@ -9,7 +9,7 @@
 # Initialize variables
 declare USERS="${1:-root}"
 declare LOOKBACK_MIN="${2:-15}"
-declare PROCESS="${3:-CROND}"
+declare TAG="${3:-CROND}"
 declare PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 
 # Check journalctl entries for a given service within a configurable lookback period,
@@ -17,76 +17,74 @@ declare PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 # Report matching entries as an NHC health check.
 function check_journalctl()
 {
-	# Defaults 
-	local USERS="${1:-root}"
-	local LOOKBACK_MIN="${2:-15 min}"
-	local PROCESS="${3:-CROND}"
-	local PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
+    # Defaults 
+    local USERS="${1:-root}"
+    local LOOKBACK_MIN="${2:-15 min}"
+    local TAG="${3:-CROND}"
+    local PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 
-	local USER
-	local USER_LOGS
-	local MATCH
-	local SINCE
-	local LOGS
-	local WARNING
+    local USER
+    local USER_LOGS
+    local MATCH
+    local SINCE
+    local LOGS
+    local WARNING
 
-	local -a USER_LIST
-	local -a ERRORS=()
+    local -a USER_LIST
+    local -a ERRORS=()
 
-	IFS=',' read -r -a USER_LIST <<< "${USERS}"
+    IFS=',' read -r -a USER_LIST <<< "${USERS}"
 
-	SINCE="$(date -d "-${LOOKBACK_MIN} min" "+%Y-%m-%d %H:%M:%S")"
+    SINCE="$(date -d "-${LOOKBACK_MIN} min" "+%Y-%m-%d %H:%M:%S")"
 
-	# Fetch Logs
-	LOGS="$(
-	journalctl \
-		--since "${SINCE}" \
-		-t "${PROCESS}" \
-		-g "${PATTERN}" \
-		--no-pager 2>/dev/null ||
-	true
-	)"
-	# filter on USER_LIST 
-	for USER in "${USER_LIST[@]}"; do
+    # Fetch Logs
+    LOGS="$(
+    journalctl \
+        --since "${SINCE}" \
+        -t "${TAG}" \
+        -g "${PATTERN}" \
+        --no-pager 2>/dev/null ||
+    true
+    )"
+    # filter on USER_LIST 
+    for USER in "${USER_LIST[@]}"; do
 
-	# Only cron execution CMD's for this user
-	USER_LOGS="$(
-		printf '%s\n' "${LOGS}" |
-		grep -iE "(${USER})" |
-		grep -iE "CMD" ||
-		true
-	)"
+        # Only fetch execution CMD's for listed user from the journalctr output in $LOGS.
+        USER_LOGS="$(
+            printf '%s\n' "${LOGS}" |
+            grep -iE "(${USER})" |
+            grep -iE "CMD" ||
+            true
+        )"
 
-	if [[ -n "${USER_LOGS}" ]]; then
+        if [[ -n "${USER_LOGS}" ]]; then
 
-		MATCH="$(
-		printf '%s\n' "${USER_LOGS}" |
-		grep -iE "${PATTERN}" ||
-		true
-		)"
-		if [[ -n "${MATCH}" ]]; then
-		ERRORS+=("${USER}: $(printf '%s\n' "${MATCH}" | head -n1)")
-		fi
-	fi
-	done
+            MATCH="$(
+                printf '%s\n' "${USER_LOGS}" |
+                grep -iE "${PATTERN}" ||
+                true
+                )"
+            if [[ -n "${MATCH}" ]]; then
+                ERRORS+=("${USER}: $(printf '%s\n' "${MATCH}" | head -n1)")
+            fi
+        fi
+    done
 
-	# Report $WARNING to logfile using 'die 1'
-	if [[ ${#ERRORS[@]} -gt 0 ]]; then
+    # Report $WARNING to logfile using 'die 1'
+    if [[ ${#ERRORS[@]} -gt 0 ]]; then
 
-	WARNING="$FUNCNAME:  CRON_ERRORS detected in last ${LOOKBACK_MIN} min"
-	WARNING="${WARNING};  Affected user: ${USER}"
+        WARNING="$FUNCNAME:  ${TAG}_ERRORS detected in last ${LOOKBACK_MIN} min"
+        WARNING="${WARNING};  Affected user: ${USER}"
 
-	for MATCH in "${ERRORS[@]}"; do
-		WARNING="${WARNING}; ${MATCH}"
-	done
+        for MATCH in "${ERRORS[@]}"; do
+            WARNING="${WARNING}; ${MATCH}"
+        done
 
-	   die 1 "${WARNING}"
+        die 1 "${WARNING}"
+        return 1
+    fi
 
-	   return 1
-	fi
-
-	# reporting if 'OK and return 0'
-	log "$FUNCNAME:  CRON_OK: no errors detected in last ${LOOKBACK_MIN} min"
-
-	return 0
+    # reporting if 'OK and return 0'
+    log "$FUNCNAME:  ${TAG}_OK: no errors detected in last ${LOOKBACK_MIN} min"
+    return 0
 }

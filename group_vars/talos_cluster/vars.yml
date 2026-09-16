@@ -303,15 +303,15 @@ lfs_mounts:
 nhc_cron_checks:
   deploy_admin_interface:
     - user: "root"
-      lookback: 15
-      service: "CROND"
+      lookback_min: 15
+      tag: "CROND"
 #    - user: "umcg-atd-dm"
-#      lookback: 15
+#      lookback_min: 15
 #      service: "CROND"
 #      pattern: "FAILED|exit code|backup FAILED"
 #  chaperone:
 #    - user: "umcg-ogm-dm"
 #      lookback: 10
-#      service: "CROND"
+#      tag: "CROND"
 #      pattern: "FAILED|exit code|backup FAILED"
 ...
