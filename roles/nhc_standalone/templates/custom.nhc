@@ -7,18 +7,21 @@
 #
 
 # Initialize variables
-declare USERS="${1:-root,umcg-atd-dm,umcg-atd-ateambot}"
+declare USERS="${1:-root}"
 declare LOOKBACK_MIN="${2:-15}"
 declare PROCESS="${3:-CROND}"
+declare PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 
-#function check_journalctl () USERLIST LOOKBACKTIME PROCESSNAME PATTERNLIST
+# Check journalctl entries for a given service within a configurable lookback period,
+# filtering by tag (-t), error pattern (-g PATTERN), and user list.
+# Report matching entries as an NHC health check.
 function check_journalctl()
 {
-	# CONFIG Defaults
-	local USERS="${1:-root,umcg-atd-dm,umcg-atd-ateambot}"
-	local LOOKBACK_MIN="${2:-15}"
+	# Defaults 
+	local USERS="${1:-root}"
+	local LOOKBACK_MIN="${2:-15 min}"
 	local PROCESS="${3:-CROND}"
-	local PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault}"
+	local PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 
 	local USER
 	local USER_LOGS
@@ -34,57 +37,56 @@ function check_journalctl()
 
 	SINCE="$(date -d "-${LOOKBACK_MIN} min" "+%Y-%m-%d %H:%M:%S")"
 
-	#die 1 "$FUNCNAME:  journalctl --since ${SINCE} -t ${PROCESS}"
-	# FETCH LOGS (TO DO: MAKE It work with -t)
+	# Fetch Logs
 	LOGS="$(
-		journalctl \
-			--since "${SINCE}" \
-			-g "${PROCESS}" \
-			--no-pager 2>/dev/null | grep "${PROCESS}" ||
+	journalctl \
+		--since "${SINCE}" \
+		-t "${PROCESS}" \
+		-g "${PATTERN}" \
+		--no-pager 2>/dev/null ||
+	true
+	)"
+	# filter on USER_LIST 
+	for USER in "${USER_LIST[@]}"; do
+
+	# Only cron execution CMD's for this user
+	USER_LOGS="$(
+		printf '%s\n' "${LOGS}" |
+		grep -iE "(${USER})" |
+		grep -iE "CMD" ||
 		true
 	)"
 
-	for USER in "${USER_LIST[@]}"; do
+	if [[ -n "${USER_LOGS}" ]]; then
 
-		# Only cron execution lines for this user
-		USER_LOGS="$(
-			printf '%s\n' "${LOGS}" |
-			grep "(${USER})" |
-			grep "CMD" ||
-			true
+		MATCH="$(
+		printf '%s\n' "${USER_LOGS}" |
+		grep -iE "${PATTERN}" ||
+		true
 		)"
-
-		if [[ -n "${USER_LOGS}" ]]; then
-
-			MATCH="$(
-				printf '%s\n' "${USER_LOGS}" |
-				grep -iE "${PATTERN}" ||
-				true
-			)"
-
-			if [[ -n "${MATCH}" ]]; then
-				ERRORS+=("${USER}: $(printf '%s\n' "${MATCH}" | head -n1)")
-			fi
+		if [[ -n "${MATCH}" ]]; then
+		ERRORS+=("${USER}: $(printf '%s\n' "${MATCH}" | head -n1)")
 		fi
+	fi
 	done
 
-	# Create warning message
+	# Report $WARNING to logfile using 'die 1'
 	if [[ ${#ERRORS[@]} -gt 0 ]]; then
 
-
 	WARNING="$FUNCNAME:  CRON_ERRORS detected in last ${LOOKBACK_MIN} min"
-	log $WARNING
 	WARNING="${WARNING};  Affected user: ${USER}"
 
 	for MATCH in "${ERRORS[@]}"; do
 		WARNING="${WARNING}; ${MATCH}"
 	done
-	log "${WARNING}"
-	die 1 "${WARNING}"
 
-		return 1
+	   die 1 "${WARNING}"
+
+	   return 1
 	fi
 
+	# reporting if 'OK and return 0'
 	log "$FUNCNAME:  CRON_OK: no errors detected in last ${LOOKBACK_MIN} min"
+
 	return 0
 }
