@@ -58,7 +58,6 @@ logstoprm_rsyncd_module:
 use_ldap: false
 create_ldap: false
 use_sssd: false
-
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
@@ -76,6 +75,10 @@ external_jumphosts:
     hosts:
       - hostname: portal
         network: external_unfiltered
+  - group: lifter_cluster
+    hosts:
+      - hostname: lt-portal
+        network: external-v4
   - group: nibbler_cluster
     hosts:
       - hostname: tunnel

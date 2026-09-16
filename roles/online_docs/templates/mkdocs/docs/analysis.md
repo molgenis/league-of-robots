@@ -453,11 +453,7 @@ cqos
 ## Nodes and Partitions
 
 Amount and types of resources (CPUs, Memory, storage, etc.) varies from one cluster to the next. See the [specifications](../specifications/) page for an overview.
-To get an overview of the nodes and see how they are doing from the commandline, login to a cluster UI and execute:
-```
-sinfo -o "%P|%a|%D|%T|%z|%c|%B|%m|%d|%f|%g|%l|%s|%S|%N|%E" | column -t -s "|"
-```
-Cannot remember the custom format string above? Try ```cnodes``` from our [cluster-utils](https://github.com/molgenis/cluster-utils) module:
+To get an overview of the nodes and see how they are doing, try ```cnodes``` from our [cluster-utils](https://github.com/molgenis/cluster-utils) module:
 ```
 module load cluster-utils
 module list

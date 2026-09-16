@@ -59,7 +59,7 @@
   check_mode: false
   register: 'lmod_version'
 
-- name: 'Get host key fingeprints from dedicated data transfer server.'
+- name: 'Get host key fingerprints from dedicated data transfer server.'
   ansible.builtin.shell:
     cmd: |
       set -o pipefail

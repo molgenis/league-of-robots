@@ -558,20 +558,27 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
   ```
 * Firstly, create the jumphost, which is required to access the other machines.  
   Deploy the signed hosts keys and create local admin accounts with ```init.yml``` and
-  configure other stuff on the jumphost (contains amongst others the settings required to access the other machines behind the jumphost)
-  with ```cluster.yml```:
-  ```
+  configure other stuff on the jumphost with ```single_group_playbooks/jumphost.yml```:
+  ```bash
   ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u "${default_cloud_image_user}" -l 'jumphost' single_group_playbooks/init.yml
-  ansible-playbook -u "${lor_admin_user}" -l 'jumphost' cluster.yml
+  ansible-playbook -u "${lor_admin_user}" -l 'jumphost' single_group_playbooks/jumphost.yml
   ```
-* Secondly, deploy the rest of the machines in the same order.  
+* Secondly, create the repo server, which is required to serve packages to the other machines behind the jumphost, in the same order.  
   For ```init.yml``` you must (temporarily) set ```JUMPHOST_USER``` for access to the jumphost to _your local admin account_,
   because the ```${default_cloud_image_user}``` user will no longer be able to login to the jumphost:
   ```bash
   export JUMPHOST_USER="${lor_admin_user}" # Requires SSH client config as per end user documentation: see above.
-  ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u "${default_cloud_image_user}" -l '!jumphost' single_group_playbooks/init.yml
+  ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u "${default_cloud_image_user}" -l 'repo' single_group_playbooks/init.yml
+  ansible-playbook -u "${lor_admin_user}" -l 'repo' single_group_playbooks/repo.yml
+  ```
+* Thirdly, deploy the rest of the machines in the same order.  
+  For ```init.yml``` you must (temporarily) set ```JUMPHOST_USER``` for access to the jumphost to _your local admin account_,
+  because the ```${default_cloud_image_user}``` user will no longer be able to login to the jumphost:
+  ```bash
+  export JUMPHOST_USER="${lor_admin_user}" # Requires SSH client config as per end user documentation: see above.
+  ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u "${default_cloud_image_user}" -l '!jumphost,!repo' single_group_playbooks/init.yml
   unset JUMPHOST_USER
-  ansible-playbook -u "${lor_admin_user}" -l '!jumphost' cluster.yml
+  ansible-playbook -u "${lor_admin_user}" -l '!jumphost,!repo' cluster.yml
   ```
 * (Re-)deploying only a specific role - e.g. *rsyslog_client* - on a previously deployed stack
   ```bash

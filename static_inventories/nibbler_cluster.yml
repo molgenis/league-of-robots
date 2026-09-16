@@ -243,6 +243,9 @@ all:
                       dhcp: false
                   lnet:
                     name: tcp20
+              disabled_network_interfaces:
+                - name: eno1
+                - name: eno2
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
@@ -290,10 +293,15 @@ all:
                       dhcp: false
                   lnet:
                     name: tcp20
+              disabled_network_interfaces:
+                - name: eno1
+                - name: eno2
+                - name: enp65s0f0np0
               perc_devices: false
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
-                  device: '/dev/nvme0n1'
+                  device: '/dev/nvme1n1'
+                  label: local
                   mounted_owner: root
                   mounted_group: root
                   mounted_mode: '0755'
