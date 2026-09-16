@@ -305,14 +305,13 @@ nhc_cron_checks:
     - user: "root"
       lookback: 15
       service: "CROND"
-
-    - user: "umcg-atd-dm"
-      lookback: 15
-      service: "CROND"
-      pattern: "FAILED|exit code|backup FAILED"
-  chaperone:
-    - user: "umcg-ogm-dm"
-      lookback: 10
-      service: "CROND"
-      pattern: "FAILED|exit code|backup FAILED"
+#    - user: "umcg-atd-dm"
+#      lookback: 15
+#      service: "CROND"
+#      pattern: "FAILED|exit code|backup FAILED"
+#  chaperone:
+#    - user: "umcg-ogm-dm"
+#      lookback: 10
+#      service: "CROND"
+#      pattern: "FAILED|exit code|backup FAILED"
 ...
