@@ -321,7 +321,7 @@ all:
           use_ldap: false
           functional_admin_group: 'MEDGEN-NFG GCC Analyse Team'
           #
-          # Overrule regular_groups compared to rest of Winged Helix:
+          # Overrule regular_groups compared to rest of stack:
           # * Do not create local functional_admin_group, which comes from UMCG AD.
           #
           regular_groups:
@@ -338,6 +338,7 @@ all:
             - name: 'umcg-logstoprm'
             - name: 'umcg-ogm'
             - name: 'umcg-patho'
+            - name: 'umcg-pgx'
             - name: 'umcg-pr'
             - name: 'umcg-vipt'
           ssh_client_configs:

@@ -273,7 +273,7 @@ all:
           ogm_enabled: true      # this machine installs backups for the Optical Genome Mapping
           functional_admin_group: 'MEDGEN-NFG GCC Analyse Team'
           #
-          # Overrule regular_groups compared to rest of Winged Helix:
+          # Overrule regular_groups compared to rest of stack:
           # * Do not create local functional_admin_group, which comes from UMCG AD.
           #
           regular_groups:
