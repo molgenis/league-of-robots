@@ -1,0 +1,79 @@
+---
+ip_addresses:
+  lifter:
+    lt_internal_management:
+      address: 10.10.1.250
+      netmask: /32
+    umcg-1068:
+      address: 172.23.60.214
+      netmask: /32
+    lt_umcg-1068:
+      address: 10.10.2.22
+      netmask: /32
+  lt-chaperone:
+    lt_internal_management:
+      address: 10.10.1.240
+      netmask: /32
+  lt-dai:
+    lt_internal_management:
+      address: 10.10.1.190
+      netmask: /32
+    umcg-1068:
+      address: 172.23.60.245
+      netmask: /32
+    lt_umcg-1068:
+      address: 10.10.2.42
+      netmask: /32
+  lt-node-c01:
+    lt_internal_management:
+      address: 10.10.1.8
+      netmask: /32
+    umcg-1068:
+      address: 172.23.60.242
+      netmask: /32
+    lt_umcg-1068:
+      address: 10.10.2.228
+      netmask: /32
+  lt-portal:
+    external-v4:
+      address: 145.100.234.242
+      netmask: /32
+      fqdn: 'NXDOMAIN'
+    lt_internal_management:
+      address: 10.10.1.77
+      netmask: /32
+  lt-repo:
+    lt_internal_management:
+      address: 10.10.1.166
+      netmask: /32
+  lt-sai:
+    lt_internal_management:
+      address: 10.10.1.62
+      netmask: /32
+    umcg-1068:
+      address: 172.23.60.227
+      netmask: /32
+    lt_umcg-1068:
+      address: 10.10.2.239
+      netmask: /32
+  lt-transfer:
+    lt_internal_management:
+      address: 10.10.1.44
+      netmask: /32
+  lt_internal_management-external-v4-router:
+    lt_internal_management:
+      address: 10.10.1.1
+      netmask: /32
+    external-v4:
+      address: 145.100.235.13
+      netmask: /32
+      fqdn: 'NXDOMAIN'
+  lt_umcg-1068-umcg-1068-router:
+    lt_umcg-1068:
+      address: 10.10.2.1
+      netmask: /32
+    umcg-1068:
+      address: 172.23.60.223
+      netmask: /32
+      fqdn: 'NXDOMAIN'
+...

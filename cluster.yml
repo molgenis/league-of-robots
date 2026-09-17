@@ -49,9 +49,12 @@
 - name: Run playbook for compute nodes.
   ansible.builtin.import_playbook: single_group_playbooks/compute_node.yml
 
-- name: Run playbook for documentation servers.
-  ansible.builtin.import_playbook: single_group_playbooks/docs.yml
+- name: Run playbook for chaperone servers.
+  ansible.builtin.import_playbook: single_group_playbooks/chaperone.yml
 
 - name: Run playbook for data transfer servers.
   ansible.builtin.import_playbook: single_group_playbooks/data_transfer.yml
+
+- name: Run playbook for documentation servers.
+  ansible.builtin.import_playbook: single_group_playbooks/docs.yml
 ...

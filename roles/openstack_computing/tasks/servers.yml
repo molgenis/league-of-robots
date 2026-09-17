@@ -146,14 +146,14 @@
     server: "{{ inventory_hostname }}"
     state: present
     reuse: true
-    network: "{{ public_network }}"
+    network: "{{ external_network }}"
     nat_destination: "{{ private_network }}"
-    floating_ip_address: "{{ ip_addresses[inventory_hostname][public_network]['address'] | default(omit) }}"
+    floating_ip_address: "{{ ip_addresses[inventory_hostname][external_network]['address'] | default(omit) }}"
     wait: true
     timeout: "{{ openstack_api_timeout }}"
   vars:
     private_network: "{{ item['name'] }}"
-    public_network: "{{ stack_networks
+    external_network: "{{ stack_networks
         | selectattr('name', 'equalto', private_network)
         | map(attribute='router')
         | map(attribute='external_network') | first }}"

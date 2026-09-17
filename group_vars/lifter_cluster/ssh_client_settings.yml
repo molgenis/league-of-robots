@@ -1,0 +1,17 @@
+---
+ssh_client_jumphosts:
+  - alias: lt-portal
+    hostname: 145.100.234.242
+
+ssh_client_known_hosts: "\
+  @cert-authority \
+  lt-portal*,\
+  145.100.234.242,\
+  *lt-transfer*,\
+  *lt-sai,\
+  *lt-dai,\
+  *lifter,\
+  *docs-on-bateleur,\
+  *lt-* \
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGgm4IAblUIeVGljDdzoOML82+WrY5OKduA5ZlVwmnk/ CA key for lifter_cluster"
+...
