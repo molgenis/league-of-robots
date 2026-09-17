@@ -22,7 +22,7 @@
   #
   strategy: linear
   roles:
-   - role: yum_repos
-     when: repo_manager == 'none' or
+    - role: yum_repos
+      when: repo_manager == 'none' or
            repo_manager == 'mirror'
 ...

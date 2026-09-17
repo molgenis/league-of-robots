@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -ueo pipefail
+
+_main="/mnt/repos"
+cd ${_main}
+
+_output='--info=progress2'
+[[ "${1:-}" == "-q" ]] && _output='-q'
+{% for rm_secondary_server in global_repo_servers                                                   
+          | selectattr('primary', 'undefined')
+          | map(attribute='name')
+          | list
+          | first %}
+rsync --delete -azH /mnt/repos/ rsync://repo@{{ rm_secondary_server }}/repo/ {% raw %}${_output}{% endraw %}
+{% endfor %}
