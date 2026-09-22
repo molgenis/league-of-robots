@@ -5,7 +5,7 @@ bb_infra_catalog:
       vars:
         make: Dell
         model: PowerEdge R7525
-        support_expiration_date: 2027-02-12
+        support_expiration_date: 2031-02-12
         location: DCE
       hosts:
         betabarrel:
@@ -34,6 +34,24 @@ bb_infra_catalog:
               65363465366262656436653439346136366162643237343565663739386361653730633362623563
               6366643836663364350a353032626235343738643834353530666265386261666432316236643334
               3230
+    bb_bm_3:
+      vars:
+        #
+        # Storage server.
+        #
+        make: Dell
+        model: PowerEdge R760xs
+        support_expiration_date: 2029-09-30
+        location: CBC
+      hosts:
+        cf-storage:
+          serial: !vault |
+              $ANSIBLE_VAULT;1.2;AES256;all
+              38373563653761646133613365636331646238613136366463343738353263343137613832646639
+              3934353564623633653066623962333064643237336264620a616364643537386333643062666537
+              30653362656262613236333838663664313631303938383034653262626564313933346361666365
+              3562346238303530370a326436616565623366386462353865326561376234323337333161326437
+              3434
     bb_vm_1: 
       vars:
         location: Merlin cloud in DCE

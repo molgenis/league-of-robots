@@ -31,5 +31,5 @@
           - cluster_class
       when:
         - hostvars[inventory_hostname][search_attr_name] is defined
-        - hostvars[inventory_hostname][search_attr_name] | regex_search("(?i)" + search_attr_value)
+        - hostvars[inventory_hostname][search_attr_name] is ansible.builtin.regex("(?i)" + search_attr_value)
 ...
