@@ -4,6 +4,7 @@ all:
     controller_api:
       hosts:
         localhost:
+          ansible_python_interpreter: /usr/bin/python3
     jumphost:
       hosts:
         cf-porch:
