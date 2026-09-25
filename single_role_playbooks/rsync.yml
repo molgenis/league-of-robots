@@ -1,0 +1,6 @@
+---
+- name: deploy rsync
+  hosts: cluster
+  roles:
+    - rsync
+...

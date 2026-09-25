@@ -6,7 +6,7 @@
     name:
       - 'iptables'
       - 'iptables-services'
-      - 'initscripts-service'
+      - "initscripts{% if ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] >= '9' %}-service{% endif %}"
       #### ToDo: fail2ban
   notify: restart_iptables
   become: true
