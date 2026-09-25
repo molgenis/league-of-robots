@@ -22,4 +22,5 @@
     - jenkins
     - certs_webservers
     - configure_jenkins_projects
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

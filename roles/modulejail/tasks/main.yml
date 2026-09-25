@@ -1,0 +1,63 @@
+---
+- name: Install modulejail RPM from remote repo.
+  ansible.builtin.package:
+    name: "{{ path }}/{{ file }}"
+    state: latest
+    disable_gpg_check: true
+  vars:
+    path: "https://github.com/jnuyens/modulejail/releases/download/v{{ modulejail_version }}"
+    file: "modulejail-{{ modulejail_version }}-{{ modulejail_release }}.noarch.rpm"
+  become: true
+
+- name: 'Create folder for modulejail config.'
+  ansible.builtin.file:
+    name: /etc/modulejail
+    owner: root
+    group: root
+    mode: '0755'
+    state: 'directory'
+  become: true
+
+- name: 'Deploy modulejail allowlist config file.'
+  ansible.builtin.template:
+    src: allowlist.conf.j2
+    dest: "/etc/modulejail/{{ modulejail_allowlist }}"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Execute modulejail to create blocklist containing all unused kernel module not present in the allow list.
+  ansible.builtin.shell:
+    cmd: |
+         set -e
+         set -u
+         set -o pipefail
+         blocklist='/etc/modprobe.d/{{ modulejail_blocklist }}'
+         if [[ ! -e "${blocklist}" ]]; then
+             install -m 0644 /dev/null "${blocklist}"
+         fi
+         checksum_old="$(sha256sum "${blocklist}")"
+         modulejail \
+             {% if modulejail_enforce | default(false) %}--fail-on-module-load{% else %}--warn-only{% endif %} \
+             --verbose-logging \
+             --profile firewall \
+             --whitelist-file /etc/modulejail/{{ modulejail_allowlist }} \
+             --output "${blocklist}"
+         checksum_new="$(sha256sum "${blocklist}")"
+         if [[ "${checksum_old}" != "${checksum_new}" ]]; then
+             echo "${blocklist} changed."
+         fi
+  register: modulejail_blocklist_conf_status
+  changed_when:
+    - '"changed" in modulejail_blocklist_conf_status.stdout'
+  become: true
+
+- name: Report modulejail status.
+  ansible.builtin.debug:
+    msg:
+      - "{{ modulejail_blocklist_conf_status.stdout }}"
+  changed_when:
+    - '"changed" in modulejail_blocklist_conf_status.stdout'
+
+...

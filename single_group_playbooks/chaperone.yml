@@ -62,4 +62,10 @@
   roles:
     - logs_toprm
     - ogm
+
+- name: '###==-> More Roles only for completely managed chaperones. <-==###'
+  hosts:
+    - chaperone,!mit_chaperone
+  roles:
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

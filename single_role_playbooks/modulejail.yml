@@ -1,0 +1,6 @@
+---
+- hosts:
+    - all,!controller_api
+  roles:
+    - role: modulejail
+...

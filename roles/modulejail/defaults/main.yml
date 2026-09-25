@@ -1,0 +1,10 @@
+---
+modulejail_version: 1.6.2
+modulejail_release: 1
+modulejail_allowlist: allowlist.conf
+modulejail_blocklist: modulejail-blocklist.conf
+modulejail_enforce: false
+modulejail_allowed_kernel_modules:
+  - zstd
+  - zstd_compress
+...

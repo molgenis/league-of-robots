@@ -46,6 +46,9 @@
 - name: Run playbook for User Interfaces.
   ansible.builtin.import_playbook: single_group_playbooks/user_interface.yml
 
+- name: Run playbook for all cluster machines part 3.
+  ansible.builtin.import_playbook: single_group_playbooks/cluster_part3.yml
+
 - name: Run playbook for compute nodes.
   ansible.builtin.import_playbook: single_group_playbooks/compute_node.yml
 

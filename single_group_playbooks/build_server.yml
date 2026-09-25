@@ -22,4 +22,5 @@
     - cluster       # installing software
     - sudoers
     - build_environment
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

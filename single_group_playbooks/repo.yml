@@ -23,6 +23,7 @@
     - local_storage
     - remove
     - update
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 
 - name: '###==-> More roles for repo management servers. <-==###'
   hosts:

@@ -1,0 +1,10 @@
+---
+- name: Import pre deploy checks.
+  ansible.builtin.import_playbook: pre_deploy_checks.yml
+
+- name: '###==-> Basic roles for all cluster machines part 3. <-==###'
+  hosts:
+    - cluster
+  roles:
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
+...

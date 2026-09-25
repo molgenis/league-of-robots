@@ -1,0 +1,29 @@
+#jinja2: trim_blocks:True, lstrip_blocks:True
+#
+# /etc/modulejail/allowlist.conf
+#
+# File format:
+#  * One kernel module per line.
+#  * Blank lines and '#' comments are allowed and skipped.
+#  * Kernel module names may be written in either dash or underscore form (E.g. "nft-compat" or "nft_compat").
+#    Module jail will normalise all dashes to underscores.
+# Permissions:
+#  * The file mode MUST NOT be group-writable nor world-writable;
+#  * modulejail will refuse to run otherwise.
+# Dependencies:
+#  * Dependencies for a kernel module in the allow list will not be automagically allowed too,
+#    so all dependencies must be added to the allow list too.
+#  * You can find the dependencies for module using
+#        modprobe --show-depends kernel_module_name
+#    which will produce a list like this
+#        insmod /lib/modules/.../dependency-1.ko
+#        insmod /lib/modules/.../dep_two.ko
+#        insmod /lib/modules/.../another_one_we_need.ko
+#  * To extract the names in underscore format in one go:
+#        modprobe --show-depends kernel_module_name \
+#          | awk '/^insmod/ {print $2}' \
+#          | sed -E 's|.*/||;s|\.ko\..*$||;s|-|_|g'
+#
+{% for allowed_kernel_module in modulejail_allowed_kernel_modules | default([]) %}
+{{ allowed_kernel_module }}
+{% endfor %}
