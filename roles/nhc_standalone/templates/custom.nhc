@@ -1,10 +1,4 @@
-# NHC -- UMCG University's Checks for journalclr patterns
-#
-# Gerben vd Vries <you@your.com>
-# Date
-#
-# Copyright and/or license information if different from upstream
-#
+# NHC -- UMCG University's Checks for journalctl patterns
 
 # Initialize variables
 declare USERS="${1:-root}"
