@@ -27,6 +27,7 @@
     path: "{{ local_temp_repo_dir }}"
     state: absent
   changed_when: false # local files are only temporary, the actual change occurs in next task
+  run_once: true
   delegate_to: localhost
   connection: local
 
@@ -36,6 +37,7 @@
     state: directory
     mode: '0755'
   changed_when: false # local files are only temporary, the actual change occurs in following tasks
+  run_once: true
   delegate_to: localhost
   connection: local
 

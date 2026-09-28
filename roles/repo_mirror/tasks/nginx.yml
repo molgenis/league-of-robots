@@ -35,7 +35,7 @@
     src: nginx.conf.j2
     dest: /etc/nginx/nginx.conf
     mode: '0644'
-  notify: nginx_reload
+  notify: rm_nginx_reload
   become: true
 
 - name: Deploy nginx rsyslog config
@@ -43,7 +43,7 @@
     src: 30_nginx.conf.j2
     dest: /etc/rsyslog.d/30_nginx.conf
     mode: '0644'
-  notify: rsyslog_restart
+  notify: rm_rsyslog_restart
   become: true
 
 - name: Deploy SSL site config
@@ -53,7 +53,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: "nginx_reload"
+  notify: rm_nginx_reload
   become: true
 
 - name: Ensure cert directory exists

@@ -4,6 +4,7 @@
 set -ueo pipefail
 _main="{{ main_repo_path }}"
 mountpoint -q "${_main}" || { echo "${_main} not mounted" >&2; exit 1; }
+cd "${_main}"
 
 {% raw %}
 ! test -d "${_main}/0cache" && mkdir "${_main}/0cache"
@@ -16,44 +17,86 @@ print_all_repos() {
    grep '\[.*\]' */*.repo | tr ':' '/' | tr -d '[]' | cut -d'/' -f 1,3 --output-delimiter=" " | sort -u
 }
 
-if [[ -z "${1:-}" ]]; then
+function help(){
       echo "Error, you did not provide distribution!"
       print_all_repos
       echo ""
+      echo "  ${0} [ -d string [ -r string ] ] | [ -0 ]"
+      echo ""
       echo "Correct syntax for downloading the specific repository is"
-      echo "  ${0} [os_distribution] [repository]"
+      echo "  ${0} -d os_distribution -r repository"
+      echo ""
       echo "or to download ALL repositories of a specific OS distribution"
-      echo "  ${0} [os_distribution]"
+      echo "  ${0} -d os_distribution"
+      echo ""
+      echo "or to Automatically detect All existing distributions and repositories and"
+      echo "download latest version into cache, but do NOT CREATE VERSION, use"
+      echo "  ${0} -0"
+      echo ""
       exit
+}
+
+if [[ -z "${1:-}" ]]; then
+   help
 fi
 
-_os_distribution=${1}
-_do_repos=${2:-}
+_cache_only=false
+_errors=""
+OPTSTRING=":d:r:0"
+while getopts ${OPTSTRING} opt; do
+  case ${opt} in
+    d) _do_os_distribution=${OPTARG} && echo "distribution: ${OPTARG}" ;;
+    r) _do_repos=${OPTARG} && echo "repository: ${OPTARG}" ;;
+    0) _cache_only=true && echo "downloading cache only - NO VERSIONING" ;;
+    *) help ;;
+  esac
+done
+
 _time="$(date +%Y%m%d-%H%M%S)"
 
 ## A bit of logging
 echo "${_time} running ${0} ${*}" >> "${_main}/logs/cli/$(basename ${0}).log"
 echo "    current versions are:" >> "${_main}/logs/cli/$(basename ${0}).log"
-ls -Rl 1versions/ | sed 's/^/        /g' >> "${_main}/logs/cli/$(basename ${0}).log"
+find 1versions/ -maxdepth 3 -type d | sed 's/^/        /g' >> "${_main}/logs/cli/$(basename ${0}).log"
 
-if [[ -z "${_do_repos:-}" ]]; then
-   _do_repos="$(grep -h "\[.*\]" "${_main}/dnf/repos.d/${_os_distribution}/"*.repo | tr -d '[]' | sort -u)"
+# $1 distribution
+# $2 repository
+function _download_and_version(){
+   echo ""
+   local _repo_log_dir="${_main}/logs/scripts/${1}/${2}"
+   ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
+   local _repo_log="${_repo_log_dir}/${_time}"
+   echo "- Log file: ${_repo_log}"
+   if ! dnf reposync --conf "${_main}/dnf/repos.d/${1}.conf" --repo "${2}" --downloaddir="${_main}/0cache/${1}/" --download-metadata 1>"${_repo_log}" 2>&1; then
+      echo "  Error, unsuccessfull"
+      _errors="$(echo -e "${_errors}\n${1} ${2} returned ${?}")"
+      return 0
+   fi
+   ${_cache_only} && return 0 ## if only caching, don't make version
+   mkdir -p "${_main}/1versions/${1}/${2}/"
+   cp -a --reflink=always "${_main}/0cache/${1}/${2}/" "${_main}/1versions/${1}/${2}/${_time}/" || exit
+   echo "  New version created:   ${_main}/1versions/${1}/${2}/${_time}"
+}
+
+if ${_cache_only}; then
+   for _each_distro in $(find "${_main}/0cache/" -mindepth 1 -maxdepth 1 -type d -printf '%P '); do
+      for _each_repo in $(find "${_main}/0cache/${_each_distro}" -mindepth 1 -maxdepth 1 -type d -printf '%P '); do
+         _download_and_version "${_each_distro}" "${_each_repo}"
+      done
+   done
+else
+   if [[ -z "${_do_repos:-}" ]]; then
+      _do_repos="$(grep -h "\[.*\]" "${_main}/dnf/repos.d/${_do_os_distribution}/"*.repo | tr -d '[]' | sort -u)"
+   fi
+   for _each_repository in ${_do_repos}; do
+      _download_and_version "${_do_os_distribution}" "${_each_repository}"
+   done
 fi
 
-for _repo in ${_do_repos}; do
-   echo ""
-   _repo_log_dir="${_main}/logs/scripts/${_os_distribution}/${_repo}"
-   ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
-   _repo_log="${_repo_log_dir}/${_time}"
-   echo "- Log file: ${_repo_log}"
-   if ! dnf reposync --conf "${_main}/dnf/repos.d/${_os_distribution}.conf" --repo "${_repo}" --downloaddir="${_main}/0cache/${_os_distribution}/" --download-metadata 1>"${_repo_log}" 2>&1; then
-      echo "  Error, unsuccessfull"
-      continue
-   fi
-   mkdir -p "${_main}/1versions/${_os_distribution}/${_repo}/"
-   cp -a --reflink=always "${_main}/0cache/${_os_distribution}/${_repo}/" "${_main}/1versions/${_os_distribution}/${_repo}/${_time}/" || exit
-   echo "  New version created:   ${_main}/1versions/${_os_distribution}/${_repo}/${_time}"
-done
-
-echo "done"
+if [[ -n "${_errors}" ]]; then
+   echo -e "Errors occured:\n${_errors}"
+   exit 1
+else
+   echo "Successfully finished."
+fi
 {% endraw %}

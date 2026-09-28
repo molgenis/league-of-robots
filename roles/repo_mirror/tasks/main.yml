@@ -1,4 +1,29 @@
 ---
+- name: Determine primary repo server name
+  ansible.builtin.set_fact:
+    rm_primary_name: >-
+      {{ (global_repo_servers
+          | selectattr('primary', 'defined')
+          | selectattr('primary')
+          | map(attribute='name')
+          | list
+          | first) | default('', true) }}
+
+- name: Fail if primary is missing
+  ansible.builtin.fail:
+    msg: >-
+      No global_repo_servers has "primary: true"
+  when: rm_primary_name | length == 0
+
+- name: Determine whether this host is the primary
+  ansible.builtin.set_fact:
+    rm_repo_is_primary: "{{ rm_primary_name == inventory_hostname }}"
+
+- name: Show primary determination
+  debug:
+    msg: >-
+      {{ inventory_hostname }} is {{ 'PRIMARY' if rm_repo_is_primary else 'SECONDARY' }}
+
 - name: Install SSH public key
   ansible.posix.authorized_key:
     user: "{{ repo_user }}"
@@ -34,9 +59,11 @@
   with_items:
     - 1_sync_repo_to_new_version.sh
     - 2_new_repo_distribution.sh
-    - 3_clean_deploy_wrong_links.sh
+    - 2_sync_servers.sh
+    - 3_clean_deploy_dead_links.sh
     - 4_clean_unused_versions.sh
   become: true
+  when: rm_repo_is_primary
 
 - name: "Configure repo for each distribution"
   ansible.builtin.include_tasks: configure_repo_options.yml

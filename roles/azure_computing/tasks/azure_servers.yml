@@ -40,10 +40,6 @@
       publisher: "{{ azure_image[os_distribution].publisher }}"
       sku: "{{ azure_image[os_distribution].sku }}"
       version: "{{ azure_image[os_distribution].version }}"
-    plan:
-      name: "{{ azure_image[os_distribution].sku }}"
-      product: "{{ azure_image[os_distribution].offer }}"
-      publisher: "{{ azure_image[os_distribution].publisher }}"
     started: true
   vars:
     vm_nics: |

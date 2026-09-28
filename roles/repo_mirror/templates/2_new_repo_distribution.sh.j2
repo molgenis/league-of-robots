@@ -37,8 +37,7 @@ while getopts ${OPTSTRING} opt; do
     r) _repoarg=${OPTARG} && echo "repository: ${_repoarg}" ;;
     v) _versionarg=${OPTARG} && echo "version: ${_versionarg}" ;;
     p) _prompt=true ;;
-    *) help
-       ;;
+    *) help ;;
   esac
 done
 
@@ -188,11 +187,11 @@ for _each_repo in ${_reposelect:-error}; do
    fi
 done
 
+cd "${_main}"
 if ! test -e "2deploy/all"; then
    echo "Creating missing link to all repositories ..."
-   ln -s "../1versions/" "2deploy/all"
+   ln -s "../1versions/" "./2deploy/all"
 fi
 
-
-echo "done"
+echo "Successfully finished."
 {% endraw %}

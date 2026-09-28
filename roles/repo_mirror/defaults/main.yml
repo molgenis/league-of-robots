@@ -12,13 +12,5 @@ local_ca_cert_file: "srm.pem" # local CA certificate
 local_ca_key_file: "srm.key"  # local CA private key
 
 # systemd unit settings
-repo_primary_timer_service_name: "repo-sync"        # base name, used for .service and .timer
-#repo_primary_timer_exec_start: "/usr/local/bin/repo-sync.sh"
-repo_primary_timer_exec_start: "/usr/bin/uptime"
-
-# systemd timer settings
-#repo_primary_timer_oncalendar: "hourly"     # fires every hour, on the hour
-repo_primary_timer_oncalendar: "minutely"
-repo_primary_timer_randomized_delay_sec: 0
-repo_primary_timer_persistent: true         # catch up missed runs after downtime
+repo_seconday_daily_download_service_name: "daily_download"
 ...

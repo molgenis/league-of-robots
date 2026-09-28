@@ -1,4 +1,4 @@
-# {{ ansible_managed | default('Managed by Ansible - role: repo_primary_timer') }}
+# {{ ansible_managed | default('Managed by Ansible - role: repo_manager') }}
 [Unit]
 Description=Syncronization service between repo servers
 Wants=network-online.target
@@ -8,4 +8,4 @@ After=network-online.target
 Type=oneshot
 User={{ repo_user }}
 Group={{ repo_group }}
-ExecStart={{ repo_primary_timer_exec_start }}
+ExecStart="{{ main_repo_path }}/2_sync_servers.sh"

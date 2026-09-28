@@ -3,20 +3,21 @@
   systemd:
     daemon_reload: true
   become: true
+  listen: rm_reload_systemd_daemon
 
 - name: Reload nginx
   ansible.builtin.service:
     name: nginx
     state: reloaded
   become: true
-  listen: nginx_reload
+  listen: rm_nginx_reload
 
 - name: Restart rsyslog (cannot be reloaded)
   ansible.builtin.service:
     name: rsyslog
     state: restart
   become: true
-  listen: rsyslog_restart
+  listen: rm_rsyslog_restart
 
 - name: New key fail at the end of the role
   ansible.builtin.fail:

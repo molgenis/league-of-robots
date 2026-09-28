@@ -1,60 +1,34 @@
 ---
-- name: Determine primary repo server name
-  ansible.builtin.set_fact:
-    rm_primary_name: >-
-      {{ (global_repo_servers
-          | selectattr('primary', 'defined')
-          | selectattr('primary')
-          | map(attribute='name')
-          | list
-          | first) | default('', true) }}
-
-- name: Fail if primary is missing
-  ansible.builtin.fail:
-    msg: >-
-      No global_repo_servers has "primary: true"
-  when: rm_primary_name | length == 0
-
-- name: Determine whether this host is the primary
-  ansible.builtin.set_fact:
-    rm_repo_is_primary: "{{ rm_primary_name == inventory_hostname }}"
-
-- name: Show primary determination
-  debug:
-    msg: >-
-      {{ inventory_hostname }} is {{ 'PRIMARY' if rm_repo_is_primary else 'SECONDARY' }}
-
 # On PRIMARY: install and enable the service and timer
 - name: Install service and timer on primary server
   when: rm_repo_is_primary
   block:
-    - name: Deploy systemd service unit
+    - name: Deploy systemd service and timer units
       ansible.builtin.template:
-        src: repo_ha_sync.service.j2
-        dest: '/etc/systemd/system/{{ repo_primary_timer_service_name }}.service'
+        src: "{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
         owner: root
         group: root
         mode: '0644'
-      notify: reload systemd daemon
-
-    - name: Deploy systemd timer unit
-      ansible.builtin.template:
-        src: repo_ha_sync.timer.j2
-        dest: "/etc/systemd/system/{{ repo_primary_timer_service_name }}.timer"
-        owner: root
-        group: root
-        mode: '0644'
-      notify: reload systemd daemon
+      loop:
+        - repo-sync.service
+        - repo-download_cache.timer
+        - repo-sync.timer
+        - repo-download_cache.service
+      notify: rm_reload_systemd_daemon
 
     - name: Flush handlers
       meta: flush_handlers
 
     - name: Enable and start the timer
       ansible.builtin.systemd_service:
-        name: "{{ repo_primary_timer_service_name }}.timer"
+        name: "{{ item }}"
         enabled: true
         state: started
         daemon_reload: true
+      loop:
+        - "repo-sync.timer"
+        - "repo-download_cache.timer"
 
     - name: Create /home/repo/.ssh
       ansible.builtin.file:
@@ -77,51 +51,32 @@
 
 # On SECONDARY: remove service and timer
 - name: Remove service and timer from SECONDARY servers
-  when: not rm_repo_is_primary
   block:
-    - name: Check if timer file exists
-      ansible.builtin.stat:
-        path: "/etc/systemd/system/{{ repo_primary_timer_service_name }}.timer"
-      register: rm_timer_file
-
-    - name: Check if service file exists
-      ansible.builtin.stat:
-        path: "/etc/systemd/system/{{ repo_primary_timer_service_name }}.service"
-      register: rm_service_file
-
-    - name: Stop and disable timer if present
-      ansible.builtin.systemd_service:
-        name: "{{ repo_primary_timer_service_name }}.timer"
-        state: stopped
-        enabled: false
-      when: rm_timer_file.stat.exists
-      failed_when: false
-
-    - name: Stop and disable service if present
-      ansible.builtin.systemd_service:
-        name: "{{ repo_primary_timer_service_name }}.service"
-        state: stopped
-        enabled: false
-      when: rm_service_file.stat.exists
-      failed_when: false
-
-    - name: Remove timer 
-      file:
-        path: "/etc/systemd/system/{{ repo_primary_timer_service_name }}.timer"
-        state: absent
-      notify: reload systemd daemon
-
-    - name: Remove service
-      file:
-        path: "/etc/systemd/system/{{ repo_primary_timer_service_name }}.service"
-        state: absent
-      notify: reload systemd daemon
+    - name: Deploy systemd repo-download_cache timer and service units
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - repo-download_cache.service
+        - repo-download_cache.timer
+      notify: rm_reload_systemd_daemon
 
     - name: Flush handlers
       meta: flush_handlers
 
+
+    - name: Enable and start the timer
+      ansible.builtin.systemd_service:
+        name: "repo-download_cache.timer"
+        enabled: true
+        state: started
+        daemon_reload: true
+
     - name: Reset failed state for removed units (ignore if none)
-      command: "systemctl reset-failed {{ repo_primary_timer_service_name }}.service {{ repo_primary_timer_service_name }}.timer"
+      command: "systemctl reset-failed repo-sync.service repo-sync.timer"
       changed_when: false
       failed_when: false
   become: true

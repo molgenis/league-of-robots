@@ -15,11 +15,36 @@ _time="$(date +%Y%m%d-%H%M%S)"
 ## A bit of logging
 echo "${_time} running ${0} ${*}" >> "${_main}/logs/cli/$(basename ${0}).log"
 
-_all_versions="$(find ${_main}/1versions/* -mindepth 2 -maxdepth 2 -type d | sed "s|${_main}/1versions/||" | sort)"
-_all_links="$(find ${_main}/2deploy/* -mindepth 1 -maxdepth 1 -type l \! -path "${_main}/2deploy/all/*" | xargs -I{} readlink {} | sed "s|../../1versions/||" | sort)"
+_all_versions="$(find ${_main}/1versions/* -mindepth 2 -maxdepth 2 -type d | sed "s|${_main}/1versions/||" | sed 's|/$||g' | sort)"
+_all_links="$(find ${_main}/2deploy/* -mindepth 1 -maxdepth 1 -type l \! -path "${_main}/2deploy/all/*" | xargs -I{} readlink {} | sed 's|../../1versions/||' | sed 's|/$||g' | sort)"
 _unused_versions="$(comm -23 <(echo "${_all_versions}") <(echo "${_all_links}"))"
 
-# print unused versions
+function help(){
+   echo "Syntax"
+   echo ""
+   echo "  ${0} [ -A ]"
+   echo ""
+   echo "To clean all unused versions"
+   echo "  ${0} -A"
+   echo ""
+}
+
+_clean_all=false
+OPTSTRING=":A"
+while getopts ${OPTSTRING} opt; do
+  case ${opt} in
+    A) _clean_all=true && echo "cleaning ALL unused versions";;
+    *) help ;;
+  esac
+done
+
+_time="$(date +%Y%m%d-%H%M%S)"
+
+# print unused versions or exit
+if [ -z "${_unused_versions}" ]; then
+   echo "No unused versions."
+   exit 0
+fi
 echo "Unused versions are:"
 i=0
 # ANSI color codes
@@ -33,23 +58,31 @@ done | column -t
 echo -en "${RESET}"
 
 _del_version=x
-while [[ ! "${_del_version}" =~ ^[0-9]+$ ]]; do
-   read -p '> Delete unused version: #' _del_version
-done
+if ! ${_clean_all}; then
+   while [[ ! "${_del_version}" =~ ^[0-9]+$ ]]; do
+      read -p '> Delete unused version: #' _del_version
+   done
+fi
 
 d=0
 for _delete_version in ${_unused_versions}; do
-   if [[ "${_del_version}" -eq "${d}" ]]; then
-      echo " deleting ${_main}/1versions/${_delete_version}"
-      read -p "> delete? [y/N]" _confirm
-      if [[ "${_confirm}" == "y" ]]; then
-         echo "deleting ... "
-         rm -rf "${_main}/1versions/${_delete_version}"
-         echo "done"
-      else echo Skipping...
+   if ${_clean_all} || [[ ${_del_version} -eq ${d} ]]; then
+      _path="${_main}/1versions/${_delete_version}"
+      echo -n "Deleting ${_path}  "
+
+      if ! ${_clean_all}; then
+         read -r -p "  > delete? [y/N] " _confirm
+         [[ ${_confirm} == [yY] ]] || {
+            echo "  Skipping..."
+            d=$((d + 1))
+            continue
+         }
       fi
+
+      rm -rf -- "${_path}" && echo "   Deleted" || echo "   FAILED"
    fi
-   d=$((d+1))
+   d=$((d + 1))
 done
 
+echo "Successfully finished."
 {% endraw %}

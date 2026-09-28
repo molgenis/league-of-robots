@@ -47,6 +47,27 @@ Downloading, testing and deployment work is done on secondary server ONLY! Later
     [admin@repo-primary /mnt/repos]$ 
     [admin@repo-primary /mnt/repos]$ 
     [admin@repo-primary /mnt/repos]$ 
+
+## Daily cache and server syncronization
+
+There is next-to-impossible to make a good syncronization of two servers that
+have large versions changes, without waiting a long time for each `rsync` finish`
+(which depends on network speed, disk and memory capacity and usage).
+
+Therefore systems CONSTANTLY download cached rpm's from upstream storage. This ensure two things
+ - both servers are updated with the same content
+ - version-propagation is almost instantaneous
+
+But since the download script must update existing Distributions and Repositories,
+while NOT all repositories that we label as 'mirror-capable' (marked with
+`repo_server_download: true` in the `groups/all/repos.yml`) should actually donwload
+only the ones on the server.
+
+Syncronization script:
+ - therefore script parses only existing cached Distros and Repositories, then
+   syncronizes only those (`./1_sync_repo_to_new_version.sh -0`)
+ - with option `-0`
+
 ## Dependecies
 
 This role has dependency on _rsyncd_ role that provides rsync module configuration.
