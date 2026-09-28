@@ -4,6 +4,7 @@ all:
     controller_api:
       hosts:
         localhost:
+          ansible_python_interpreter: python3
     jumphost:
       hosts:
         spring:
