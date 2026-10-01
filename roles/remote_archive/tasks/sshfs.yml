@@ -16,7 +16,13 @@
 
 - name: Keys generated and we stop the role
   ansible.builtin.debug:
-    msg: " ... key pair was created, now you must copy public key to remote system's authorized_keys."
+    msg:
+      - "SSH key pair was created for the root user on {{ inventory_hostname }}."
+      - "Now you must now copy {{ inventory_hostname }}:{{ archive_ssh_key_location }}.pub
+        to {{ item['archive_system'] }}:/home/{{ item['archive_user'] }}/.ssh/authorized_keys."
+  loop: "{{ remote_archive }}"
+  loop_control:
+    label: "{{ item['name'] }}"
   when: make_root_keypair.changed is true # noqa no-handler
   failed_when: true
 

@@ -3,7 +3,7 @@ hc_infra_catalog:
   children:
     hc_vm_1: 
       vars:
-        location: Embassy cloud by EMBL-EBI
+        location: Bateleur cloud in CBC
       hosts:
         portal:
         hyperchicken:

@@ -588,7 +588,6 @@ Once configured correctly you should be able to do a multi-hop SSH via a jumphos
   * When a new group needs to be added, an old one needs to be removed or a config for a groups needs to be updated,
     then you can re-deploy only the relevant tasks in the correct order using the `groups` tag:
     ```bash
-    ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/cgroups.yml
     ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/regular_users.yml
     ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/sudoers.yml
     ansible-playbook -u "${lor_admin_user}" -t groups single_role_playbooks/shared_storage.yml

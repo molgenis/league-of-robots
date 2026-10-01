@@ -1,14 +1,46 @@
 ---
 tl_infra_catalog:
   children:
+    tl_bm_1:
+      vars:
+        make: Dell
+        model: PowerEdge R630
+        support_expiration_date: 2027-11-30
+        location: Merlin cloud in DCE
+      hosts:
+        tl-node-a01:
+          serial: !vault |
+              $ANSIBLE_VAULT;1.2;AES256;all
+              65346433323538303162326430333433373034366563303630393835643361373632343936333232
+              6163366539316538343664393863333336616335613666660a303735613032663438623637653437
+              32623332313134323633343137333761383436303538633236613832643430373361643038376337
+              6138633139616366650a663763626133646336646261633963393161666638653539333765303331
+              3163
+    tl_bm_2:
+      vars:
+        make: Dell
+        model: PowerEdge R6515
+        support_expiration_date: 2027-11-30
+        location: Merlin cloud in DCE
+      hosts:
+        nb-node-b01:
+          serial: !vault |
+              $ANSIBLE_VAULT;1.2;AES256;all
+              33613564376462326565616561633963613535613765643866306434386530396339623338643966
+              6166326634343365646638356462383538336439373330340a313265393037653762666633353464
+              38393533663030643635626431643965626461633366643262393263633161656138663062646437
+              6332653463383931390a396438303366613164373533616137643162303537663436663237636365
+              6238
     tl_vm_1: 
       vars:
         location: Shikra cloud in DCE
       hosts:
         reception:
         talos:
+        tl-chaperone:
         tl-dai:
         tl-sai:
+        tl-transfer:
         tl-repo:
-        tl-vcompute[01:03]:
+        tl-node-c01:
 ...

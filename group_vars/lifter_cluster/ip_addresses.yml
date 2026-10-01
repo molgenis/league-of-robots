@@ -10,9 +10,13 @@ ip_addresses:
     lt_umcg-1068:
       address: 10.10.2.22
       netmask: /32
-  lt-chaperone:
+  lt-chaperone-broken:  # Temporarily preserved for post mortem of potential Woodlark issue.
     lt_internal_management:
       address: 10.10.1.240
+      netmask: /32
+  lt-chaperone:
+    lt_internal_management:
+      address: 10.10.1.222
       netmask: /32
   lt-dai:
     lt_internal_management:
@@ -60,6 +64,7 @@ ip_addresses:
     lt_internal_management:
       address: 10.10.1.44
       netmask: /32
+      fqdn: 'lt-transfer'  # Not really a FQDN as there is no public IP: only for internal use / testing.
   lt_internal_management-external-v4-router:
     lt_internal_management:
       address: 10.10.1.1

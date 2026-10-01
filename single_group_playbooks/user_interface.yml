@@ -11,7 +11,6 @@
   hosts:
     - user_interface
   roles:
-    - cgroups
     - build_environment
     - slurm
     - sudoers

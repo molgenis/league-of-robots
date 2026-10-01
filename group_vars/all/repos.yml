@@ -225,7 +225,7 @@ yum_repos:
         - distro
         - core
     - id: appstream
-      name: Rocky Linux 9 - AppStream
+      name: AlmaLinux 9 - AppStream
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/9/appstream
       enabled: 1
       repo_server_download: true
@@ -235,7 +235,7 @@ yum_repos:
         - distro
         - core
     - id: crb
-      name: Rocky Linux 9 - CRB
+      name: AlmaLinux 9 - CRB
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/$releasever/crb
       enabled: 1
       repo_server_download: true
@@ -245,7 +245,7 @@ yum_repos:
         - distro
         - core
     - id: extras
-      name: Rocky Linux 9 - Extras
+      name: AlmaLinux - Extras
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/$releasever/extras
       enabled: 1
       repo_server_download: true
