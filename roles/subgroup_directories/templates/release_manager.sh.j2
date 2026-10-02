@@ -6,6 +6,7 @@ set -euo pipefail
 ########################################
 
 CURRENT_USER="$(id -un)"
+CURRENT_DIR="$(pwd)"
 
 # Expected format: L-<group>-dm
 if [[ ! "${CURRENT_USER}" =~ ^L-([A-Za-z0-9_-]+)-dm$ ]]; then
@@ -28,6 +29,20 @@ lfs_rsc="{{ lfs_rsc }}"
 BASE="/groups/L-${DM_GROUP}/tmp09"
 RELEASES="${BASE}/rel"
 GROUP="L-${DM_GROUP}-rel"
+
+# Check tmp location
+if [[ "${CURRENT_DIR}" == "/groups/L-${DM_GROUP}/tmp"* ]] && [[ -z "${lfs_tmp}" ]]; then
+    echo "[ERROR] lfs_tmp is empty, but release_manager.sh is being executed from a tmp location." >&2
+    echo "        Current location: ${CURRENT_DIR}" >&2
+    exit 1
+fi
+
+# Check rsc location
+if [[ "${CURRENT_DIR}" == "/groups/L-${DM_GROUP}/rsc"* ]] && [[ -z "${lfs_rsc}" ]]; then
+    echo "[ERROR] lfs_rsc is empty, release_manager.sh is being executed from an rsc location." >&2
+    echo "        Current location: ${CURRENT_DIR}" >&2
+    exit 1
+fi
 
 
 ########################################
