@@ -58,17 +58,46 @@
 - name: Flush handlers so daemon_reload happens before enabling units
   ansible.builtin.meta: flush_handlers
 
-- name: Ensure services are having right state
+- name: Check which units exist
+  ansible.builtin.command: systemctl cat {{ item }}
+  loop:
+    - subgroup_directories_auto.service
+    - subgroup_directories_auto.timer
+    - subgroup_directories_auto.path
+  register: unit_check
+  changed_when: false
+  failed_when: false
+
+- name: Ensure services are enabled
   ansible.builtin.systemd:
     name: "{{ item.name }}"
     state: "{{ item.state | default(omit) }}"
-    enabled: "{{ subgroup_directories_auto_is_enabled }}"
+    enabled: "true"
   loop:
     - name: subgroup_directories_auto.service
     - name: subgroup_directories_auto.timer
       state: "{{ 'started' if subgroup_directories_auto_is_enabled else 'stopped' }}"
     - name: subgroup_directories_auto.path
       state: "{{ 'started' if subgroup_directories_auto_is_enabled else 'stopped' }}"
+  when: subgroup_directories_auto_is_enabled
+  become: true
+
+- name: Ensure services are stopped and disabled
+  ansible.builtin.systemd:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default(omit) }}"
+    enabled: "false"
+  loop: "{{ unit_check.results }}"
+  when: item.rc == 0 and not subgroup_directories_auto_is_enabled
+  become: true
+
+- name: Ensure services are removed
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}"
+    state: absent
+  when: item.rc == 0 and not subgroup_directories_auto_is_enabled
+  loop: "{{ unit_check.results }}"
+  notify: subgroup_directories_auto_reload_systemd
   become: true
 
 #
