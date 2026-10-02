@@ -9,6 +9,9 @@
     owner: root
     group: root
     mode: "{{ item.mode }}"
+  vars:
+    lfs_tmp: "{{ item.lfs_tmp | default('') }}"
+    lfs_rsc: "{{ item.lfs_rsc | default('') }}"
   with_items:
     - name: lsaai_auth
       path: /etc
@@ -22,6 +25,21 @@
     - name: lsaai_subgroups.sh
       path: /usr/local/bin
       mode: "0755"
+    - name: release_manager.sh
+      path: /usr/local/bin
+      mode: "0755"
+      lfs_tmp: >-
+        {{ lfs_mounts | selectattr('lfs', 'match', '^tmp[0-9]{2}$') | first }}
+        # {{ lfs_mounts
+        #     | selectattr('lfs', 'match', '^tmp(0[0-9])')
+        #     | map(attribute='lfs') 
+        #     | first }}           
+      lfs_rsc: >-
+        {{ lfs_mounts | selectattr('lfs', 'match', '^rsc[0-9]{2}$') | first }}
+      #   {{ lfs_mounts
+      #       | selectattr('lfs', 'match', '^rsc(0[0-9])')
+      #       | map(attribute='lfs') 
+      #       | first }}
   become: true
   when: subgroup_directories_auto_is_enabled
 

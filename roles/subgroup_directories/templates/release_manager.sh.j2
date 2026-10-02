@@ -1,0 +1,448 @@
+#!/bin/bash
+set -euo pipefail
+
+########################################
+# DETECT DATA MANAGER
+########################################
+
+CURRENT_USER="$(id -un)"
+
+# Expected format: L-<group>-dm
+if [[ ! "${CURRENT_USER}" =~ ^L-([A-Za-z0-9_-]+)-dm$ ]]; then
+    echo "[ERROR] This script may only be executed by a Data Manager user." >&2
+    echo "        Expected username format: L-<group>-dm" >&2
+    echo "        Current user: ${CURRENT_USER}" >&2
+    exit 1
+fi
+
+# Extract group name from username
+DM_GROUP="${BASH_REMATCH[1]}"
+
+########################################
+# CONFIG
+########################################
+
+lfs_tmp="{{ lfs_tmp }}"
+lfs_rsc="{{ lfs_rsc }}"
+
+BASE="/groups/L-${DM_GROUP}/tmp09"
+RELEASES="${BASE}/rel"
+GROUP="L-${DM_GROUP}-rel"
+
+
+########################################
+# HELP
+########################################
+
+usage() {
+  local prog
+  prog="$(basename "$0")"
+  cat <<EOF
+
+===========================================================
+               DATA RELEASE TOOL
+===========================================================
+
+USAGE
+
+NORMAL WORKFLOW
+  ${prog} publish <freeze> <version>
+  ${prog} publish <freeze> <version> <path_to_exclude_list>
+
+      Create a new release directly from master.
+      Optionally exclude files listed in the exclude file.
+
+  ${prog} publish <freeze> <from_version> <to_version>
+  ${prog} publish <freeze> <from_version> <to_version> <path_to_exclude_list>
+
+      Create a new release from an existing release.
+      Optionally exclude files listed in the exclude file.
+
+MANUAL RELEASE WORKFLOW:
+  1. Duplicate an existing release:
+     ${prog} duplicate <freeze> <from_version> <to_version> <path_to_exclude_list>
+
+  2. Finalize the new release:
+     ${prog} finalize <freeze> <version>
+
+     duplicate: Create a hardlink-based copy; no ACLs are added.
+     finalize:  Add read access for the new release group.
+
+MAINTENANCE
+  ${prog} cleanup <freeze> <group-subgroup-version>
+
+     cleanup: Remove the specified subgroup ACLs from the freeze.
+
+  ${prog} init master <freeze>
+
+     init:    create itinal empty master/ dir in rel directory
+-----------------------------------------------------------
+EXCLUDE FILE FORMAT
+
+  One relative path per line, for example:
+    bams/sample3.bam
+    vcfs/sample19.vcf
+-----------------------------------------------------------
+EOF
+}
+
+########################################
+# ACL HELPERS
+########################################
+
+resetMasterPerms() {
+    local _master="${1}"
+    echo "[RESET] Master permissions"
+
+    #remove all ACLs
+    #find "${_master}" -type d -exec setfacl -b {} \;
+    #find "${_master}" -type f -exec setfacl -b {} \;
+
+    find "${_master}" -type d -exec chmod 700 {} \;
+    find "${_master}" -type f -exec chmod 640 {} \;
+}
+
+lockDownRecursive() {
+  local _path="${1}"
+
+  find "${_path}" -type d -exec setfacl -m o::--- {} \;
+  find "${_path}" -type d -exec setfacl -d -m o::--- {} \;
+}
+
+grantGroupRX() {
+  local _path="${1}"
+  local _group="${2}"
+
+  setfacl -m g:${_group}:r-- "${_path}"
+  setfacl -m m::r-- "${_path}"
+}
+
+grantGroupRXRecursive() {
+  local _path="${1}"
+  local _group="${2}"
+
+  # Apply ACL only to directories.
+  find "${_path}" -type d -exec setfacl -m g:${_group}:r-x {} \;
+  find "${_path}" -type d -exec setfacl -m m::r-x {} \;
+
+  find "${_path}" -type d -exec setfacl -d -m g:${_group}:r-x {} \;
+  find "${_path}" -type d -exec setfacl -d -m m::r-x {} \;
+}
+
+setDirectoryPerms() {
+  local _path="${1}"
+  local _group="${2}"
+
+  #echo "find ${_path} -type d -exec chgrp ${_group} {} \;"
+
+  find "${_path}" -type d -exec chgrp "${_group}" {} \;
+
+  # remove old ACL entries
+  find "${_path}" -type d -exec setfacl -b {} \;
+  # set perms
+  find "${_path}" -type d -exec chmod 2750 {} \;
+
+}
+
+########################################
+# CLEANUP MESS HELPER
+########################################
+cleanupAclForGroup() {
+    local _freeze="${1}"
+    local _group="${2}"
+
+    local _basePath="${BASE}/rel/${_freeze}"
+
+    echo "[CLEANUP] Removing ACL group ${_group}"
+
+    find "${_basePath}" \( -type f -o -type d \) -print0 |
+    while IFS= read -r -d '' _path; do
+        # remove named ACL
+        setfacl -x "g:${_group}" "${_path}" 2>/dev/null || true
+    done
+    resetMasterPerms "${_basePath}/master"
+    echo "[CLEANUP] Done"
+}
+
+
+########################################
+# EXCLUDE HELPER
+########################################
+
+shouldSkipFile() {
+  local _relPath="${1}"
+  local _excludeFile="${2:-}"
+
+  [[ -z "${_excludeFile}" ]] && return 1
+  [[ ! -f "${_excludeFile}" ]] && return 1
+
+  grep -v '^[[:space:]]*#' "${_excludeFile}" | \
+  grep -v '^[[:space:]]*$' | \
+  grep -Fxq "${_relPath}"
+}
+
+########################################
+# INIT
+########################################
+
+initMaster() {
+  local _freeze="${2}"
+  local _master="${1}"
+
+  local _src="${BASE}/rel/${_freeze}/master"
+
+  echo "[INIT]"
+  mkdir -p "${_src}"
+
+  #chgrp "L-erdera-dms" "${MASTER}"
+  # chmod down back to only owner
+  find "${_src}" -type d -exec chmod 700 {} \;
+  find "${_src}" -type f -exec chmod 600 {} \;
+  #lockDownRecursive "${MASTER}"
+  echo "[INIT] Done"
+}
+
+########################################
+# HARDLINK TREE
+########################################
+
+hardlinkTree() {
+    local _src="${1}"
+    local _dst="${2}"
+    local _group="${3}"
+    local _excludeFile="${4:-}"
+    local _applyAcl="${5}"
+
+    #echo "hardlinkTree"
+
+    test -d "${_dst}" || { echo "Destination does not exist, missing ${_dst}"; exit 1 ; }
+
+    while IFS= read -r -d '' _path; do
+
+        local _relPath="${_path#${_src}/}"
+        local _dstPath="${_dst}/${_relPath}"
+
+	echo "${_relPath} ${_dstPath}"
+
+        if [[ -d "${_path}" ]]; then
+            mkdir -p "${_dstPath}"
+            continue
+        fi
+
+        [[ -f "${_path}" ]] || continue
+
+        if shouldSkipFile "${_relPath}" "${_excludeFile}"; then
+            echo "[SKIP] ${_relPath}"
+            continue
+        fi
+
+        ln "$(realpath "${_path}")" "${_dstPath}"
+
+        if [[ "${_applyAcl}" == "true" ]]; then
+            grantGroupRX "${_path}" "${_group}"
+        fi
+
+    done < <(find "${_src}" -mindepth 1 -print0)
+
+    setDirectoryPerms "${_dst}" "${_group}"
+    grantGroupRXRecursive "${_dst}" "${_group}"
+    lockDownRecursive "${_dst}"
+}
+
+########################################
+# DUPLICATE RELEASE
+########################################
+
+duplicateRelease() {
+  local _freeze="${1}"
+  local _from="${2}"
+  local _to="${3}"
+  local _excludeFile="${4:-}"
+
+  local _src="${RELEASES}/${_freeze}/${_from}"
+  local _dst="${RELEASES}/${_freeze}/${_to}"
+  local _group="${GROUP}-${_freeze}-${_to}"
+
+  echo "[DUPLICATE] ${_freeze}: ${_from} -> ${_to} ,with group ${_group}"
+
+  [ -d "${_src}" ] || { echo "[ERROR] Missing ${_src}"; exit 1; }
+  [ -d "${_dst}" ] || { echo "[ERROR] Subgroup does not Exists yet: ${_dst}"; exit 1; }
+
+#  mkdir -p "${_dst}"
+
+  hardlinkTree "${_src}" "${_dst}" "${_group}" "${_excludeFile}" "false"
+
+  echo "[DUPLICATE] Done"
+}
+
+########################################
+# PUBLISH FROM MASTER
+########################################
+
+publishFromMaster() {
+  local _freeze="${1}"
+  local _version="${2}"
+  local _excludeFile="${3:-}"
+
+  local _src="${BASE}/rel/${_freeze}/master"
+  local _dst="${RELEASES}/${_freeze}/${_version}"
+  local _group="${GROUP}-${_freeze}-${_version}"
+
+  echo "[PUBLISH] ${_freeze}/${_version} from master"
+
+  [ -d "${_src}" ] || { echo "[ERROR] Missing ${_src}"; exit 1; }
+  [ -d "${_dst}" ] || { echo "[ERROR] Subgroup does not Exists yet: ${_dst}"; exit 1; }
+
+  #mkdir -p "${_dst}"
+
+  hardlinkTree "${_src}" "${_dst}" "${_group}" "${_excludeFile}" "true"
+
+  echo "[PUBLISH] Done"
+}
+
+########################################
+# PUBLISH FROM RELEASE
+########################################
+
+publishFromRelease() {
+  local _freeze="${1}"
+  local _from="${2}"
+  local _to="${3}"
+  local _excludeFile="${4:-}"
+
+  local _src="${RELEASES}/${_freeze}/${_from}"
+  local _dst="${RELEASES}/${_freeze}/${_to}"
+  local _group="${GROUP}-${_freeze}-${_to}"
+
+  echo "[PUBLISH] ${_freeze}: ${_from} -> ${_to}"
+
+  [ -d "${_src}" ] || { echo "[ERROR] Missing ${_src}"; exit 1; }
+  [ -d "${_dst}" ] || { echo "[ERROR] Subgroup does not Exists yet: ${_dst}"; exit 1; }
+
+  #mkdir -p "${_dst}"
+
+  hardlinkTree "${_src}" "${_dst}" "${_group}" "${_excludeFile}" "true"
+
+  echo "[PUBLISH] Done"
+}
+
+########################################
+# PUBLISH EXISTING DUPLICATE
+########################################
+
+publishExistingRelease() {
+    local _freeze="${1}"
+    local _version="${2}"
+
+    local _src="${RELEASES}/${_freeze}/${_version}"
+    local _group="${GROUP}-${_freeze}-${_version}"
+
+    echo "[FINALIZE] ${_freeze}/${_version}"
+
+    [ -d "${_src}" ] || {
+        echo "[ERROR] Missing ${_src}"
+        exit 1
+    }
+
+    # Directories: add read + default GROUP ACLs
+    find "${_src}" -type d -exec setfacl -m g:${_group}:r-x {} \;
+    find "${_src}" -type d -exec setfacl -m m::r-x {} \;
+
+    find "${_src}" -type d -exec setfacl -d -m g:${_group}:r-x {} \;
+    find "${_src}" -type d -exec setfacl -d -m m::r-x {} \;
+
+    # Files: add read ACL's
+    find "${_src}" -type f -print0 |
+    while IFS= read -r -d '' _file; do
+        setfacl -m g:${_group}:r-- "${_file}"
+        setfacl -m m::r-- "${_file}"
+    done
+
+    echo "[FINALIZING] Done"
+}
+
+########################################
+# MAIN
+########################################
+
+case "${1:-help}" in
+  init)
+    initMaster "${2}" "${3}"
+    ;;
+
+  duplicate)
+    case $# in
+      4)
+        # duplicate <freeze> <from> <to_version>
+        duplicateRelease "${2}" "${3}" "${4}"
+        ;;
+      5)
+        # duplicate <freeze> <from> <to_version> <exclude_file>
+        duplicateRelease "${2}" "${3}" "${4}" "${5}"
+        ;;
+      *)
+        usage
+        exit 1
+        ;;
+    esac
+    ;;
+
+  publish)
+    case $# in
+      3)
+        # publish <freeze> <version>
+        publishFromMaster "${2}" "${3}"
+        ;;
+
+      4)
+        # publish <freeze> <version> <exclude OR to_version>
+        if [[ -f "${4}" ]]; then
+          publishFromMaster "${2}" "${3}" "${4}"
+        else
+          publishFromRelease "${2}" "${3}" "${4}"
+        fi
+        ;;
+
+      5)
+        # publish <freeze> <from> <to_version> <exclude_file>
+        publishFromRelease "${2}" "${3}" "${4}" "${5}"
+        ;;
+
+      *)
+        usage
+        exit 1
+        ;;
+    esac
+    ;;
+
+  finalize)
+    case $# in
+      3)
+        # finalize <freeze> <version>
+        publishExistingRelease "${2}" "${3}"
+        ;;
+      *)
+        usage
+        exit 1
+        ;;
+    esac
+    ;;
+
+  cleanup)
+    case $# in
+      3)
+        # cleanup <freeze> <group>
+        cleanupAclForGroup "${2}" "${3}"
+        ;;
+      *)
+        usage
+        exit 1
+        ;;
+    esac
+    ;;
+
+  *)
+    usage
+    exit 1
+    ;;
+esac
