@@ -202,7 +202,7 @@ all:
               host_type: baremetal
               gpu_count: 8
               gpu_type: rtx6000
-              gpu_driver_version: 595.58.03
+              gpu_driver_version: 615.71.09
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
