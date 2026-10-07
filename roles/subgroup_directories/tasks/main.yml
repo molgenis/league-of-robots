@@ -5,14 +5,15 @@
   when:
     - inventory_hostname in groups['sys_admin_interface']
 
-- name: Check if privilege escalation is possible
+- name: Check for elevated permissions - ignore fail if run as non-admin
   ansible.builtin.command: whoami
-  become: true
   register: become_check
-  ignore_errors: true
   changed_when: false
+  failed_when: false
+  ignore_errors: true
   when:
     - inventory_hostname in groups['user_interface']
+  become: true
 
 - name: Deploy hierarchical structure tools
   ansible.builtin.include_tasks:

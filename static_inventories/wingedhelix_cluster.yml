@@ -115,12 +115,10 @@ all:
             - "{{ all.ip_addresses['erasmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
+            - "{{ wingedhelix_cluster.ip_addresses['wingedhelix']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
           iptables_allow_https_inbound:
             # On data_transfer servers port 443 is used for SSH too.
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -132,12 +130,10 @@ all:
             - "{{ all.ip_addresses['erasmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
+            - "{{ wingedhelix_cluster.ip_addresses['wingedhelix']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
           iptables_allow_ssh_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
             - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -148,12 +144,10 @@ all:
             - "{{ all.ip_addresses['erasmus_mc']['net'] }}"
             - "{{ all.ip_addresses['genomescan']['portal'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['wh_internal_management'] }}"
+            - "{{ wingedhelix_cluster.ip_addresses['wingedhelix']['wh_internal_management'] }}"
             - "{{ wingedhelix_cluster.ip_addresses['wh_internal_management-vlan16-router']['vlan16'] }}"
-            - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan1336'] }}"
             - "{{ betabarrel_cluster.ip_addresses['vlan1336-vlan16-router']['vlan16'] }}"
-            - "{{ copperfist_cluster.ip_addresses['cf-porch']['cf_internal_management'] }}"
             - "{{ copperfist_cluster.ip_addresses['cf_internal_management-external-router']['external'] }}"
-            - "{{ copperfist_cluster.ip_addresses['copperfist']['vlan16'] }}"
     docs:
       hosts:
         docs-on-bateleur:

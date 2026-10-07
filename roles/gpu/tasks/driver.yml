@@ -24,7 +24,7 @@
 #
 # See https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#known-issues
 #
-- name: "Workaround - disable KASLR or {{ gpu_type }} GPUs that use NVIDIA HMM for NVIDIA UVM."
+- name: "Workaround - disable KASLR for rtx6000 GPUs that use NVIDIA HMM for NVIDIA UVM."
   ansible.builtin.include_tasks: disable_kaslr.yml
   when:
     - gpu_count|default(0) >= 1
