@@ -88,7 +88,7 @@ Make sure your data/project/folder is accompanied by a README, see our [storage]
 **Become the data-manager user**
 
 ```
-sudo -u [group]-dm bash
+sudo -u [group]-dm bash -l
 ```
 
 **(optional) Start screen session**
@@ -106,7 +106,9 @@ Optional, but be aware that upload to an archive system should be in average wel
 We created a script that will help data managers to easily determine if the data is of correct size or too fragmented.
 Simply run it and as an argument provide the path to the folder
 
-`/usr/local/bin/arc_surf_sizecheck /path/to/data`
+```
+   arc_surf_sizecheck /path/to/data
+```
 
 The script might take a little longer to finish if folder is larger or there are many small files.
 
@@ -190,7 +192,7 @@ If file was copied recently, it _can be_ still on regular disks
 on the remote archive server, so we can simply issue remote command to calculate the
 `sha256sum` value of it
 ```
-   /usr/local/bin/arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
+   arc_surf --sha256sum /groups/[GROUP]/arcXX/subfolder/file
 ```
 
 If checkum was also made just after the .tar(.gz) file was created, then both values can be checked if they are still identical.
@@ -206,7 +208,7 @@ Files in tmp/prm that have been successfully archived and verified by checksum c
 (optionally) If file is still online, it can be moved to the tape (or simply wait for it to automatically move there)
 
 ```
-   [dm-user@~]$ /usr/local/bin/arc_surf --darelease /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ arc_surf --darelease /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.5eHsc2kAPj )
 ```
@@ -216,7 +218,7 @@ Files in tmp/prm that have been successfully archived and verified by checksum c
 Listing the file status
 
 ```
-   [dm-user@~]$ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.ECc4X0dAEz )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (OFL) project-x.tar.gz
@@ -226,7 +228,7 @@ Listing the file status
 
 If file is offline, we can call it back to disks - stage it `online` with
 ```
-   [dm-user@~]$ /usr/local/bin/arc_surf --daget /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ arc_surf --daget /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.EeHDV2kAPj )
 ```
@@ -236,7 +238,7 @@ If file is offline, we can call it back to disks - stage it `online` with
 After some time we check the status again.
 
 ```
-   [dm-user@~]$ /usr/local/bin/arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
+   [dm-user@~]$ arc_surf --dals /groups/[group]/arc[0X]/projects/project-x.tar.gz
    Submitted to remote host, waiting for reply ...
    ( You can press CTRL+C and check later for the output in /var/cache/arcq//output/tmp.qo7tO9CtVB )
    -rw-r-----  1 dm-user    dm-user    10485760000 2024-11-26 18:08 (QUE) project-x.tar.gz
@@ -260,7 +262,7 @@ Make sure the .tar.gz file
 Use `--help` argument to get more information
 
 ```
-   [dm-user@~]$ /usr/local/bin/arc_surf --help
+   [dm-user@~]$ arc_surf --help
    Provide one of the following arguments
     --quiet                  don't print the start message - supress the extra output
     --budget                 print the used disk space by my group
