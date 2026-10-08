@@ -39,7 +39,7 @@ all:
               add_hostname_to_ip_address: true
         earl3:
           cluster_class: 'diagnostics'
-          azure_flavor: "Standard_DS1_v2"
+          azure_flavor: "Standard_D2lds_v5"
           host_networks:
             - name: "{{ stack_prefix }}_external"
               security_group: "{{ stack_prefix }}_logservers"

@@ -208,7 +208,7 @@ lfs_quota:
       umcg-datateam: 1024
       umcg-endocrinology: 2048
       umcg-erdera: 11264
-      umcg-fg: 10240
+      umcg-fg: 14336
       umcg-forcespe: 1024
       umcg-franke-scrna: 15360
       umcg-fu: 2048
