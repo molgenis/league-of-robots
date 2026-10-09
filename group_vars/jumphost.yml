@@ -1,23 +1,4 @@
 ---
-iptables_allow_icmp_inbound:
-  - ANY
-iptables_allow_https_inbound:
-  - ANY  # Port 443 is used as fallback for SSH on jumphosts. Port 443 outbound is allowed by default.
-iptables_allow_ssh_inbound:
-  - ANY
-iptables_allow_ssh_outbound:
-  - ANY
-ssh_host_signer_hostnames: "{{ inventory_hostname }}\
-    {% for network_id in ip_addresses[inventory_hostname] %}\
-      {% if ip_addresses[inventory_hostname][network_id]['fqdn'] is defined and
-            ip_addresses[inventory_hostname][network_id]['fqdn'] | length >= 1 %}\
-        {% if ip_addresses[inventory_hostname][network_id]['fqdn'] == 'NXDOMAIN' %}\
-          ,{{ ip_addresses[inventory_hostname][network_id]['address'] }}\
-        {% else %}\
-          ,{{ ip_addresses[inventory_hostname][network_id]['fqdn'] }}\
-        {% endif %}\
-      {% endif %}\
-    {% endfor %}"
 #
 # Enforce that jumphost servers use `yum_repos` for defining repositories, since they cannot use Pulp.
 #
@@ -38,6 +19,29 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
               | map(attribute='id') }}"
+modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
+#
+# Firewall configuration.
+#
+iptables_allow_icmp_inbound:
+  - ANY
+iptables_allow_https_inbound:
+  - ANY  # Port 443 is used as fallback for SSH on jumphosts. Port 443 outbound is allowed by default.
+iptables_allow_ssh_inbound:
+  - ANY
+iptables_allow_ssh_outbound:
+  - ANY
+ssh_host_signer_hostnames: "{{ inventory_hostname }}\
+    {% for network_id in ip_addresses[inventory_hostname] %}\
+      {% if ip_addresses[inventory_hostname][network_id]['fqdn'] is defined and
+            ip_addresses[inventory_hostname][network_id]['fqdn'] | length >= 1 %}\
+        {% if ip_addresses[inventory_hostname][network_id]['fqdn'] == 'NXDOMAIN' %}\
+          ,{{ ip_addresses[inventory_hostname][network_id]['address'] }}\
+        {% else %}\
+          ,{{ ip_addresses[inventory_hostname][network_id]['fqdn'] }}\
+        {% endif %}\
+      {% endif %}\
+    {% endfor %}"
 user_quota_on_root_partition:
   blocks_soft: 512K
   blocks_hard: 1024K

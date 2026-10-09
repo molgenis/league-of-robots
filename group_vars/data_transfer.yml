@@ -19,6 +19,7 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
               | map(attribute='id') }}"
+modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
 additional_etc_hosts: []  # Do not add additional machines to /etc/hosts on data transfer servers.
 iptables_allow_icmp_inbound:
   - ANY

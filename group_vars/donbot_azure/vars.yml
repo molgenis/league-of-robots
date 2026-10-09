@@ -4,6 +4,7 @@ stack_domain: 'donbot'
 stack_name: "{{ stack_domain }}_azure"  # stack_name must match the name of the folder that contains this vars.yml file.
 os_distribution: 'rocky9'
 repo_manager: 'none'
+modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
 #
 # Configure limited subset of repos.
 # Listing the repo ID here does not mean the repo will be enabled!

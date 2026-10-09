@@ -34,8 +34,11 @@
          set -u
          set -o pipefail
          blocklist='/etc/modprobe.d/{{ modulejail_blocklist }}'
+         declare -a blocked_old
          if [[ ! -e "${blocklist}" ]]; then
              install -m 0644 /dev/null "${blocklist}"
+         else
+             readarray -t blocked_old < <(awk '/^install ([^ ]*)/{ print $2 }' "${blocklist}" | sort)
          fi
          checksum_old="$(sha256sum "${blocklist}")"
          modulejail \
@@ -45,9 +48,31 @@
              --whitelist-file /etc/modulejail/{{ modulejail_allowlist }} \
              --output "${blocklist}"
          checksum_new="$(sha256sum "${blocklist}")"
+         {% raw %}
          if [[ "${checksum_old}" != "${checksum_new}" ]]; then
              echo "${blocklist} changed."
+             if [[ "${#blocked_old[@]}" -ge 1 ]]; then
+                 readarray -t blocked_new < <(awk '/^install ([^ ]*)/{ print $2 }' "${blocklist}" | sort)
+                 echo 'Blocked kernel modules added or removed in the new block list compared to the old one:'
+                 set +e
+                 diff --old-line-format='-%L' \
+                      --new-line-format='+%L' \
+                      --unchanged-group-format='' \
+                      <(printf '%s\n' "${blocked_old[@]}") <(printf '%s\n' "${blocked_new[@]}")
+                 status="${?}"
+                 set -e
+                 if [[ "${status}" -eq 0 ]]; then
+                     echo '(List may be empty when only meta data lines were changed.)'
+                 elif [[ "${status}" -ge 2 ]]; then
+                     exit "${status}"
+                 else
+                     echo "status: ${status}"
+                 fi
+             else
+                 echo 'There was no previous list of blocked kernel modules: the complete list is new.'
+             fi
          fi
+         {% endraw %}
   register: modulejail_blocklist_conf_status
   changed_when:
     - '"changed" in modulejail_blocklist_conf_status.stdout'
@@ -56,6 +81,7 @@
 - name: Report modulejail status.
   ansible.builtin.debug:
     msg:
+      - "modulejail runs in {% if modulejail_enforce is true %}enforcing{% else %}permissive{% endif %} audit mode."
       - "{{ modulejail_blocklist_conf_status.stdout }}"
   changed_when:
     - '"changed" in modulejail_blocklist_conf_status.stdout'
