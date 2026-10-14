@@ -26,3 +26,34 @@ You can check what `modulejail` did using `journalctl`. E.g.:
 ```
 journalctl -t modulejail --since '1 day ago'
 ```
+
+## Inspecting what modules are used
+
+```bash
+#
+# List all loaded kernel modules
+#
+lsmod
+#
+# Get details for an installed kernel module
+#
+modinfo kernel_module_name
+#
+# Load a kernel module
+#
+modprobe kernel_module_name
+#
+# Unload a kernel module
+#
+modprobe -r kernel_module_name
+#
+# List dependencies for a kernel module
+#
+modprobe --show-depends kernel_module_name
+#
+# To extract the names in underscore format in one go for an allow or block list.
+#
+modprobe --show-depends kernel_module_name \
+    | awk '/^insmod/ {print $2}' \
+    | sed -E 's|.*/||;s|\.ko\..*$||;s|-|_|g'
+```

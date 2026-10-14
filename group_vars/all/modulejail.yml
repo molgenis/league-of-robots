@@ -1,0 +1,94 @@
+---
+modulejail_generic_modules:
+  #
+  # Z standard data (de)compression functions.
+  #
+  - zstd
+  - zstd_compress
+
+modulejail_amd_cpu_modules:
+  #
+  # AMD Address Translation Library (ATL)
+  # Address reported for DRAM ECC errors are relative to the Unified Memory Controllers (UMCs).
+  # These relative address must be converted to a system physical address to be usable by the OS.
+  #
+  - amd_atl
+  #
+  # Error Detection And Correction (EDAC); replaces mcdlog daemon on AMD systems.
+  #
+  - edac_mce_amd
+  #
+  # The AMD FRU Memory Poison Manager (FMPM) allows information on bad/faulty memory to persist across reboots.
+  #
+  - fmpm
+
+modulejail_intel_cpu_modules:
+  #
+  # Support for Intel CPU C-states a.k.a idle power states.
+  #
+  - intel_cstate
+  #
+  # Uncore: provides microprocessor functions closely connected to, but not part of a CPU core.
+  #
+  - intel_uncore
+
+modulejail_dell_server_modules:
+  #
+  # dell_laptop: Provides WiFi and Bluetooth support on various Dell Inspiron laptop models.
+  #              Should not be loaded on PowerEdge servers; this is a bug.
+  # dell_smbios: used a.o. by the dmidecode command.
+  # fjes: FUJITSU Extended Socket Network Device Driver.
+  #       This is a bug in this driver which uses a too generic ACPI device alias "PNP0C02".
+  #       We do not have this FUJITSU hardware and do not need this module.
+  # mgag200: Matrox GA G200 SE GPU driver.
+  #          This GPU from 1998 is still a popular choice for servers like Dell PowerEdge machines.
+  #
+  - dell_smbios
+  - mgag200
+
+modulejail_lustre_modules:
+  #
+  # Lustre Networking and dependencies.
+  #
+  - libcfs
+  - lnet
+  - sunrpc
+  #
+  # Lustre file system and dependencies.
+  #
+  - fid
+  - fld
+  - lov
+  - lmv
+  - lustre
+  - mdc
+  - obdclass
+  - osc
+  - ptlrpc
+
+modulejail_remote_archive_modules:
+  #
+  # Remote archive uses SSHFS automounts using FUSE (Filesystem in USErspace).
+  #
+  - fuse
+
+modulejail_allowed_kernel_modules: >-
+  {%- set customized_allowed_kernel_modules = modulejail_generic_modules
+          + modulejail_amd_cpu_modules
+          + modulejail_intel_cpu_modules -%}
+  {%- if host_type | default('vm') == 'baremetal' -%}
+    {%- set customized_allowed_kernel_modules =
+            customized_allowed_kernel_modules + modulejail_dell_server_modules -%}
+  {%- endif -%}
+  {%- if inventory_hostname in groups['cluster'] | default([])
+      and pfs_mounts | default([]) | selectattr('type', 'equalto', 'lustre') | length > 0 -%}
+    {%- set customized_allowed_kernel_modules = 
+            customized_allowed_kernel_modules + modulejail_lustre_modules -%}
+  {%- endif -%}
+  {%- if inventory_hostname in groups['user_interface'] | default([])
+      and remote_archive | default([]) | length > 0 -%}
+    {%- set customized_allowed_kernel_modules = 
+            customized_allowed_kernel_modules + modulejail_remote_archive_modules -%}
+  {%- endif -%}
+  {{ customized_allowed_kernel_modules | default([]) | sort | unique }}
+...
