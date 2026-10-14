@@ -3,8 +3,8 @@ stack_prefix: 'logs'
 stack_domain: ''
 stack_name: "{{ stack_prefix }}_library"  # stack_name must match the name of the folder that contains this vars.yml file.
 repo_manager: 'none'
-os_distribution: 'rocky9'
-cloud_image: RockyLinux-9.3_xfs
+os_distribution: 'alma9'
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 cloud_user: centos
 availability_zone: nova
 stack_networks:
@@ -20,11 +20,11 @@ azure_networks:
     cidr: '10.10.1.0/24'
     create: true
 azure_image:
-  rocky9:
-    offer: 'rockylinux-x86_64'
-    publisher: 'resf'
-    sku: '9-base'
-    version: 'latest'
+  alma9:
+    offer: 'almalinux-x86_64'
+    publisher: 'almalinux'
+    sku: '9-gen2'
+    version: '9.8.2026090701'
 azure_resource_group: "{{ stack_name }}"
 nameservers: [
   '8.8.4.4',  # Google DNS.

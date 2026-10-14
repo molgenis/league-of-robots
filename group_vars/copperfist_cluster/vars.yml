@@ -442,7 +442,7 @@ pfs_mounts:
 #    ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
 #    machines: "{{ groups['chaperone'] }}"
   - pfs: 'ogm'
-    source: '//storage5.umcg.nl/algemenedata$/appdata/medgen'
+    source: '//storage5.umcg.nl/algemenedata2$/appdata/medgen'
     type: cifs    # checked with cat /proc/filesystem
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'

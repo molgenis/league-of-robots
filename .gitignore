@@ -12,6 +12,7 @@ documentation/.~lock.UMCG Research IT HPC cluster technical design.docx#
 openstacksdk*
 python.venv*
 *-openrc.sh
+openrc
 promtools/results/*
 roles/hpc-cloud
 roles/HPCplaybooks

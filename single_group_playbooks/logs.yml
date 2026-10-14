@@ -16,6 +16,7 @@
     - ssh  # client
     - update
     - remove
+    - logins
     - role: yum_local
       when: local_yum_repository is defined
     - logrotate
