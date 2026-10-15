@@ -12,4 +12,5 @@ iptables_allow_https_inbound:
   - "{{ nibbler_cluster.ip_addresses['nb_internal_management-vlan16-router']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['tl_internal_management-vlan16-router']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['vt_internal_management-external-router']['external'] }}"
+modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
 ...

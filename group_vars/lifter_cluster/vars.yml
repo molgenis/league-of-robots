@@ -29,7 +29,7 @@ cluster_class: 'development'
 repo_manager: 'pulp'
 os_distribution: 'alma9'
 os_minorversion: '.8'
-modulejail_enforce: true
+modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
 figlet_font: 'ogre'
 motd: |
       =========================================================================
