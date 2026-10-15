@@ -188,8 +188,6 @@ regular_groups:
     sponsor: umcg-gd-owners
   - name: 'umcg-patho'
     sponsor: umcg-gd-owners
-  - name: 'umcg-pr'
-    sponsor: umcg-gd-owners
   - name: 'umcg-vipt'
     sponsor: umcg-mswertz
 regular_users:
@@ -240,10 +238,6 @@ regular_users:
     groups: ['umcg-pgx', "{{ functional_users_group }}"]
   - name: 'umcg-pgx-dm'
     groups: ['umcg-pgx', "{{ functional_users_group }}"]
-  - name: 'umcg-pr-ateambot'
-    groups: ['umcg-pr', "{{ functional_users_group }}"]
-  - name: 'umcg-pr-dm'
-    groups: ['umcg-pr', "{{ functional_users_group }}"]
   - name: 'umcg-vipt-dm'
     groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
@@ -271,8 +265,6 @@ sudoers:
     become: ['umcg-patho-ateambot', 'umcg-patho-dm']
   - who: ['%umcg-pgx']
     become: ['umcg-pgx-ateambot', 'umcg-pgx-dm']
-  - who: ['%umcg-pr']
-    become: ['umcg-pr-ateambot', 'umcg-pr-dm']
   - who: ['%umcg-vipt']
     become: ['umcg-vipt-dm']
 remote_users_in_local_groups:
@@ -281,7 +273,7 @@ remote_users_in_local_groups:
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-vipt',
     ]
   - name: 'charbonb'
     groups: [
@@ -293,7 +285,7 @@ remote_users_in_local_groups:
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-vipt',
     ]
   - name: 'hendriksend'
     groups: [
@@ -305,28 +297,28 @@ remote_users_in_local_groups:
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-vipt',
     ]
   - name: 'kanningaroj'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-vipt',
     ]
   - name: 'neerincxp'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-vipt',
     ]
   - name: 'vriesgb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst',
         'umcg-gap', 'umcg-gd', 'umcg-genomescan',
         'umcg-labgnkbh', 'umcg-logstoprm', 'umcg-ogm', 'umcg-patho',
-        'umcg-pgx', 'umcg-pr', 'umcg-vipt',
+        'umcg-pgx', 'umcg-vipt',
     ]
 #
 ## Limit the storage for specific folder, by using a loop mount of formatted file
@@ -460,33 +452,53 @@ lfs_mounts:
     pfs: local_raid
     groups:
       - name: umcg-atd
+        mode: '2770'
       - name: umcg-gap
+        mode: '2770'
       - name: umcg-gd
+        mode: '2770'
       - name: umcg-genomescan
+        mode: '2770'
       - name: umcg-gsad
+        mode: '2770'
       - name: umcg-gst
+        mode: '2770'
       - name: umcg-lab
+        # mode: Use '2750' default to prevent accidental modification of data that cannot be recreated.
       - name: umcg-labgnkbh
+        mode: '2770'
       - name: umcg-patho
+        mode: '2770'
       - name: umcg-pgx
-      # - name: umcg-pr
+        mode: '2770'
       - name: umcg-vipt
+        mode: '2770'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] }}"
   - lfs: tmp15
     pfs: 'umcgst15'
     groups:
       - name: umcg-atd
+        mode: '2770'
       - name: umcg-gap
+        mode: '2770'
       - name: umcg-gd
+        mode: '2770'
       - name: umcg-genomescan
+        mode: '2770'
       - name: umcg-gsad
+        mode: '2770'
       - name: umcg-gst
+        mode: '2770'
       - name: umcg-lab
+        # mode: Use '2750' default to prevent accidental modification of data that cannot be recreated.
       - name: umcg-labgnkbh
+        mode: '2770'
       - name: umcg-patho
+        mode: '2770'
       - name: umcg-pgx
-      # - name: umcg-pr
+        mode: '2770'
       - name: umcg-vipt
+        mode: '2770'
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
@@ -614,36 +626,6 @@ lfs_mounts:
     groups:
       - name: umcg-labgnkbh
     rw_machines: "{{ groups['chaperone'] }}"
-#  - lfs: prm55
-#    pfs: 'research$'
-#    groups:
-#      - name: umcg-pr
-#    rw_machines: "{{ groups['chaperone'] }}"
-#  - lfs: dat55
-#    pfs: 'research$'
-#    groups:
-#      - name: umcg-pr
-#    rw_machines: "{{ groups['chaperone'] }}"
-#  - lfs: prm56
-#    pfs: 'research$'
-#    groups:
-#      - name: umcg-pr
-#    rw_machines: "{{ groups['chaperone'] }}"
-#  - lfs: dat56
-#    pfs: 'research$'
-#    groups:
-#      - name: umcg-pr
-#    rw_machines: "{{ groups['chaperone'] }}"
-#  - lfs: prm57
-#    pfs: 'research$'
-#    groups:
-#      - name: umcg-pr
-#    rw_machines: "{{ groups['chaperone'] }}"
-#  - lfs: dat57
-#    pfs: 'research$'
-#    groups:
-#      - name: umcg-pr
-#    rw_machines: "{{ groups['chaperone'] }}"
   - lfs: prm67
     pfs: 'ogm'
     groups:
