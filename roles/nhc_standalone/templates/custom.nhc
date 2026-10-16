@@ -9,6 +9,14 @@ declare PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 # Check journalctl entries for a given service within a configurable lookback period,
 # filtering by tag (-t), error pattern (-g PATTERN), and user list.
 # Report matching entries as an NHC health check.
+#
+# Behaviour:
+# FAILED: A matching error pattern is found within the configured time window.
+# OK: No matching error pattern is found found within the configured time window.
+#
+# An 'CLEARED' notification does not 100% guarantee that a process runs 'OK' again;
+# it means that no matching log entries were found in the given lookback period.
+# Therefore, make sure the `lookback_min` matches the run freqency of your check.
 function check_journalctl()
 {
     # Defaults 
