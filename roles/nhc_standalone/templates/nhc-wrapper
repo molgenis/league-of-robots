@@ -300,7 +300,7 @@ function nhcwrap_report_results() {
 				}\0
 			EOM
 			echo -n "Notifying Slack channel that the NHC error was cleared ... "
-			curl -X POST "${slack_webhook}" \
+			curl -s -X POST "${slack_webhook}" \
 				-H 'Content-Type: application/json' \
 				-d "${message}"
 			echo
@@ -320,7 +320,7 @@ function nhcwrap_report_results() {
 				}\0
 			EOM
 			echo -n "Notifying Slack channel for new NHC error ... "
-			curl -X POST "${slack_webhook}" \
+			curl -s -X POST "${slack_webhook}" \
 				-H 'content-type:application/json' \
 				-d "${message}"
 			echo
