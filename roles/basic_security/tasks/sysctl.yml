@@ -1,5 +1,5 @@
 ---
-- name: Install sysctl config file to manage kernel and network parameters upon next reboot.
+- name: Install sysctl config file to manage kernel and network parameters at boot.
   ansible.builtin.template:
     src: "{{ item }}"
     dest: "/etc/sysctl.d/{{ item }}"
@@ -10,6 +10,28 @@
     - 52-ansible-managed-netwerk-params.conf
     - 53-ansible-managed-filesystem-params.conf
     - 54-ansible-managed-kernel-params.conf
+  become: true
+
+- name: Install sysctl config file to disable unprivileged user name spaces at boot.
+  ansible.builtin.template:
+    src: 55-ansible-managed-disable-unprivileged-user-name-spaces.conf
+    dest: /etc/sysctl.d/55-ansible-managed-disable-unprivileged-user-name-spaces.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - inventory_hostname not in groups['cluster'] | default([])
+    - inventory_hostname not in groups['build_server'] | default([])
+  become: true
+
+- name: Remove sysctl config file that disables unprivileged user name spaces upon at boot.
+  ansible.builtin.file:
+    path: /etc/sysctl.d/55-ansible-managed-disable-unprivileged-user-name-spaces.conf
+    state: absent
+  when:
+    - inventory_hostname in groups['cluster'] | default([])
+    - inventory_hostname in groups['build_server'] | default([])
+  notify: basic_security_reboot
   become: true
 
 - name: Modify sysctl kernel parameters right now.
@@ -82,6 +104,16 @@
       value: 1
     - name: fs.protected_hardlinks
       value: 1
+  become: true
+
+- name: Modify sysctl parameters to disable unprivileged user namespaces right now.
+  ansible.posix.sysctl:
+    name: user.max_user_namespaces
+    value: 0
+    sysctl_set: true
+  when:
+    - inventory_hostname not in groups['cluster'] | default([])
+    - inventory_hostname not in groups['build_server'] | default([])
   become: true
 
 - name: Modify sysctl kernel parameters on RedHat distros >= 8.x right now.
