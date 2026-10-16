@@ -28,27 +28,40 @@ function create_chown_and_chmod(){
    # $2 = owner:group
    # $3 = mode
    if ! test -d "${1}"; then
-      echo "  creating ${1}"
-      mkdir "${1}"
-   fi
-   if [[ "$(stat -c '%U:%G' "${1}")" != "${2}" ]]; then
-      echo "  ownership changed into ${2} on ${1}"
-	   # chown should not fail this script - allow it as it should never kill the service
-      if ! chown "${2}" "${1}" 2>/dev/null; then
-         echo "  ! Warning: could not chown ${1} to ${2}"
+      if test -d ${1%/*}; then
+         echo "  creating ${1}"
+         mkdir "${1}"
+      else
+         echo "WARNING: There is folder ${1%/*} to place inside the subgroup '${1##*/}' - skipping ..."
+         return 1
       fi
    fi
-   _group_write_permission="${3:(-2):1}" # take the number before last -> 5 out of 0750
+   local _group_name="${2##*:}"                    # take group name from $2='user:group'
+   # change group names if they are different than on what should be
+   if [[ "$(stat -c '%U:%G' "${1}")" != "${2}" ]]; then
+      # but only if group actually exists on a system (not that some groups can
+      # may not have users, and will not be propagated via ldap, or users have
+      # been removed) - therefore only group GID will remain, which should not be
+      # changed a system
+      # this might be redundant, as script iterates only through existing groups
+      # but better be safe waisting cycles, than sorry
+      if getent group "${_group_name}" >/dev/null; then
+         echo "  ownership changed into ${2} on ${1}"
+         # chown should not fail this script - allow it as it should never kill the service
+         if ! chown "${2}" "${1}" 2>/dev/null; then
+            echo "  ! Warning: could not chown ${1} to ${2}"
+         fi
+      else
+         echo "! Warning: there is no ${_group_name} group - chown of the ${1} skipped"
+      fi
+   fi
+   # local _group_write_permission="${3:(-2):1}" # take the number before last -> 5 out of 0750
    # leading zero just annoys things here
    local _mode="${3#0}"
    if [[ "$(stat -c '%a' "${1}")" != "${_mode}" ]]; then
       echo "    mode changed ${_mode} on ${1}"
       chmod "${_mode}" "${1}"
    fi
-   local _acl="$(getfacl -p "${1}")"
-   local _group_acl_write="r-x"                          # default acl is read-only
-   [[ "${_group_write_permission}" == "7" ]] && _group_acl_write='rwx' # but if mode is 7>7<0 then acl is read-write
-   local _group_name="${2##*:}"                          # take group name from $2='user:group'
 }
 
 # For now only groups starting with 'L-'
@@ -117,10 +130,10 @@ for _main_group in ${_main_groups}; do
                   [[ "${_each_group}" =~ ^"${_main_group}"-sub-.{1,} ]] && _setmode="2770" # for -sub- subfolders
                   create_chown_and_chmod "${_main_group_path}/${_sub_group_path}" "${_main_group}-dm:${_each_group}" "${_setmode}"
                   [[ "${_each_group}" =~ ^"${_main_group}"-rel-.{1,} ]] && {
-                     getfacl "${_main_group_path}/${_sub_group_path}" 2>/dev/null | grep -q "default:mask::rwx" && {
+                     if getfacl "${_main_group_path}/${_sub_group_path}" 2>/dev/null | grep -q "default:mask::rwx"; then
                         echo "   removing write (ACL) permissions on the 'rel-' subfolders for '${_main_group_path}/${_sub_group_path}'"
                         setfacl -d -m "mask::r-x" "${_main_group_path}/${_sub_group_path}"
-                     }
+                     fi
                   }
                else
                   echo "WARNING: Group ${_each_group} cannot be placed anywhere!"
