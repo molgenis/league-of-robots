@@ -5,4 +5,10 @@
     state: "{{ basic_security_ssh_restart_handler_state }}"
   become: true
   listen: basic_security_restart_sshd
+
+- name: 'Reboot to apply changed sysctl settings.'
+  ansible.builtin.reboot:
+    msg: 'Reboot initiated by Ansible "basic_security" role from League of Robots playbook/repo.'
+  become: true
+  listen: basic_security_reboot
 ...
