@@ -31,12 +31,13 @@ function check_journalctl()
 
     SINCE="$(date -d "-${LOOKBACK_MIN} min" "+%Y-%m-%d %H:%M:%S")"
 
-    # Fetch Logs
+    # Fetch Logs for a specific TAG and a PATTERN
     LOGS="$(
     journalctl \
         --since "${SINCE}" \
         -t "${TAG}" \
         -g "${PATTERN}" \
+        --case-sensitive=no \
         --no-pager 2>/dev/null ||
     true
     )"
