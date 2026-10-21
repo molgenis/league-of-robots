@@ -54,7 +54,7 @@ function check_journalctl()
 
         # Only fetch execution CMD's for listed user from the journalctr output in ${LOGS}.
         USER_LOGS="$(
-            grep -iE "\(${USER}\) CMD" <<< "${LOGS}" |
+            grep -iE "\(${USER}\) CMD" <<< "${LOGS}" ||
             true
         )"
         # Look for error patterns in ${USER_LOGS}.
