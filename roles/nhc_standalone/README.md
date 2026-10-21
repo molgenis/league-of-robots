@@ -1,10 +1,10 @@
-# nhc_standlone role
+# nhc_standalone role
 
 This role installs [Node Health Check](https://github.com/mej/nhc) (NHC) as a _standalone_ application.
 That means _NHC_ is not executed by a resources manager like _Slurm_.
 For deployment of _NHC_ on _Slurm clients_ see the `slurm` role instead.
 
-# nhc_standlone custom add-ons
+# nhc_standalone custom add-ons
 
 nhc_standlone was extended with additional `check_journalctl` check and a custom `nhc-wrapper` with Slack notifications.
 
