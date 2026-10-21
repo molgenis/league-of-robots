@@ -6,7 +6,7 @@ For deployment of _NHC_ on _Slurm clients_ see the `slurm` role instead.
 
 # nhc_standalone custom add-ons
 
-nhc_standlone was extended with additional `check_journalctl` check and a custom `nhc-wrapper` with Slack notifications.
+nhc_standalone was extended with additional `check_journalctl` check and a custom `nhc-wrapper` with Slack notifications.
 
 ## Prerequisites
 - Deployment of the role is limited to a list of inventory `groups` specified in:
