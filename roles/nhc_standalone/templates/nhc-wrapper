@@ -302,7 +302,7 @@ function nhcwrap_report_results() {
 			echo -n "Notifying Slack channel that the NHC error was cleared ... "
 			curl -s -X POST "${slack_webhook}" \
 				-H 'Content-Type: application/json' \
-				-d "${message}"
+				-d "${message}" || logger -t "nhc_standalone" "Error while updating SLACK (return code ${?})"
 			echo
 		else
 			echo "The following errors on ${cluster_name} have now been CLEARED: ${PREV_RESULTS}"
@@ -322,7 +322,7 @@ function nhcwrap_report_results() {
 			echo -n "Notifying Slack channel for new NHC error ... "
 			curl -s -X POST "${slack_webhook}" \
 				-H 'content-type:application/json' \
-				-d "${message}"
+				-d "${message}" || logger -t "nhc_standalone" "Error while updating SLACK (return code ${?})"
 			echo
 		else
 			echo "$(< "${SAVEFILE}")"

@@ -36,7 +36,7 @@ nhc_journalctl_checks:
 ```
 
 - `group` defines the Ansible inventory group.
-- `user` specifies the user to filter on.
+- `user` specifies the user to filter on. Can also be userlist: `'user1,user2'`
 - `lookback_min` defines how far back to search in logs.
 - `tag` specifies the journalctl tag (`journalctl -t`).
 - `pattern` defines the error pattern to match.

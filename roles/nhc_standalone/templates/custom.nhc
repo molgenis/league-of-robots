@@ -1,4 +1,4 @@
-# NHC -- UMCG University's Checks for journalctl patterns
+# NHC -- UMCG's check for journalctl patterns
 
 # Initialize variables
 declare USERS="${1:-root}"
@@ -21,7 +21,7 @@ function check_journalctl()
 {
     # Defaults 
     local USERS="${1:-root}"
-    local LOOKBACK_MIN="${2:-15 min}"
+    local LOOKBACK_MIN="${2:-15}"
     local TAG="${3:-CROND}"
     local PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 
