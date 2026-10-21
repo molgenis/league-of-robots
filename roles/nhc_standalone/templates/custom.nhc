@@ -52,19 +52,16 @@ function check_journalctl()
     # filter on USER_LIST 
     for USER in "${USER_LIST[@]}"; do
 
-        # Only fetch execution CMD's for listed user from the journalctr output in $LOGS.
+        # Only fetch execution CMD's for listed user from the journalctr output in ${LOGS}.
         USER_LOGS="$(
-            printf '%s\n' "${LOGS}" |
-            grep -iE "\(${USER}\)" |
-            grep -iE "CMD" ||
+            grep -iE "\(${USER}\) CMD" <<< "${LOGS}" |
             true
         )"
-
+        # Look for error patterns in ${USER_LOGS}.
         if [[ -n "${USER_LOGS}" ]]; then
 
             MATCH="$(
-                printf '%s\n' "${USER_LOGS}" |
-                grep -iE "${PATTERN}" ||
+                grep -iE "${PATTERN}" <<< "${USER_LOGS}" ||
                 true
                 )"
             if [[ -n "${MATCH}" ]]; then
