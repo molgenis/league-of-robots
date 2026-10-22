@@ -9,9 +9,9 @@ flock -n 9 || { echo "Sync already running" >&2; exit 1; }
 _main="/mnt/repos"
 
 {% set rm_secondary_server = global_repo_servers                                                   
-          | selectattr('primary', 'undefined')
-          | map(attribute='name')
-          | first %}
+       | selectattr('primary', 'undefined')
+       | map(attribute='name')
+       | first %}
 _remote="repo@{{ rm_secondary_server }}::repo"
 _ssh_ctl="/dev/shm/${USER}-rsync-ssh-ctl-%C"
 _ssh_cmd="ssh -o ConnectTimeout=15 -o ControlMaster=auto -o ControlPath=${_ssh_ctl} -o ControlPersist=60s"
