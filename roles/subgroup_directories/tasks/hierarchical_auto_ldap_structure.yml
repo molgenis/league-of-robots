@@ -22,6 +22,9 @@
     - name: lsaai_subgroups.sh
       path: /usr/local/bin
       mode: "0755"
+    - name: release_manager.sh
+      path: /usr/local/bin
+      mode: "0755"
   become: true
   when: subgroup_directories_auto_is_enabled
 
