@@ -16,6 +16,7 @@
     - logrotate
     - remove
     - update
+    - coredumps
     - sshd
     - basic_security
     - certs_webservers
