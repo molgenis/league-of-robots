@@ -24,5 +24,9 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
               | map(attribute='id') }}"
-modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
+#
+# Security hardening.
+#
+basic_security_enable_unprivileged_user_namespaces: false
+modulejail_enforce: true
 ...
