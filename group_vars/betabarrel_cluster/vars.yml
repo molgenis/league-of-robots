@@ -184,9 +184,9 @@ regular_groups:
     # No sponsor as this group does not use Slurm.
   - name: 'umcg-ogm'
     sponsor: umcg-gd-owners
-  - name: 'umcg-pgx'
-    sponsor: umcg-gd-owners
   - name: 'umcg-patho'
+    sponsor: umcg-gd-owners
+  - name: 'umcg-pgx'
     sponsor: umcg-gd-owners
   - name: 'umcg-vipt'
     sponsor: umcg-mswertz

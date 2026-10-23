@@ -247,6 +247,19 @@ lfs_quota:
       umcg-vdakker: 1024
       umcg-verbeek: 1024
       umcg-weersma: 10240
+  tmp07:
+    quota_limits:  # All values in GB.
+      umcg-atd: 3072
+      umcg-gap: 2048
+      umcg-gd: 10240
+      umcg-genomescan: 20480
+      umcg-gsad: 1024
+      umcg-gst: 3072
+      umcg-lab: 10240
+      umcg-labgnkbh: 5120
+      umcg-patho: 5120
+      umcg-pgx: 3072
+      umcg-vipt: 3072
   tmp08:
     quota_limits:  # All values in GB.
       umcg-atd: 512
