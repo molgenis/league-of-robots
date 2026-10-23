@@ -66,6 +66,16 @@ modulejail_lustre_modules:
   - osc
   - ptlrpc
 
+modulejail_container_modules:
+  #
+  # Modules required for (Apptainer) container workloads.
+  # binfmt_misc: Kernel Support for miscellaneous Binary Formats.
+  #              Allows arbitrary executable file formats to be recognized and passed to certain user space applications, such as containers.
+  #              binfmt_misc recognises the binary-type by matching some bytes at the beginning of the file with a magic byte sequence (masking out specified bits) you have supplied.
+  #              binfmt_misc can also recognise a filename extensions for executables.
+  #
+  - binfmt_misc
+
 modulejail_remote_archive_modules:
   #
   # Remote archive uses SSHFS automounts using FUSE (Filesystem in USErspace).
@@ -77,18 +87,23 @@ modulejail_allowed_kernel_modules: >-
           + modulejail_amd_cpu_modules
           + modulejail_intel_cpu_modules -%}
   {%- if host_type | default('vm') == 'baremetal' -%}
-    {%- set customized_allowed_kernel_modules =
-            customized_allowed_kernel_modules + modulejail_dell_server_modules -%}
+    {%- set customized_allowed_kernel_modules = customized_allowed_kernel_modules
+            + modulejail_dell_server_modules -%}
   {%- endif -%}
   {%- if inventory_hostname in groups['cluster'] | default([])
       and pfs_mounts | default([]) | selectattr('type', 'equalto', 'lustre') | length > 0 -%}
-    {%- set customized_allowed_kernel_modules = 
-            customized_allowed_kernel_modules + modulejail_lustre_modules -%}
+    {%- set customized_allowed_kernel_modules = customized_allowed_kernel_modules
+            + modulejail_lustre_modules -%}
+  {%- endif -%}
+  {%- if inventory_hostname in groups['cluster'] | default([])
+      or inventory_hostname in groups['build_server'] -%}
+    {%- set customized_allowed_kernel_modules = customized_allowed_kernel_modules
+            + modulejail_container_modules -%}
   {%- endif -%}
   {%- if inventory_hostname in groups['user_interface'] | default([])
       and remote_archive | default([]) | length > 0 -%}
-    {%- set customized_allowed_kernel_modules = 
-            customized_allowed_kernel_modules + modulejail_remote_archive_modules -%}
+    {%- set customized_allowed_kernel_modules = customized_allowed_kernel_modules
+            + modulejail_remote_archive_modules -%}
   {%- endif -%}
   {{ customized_allowed_kernel_modules | default([]) | sort | unique }}
 ...
