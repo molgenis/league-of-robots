@@ -1,4 +1,5 @@
 ---
+basic_security_enable_unprivileged_user_namespaces: true
 basic_security_ssh_port: 22
 basic_security_ssh_config_path: /etc/ssh/sshd_config
 basic_security_ssh_password_authentication: 'no'

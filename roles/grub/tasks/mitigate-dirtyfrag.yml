@@ -12,6 +12,11 @@
 #   https://gist.github.com/m3nu/c19269ef4fd6fa53b03eb388f77464da
 #   https://www.reddit.com/r/HPC/comments/1szhpav/copyfail_mitigations_in_a_hpc_cluster_environment/
 #
+# Same mitigation also protects against later reported ZDI-CAN-33367 (no CVE yet);
+# this is the same mistake in a different helper resulting in the same error/exploit.
+# See also:
+#   https://almalinux.org/blog/2026-10-23-zdi-can-33367/
+#
 - name: Unload vulnerable kernel modules.
   ansible.builtin.command:
     cmd: rmmod "{{ item }}"

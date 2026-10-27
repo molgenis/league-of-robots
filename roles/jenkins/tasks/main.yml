@@ -18,7 +18,6 @@
     state: latest
     update_cache: true
     name:
-      - php
       - httpd
       - mod_ssl
       # Do not install 'ShellCheck' from EPEL: too old
