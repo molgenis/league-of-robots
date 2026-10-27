@@ -2,6 +2,10 @@
 slurm_local_scratch_dir: '/local'
 autoupdate_enabled: false
 #
+# Enable unprivileged user namespaces to allow container workloads.
+#
+basic_security_enable_unprivileged_user_namespaces: true
+#
 # Do not use fail2ban for machines behind the jumphost to prevent the jumphost from getting blocked.
 # We already have fail2ban on the jumphost to block external IPs the produce too many failed logins.
 #

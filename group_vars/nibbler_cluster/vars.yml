@@ -247,6 +247,8 @@ regular_groups:
     sponsor: umcg-research-it
   - name: 'umcg-erdera'
     sponsor: umcg-research-it
+  - name: 'umcg-femhealthdata'
+    sponsor: umcg-research-it
   - name: 'umcg-fg'
     sponsor: umcg-research-it
   - name: 'umcg-forcespe'
@@ -370,6 +372,8 @@ regular_users:
     groups: ['umcg-endocrinology']
   - name: 'umcg-erdera-dm'
     groups: ['umcg-erdera']
+  - name: 'umcg-femhealthdata-dm'
+    groups: ['umcg-femhealthdata']
   - name: 'umcg-fg-dm'
     groups: ['umcg-fg']
   - name: 'umcg-forcespe-dm'
@@ -472,7 +476,7 @@ regular_users:
     groups: ['umcg-wijmenga']
 sudoers:
   - who: ['%umcg-as']
-    become: ['umcg-vipbot', 'umcg-as-dm', 'umcg-capicebot']
+    become: ['umcg-as-dm', 'umcg-capicebot', 'umcg-vipbot']
   - who: ['%umcg-atd']
     become: ['umcg-atd-ateambot', 'umcg-atd-dm']
   - who: ['%umcg-biogen-dms']
@@ -493,6 +497,8 @@ sudoers:
     become: ['umcg-erdera-dm']
   - who: ['%umcg-gcc']
     become: ['umcg-gcc-dm']
+  - who: ['%umcg-femhealthdata']
+    become: ['umcg-femhealthdata-dm']
   - who: ['%umcg-fg-dms']
     become: ['umcg-fg-dm']
   - who: ['%umcg-forcespe-dms']
@@ -502,7 +508,7 @@ sudoers:
   - who: ['%umcg-fu-dms']
     become: ['umcg-fu-dm']
   - who: ['%umcg-gap-dms']
-    become: [ 'umcg-gap-ateambot', 'umcg-gap-dm']
+    become: ['umcg-gap-ateambot', 'umcg-gap-dm']
   - who: ['%umcg-gastrocol-dms']
     become: ['umcg-gastrocol-dm']
   - who: ['%umcg-gcc']
@@ -834,6 +840,7 @@ lfs_mounts:
       - name: umcg-griac
       - name: umcg-grip
       - name: umcg-gsad
+      - name: umcg-femhealthdata
       - name: umcg-hematology
       - name: umcg-hgsvc
       - name: umcg-hlhs

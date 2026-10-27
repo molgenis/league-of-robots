@@ -4,7 +4,7 @@ stack_domain: ''
 stack_name: "{{ slurm_cluster_name }}_cluster"  # stack_name must match the name of the folder that contains this vars.yml file.
 stack_prefix: 'wh'
 stack_dtap_state: production
-slurm_version: '23.02.7-2.el9.umcg'
+slurm_version: '25.11.8-1.el9.umcg'
 slurm_partitions:
   - name: regular_big_vm  # Must be in sync with group listed in Ansible inventory.
     default: yes
@@ -32,8 +32,8 @@ slurm_qos_limit_fractions:
   interactive-short:
     user: 0.5
 repo_manager: 'pulp'
-os_distribution: 'rocky9'
-os_minorversion: '.4'
+os_distribution: 'alma9'
+os_minorversion: '.8'
 figlet_font: 'ogre'
 motd: |
       =========================================================
@@ -117,9 +117,9 @@ totp:
     - "{{ all.ip_addresses['umcg']['net2']['address'] }}{{ all.ip_addresses['umcg']['net2']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net3']['address'] }}{{ all.ip_addresses['umcg']['net3']['netmask'] }}"
     - "{{ all.ip_addresses['umcg']['net4']['address'] }}{{ all.ip_addresses['umcg']['net4']['netmask'] }}"
-cloud_image: RockyLinux-9.3_xfs
-cloud_user: cloud-user
+cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
+enable_predictable_network_interface_names: true
 stack_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
@@ -169,25 +169,42 @@ envsync_group: 'umcg-depad'
 functional_admin_group: 'umcg-funad'
 functional_users_group: 'umcg-funus'  # For all functional accounts. Used in /etc/security/access.conf on chaperones.
 hpc_env_prefix: '/apps'
+sponsors:
+  - name: umcg-gd-owners
+    slurm_shares: 120
+  - name: umcg-mswertz
+    slurm_shares: 8
 regular_groups:
   # Note, for chaperone machines this is controlled in the static_inventories
   - name: "{{ envsync_group }}"
   - name: "{{ functional_admin_group }}"
   - name: "{{ functional_users_group }}"
   - name: 'umcg-atd'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gap'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gd'
+    sponsor: umcg-gd-owners
   - name: 'umcg-genomescan'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gsad'
+    sponsor: umcg-gd-owners
   - name: 'umcg-gst'
+    sponsor: umcg-gd-owners
   - name: 'umcg-lab'
+    sponsor: umcg-gd-owners
   - name: 'umcg-labgnkbh'
+    sponsor: umcg-gd-owners
   - name: 'umcg-logstoprm'
+    # No sponsor as this group does not use Slurm.
   - name: 'umcg-patho'
+    sponsor: umcg-gd-owners
   - name: 'umcg-pgx'
+    sponsor: umcg-gd-owners
   - name: 'umcg-vipt'
+    sponsor: umcg-mswertz
 regular_users:
-  # Note, for chaperone machines this is controlled in the static_inventories
+  # Note, for chaperone machines this is controlled in the static_inventories.
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
   - name: 'umcg-atd-ateambot'
@@ -230,6 +247,8 @@ regular_users:
     groups: ['umcg-patho', "{{ functional_users_group }}"]
   - name: 'umcg-patho-dm'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
+  - name: 'umcg-pgx-ateambot'
+    groups: ['umcg-pgx', "{{ functional_users_group }}"]
   - name: 'umcg-pgx-dm'
     groups: ['umcg-pgx', "{{ functional_users_group }}"]
   - name: 'umcg-vipt-dm'
@@ -272,7 +291,7 @@ remote_users_in_local_groups:
   - name: 'charbonb'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
-        'umcg-gap', 'umcg-gd', 'umcg-vipt',
+        'umcg-pgx', 'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
   - name: 'cimermans'
     groups: [
@@ -284,7 +303,7 @@ remote_users_in_local_groups:
   - name: 'hendriksend'
     groups: [
         "{{ envsync_group }}", 'umcg-atd', 'umcg-gsad',
-        'umcg-gap', 'umcg-gd', 'umcg-vipt',
+        'umcg-pgx', 'umcg-gap', 'umcg-gd', 'umcg-vipt',
     ]
   - name: 'langek'
     groups: [

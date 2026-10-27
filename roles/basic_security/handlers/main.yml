@@ -6,6 +6,14 @@
   become: true
   listen: basic_security_restart_sshd
 
+- name: 'Restart irqbalance service.'
+  ansible.builtin.systemd:
+    name: irqbalance.service
+    state: restarted
+    daemon_reload: true
+  become: true
+  listen: basic_security_restart_irqbalance
+
 - name: 'Reboot to apply changed sysctl settings.'
   ansible.builtin.reboot:
     msg: 'Reboot initiated by Ansible "basic_security" role from League of Robots playbook/repo.'

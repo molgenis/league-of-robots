@@ -20,8 +20,7 @@
     group: root
     mode: '0644'
   when:
-    - inventory_hostname not in groups['cluster'] | default([])
-    - inventory_hostname not in groups['build_server'] | default([])
+    - basic_security_enable_unprivileged_user_namespaces is false
   become: true
 
 - name: Remove sysctl config file that disables unprivileged user name spaces upon at boot.
@@ -29,8 +28,7 @@
     path: /etc/sysctl.d/55-ansible-managed-disable-unprivileged-user-name-spaces.conf
     state: absent
   when:
-    - inventory_hostname in groups['cluster'] | default([])
-    - inventory_hostname in groups['build_server'] | default([])
+    - basic_security_enable_unprivileged_user_namespaces is true
   notify: basic_security_reboot
   become: true
 
@@ -112,8 +110,7 @@
     value: 0
     sysctl_set: true
   when:
-    - inventory_hostname not in groups['cluster'] | default([])
-    - inventory_hostname not in groups['build_server'] | default([])
+    - basic_security_enable_unprivileged_user_namespaces is false
   become: true
 
 - name: Modify sysctl kernel parameters on RedHat distros >= 8.x right now.
