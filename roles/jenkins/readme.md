@@ -1,5 +1,7 @@
 # Jenkins
 
+This role installs a Jenkins webserver, which is used to run automated tests for our pipelines.
+
 ### Installing plugins manually when the webpage is unavailable
 
 Find the current version of the plugin in plugins folder: 
