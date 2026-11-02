@@ -32,11 +32,7 @@ regular_users:
     groups: ['vipt']
   - name: 'bcharbon'
     groups: ['vipt']
-  - name: 'svandenhoek'
-    groups: ['vipt']
   - name: 'mbijlsma'
-    groups: ['vipt']
-  - name: 'jkloosterman'
     groups: ['vipt']
   - name: 'mbeukers'
     groups: ['vipt']
