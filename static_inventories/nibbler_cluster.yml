@@ -272,7 +272,7 @@ all:
               host_type: baremetal
               gpu_count: 16
               gpu_type: a40
-              gpu_driver_version: 590.48.01
+              gpu_driver_version: 615.71.09
               gpu_kernel_module_type: proprietary
               host_networks:
                 - name: vlan1338

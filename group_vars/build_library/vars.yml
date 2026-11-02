@@ -32,17 +32,19 @@ regular_users:
     groups: ['vipt']
   - name: 'bcharbon'
     groups: ['vipt']
-  - name: 'svandenhoek'
-    groups: ['vipt']
   - name: 'mbijlsma'
-    groups: ['vipt']
-  - name: 'jkloosterman'
     groups: ['vipt']
   - name: 'mbeukers'
     groups: ['vipt']
+  - name: 'gvdvries'
+    groups: ['vipt']
+  - name: 'rkanninga'
+    groups: ['vipt']
+  - name: 'kdelange'
+    groups: ['vipt']
 sudoers:
   - who: ['%vipt']
-    become: 'ALL'
+    become: ['ALL']
     name: 'apptainer'
     command: '/bin/apptainer'
 use_ldap: false

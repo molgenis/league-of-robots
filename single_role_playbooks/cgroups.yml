@@ -1,7 +1,0 @@
----
-- name: Install cgroups role.
-  hosts:
-    - user_interface
-  roles:
-     - cgroups
-...

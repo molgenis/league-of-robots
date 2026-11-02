@@ -23,10 +23,16 @@
 # Printing legal captain obvious messages does not secure systems,
 # but can disclose info about system type / config to hackers.
 #
-- name: Disable /etc/issue pre-login banner messages.
-  ansible.builtin.file:
-    name: "{{ item }}"
-    state: absent
+# Deleting these files causes updated RPM packages to re-install them.
+# Therefore we delete only the content and leave empty files in place.
+#
+- name: Remove all content from /etc/issue pre-login banner messages.
+  ansible.builtin.copy:
+    dest: "{{ item }}"
+    content: ''
+    owner: root
+    group: root
+    mode: '0644'
   loop:
     - /etc/issue
     - /etc/issue.net

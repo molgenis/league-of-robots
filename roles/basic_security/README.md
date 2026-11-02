@@ -4,9 +4,20 @@
 
 See `defaults/main.yml` for variables and their defaults.
 
-**It is _very_ important that you quote the 'yes' or 'no' values. Failure to do so may lock you out of your server.**
+#### Unprivilegred user namespaces
 
-Hence these values are not "YAML" booleans and you cannot use `true` or `false`.
+Using _unprivilegred user namespaces_ improves security for containerized workloads and the default is
+`basic_security_enable_unprivileged_user_namespaces: true`.
+
+However, it also adds a significant amount of attack surface.
+Therefore it should be disabled on security hardened machines like jumphosts that do not need support for containers.
+
+#### SSH
+
+**It is _very_ important that you quote the 'yes' or 'no' values for `basic_security_ssh_*` variables.**
+**Failure to do so may lock you out of your server.**
+
+Hence these values are not "YAML" booleans and you cannot use `true` nor `false`.
 These values must end up in the sshd.conf as `yes` or `no` and therefore must be treated as strings in YAML.
 
 - The state of the SSH daemon. Typically this should remain `started`.

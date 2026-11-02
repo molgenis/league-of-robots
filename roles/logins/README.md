@@ -6,11 +6,12 @@ Systemd manages all users slices. These slices are located under main `user.slic
 Cgroups v2 can be managed separately, but users cannot be moved into another slice hierarchy,
 because `systemd` already exclusively manages user slices.
 
-Therefore we manage user's resource availability, with help of systemd slice
-modification. Limitation on the slice is per individual user.
+Therefore we manage user's resource availability by modifying systemd user slices.
+Limitation on the slice is per individual user.
+It is currently not possible to configure limits for specific groups of users.
 
-This is done with helper script, that gets automatically executed every time a
-new user logs into the system via ssh.
+User slice limits are applied using the `/etc/pam-script.d/limitedusers.sh` helper script,
+that gets automatically executed every time a user logs into the system via a new ssh session.
 
 This is done with the following line in the `/etc/pam.d/sshd` file
 
@@ -18,10 +19,9 @@ This is done with the following line in the `/etc/pam.d/sshd` file
      session    optional     pam_exec.so /etc/pam-script.d/limitedusers.sh
 ```
 
-A script `/etc/pam-script.d/limitedusers.sh` is called at the login, but upon error
-the login stil gets processed.
+In case there is an error in `/etc/pam-script.d/limitedusers.sh`, the login stil gets processed.
 
-## Script limitedusers.sh 
+## Script limitedusers.sh
 
 The script uses systemd's command line tool `systemctl` to modify the CPU and RAM limit of the user's slice. 
 
@@ -30,15 +30,27 @@ Script controls users that
  - have UID > 1000
  - are not part of the admin group
 
-Users that gain elevated permissions by switching to another account using `su` or `sudo` are still on the *same* slice and hence cannot escape the limits from their original login account.
+Users that gain elevated permissions by switching to another account using `su` or `sudo` are still on the *same* slice
+and hence cannot escape the limits from their original login account.
 
-## systemd control groups vs slurm
+You can inspect your own limits using `systemctl`:
+```bash
+systemctl show "user-$(id -u).slice" | fgrep CPUQuotaPerSecUSec=
+systemctl show "user-$(id -u).slice" | fgrep MemoryMax=
+```
+or alternatively read the values from:
+```bash
+cat /sys/fs/cgroup/user.slice/user-$(id -u).slice/cpu.max
+cat /sys/fs/cgroup/user.slice/user-$(id -u).slice/memory.max
+```
+
+## systemd control groups for slurm
 
 TLDR: Users slice limits are NOT same as slurm slice limits.
 
-Slurm has job placed under `system.slice`, and the resources are managed there.
-It is not managed under `user.slice`. Therefore `pam.d/sshd` is not conflicting
-with the `slurm` jobs.
+Slurm has jobs placed under the `system.slice`, and the resources are managed there.
+It is not managed under `user.slice`.
+Therefore the limits configured by the `limitedusers.sh` script do not affect `slurm` jobs.
 
 ```
 └─system.slice (#55)
@@ -61,17 +73,41 @@ with the `slurm` jobs.
 
 This can be nicely observed with `systemd-cgls`.
 
-## Memory control
+#### CPU control
 
-Memory of the cgroups is limited to whatever is set as the `memory.max` value. But
-note that this field is limiting only resident set size of the memory, therefore
-it will not (!) limit memory consumption of the additional swapped space.
+CPU is limited using the `cpu.max` value.
+Note that this limit contains two values
+ * The first value is the amount of CPU time a user can consume
+ * per the second value == the duration over which the usage is computed and over which the limit is enforced.
+The values are in micro seconds.
 
-Simply put: if there is limit of `memory.max=100MB`, user can still use 1G of
-total memory, where 100M is placed in memory and the rest of the 900M will be
-placed in swap.
+When the CPU limit is set with `systemctl` a different unit is used: % of a CPU core.
+E.g. 100% equals 1 CPU core, 250% equals 2,5 CPU core, etc.
 
-## Local Disk Bandwidth control
+When the CPU limit is reported with `systemctl` yet another unit is used: CPUQuotaPerSecUSec,
+which stands for the the amount of time per 1 second of CPU time.
+
+Example:
+ * On system with 4 cores, `limitedusers.sh` will set the limit for CPU usage to 20% of total CPUs available.
+ * `4 cores * 100% = 400% total CPU`
+ * `4 cores *  20% =  80% CPU per user`
+ * `cpu.max = 80000 100000`  
+   So the period over which the limit is enforced is 100000 / 1000 = 100 milli seconds.  
+   And the user's slice is 80000 / 1000 = 80 milli seconds per that period of 100 milli seconds.
+ * `CPUQuotaPerSecUSec=800ms`  
+   Note that this is by definition per second and therefore 10 times higher than the cpu.max limit,  
+   which was reported per 100 milli seconds.
+
+#### Memory control
+
+Memory is limited using the `memory.max` value.
+Note that this limit only applies to the _resident set size_ of the memory.
+Therefore it will **not** limit memory consumption of additional swapped space nor of virtual memory.
+
+Simply put: when `memory.max=100MB` a user can still use 1 GB memory total,
+where 100 MB is placed in real memory and the rest of the 900 MB will be placed in swap space.
+
+#### Local Disk Bandwidth control
 
 If control groups is set to
 

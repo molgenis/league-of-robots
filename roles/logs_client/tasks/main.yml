@@ -39,6 +39,9 @@
         (groups.jumphost | default([]) | first)
         | default(lookup('env', 'AI_PROXY'))
       }}
+  tags:
+    - always
+    - test
 
 - name: Open logs server firewall for each client
   ansible.builtin.include_tasks:

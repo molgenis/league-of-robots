@@ -98,7 +98,7 @@
         - - {{ extra_mount['device'] }}
           - {{ extra_mount['mount_point'] }}
           - {{ extra_mount['type'] }}
-          - {{ extra_mount['mount_options'] }}
+          - {{ extra_mount['mount_options'] }}{% if 'nofail' not in extra_mount['mount_options']%},nofail{% endif %}
         {% endfor %}
       {% endif %}
     availability_zone: "{{ availability_zone }}"

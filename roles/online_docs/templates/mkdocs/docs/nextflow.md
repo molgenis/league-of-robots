@@ -141,7 +141,7 @@ for example, create a ```launch_script.sh``` containing:
 #SBATCH --nodes=1
 #SBATCH --open-mode=append
 #SBATCH --export=NONE
-#SBATCH --get-user-env=L
+#SBATCH --get-user-env
 
 PIPELINE=$1
 CONFIG=$2

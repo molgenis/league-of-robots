@@ -69,7 +69,7 @@ Create a slurm script with appropriate fields. For more information check also t
     #SBATCH --nodes=1
     #SBATCH --open-mode=truncate
     #SBATCH --export=NONE
-    #SBATCH --get-user-env=60L
+    #SBATCH --get-user-env
     
     # clear all loaded modules
     module purge

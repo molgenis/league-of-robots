@@ -247,7 +247,7 @@ yum_repos:
         - distro
         - core
     - id: extras
-      name: AlmaLinux 9 - Extras
+      name: AlmaLinux - Extras
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/$releasever/extras
       enabled: 1
       repo_server_download: true

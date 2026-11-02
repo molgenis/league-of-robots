@@ -17,4 +17,39 @@
     daemon_reload: true
     force: true
   become: true
+
+- name: Create folder for systemd override file.
+  ansible.builtin.file:
+    name: /etc/systemd/system/irqbalance.service.d
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'directory'
+  notify:
+    - basic_security_restart_irqbalance
+  when:
+    - basic_security_enable_unprivileged_user_namespaces is false
+  become: true
+
+- name: Install systemd override file to patch irqbalance.service when unprivileged user namespaces are disabled.
+  ansible.builtin.copy:
+    src: files/irqbalance.service.override.conf
+    dest: /etc/systemd/system/irqbalance.service.d/override.conf
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify:
+    - basic_security_restart_irqbalance
+  when:
+    - basic_security_enable_unprivileged_user_namespaces is false
+  become: true
+
+- name: Remove systemd override file to patch irqbalance.service when unprivileged user namespaces are enabled.
+  ansible.builtin.file:
+    path: /etc/systemd/system/irqbalance.service.d/override.conf
+    state: absent
+  when:
+    - basic_security_enable_unprivileged_user_namespaces is true
+  notify: basic_security_restart_irqbalance
+  become: true
 ...

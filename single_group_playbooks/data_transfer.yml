@@ -29,4 +29,5 @@
       when: local_mounts is defined and local_mounts | length > 0
     - cleanup_gs_data
     - nhc_standalone
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

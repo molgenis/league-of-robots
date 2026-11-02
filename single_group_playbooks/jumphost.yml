@@ -25,10 +25,7 @@
     - sshd
     - basic_security
     - regular_users
-    # Disabled monitoring: needs update. See also:
-    # https://github.com/rug-cit-hpc/league-of-robots/issues/294
-    # - node_exporter
-    # - {role: grafana_proxy, when: ansible_hostname == 'airlock'}
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 
 - name: '###==-> More roles for jumphosts. <-==###'
   hosts:

@@ -6,6 +6,7 @@
   ansible.builtin.import_playbook: init.yml
 
 - name: '##==-> Configure syslog servers. <-==###'
+  hosts: logs
   roles:
     - interfaces
     - iptables
@@ -15,11 +16,12 @@
     - ssh  # client
     - update
     - remove
+    - logins
     - role: yum_local
       when: local_yum_repository is defined
     - logrotate
     - sshd
     - basic_security
     - logs_server
-  hosts: logs
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

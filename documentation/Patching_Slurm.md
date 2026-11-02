@@ -170,7 +170,7 @@ tar -cvjf ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}-${SLURM_REL}.umcg.tar.bz2  s
 ### 6. Build patched RPMs
 
 ```
-rpmbuild -ta --with lua --with mysql ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}-${SLURM_REL}.umcg.tar.bz2
+rpmbuild -ta --with lua --with mysql --with cgroupv2 ~/rpmbuild/SOURCES/slurm-${SLURM_VERSION}-${SLURM_REL}.umcg.tar.bz2
 ```
 When successful, add the patched RPMs to our custom repo on the Pulp repo servers for the corresponding infra stacks.
 Don't forget to create a new Pulp publication for the updated repo version and then update the Pulp distribution 

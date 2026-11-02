@@ -1,4 +1,28 @@
 ---
+# This is enforcing that log servers uses `yum_repos` to create
+# yum repositories, since repo servers cannot use Pulp
+repo_manager: 'none'
+#
+# Configure limited subset of repos.
+# Listing the repo ID here does not mean the repo will be enabled!
+# It means the repo config as listed in the yum_repos variable from
+#     group_vars/all/repos.yml
+# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
+#
+yum_repos_deployed_on_clients:
+  alma9: "{{ yum_repos['alma9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog'])
+              | map(attribute='id') }}"
+  rocky9: "{{ yum_repos['rocky9']
+              | selectattr('tags', 'defined')
+              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
+              | map(attribute='id') }}"
+#
+# Security hardening.
+#
+basic_security_enable_unprivileged_user_namespaces: false
+modulejail_enforce: true
 #
 # Firewall configuration.
 #
@@ -37,23 +61,4 @@ iptables_allow_ssh_inbound:
   - "{{ patchcord_library.ip_addresses['spring']['vlan1066'] }}"
 iptables_allow_logs_inbound:
   - ANY
-# This is enforcing that log servers uses `yum_repos` to create
-# yum repositories, since repo servers cannot use Pulp
-repo_manager: 'none'
-#
-# Configure limited subset of repos.
-# Listing the repo ID here does not mean the repo will be enabled!
-# It means the repo config as listed in the yum_repos variable from
-#     group_vars/all/repos.yml
-# will be applied to the machine, which can include instructions for both enabling or disabling a repo.
-#
-yum_repos_deployed_on_clients:
-  alma9: "{{ yum_repos['alma9']
-              | selectattr('tags', 'defined')
-              | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog'])
-              | map(attribute='id') }}"
-  rocky9: "{{ yum_repos['rocky9']
-              | selectattr('tags', 'defined')
-              | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
-              | map(attribute='id') }}"
 ...

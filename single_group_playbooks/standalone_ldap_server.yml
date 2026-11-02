@@ -23,5 +23,7 @@
     - ldap_server
     - regular_users   # to create lsaai user
     - cluster         # to install perun software
-    - { role: lsaai_server, when: perun_facility_name is defined }
+    - role: lsaai_server
+      when: perun_facility_name is defined
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

@@ -5,7 +5,7 @@ cf_infra_catalog:
       vars:
         make: Dell
         model: PowerEdge R7525
-        support_expiration_date: 2027-02-12
+        support_expiration_date: 2031-02-12
         location: CBC
       hosts:
         copperfist:

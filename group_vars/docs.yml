@@ -17,6 +17,11 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog'])
               | map(attribute='id') }}"
 #
+# Security hardening.
+#
+basic_security_enable_unprivileged_user_namespaces: false
+modulejail_enforce: true
+#
 # Firewall configuration.
 #
 iptables_allow_icmp_inbound:
@@ -28,6 +33,7 @@ iptables_allow_icmp_inbound:
   - "{{ all.ip_addresses['rug']['operator'] }}"
   - "{{ all.ip_addresses['gcc']['cloud_net'] }}"
   - "{{ hyperchicken_cluster.ip_addresses['portal']['external_unfiltered'] }}"
+  - "{{ lifter_cluster.ip_addresses['lt-portal']['external-v4'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"
@@ -36,6 +42,7 @@ iptables_allow_icmp_inbound:
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
 iptables_allow_ssh_inbound:
   - "{{ hyperchicken_cluster.ip_addresses['portal']['external_unfiltered'] }}"
+  - "{{ lifter_cluster.ip_addresses['lt-portal']['external-v4'] }}"
   - "{{ nibbler_cluster.ip_addresses['tunnel']['vlan16'] }}"
   - "{{ talos_cluster.ip_addresses['reception']['vlan16'] }}"
   - "{{ vaxtron_cluster.ip_addresses['foyer']['external'] }}"

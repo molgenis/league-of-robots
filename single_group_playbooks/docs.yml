@@ -16,8 +16,10 @@
     - logrotate
     - remove
     - update
+    - coredumps
     - sshd
     - basic_security
     - certs_webservers
     - online_docs
+    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

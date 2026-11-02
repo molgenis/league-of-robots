@@ -1,5 +1,10 @@
 ---
 #
+# Security hardening.
+#
+basic_security_enable_unprivileged_user_namespaces: false
+modulejail_enforce: true
+#
 # Firewall configuration.
 #
 iptables_allow_http_inbound:
