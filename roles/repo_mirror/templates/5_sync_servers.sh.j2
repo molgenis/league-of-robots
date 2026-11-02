@@ -7,40 +7,51 @@ exec 9>"${_lock}"
 flock -n 9 || { echo "Sync already running" >&2; exit 1; }
 
 _main="/mnt/repos"
+_quiet=false
 
 {% set rm_secondary_server = global_repo_servers                                                   
        | selectattr('primary', 'undefined')
        | map(attribute='name')
        | first %}
-_remote="repo@{{ rm_secondary_server }}::repo"
+_remote_sys="repo@{{ rm_secondary_server }}::repo"
 _ssh_ctl="/dev/shm/${USER}-rsync-ssh-ctl-%C"
 _ssh_cmd="ssh -o ConnectTimeout=15 -o ControlMaster=auto -o ControlPath=${_ssh_ctl} -o ControlPersist=60s"
 _opts=(-e "${_ssh_cmd}" -azH --delete --numeric-ids --delay-updates --timeout=120)
-_opts+=(--skip-compress=rpm/gz/xz/bz2/zst --exclude=/dnf/cache/)
+#_opts+=(--skip-compress=rpm/gz/xz/bz2/zst --exclude=/dnf/cache/)
+_opts+=(--skip-compress=rpm/gz/xz/bz2/zst)
 _out=(--info=progress2)
 
 while getopts "nqv" o; do
   case $o in
     n) _opts+=(-n -i); _out=() ;;
-    q) _out=(-q) ;;
+    q) _out=(-q) && _quiet=true ;;
     v) _opts+=(-v) ;;
     *) echo "Usage: $0 [-n dry-run] [-q quiet] [-v verbose]"; exit 1 ;;
   esac
 done
 
 mountpoint -q "${_main}" || { echo "${_main} not mounted" >&2; exit 1; }
-
 cd "${_main}"
+
+if ! ${_quiet}; then echo "Syncing versions ... "; fi
 for _each_os in $(cd 1versions/; find . -mindepth 1 -maxdepth 1 -type d -printf '%P\n'); do
    for _each_repo in $(cd "1versions/${_each_os}"; find . -mindepth 1 -maxdepth 1 -type d -printf '%P\n'); do
-      for _each_timestamp in $(cd "1versions/${_each_os}/${_each_repo}"; find . -mindepth 1 -maxdepth 1 -type d -printf '%P\n'); do
-         _src="1versions/${_each_os}/${_each_repo}/${_each_timestamp}"
-         _dst="${_remote}/${_src}"
-         rsync "${_opts[@]}" "${_out[@]}" "${_src}/" "${_dst}/" \
-            --exclude=repodata/ \
-            --link-dest="../../../../0cache/${_each_os}/${_each_repo}"
-      done
+      _src="1versions/${_each_os}/${_each_repo}/"
+      _dst="${_remote_sys}/${_src}"
+      rsync "${_opts[@]}" "${_out[@]}" "${_src}/" "${_dst}/" \
+         --link-dest="../../../../0cache/${_each_os}/${_each_repo}"
    done
 done
 
-echo "Successfully finished."
+if ! ${_quiet}; then echo "Syncing 2deploy ... "; fi
+# With regular 'rsync ... 2deploy/ ${_remote_sys}/2deploy/" will fail, because
+# links that are pointing outside of the 2deploy, like
+#    ../../1versions/alma9/...
+# will be overwritten into
+#    ../1versions/alma9/...
+# 
+# So instead I rsync 2-levels deep, to allow 2 level deep links, with 
+#    --include='/2deploy/***' --exclude='*' ./* remote/
+#    
+rsync "${_opts[@]}" "${_out[@]}" --include='/2deploy/***' --exclude='*' "./" "${_remote_sys}/"
+if ! ${_quiet}; then echo "Successfully finished syncing servers."; fi

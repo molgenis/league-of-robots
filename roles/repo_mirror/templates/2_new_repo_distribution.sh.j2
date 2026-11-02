@@ -193,5 +193,9 @@ if ! test -e "2deploy/all"; then
    ln -s "../1versions/" "./2deploy/all"
 fi
 
-echo "Successfully finished."
+
+echo "Syncronizing severs ... "
+./5_sync_servers.sh -q
+
+echo "Successfully finished creating new version."
 {% endraw %}

@@ -19,7 +19,7 @@
   ansible.builtin.set_fact:
     rm_repo_is_primary: "{{ rm_primary_name == inventory_hostname }}"
 
-- name: Show primary determination
+- name: Show primary host
   debug:
     msg: >-
       {{ inventory_hostname }} is {{ 'PRIMARY' if rm_repo_is_primary else 'SECONDARY' }}
@@ -59,9 +59,9 @@
   with_items:
     - 1_sync_repo_to_new_version.sh
     - 2_new_repo_distribution.sh
-    - 2_sync_servers.sh
     - 3_clean_deploy_dead_links.sh
     - 4_clean_unused_versions.sh
+    - 5_sync_servers.sh
   become: true
   when: rm_repo_is_primary
 
