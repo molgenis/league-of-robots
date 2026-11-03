@@ -14,7 +14,7 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp0s3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -39,7 +39,7 @@ all:
               security_group: "{{ stack_prefix }}_repo"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
           swap_file_size: 2
     data_transfer:
       hosts:
