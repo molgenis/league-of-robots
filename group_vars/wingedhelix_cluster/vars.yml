@@ -39,11 +39,6 @@ motd: |
       =========================================================
           Welcome to {{ slurm_cluster_name | capitalize }}
       =========================================================
-additional_etc_hosts:
-  - group: copperfist_cluster
-    nodes:
-      - name: copperfist
-        network: vlan16
 #
 # Configure the SSH client on this stack for logins on other stacks listed in ssh_client_configs.
 #
