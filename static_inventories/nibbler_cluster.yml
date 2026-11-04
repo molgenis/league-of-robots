@@ -20,7 +20,7 @@ all:
     repo:
       hosts:
         nb-repo:
-          cloud_flavor: umcg.v1.vm.1-2
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: vlan1338
               security_group: "{{ stack_prefix }}_repo"
