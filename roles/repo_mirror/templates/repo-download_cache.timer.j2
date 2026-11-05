@@ -3,8 +3,9 @@
 Description=Periodically start syncronization service between repo servers
 
 [Timer]
-OnCalendar=4 hours
-RandomizedDelaySec=300
+OnBootSec=15min
+OnCalendar=hourly
+RandomizedDelaySec=60
 Persistent=true
 Unit=repo-download_cache.service
 

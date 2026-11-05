@@ -7,43 +7,56 @@ exec 9>"${_lock}"
 flock -n 9 || { echo "Sync already running" >&2; exit 1; }
 
 _main="/mnt/repos"
-_quiet=false
+_verbose=1        # 0 - quiet
+                  # 1 - minimal
+                  # 2 - verbose
 
-{% set rm_secondary_server = global_repo_servers                                                   
+{% set rm_secondary_server = global_repo_servers
        | selectattr('primary', 'undefined')
        | map(attribute='name')
        | first %}
 _remote_sys="repo@{{ rm_secondary_server }}::repo"
-_ssh_ctl="/dev/shm/${USER}-rsync-ssh-ctl-%C"
-_ssh_cmd="ssh -o ConnectTimeout=15 -o ControlMaster=auto -o ControlPath=${_ssh_ctl} -o ControlPersist=60s"
-_opts=(-e "${_ssh_cmd}" -azH --delete --numeric-ids --delay-updates --timeout=120)
-#_opts+=(--skip-compress=rpm/gz/xz/bz2/zst --exclude=/dnf/cache/)
-_opts+=(--skip-compress=rpm/gz/xz/bz2/zst)
+_opts=(-e \"ssh -o ConnectTimeout=15 -o ControlMaster=auto -o ControlPath=/dev/shm/rsync-ssh-ctl-%C -o ControlPersist=60s\")
+_opts+=(-rlpgoDH -z --delete --numeric-ids --timeout=120 --size-only --ignore-times --delay-updates)
+# Well tested, don't change!
+# - dnf/cache is excuded as the remote server is syncing
+# - same for repodata - also it cannot be checked against size-only
+_opts+=(--skip-compress=rpm/gz/xz/bz2/zst --exclude=/dnf/cache/ --exclude=repodata/)
 _out=(--info=progress2)
 
-while getopts "nqv" o; do
+while getopts "nqv:" o; do
   case $o in
     n) _opts+=(-n -i); _out=() ;;
-    q) _out=(-q) && _quiet=true ;;
-    v) _opts+=(-v) ;;
-    *) echo "Usage: $0 [-n dry-run] [-q quiet] [-v verbose]"; exit 1 ;;
+    q) _out=(-q); _verbose=0 ;;
+    v) if [[ ! "${OPTARG}" =~ ^[0-9]+$ ]]; then echo "error, -v is not number"; exit 1; fi; _verbose="${OPTARG}" ;;
+    *) echo "Usage: $0 [-n dry-run] [-v 0|1|2]"; exit 1 ;;
   esac
 done
+
+case "${_verbose}" in
+   1) _out=() ;;
+   2) _out=(--info=progress2) ;;
+esac
 
 mountpoint -q "${_main}" || { echo "${_main} not mounted" >&2; exit 1; }
 cd "${_main}"
 
-if ! ${_quiet}; then echo "Syncing versions ... "; fi
 for _each_os in $(cd 1versions/; find . -mindepth 1 -maxdepth 1 -type d -printf '%P\n'); do
    for _each_repo in $(cd "1versions/${_each_os}"; find . -mindepth 1 -maxdepth 1 -type d -printf '%P\n'); do
-      _src="1versions/${_each_os}/${_each_repo}/"
-      _dst="${_remote_sys}/${_src}"
-      rsync "${_opts[@]}" "${_out[@]}" "${_src}/" "${_dst}/" \
-         --link-dest="../../../../0cache/${_each_os}/${_each_repo}"
+      for _each_timestamp in $(cd "1versions/${_each_os}/${_each_repo}"; find . -mindepth 1 -maxdepth 1 -type d -printf '%P\n'); do
+         _src="1versions/${_each_os}/${_each_repo}/${_each_timestamp}"
+         _dst="${_remote_sys}/${_src}"
+         _cmd="rsync "${_opts[@]}" "${_out[@]}" "${_src}/" "${_dst}/" --link-dest="../../../../0cache/${_each_os}/${_each_repo}" --exclude=repodata/"
+         if [[ "${_verbose}" -eq "1" ]]; then echo -n "."
+         elif [[ "${_verbose}" -gt "2" ]]; then echo -e "\t${_cmd}"
+         fi
+         eval "${_cmd}"
+      done
    done
 done
 
-if ! ${_quiet}; then echo "Syncing 2deploy ... "; fi
+
+if [[ "${_verbose}" -gt "0" ]]; then echo "Syncing 2deploy ... "; fi
 # With regular 'rsync ... 2deploy/ ${_remote_sys}/2deploy/" will fail, because
 # links that are pointing outside of the 2deploy, like
 #    ../../1versions/alma9/...
@@ -52,6 +65,7 @@ if ! ${_quiet}; then echo "Syncing 2deploy ... "; fi
 # 
 # So instead I rsync 2-levels deep, to allow 2 level deep links, with 
 #    --include='/2deploy/***' --exclude='*' ./* remote/
-#    
-rsync "${_opts[@]}" "${_out[@]}" --include='/2deploy/***' --exclude='*' "./" "${_remote_sys}/"
-if ! ${_quiet}; then echo "Successfully finished syncing servers."; fi
+#
+# eval, to correctly handle opts=() with escaped \"quotes\"
+eval rsync "${_opts[@]}" "${_out[@]}" --include='/2deploy/***' --exclude='*' "./" "${_remote_sys}/"
+if [[ "${_verbose}" -gt "0" ]]; then echo "Successfully finished syncing servers."; fi
