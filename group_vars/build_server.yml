@@ -18,7 +18,14 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'rsyslog', 'irods'])
               | map(attribute='id') }}"
-modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
+#
+# Enable unprivileged user namespaces to allow container workloads.
+#
+basic_security_enable_unprivileged_user_namespaces: true
+#
+# Security hardening: block unused kernel modules from getting loaded.
+#
+modulejail_enforce: true
 #
 # Firewall configuration.
 #

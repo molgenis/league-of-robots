@@ -91,13 +91,12 @@
       - 'rsync'
   become: true
 
-- name: 'Install nano, PHP, Python and Apache webserver.'
+- name: 'Install nano, Python and Apache webserver.'
   ansible.builtin.package:
     state: 'latest'
     update_cache: true
     name:
       - 'nano'
-      - 'php'
       - 'python3'
       - 'python3-pip'
       - 'python3-jinja2'
@@ -186,41 +185,6 @@
       mode: '0755'
   become: true
 
-- name: 'Create static files for index in document root.'
-  ansible.posix.synchronize:
-    src: "{{ playbook_dir }}/roles/online_docs/files/index//./{{ item['src'] }}"
-    dest: "/var/www/html/"
-    owner: false  # Do not sync owner from Ansible control host to inventory host.
-    group: false  # Do not sync group from Ansible control host to inventory host.
-    times: false  # Do not sync time stamps from Ansible control host to inventory host.
-    checksum: true  # Determine if files are different based on checksums as opposed to combination of timestamp and size.
-    # Temporarily disabled as it is broken in Mitogen 0.3.3. Fix is already merged and will be in next Mitogen version.
-    # use_ssh_args: true
-    ssh_connection_multiplexing: true
-    rsync_opts:
-      # --omit-dir-times  Is required to prevent "sync error: some files/attrs were not transferred"
-      #                   for file systems like NFS mounts that cannot handle setting dir times properly.
-      # --chmod           Is required to prevent errors when the perms on the source are not what is required/expected on the destination.
-      #                   Fixing perms on the source would be good, but that may be out of our control.
-      #                   In that case --chmod ensures we get what we want on the destination.
-      #                   Works only when combined with --perms.
-      # --force           Is required when symlinks have changed into dirs/files or vice versa.
-      #                   In that case the wrong outdated stuff has to be deleted on the destination first before the new stuff can be created.
-      #                   Deleting the outdated stuff may fail without --force.
-      # --relative        In combination with a "source_server:some/path/not/created/on/destination/./path/created/on/destination/some_file" (dot dir)
-      #                   recreates a partial dir structure on the destination relative to the /./ dir, when it does not already exist.
-      #                   Without this combination of --relative and dot dir rsync will error when the path does not exist on the destination.
-      #                   IMPORTANT: src and dest paths must be absolute paths. Otherwise Ansible will expand the path itself which will remove the /./ dir.
-      - '--relative'
-      - '--omit-dir-times'
-      - '--chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r'
-      - '--perms'
-      - '--force'
-  with_items:
-    - src: 'index.php'
-    - src: 'sitemap.php'
-  become: true
-
 - name: 'Create sub directory structure for MarkDown files.'
   ansible.builtin.file:
     path: "/srv/mkdocs/{{ slurm_cluster_name }}/{{ item['path'] }}"
@@ -305,5 +269,28 @@
   when: item['state'] == 'file' and '.md.html' not in item['path']
   notify:
     - 'build_mkdocs'
+  become: true
+
+- name: Get list of sub web sites and their titles.
+  ansible.builtin.shell:
+    cmd: |
+         set -e
+         set -u
+         set -o pipefail
+         cd /var/www/html/
+         grep -o -i '<title>.*</title>' */index.html \
+             | sed 's/<\/*title>//gI'
+  register: online_docs_sub_websites
+  changed_when: false
+
+- name: 'Create static index.html in the document root.'
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    sub_websites: "{{ online_docs_sub_websites['stdout_lines'] }}"
   become: true
 ...

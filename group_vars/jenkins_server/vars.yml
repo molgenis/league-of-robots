@@ -64,39 +64,24 @@ external_jumphosts:
       - hostname: cf-porch
         network: external
 jenkins_plugins:
+  - analysis-model-api
+  - branch-api
+  - cloudbees-folder
+  - git
+  - github
+  - github-api
+  - github-branch-source
+  - git-client
+  - matrix-auth
+  - pipeline-stage-step
   - warnings-ng
-  - name: git
-    version: 5.10.1
-  - name: branch-api
-    version: 2.1280.v0d4e5b_b_460ef
-  - name: cloudbees-folder
-    version: 6.1100.ve9eed61d16c4
-  - name: github-branch-source
-    version: 1967.1970.vd86979736546
-  - name: analysis-model-api
-    version: 14.14.0-1004.vf53c9efb_f455
-  - name: github-api
-    version: 1.330-492.v3941a_032db_2a_
-  - name: git-client
-    version: 6.6.1
-  - name: github
-    version: 1.47.0
-  - name: matrix-auth
-    version: 3.3
-  - name: workflow-api
-    version: 1413.v2ff1a_5e720fa_
-  - name: workflow-job
-    version: 1590.v49101d088542
-  - name: workflow-multibranch
-    version: 821.vc3b_4ea_780798
-  - name: workflow-basic-steps
-    version: 1098.v808b_fd7f8cf4
-  - name: workflow-durable-task-step
-    version: 1479.v56e587f413a_7
-  - name: workflow-scm-step
-    version: 466.va_d69e602552b_
-  - name: pipeline-stage-step
-    version: 345.va_96187909426
+  - workflow-api
+  - workflow-basic-steps
+  - workflow-cps
+  - workflow-durable-task-step
+  - workflow-job
+  - workflow-multibranch
+  - workflow-scm-step
 jenkins_plugins_install_dependencies: true
 jenkins_prefer_lts: true
 jenkins_shellcheck_version: 0.8.0

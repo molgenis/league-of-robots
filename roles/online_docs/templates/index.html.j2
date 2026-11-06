@@ -1,3 +1,4 @@
+#jinja2: trim_blocks:True, lstrip_blocks: True
 <!DOCTYPE html>
 <html>
 <head>
@@ -59,7 +60,12 @@
   <h1 id=content>Documentation Library</h1>
   <h3 id=content>Infrastructure documented on this server:</h3>
   <div id=content>
-    <?php include "sitemap.php"; ?>
+    <ul>
+    {% for sub_website in sub_websites %}
+      {% set relative_url, title = sub_website | split(':') %}
+      <li><a href="{{ relative_url }}">{{ title }}</a></li>
+    {% endfor %}
+    </ul>
   </div>
 <code><span style="display:block;line-height:8px;font-size:8px;font-weight:bold;white-space:pre;font-family:monospace;">
                                                                                                                                                                

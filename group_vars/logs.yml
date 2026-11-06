@@ -19,6 +19,11 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog'])
               | map(attribute='id') }}"
 #
+# Security hardening.
+#
+basic_security_enable_unprivileged_user_namespaces: false
+modulejail_enforce: true
+#
 # Firewall configuration.
 #
 iptables_allow_icmp_inbound:
@@ -54,5 +59,4 @@ iptables_allow_ssh_inbound:
   - "{{ logs_library.ip_addresses['hatch']['logs_external_public'] }}"
 iptables_allow_logs_inbound:
   - ANY
-modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
 ...

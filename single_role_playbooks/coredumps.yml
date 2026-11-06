@@ -2,6 +2,7 @@
 - hosts:
     - cluster
     - chaperone,!mit_chaperone
+    - docs
   roles:
     - coredumps
 ...
