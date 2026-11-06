@@ -299,4 +299,19 @@ lfs_mounts:
     pfs: umcgst04/slice4
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
+
+nhc_journalctl_checks:
+  deploy_admin_interface:
+    - user: "root"
+      lookback_min: 15
+      tag: "CROND"
+#    - user: "umcg-atd-dm"
+#      lookback_min: 15
+#      tag: "CROND"
+#      pattern: "FAILED|exit code|backup FAILED"
+#  chaperone:
+#    - user: "umcg-ogm-dm"
+#      lookback: 10
+#      tag: "CROND"
+#      pattern: "FAILED|exit code|backup FAILED"
 ...

@@ -1,0 +1,90 @@
+# NHC -- UMCG's check for journalctl patterns
+
+# Initialize variables
+declare USERS="${1:-root}"
+declare LOOKBACK_MIN="${2:-15}"
+declare TAG="${3:-CROND}"
+declare PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
+
+# Check journalctl entries for a given service within a configurable lookback period,
+# filtering by tag (-t), error pattern (-g PATTERN), and user list.
+# Report matching entries as an NHC health check.
+#
+# Behaviour:
+# FAILED: A matching error pattern is found within the configured time window.
+# OK: No matching error pattern is found found within the configured time window.
+#
+# An 'CLEARED' notification does not 100% guarantee that a process runs 'OK' again;
+# it means that no matching log entries were found in the given lookback period.
+# Therefore, make sure the `lookback_min` matches the run freqency of your check.
+function check_journalctl()
+{
+    # Defaults 
+    local USERS="${1:-root}"
+    local LOOKBACK_MIN="${2:-15}"
+    local TAG="${3:-CROND}"
+    local PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
+
+    local USER
+    local USER_LOGS
+    local MATCH
+    local SINCE
+    local LOGS
+    local WARNING
+
+    local -a USER_LIST
+    local -a ERRORS=()
+
+    IFS=',' read -r -a USER_LIST <<< "${USERS}"
+
+    SINCE="$(date -d "-${LOOKBACK_MIN} min" "+%Y-%m-%d %H:%M:%S")"
+
+    # Fetch Logs for a specific TAG and a PATTERN
+    LOGS="$(
+    journalctl \
+        --since "${SINCE}" \
+        -t "${TAG}" \
+        -g "${PATTERN}" \
+        --case-sensitive=no \
+        --no-pager 2>/dev/null ||
+    true
+    )"
+    # filter on USER_LIST 
+    for USER in "${USER_LIST[@]}"; do
+
+        # Only fetch execution CMD's for listed user from the journalctr output in ${LOGS}.
+        USER_LOGS="$(
+            grep -iE "\(${USER}\) CMD" <<< "${LOGS}" ||
+            true
+        )"
+        # Look for error patterns in ${USER_LOGS}.
+        if [[ -n "${USER_LOGS}" ]]; then
+
+            MATCH="$(
+                grep -iE "${PATTERN}" <<< "${USER_LOGS}" ||
+                true
+                )"
+            if [[ -n "${MATCH}" ]]; then
+                ERRORS+=("${USER}: $(printf '%s\n' "${MATCH}" | head -n1)")
+            fi
+        fi
+    done
+
+    # Report $WARNING to logfile using 'die 1'
+    if [[ ${#ERRORS[@]} -gt 0 ]]; then
+
+        WARNING="$FUNCNAME:  ${TAG}_ERRORS detected in last ${LOOKBACK_MIN} min"
+        WARNING="${WARNING};  Affected user: ${USER}"
+
+        for MATCH in "${ERRORS[@]}"; do
+            WARNING="${WARNING}; ${MATCH}"
+        done
+
+        die 1 "${WARNING}"
+        return 1
+    fi
+
+    # reporting if 'OK and return 0'
+    log "$FUNCNAME:  ${TAG}_OK: no errors detected in last ${LOOKBACK_MIN} min"
+    return 0
+}
