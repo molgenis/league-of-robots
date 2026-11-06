@@ -5,6 +5,17 @@ modulejail_generic_modules:
   #
   - zstd
   - zstd_compress
+  #
+  # iptables firewall.
+  #
+  - nf_tables
+  - nft_compat
+  - nft_counter
+  - nft_limit
+  - nf_defrag_ipv4
+  - nf_defrag_ipv6
+  - nf_conntrack
+  - nf_conntrack_ftp
 
 modulejail_amd_cpu_modules:
   #
