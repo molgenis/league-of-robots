@@ -5,6 +5,7 @@
     - jumphost
     - cluster
     - chaperone,!mit_chaperone
+    - ldap_server
     - repo
     - repo_servers
     - logs
