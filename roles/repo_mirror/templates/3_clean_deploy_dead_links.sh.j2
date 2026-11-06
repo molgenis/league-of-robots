@@ -1,10 +1,26 @@
 #jinja2: trim_blocks:True, lstrip_blocks: True
 #!/bin/bash
 
+
 _debug=false
 _main="{{ main_repo_path }}"
 
-[[ "${1:-}" == '-d' ]] && _debug=true
+function _help(){
+   echo "Use"
+   echo "   ${0} [ -d ]"
+   echo ""
+   echo "   -d    debug"
+   echo ""
+   exit 0
+}
+
+OPTSTRING="d"
+while getopts ${OPTSTRING} opt; do
+  case ${opt} in
+    d) _debug=true ;;
+    *) _help ;;
+  esac
+done
 
 
 ! test -d "${_main}/logs/cli" && mkdir "${_main}/logs/cli"
