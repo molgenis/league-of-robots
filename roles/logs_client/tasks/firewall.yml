@@ -23,9 +23,11 @@
   ansible.builtin.fail:
     msg: |
           All attempts to connect to any of log server have failed.
-          If access to the remote logs servers is not possible (perhaps because
-          the stack does not have jumphost - you can use other (which is already
-          whitelisted) jumphosts by setting
+          If access to the remote logs servers failed,
+          because the stack does not have its own jumphost,
+          then you can use another jumphost, which was already
+          added to the allow list of the firewall / security group for the logs servers
+          by setting
             export AI_PROXY=...
           and then rerun this playbook.
   failed_when: logs_failed == logs_all
