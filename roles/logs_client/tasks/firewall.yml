@@ -21,7 +21,13 @@
 
 - name: Fail if all log servers are offline
   ansible.builtin.fail:
-    msg: "All attempts to connect to any of log server have failed."
+    msg: |
+          All attempts to connect to any of log server have failed.
+          If access to the remote logs servers is not possible (perhaps because
+          the stack does not have jumphost - you can use other (which is already
+          whitelisted) jumphosts by setting
+            export AI_PROXY=portal
+          and then rerun this playbook.
   failed_when: logs_failed == logs_all
 
 - name: Get public IP of all the clients
