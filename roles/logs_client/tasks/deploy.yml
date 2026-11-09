@@ -1,100 +1,105 @@
 ---
-- name: Install gnutls and newer openssl
-  ansible.builtin.package:
-    name:
-      - gnutls
-      - gnutls-utils
-      - openssl
-      - openssl-devel
-    state: latest
-    update_cache: true
-  become: true
-  notify: client_restart_rsyslog
+- name: Deploy rsyslog on the client machine
+  block:
+    - name: Install gnutls and newer openssl
+      ansible.builtin.package:
+        name:
+          - gnutls
+          - gnutls-utils
+          - openssl
+          - openssl-devel
+        state: latest
+        update_cache: true
+      become: true
+      notify: client_restart_rsyslog
 
-- name: Install rsyslog and additional packages provided by rsyslog
-  ansible.builtin.package:
-    name:
-      - librelp
-      - rsyslog
-      - rsyslog-relp
-      - rsyslog-openssl
-    state: latest
-    update_cache: true
-    disablerepo: '*'
-    enablerepo: rsyslog
-  become: true
-  notify: client_restart_rsyslog
+    - name: Install rsyslog and additional packages provided by rsyslog
+      ansible.builtin.package:
+        name:
+          - librelp
+          - rsyslog
+          - rsyslog-relp
+          - rsyslog-openssl
+        state: latest
+        update_cache: true
+        disablerepo: '*'
+        enablerepo: rsyslog
+      become: true
+      notify: client_restart_rsyslog
 
-- name: Make sure that rsyslog work directory /var/spool/rsyslog is created
-  ansible.builtin.file:
-    path: /var/spool/rsyslog
-    state: directory
-    owner: root
-    group: root
-    mode: '0700'
-  become: true
+    - name: Make sure that rsyslog work directory /var/spool/rsyslog is created
+      ansible.builtin.file:
+        path: /var/spool/rsyslog
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+      become: true
 
-- name: Create client keys and certificates, if managed rsyslog servers are present
-  ansible.builtin.include_tasks: client.yml
-  when: cluster_class_servers | length > 0
+    - name: Create client keys and certificates, if managed rsyslog servers are present
+      ansible.builtin.include_tasks: client.yml
+      when: cluster_class_servers | length > 0
 
-# Must be deployed first due to the order of checking the scripts in next step
-# and faulty script in rsyslog.d can break deploying rsyslog.conf
-- name: Deploy configuration for managed remote rsyslog servers
-  ansible.builtin.template:
-    src: templates/rsyslog_managed.conf
-    dest: /etc/rsyslog.d/managed.conf
-    force: true
-    mode: '0644'
-    validate: /sbin/rsyslogd -N1 -f %s
-  become: true
-  notify: client_restart_rsyslog
+    # Must be deployed first due to the order of checking the scripts in next step
+    # and faulty script in rsyslog.d can break deploying rsyslog.conf
+    - name: Deploy configuration for managed remote rsyslog servers
+      ansible.builtin.template:
+        src: templates/rsyslog_managed.conf
+        dest: /etc/rsyslog.d/managed.conf
+        force: true
+        mode: '0644'
+        validate: /sbin/rsyslogd -N1 -f %s
+      become: true
+      notify: client_restart_rsyslog
 
-- name: Deploy clients rsyslog.conf
-  ansible.builtin.template:
-    src: templates/rsyslog.conf
-    dest: /etc/rsyslog.conf
-    force: true
-    mode: '0644'
-    validate: /sbin/rsyslogd -N1 -f %s
-  become: true
-  notify: client_restart_rsyslog
+    - name: Deploy clients rsyslog.conf
+      ansible.builtin.template:
+        src: templates/rsyslog.conf
+        dest: /etc/rsyslog.conf
+        force: true
+        mode: '0644'
+        validate: /sbin/rsyslogd -N1 -f %s
+      become: true
+      notify: client_restart_rsyslog
 
-- name: Deploy configuration for unmanaged remote rsyslog servers
-  ansible.builtin.template:
-    src: templates/rsyslog_unmanaged.conf
-    dest: /etc/rsyslog.d/unmanaged.conf
-    force: true
-    mode: '0644'
-  become: true
-  notify: client_restart_rsyslog
+    - name: Deploy configuration for unmanaged remote rsyslog servers
+      ansible.builtin.template:
+        src: templates/rsyslog_unmanaged.conf
+        dest: /etc/rsyslog.d/unmanaged.conf
+        force: true
+        mode: '0644'
+      become: true
+      notify: client_restart_rsyslog
 
-- name: Deploy custom rsyslog.service
-  ansible.builtin.copy:
-    src: files/rsyslog.service
-    dest: /usr/lib/systemd/system/rsyslog.service
-    force: true
-    mode: '0644'
-  notify:
-    - systemd_reload
-    - rsyslog_enable
-  become: true
+    - name: Deploy custom rsyslog.service
+      ansible.builtin.copy:
+        src: files/rsyslog.service
+        dest: /usr/lib/systemd/system/rsyslog.service
+        force: true
+        mode: '0644'
+      notify:
+        - systemd_reload
+        - rsyslog_enable
+      become: true
 
-- name: Remove problematic /etc/rsyslog.d/listen.conf file
-  ansible.builtin.file:
-    path: /etc/rsyslog.d/listen.conf
-    state: absent
-  become: true
-  notify: client_restart_rsyslog
+    - name: Remove problematic /etc/rsyslog.d/listen.conf file
+      ansible.builtin.file:
+        path: /etc/rsyslog.d/listen.conf
+        state: absent
+      become: true
+      notify: client_restart_rsyslog
 
-- name: Fix the syslog logrotate to work correctly with rsyslog
-  ansible.builtin.template:
-    src: templates/rsyslog.logrotate
-    dest: /etc/logrotate.d/rsyslog
-    mode: '0644'
-    force: true
-  become: true
+    - name: Fix the syslog logrotate to work correctly with rsyslog
+      ansible.builtin.template:
+        src: templates/rsyslog.logrotate
+        dest: /etc/logrotate.d/rsyslog
+        mode: '0644'
+        force: true
+      become: true
 
-- name: Force all services to restart, before next tasks
-  ansible.builtin.meta: flush_handlers
+    - name: Force all services to restart, before next tasks
+      ansible.builtin.meta: flush_handlers
+
+  tags:
+    - logs_client_config
 ...

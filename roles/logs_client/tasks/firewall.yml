@@ -1,65 +1,69 @@
 ---
-- name: Ensure that the directory iptables extras exists
-  ansible.builtin.file:
-    path: "{{ iptables_extras_dir }}"
-    owner: "root"
-    group: "root"
-    mode: '0770'
-    state: 'directory'
-  delegate_to: "{{ proxy_host }}+{{ item }}"
-  register: create_iptables_extras_d
-  loop: "{{ cluster_class_servers }}"
-  become: true
-  ignore_errors: true
-  ignore_unreachable: true
+- name: Set firewall
+  block:
+    - name: Ensure that the directory iptables extras exists
+      ansible.builtin.file:
+        path: "{{ iptables_extras_dir }}"
+        owner: "root"
+        group: "root"
+        mode: '0770'
+        state: 'directory'
+      delegate_to: "{{ proxy_host }}+{{ item }}"
+      register: create_iptables_extras_d
+      loop: "{{ cluster_class_servers }}"
+      become: true
+      ignore_errors: true
+      ignore_unreachable: true
 
-- name: Count log servers online and offline
-  ansible.builtin.set_fact:
-    logs_failed: "{{ create_iptables_extras_d.results | selectattr('failed', 'defined') | select('equalto', true) | list | length
-            + create_iptables_extras_d.results | rejectattr('failed', 'defined') | list | length }}"
-    logs_all: "{{ cluster_class_servers | list | length }}"
+    - name: Count log servers online and offline
+      ansible.builtin.set_fact:
+        logs_failed: "{{ create_iptables_extras_d.results | selectattr('failed', 'defined') | select('equalto', true) | list | length
+                + create_iptables_extras_d.results | rejectattr('failed', 'defined') | list | length }}"
+        logs_all: "{{ cluster_class_servers | list | length }}"
 
-- name: Fail if all log servers are offline
-  ansible.builtin.fail:
-    msg: |
-          All attempts to connect to any of log server have failed.
-          If access to the remote logs servers failed,
-          because the stack does not have its own jumphost,
-          then you can use another jumphost, which was already
-          added to the allow list of the firewall / security group for the logs servers
-          by setting
-            export AI_PROXY=...
-          and then rerun this playbook.
-  failed_when: logs_failed == logs_all
+    - name: Fail if all log servers are offline
+      ansible.builtin.fail:
+        msg: |
+              All attempts to connect to any of log server have failed.
+              If access to the remote logs servers failed,
+              because the stack does not have its own jumphost,
+              then you can use another jumphost, which was already
+              added to the allow list of the firewall / security group for the logs servers
+              by setting
+                export AI_PROXY=...
+              and then rerun this playbook.
+      failed_when: logs_failed == logs_all
 
-- name: Get public IP of all the clients
-  ansible.builtin.uri:
-    url: http://ifconfig.me/ip
-    return_content: true
-  register: client_public_ip
-  changed_when: false
+    - name: Get public IP of all the clients
+      ansible.builtin.uri:
+        url: http://ifconfig.me/ip
+        return_content: true
+      register: client_public_ip
+      changed_when: false
 
-- name: Print public IP of all the clients
-  ansible.builtin.debug:
-    msg: "{{ inventory_hostname }} => {{ client_public_ip.content }}"
-  changed_when: false
+    - name: Print public IP of all the clients
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} => {{ client_public_ip.content }}"
+      changed_when: false
 
-- name: "Add public IPs of clients to {{ iptables_extras_dir }}/{{ stack_prefix }}.allow on rsyslog servers."
-  ansible.builtin.lineinfile:
-    path: '{{ iptables_extras_dir }}/{{ stack_prefix }}.allow'
-    state: present
-    mode: '0640'
-    create: true
-    regexp: "{{ client_public_ip.content | trim }} 41514"
-    line: "{{ client_public_ip.content | trim }} 41514"
-  delegate_to: "{{ proxy_host }}+{{ item }}"
-  register: add_ip_to_firewall_extra_allow
-  loop: "{{ cluster_class_servers }}"
-  become: true
-  notify: restart_server_firewall
-  ignore_errors: true
-  ignore_unreachable: true
+    - name: "Add public IPs of clients to {{ iptables_extras_dir }}/{{ stack_prefix }}.allow on rsyslog servers."
+      ansible.builtin.lineinfile:
+        path: '{{ iptables_extras_dir }}/{{ stack_prefix }}.allow'
+        state: present
+        mode: '0640'
+        create: true
+        regexp: "{{ client_public_ip.content | trim }} 41514"
+        line: "{{ client_public_ip.content | trim }} 41514"
+      delegate_to: "{{ proxy_host }}+{{ item }}"
+      register: add_ip_to_firewall_extra_allow
+      loop: "{{ cluster_class_servers }}"
+      become: true
+      notify: restart_server_firewall
+      ignore_errors: true
+      ignore_unreachable: true
 
-- name: Force all services to restart, before we continue to configure logs clients
-  ansible.builtin.meta: flush_handlers
+    - name: Force all services to restart, before we continue to configure logs clients
+      ansible.builtin.meta: flush_handlers
+  tags:
+    - logs_client_server_firewall
 ...
