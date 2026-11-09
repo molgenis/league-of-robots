@@ -392,7 +392,7 @@ pfs_mounts:
     ro_options: 'bind,ro,nofail'
     machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: 'medgen_zincfinger$'
-    source: '//storage5.umcg.nl'
+    source: '//storage7.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
