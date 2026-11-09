@@ -53,7 +53,7 @@ use_sssd: false
 #
 # Cluster classification (used by `logs` and `login` roles)
 #
-cluster_class: 'research'
+cluster_class: 'development'
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
