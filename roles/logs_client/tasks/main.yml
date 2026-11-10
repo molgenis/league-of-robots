@@ -1,24 +1,4 @@
 ---
-- name: Print help options
-  ansible.builtin.debug:
-    msg: >
-      this role supports following tags:
-       - test    # for testing / validating that the connection with remote log
-                 # server is working and that logs get correctly transferred
-       - always
-  run_once: true  # noqa run-once
-  delegate_to: localhost
-  connection: local
-  tags:
-    - help
-    - never
-
-- name: Stop the playbook
-  ansible.builtin.meta: end_play
-  tags:
-    - help
-    - never
-
 - name: Compile the list of logs server names
   ansible.builtin.set_fact:
     cluster_class_servers: "{{ cluster_class_servers | default([]) + [item.name] }}"
@@ -30,30 +10,35 @@
   run_once: true
   tags:
     - always
-    - test
+    - logs_client_test
 
 - name: "Set proxy host (jumphost or AI_PROXY)"
   ansible.builtin.set_fact:
     proxy_host: >-
       {{
-        (groups.jumphost | default([]) | first)
-        | default(lookup('env', 'AI_PROXY'))
+        groups.jumphost | default([]) | first
+        | default(lookup('env', 'AI_PROXY'), true)
+        | default('hatch', true)
       }}
   tags:
     - always
-    - test
+    - logs_client_test
 
 - name: Open logs server firewall for each client
   ansible.builtin.include_tasks:
     file: firewall.yml
   when: ( cluster_class is defined and ( cluster_class|length>0 ) ) or
         ( rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 ))
+  tags:
+    - logs_client_server_firewall
 
 - name: Deploy rsyslog client
   ansible.builtin.include_tasks:
     file: deploy.yml
   when: ( cluster_class is defined and ( cluster_class|length>0 ) ) or
         ( rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 ))
+  tags:
+    - logs_client_config
 
 - name: Test rsyslog client
   ansible.builtin.include_tasks:
@@ -62,5 +47,15 @@
         ( rsyslog_external_servers is defined and ( rsyslog_external_servers|length>0 ))
   tags:
     - always
-    - test
+    - logs_client_config
+    - logs_client_test
+
+- name: Restart rsyslog on the client machines
+  ansible.builtin.debug:
+    msg: "Triggering restarting of rsyslog.service on {{ inventory_hostname }}"
+  changed_when: true
+  tags:
+    - never
+    - logs_client_restart
+  notify: client_restart_rsyslog
 ...

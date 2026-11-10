@@ -227,7 +227,7 @@ all:
                 name: tcp20
           slurm_sockets: 8
           slurm_cores_per_socket: 1
-          slurm_real_memory: 15724
+          slurm_real_memory: 15731
           slurm_local_disk: 0
     compute_node:
       children:
@@ -257,7 +257,7 @@ all:
                 size: 1
             slurm_sockets: 63
             slurm_cores_per_socket: 1
-            slurm_real_memory: 491355
+            slurm_real_memory: 491351
             slurm_local_disk: 900
     mit_chaperone:
       hosts:
