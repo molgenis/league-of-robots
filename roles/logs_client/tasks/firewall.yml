@@ -1,5 +1,6 @@
 ---
 - name: Set firewall
+  tags: logs_client_server_firewall
   block:
     - name: Ensure that the directory iptables extras exists
       ansible.builtin.file:
@@ -14,13 +15,11 @@
       become: true
       ignore_errors: true
       ignore_unreachable: true
-
     - name: Count log servers online and offline
       ansible.builtin.set_fact:
         logs_failed: "{{ create_iptables_extras_d.results | selectattr('failed', 'defined') | select('equalto', true) | list | length
                 + create_iptables_extras_d.results | rejectattr('failed', 'defined') | list | length }}"
         logs_all: "{{ cluster_class_servers | list | length }}"
-
     - name: Fail if all log servers are offline
       ansible.builtin.fail:
         msg: |
@@ -33,19 +32,16 @@
                 export AI_PROXY=...
               and then rerun this playbook.
       failed_when: logs_failed == logs_all
-
     - name: Get public IP of all the clients
       ansible.builtin.uri:
         url: http://ifconfig.me/ip
         return_content: true
       register: client_public_ip
       changed_when: false
-
     - name: Print public IP of all the clients
       ansible.builtin.debug:
         msg: "{{ inventory_hostname }} => {{ client_public_ip.content }}"
       changed_when: false
-
     - name: "Add public IPs of clients to {{ iptables_extras_dir }}/{{ stack_prefix }}.allow on rsyslog servers."
       ansible.builtin.lineinfile:
         path: '{{ iptables_extras_dir }}/{{ stack_prefix }}.allow'
@@ -61,9 +57,6 @@
       notify: restart_server_firewall
       ignore_errors: true
       ignore_unreachable: true
-
     - name: Force all services to restart, before we continue to configure logs clients
       ansible.builtin.meta: flush_handlers
-  tags:
-    - logs_client_server_firewall
 ...
