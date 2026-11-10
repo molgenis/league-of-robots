@@ -21,6 +21,9 @@ yum_repos_deployed_on_clients:
               | selectattr('tags', 'defined')
               | selectattr('tags', 'intersect', ['core', 'epel', 'security', 'rsyslog', 'ltb', 'perun'])
               | map(attribute='id') }}"
+# Cluster classification (used by `logs` and `login` roles)
+cluster_class: 'development'
+# Azure
 azure_networks:
   - name: "{{ stack_prefix }}_internal_management"
     cidr: '10.10.1.0/24'
