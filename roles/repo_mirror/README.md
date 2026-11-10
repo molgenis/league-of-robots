@@ -135,3 +135,50 @@ To create and encrypt certificate
     openssl req -x509 -newkey rsa:4096 -keyout files/patchcord_library/srm-ca.key -out files/patchcord_library/srm-ca.pem -sha256 -days 3650 -nodes -subj "/C=NL/ST=Groningen/L=Groningen/O=UMCG/OU=GCC/CN="
     ansible-vault encrypt --encrypt-vault-id patchcord_library files/patchcord_library/srm.key
 ```
+
+## Diagrams
+
+### Sequence diagram
+
+```mermaid
+sequenceDiagram
+    participant Remote as Remote Repos of Alma, Rocky, Oracle, Lustre, irods ...
+    box transparent repo-primary
+        participant POcache as  Ocache Local Mirror Full Copy
+        participant PIversions as 1versions
+        participant PZdeploy as 2deploy
+    end
+    box transparent repo-secondary
+        participant SOcache as  O Cache Local Mirror Full Copy
+        participant SIversions as 1versions
+        participant SZdeploy as 2deploy
+    end
+
+    loop hourly full dowload  (syncronize) remote repositories locally
+        Remote ->> POcache: Download all repositories every hour
+        Remote ->> SOcache: Download all repositories every hour
+    end
+    %%Note right of API: Validate items,<br/>charge payment
+    %%par Notify kitchen
+    %%    API->>Kitchen: New order ticket
+    %%and Confirm to customer
+    %%    API-->>App: Order accepted, ETA 30 min
+    %%end
+    POcache ->>PIversions: Hardlink latest cache version into versioned repo
+    %%API->>Admin: Request pickup
+
+    loop rsync
+        PIversions ->> SIversions: each repository version to secondary server
+        SIversions -->> SOcache: hardlinked against local 0cache
+
+    end
+    PIversions ->> PZdeploy: make new deployment for stack
+    loop rsync
+        PZdeploy ->> SZdeploy: Syncronize 2deploy to Secondary
+    end
+
+```
+
+### Detailed diagram
+
+![Detail diagram](repo_mirror.drawio.png)
