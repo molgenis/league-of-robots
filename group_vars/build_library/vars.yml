@@ -32,11 +32,7 @@ regular_users:
     groups: ['vipt']
   - name: 'bcharbon'
     groups: ['vipt']
-  - name: 'svandenhoek'
-    groups: ['vipt']
   - name: 'mbijlsma'
-    groups: ['vipt']
-  - name: 'jkloosterman'
     groups: ['vipt']
   - name: 'mbeukers'
     groups: ['vipt']
@@ -54,6 +50,10 @@ sudoers:
 use_ldap: false
 create_ldap: false
 use_sssd: false
+#
+# Cluster classification (used by `logs` and `login` roles)
+#
+cluster_class: 'development'
 #
 # Jumphosts from other stack-name infra groups.
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.

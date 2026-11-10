@@ -14,7 +14,7 @@ all:
               assign_floating_ip: true
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp0s3
           basic_security_ssh_challenge_response_auth: 'yes' # Required for MFS in sshd_config.
           iptables_allow_icmp_inbound:
             - "{{ all.ip_addresses['umcg']['net1'] }}"
@@ -33,13 +33,13 @@ all:
     repo:
       hosts:
         wh-repo:
-          cloud_flavor: umcg.v1.vm.1-2
+          cloud_flavor: umcg.v1.vm.4-8
           host_networks:
             - name: "{{ stack_prefix }}_internal_management"
               security_group: "{{ stack_prefix }}_repo"
               add_hostname_to_ip_address: true
               nmstate_interface:
-                name: ens3
+                name: enp3s0
           swap_file_size: 2
     data_transfer:
       hosts:
@@ -227,7 +227,7 @@ all:
                 name: tcp20
           slurm_sockets: 8
           slurm_cores_per_socket: 1
-          slurm_real_memory: 15724
+          slurm_real_memory: 15731
           slurm_local_disk: 0
     compute_node:
       children:
@@ -257,7 +257,7 @@ all:
                 size: 1
             slurm_sockets: 63
             slurm_cores_per_socket: 1
-            slurm_real_memory: 491355
+            slurm_real_memory: 491351
             slurm_local_disk: 900
     mit_chaperone:
       hosts:

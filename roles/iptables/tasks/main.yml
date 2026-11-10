@@ -84,6 +84,15 @@
 - name: Flush handlers for iptables role.
   ansible.builtin.meta: flush_handlers
 
+- name: make sure /var/lock/subsys/ is there.
+  ansible.builtin.file:
+    path: /var/lock/subsys
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
 - name: Configure the firewall service.
   ansible.builtin.service:
     name: "{{ item }}"
