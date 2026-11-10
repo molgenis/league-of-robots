@@ -8,4 +8,13 @@
   ansible.builtin.include_tasks:
     file: logs_to_prm.yml
   when: inventory_hostname in groups['logs'] | default([])
+
+- name: Restart rsyslog on the servers
+  ansible.builtin.debug:
+    msg: "Triggering restarting of rsyslog.service on {{ inventory_hostname }}"
+  changed_when: true
+  tags:
+    - never
+    - restart
+  notify: restart-rsyslog.service
 ...
