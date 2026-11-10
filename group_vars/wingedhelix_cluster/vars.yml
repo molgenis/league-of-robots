@@ -391,7 +391,7 @@ pfs_mounts:
     ro_options: 'defaults,_netdev,ro,noverbose,noencrypt'
     machines: "{{ groups['sys_admin_interface'] }}"
   - pfs: 'medgen_zincfinger$'
-    source: '//storage5.umcg.nl'
+    source: '//storage7.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
@@ -403,7 +403,7 @@ pfs_mounts:
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
     machines: "{{ groups['chaperone'] }}"
   - pfs: 'medgen_wingedhelix$'
-    source: '//storage5.umcg.nl'
+    source: '//storage7.umcg.nl'
     type: cifs    # checked with cat /proc/filesystem
     rw_options: 'vers=3.0,mfsymlinks,rw,soft,perm'
     ro_options: 'vers=3.0,mfsymlinks,ro,soft,perm'
