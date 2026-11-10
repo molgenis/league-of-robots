@@ -1,57 +1,39 @@
 ---
-- name: Force all handlers to flush, before we start testing logs clients
-  ansible.builtin.meta: flush_handlers
+- name: Test the rsyslog configuration on the client
   tags:
     - always
-    - test
-
-- name: Wait for rsyslog.service to start (can take some time ...)
-  ansible.builtin.service_facts:
-  register: services_status
-  until: services_status.ansible_facts.services['rsyslog.service'].state == 'running'
-  retries: 24
-  delay: 15
-  tags:
-    - always
-    - test
-
-- name: Generate random 12-character HEX token
-  ansible.builtin.set_fact:
-    random_tag: "{{ lookup('community.general.random_string', length=12, override_all=hex_chars) }}"
-  vars:
-    hex_chars: '0123456789ABCDEF'
-  tags:
-    - always
-    - test
-
-- name: Print the token
-  ansible.builtin.debug:
-    msg: "Value for {{ inventory_hostname }} is {{ random_tag }}"
-  tags:
-    - always
-    - test
-
-- name: Create random log event on the client side with token as a tag
-  ansible.builtin.command:
-    logger -t "{{ random_tag }}" Rsyslog remote test
-  register: rsyslog_remote_test
-  changed_when: false
-  tags:
-    - always
-    - test
-
-- name: Check that remote server has received the token
-  ansible.builtin.command:
-    fgrep -q -nirI '{{ random_tag }}' /var/log/remote/{{ inventory_hostname }}
-  register: remote_test_result
-  changed_when: false
-  until: remote_test_result.rc == 0
-  retries: 12
-  delay: 5
-  delegate_to: "{{ proxy_host }}+{{ item }}"
-  loop: "{{ cluster_class_servers }}"
-  become: true
-  tags:
-    - always
-    - test
+    - logs_client_test
+  block:
+    - name: Force all handlers to flush, before we start testing logs clients
+      ansible.builtin.meta: flush_handlers
+    - name: Wait for rsyslog.service to start (can take some time ...)
+      ansible.builtin.service_facts:
+      register: services_status
+      until: services_status.ansible_facts.services['rsyslog.service'].state == 'running'
+      retries: 24
+      delay: 15
+    - name: Generate random 12-character HEX token
+      ansible.builtin.set_fact:
+        random_tag: "{{ lookup('community.general.random_string', length=12, override_all=hex_chars) }}"
+      vars:
+        hex_chars: '0123456789ABCDEF'
+    - name: Print the token
+      ansible.builtin.debug:
+        msg: "Value for {{ inventory_hostname }} is {{ random_tag }}"
+    - name: Create random log event on the client side with token as a tag
+      ansible.builtin.command:
+        logger -t "{{ random_tag }}" Rsyslog remote test
+      register: rsyslog_remote_test
+      changed_when: false
+    - name: Check that remote server has received the token
+      ansible.builtin.command:
+        fgrep -q -nirI '{{ random_tag }}' /var/log/remote/{{ inventory_hostname }}
+      register: remote_test_result
+      changed_when: false
+      until: remote_test_result.rc == 0
+      retries: 12
+      delay: 5
+      delegate_to: "{{ proxy_host }}+{{ item }}"
+      loop: "{{ cluster_class_servers }}"
+      become: true
 ...
