@@ -95,7 +95,6 @@ regular_groups:
   - name: 'umcg-lab'
   - name: 'umcg-labgnkbh'
   - name: 'umcg-patho'
-  - name: 'umcg-vipt'
 regular_users:
   - name: "{{ envsync_user }}"
     groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
@@ -131,8 +130,6 @@ regular_users:
     groups: ['umcg-patho', "{{ functional_users_group }}"]
   - name: 'umcg-patho-dm'
     groups: ['umcg-patho', "{{ functional_users_group }}"]
-  - name: 'umcg-vipt-dm'
-    groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd']
     become: 'umcg-atd-ateambot'
@@ -166,8 +163,6 @@ sudoers:
     become: 'umcg-patho-ateambot'
   - who: ['%umcg-patho']
     become: 'umcg-patho-dm'
-  - who: ['%umcg-vipt']
-    become: 'umcg-vipt-dm'
 #
 # Shared storage related variables
 #
@@ -211,7 +206,6 @@ lfs_mounts:
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-lab
-      - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: prm05
     pfs: 'medgen_zincfinger$'
@@ -220,7 +214,6 @@ lfs_mounts:
       #- name: umcg-gap         Do not use production groups while still in development phase.
       #- name: umcg-gd          Do not use production groups while still in development phase.
       - name: umcg-gsad
-      #- name: umcg-vipt        Do not use production groups while still in development phase.
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat05
     pfs: 'medgen_zincfinger$'
@@ -231,7 +224,6 @@ lfs_mounts:
       #- name: umcg-genomescan  Do not use production groups while still in development phase.
       - name: umcg-gsad
       - name: umcg-gst
-      #- name: umcg-vipt        Do not use production groups while still in development phase.
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: prm06
     pfs: 'medgen_leucinezipper$'
@@ -240,7 +232,6 @@ lfs_mounts:
       #- name: umcg-gap         Do not use production groups while still in development phase.
       #- name: umcg-gd          Do not use production groups while still in development phase.
       - name: umcg-gsad
-      #- name: umcg-vipt        Do not use production groups while still in development phase.
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat06
     pfs: 'medgen_leucinezipper$'
@@ -251,7 +242,6 @@ lfs_mounts:
       #- name: umcg-genomescan  Do not use production groups while still in development phase.
       - name: umcg-gsad
       - name: umcg-gst
-      #- name: umcg-vipt        Do not use production groups while still in development phase.
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: prm07
     pfs: 'medgen_wingedhelix$'
@@ -260,7 +250,6 @@ lfs_mounts:
       #- name: umcg-gap         Do not use production groups while still in development phase.
       #- name: umcg-gd          Do not use production groups while still in development phase.
       - name: umcg-gsad
-      #- name: umcg-vipt        Do not use production groups while still in development phase.
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: dat07
     pfs: 'medgen_wingedhelix$'
@@ -271,7 +260,6 @@ lfs_mounts:
       #- name: umcg-genomescan  Do not use production groups while still in development phase.
       - name: umcg-gsad
       - name: umcg-gst
-      #- name: umcg-vipt        Do not use production groups while still in development phase.
     rw_machines: "{{ groups['chaperone'] }}"
   - lfs: env12
     pfs: pssd
