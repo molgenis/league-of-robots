@@ -59,8 +59,7 @@ function check_journalctl()
         if [[ -n "${USER_LOGS}" ]]; then
 
             MATCH="$(
-                grep -iE "${PATTERN}" <<< "${USER_LOGS}" ||
-                true
+                grep -iE "${PATTERN}" <<< "${USER_LOGS}" || true
                 )"
             if [[ -n "${MATCH}" ]]; then
                 ERRORS+=("${USER}: $(printf '%s\n' "${MATCH}" | head -n1)")
