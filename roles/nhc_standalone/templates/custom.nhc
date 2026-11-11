@@ -46,8 +46,7 @@ function check_journalctl()
         -t "${TAG}" \
         -g "${PATTERN}" \
         --case-sensitive=no \
-        --no-pager 2>/dev/null ||
-    true
+        --no-pager 2>/dev/null || true
     )"
     # filter on USER_LIST 
     for USER in "${USER_LIST[@]}"; do
