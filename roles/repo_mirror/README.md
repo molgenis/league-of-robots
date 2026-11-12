@@ -132,7 +132,7 @@ are stored in the `files/patchcord_library/` folder.
 To create and encrypt certificate
 
 ```
-    openssl req -x509 -newkey rsa:4096 -keyout files/patchcord_library/srm-ca.key -out files/patchcord_library/srm-ca.pem -sha256 -days 3650 -nodes -subj "/C=NL/ST=Groningen/L=Groningen/O=UMCG/OU=GCC/CN="
+    openssl req -x509 -newkey rsa:4096 -keyout files/patchcord_library/srm.key -out files/patchcord_library/srm.pem -sha256 -days 3650 -nodes -subj "/C=NL/ST=Groningen/L=Groningen/O=UMCG/OU=GCC/CN="
     ansible-vault encrypt --encrypt-vault-id patchcord_library files/patchcord_library/srm.key
 ```
 
