@@ -263,7 +263,6 @@ all:
             - name: 'umcg-atd'
             - name: 'umcg-gsad'
             - name: 'umcg-gst'
-            - name: 'umcg-vipt'
           regular_users:
             - name: "{{ envsync_user }}"
               groups: ["{{ envsync_group }}", "{{ functional_users_group }}"]
@@ -279,24 +278,22 @@ all:
               groups: ['umcg-gsad', "{{ functional_users_group }}"]
             - name: 'umcg-gst-dm'
               groups: ['umcg-gst', "{{ functional_users_group }}"]
-            - name: 'umcg-vipt-dm'
-              groups: ['umcg-vipt', "{{ functional_users_group }}"]
             - name: 'mbijlsma'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst']
             - name: 'bcharbon'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
             - name: 'scimerman'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst']
             - name: 'dhendriksen'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad']
             - name: 'kdelange'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst']
             - name: 'rkanninga'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst']
             - name: 'pneerincx'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst']
             - name: 'gvdvries'
-              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst', 'umcg-vipt']
+              groups: ["{{ envsync_group }}", 'umcg-atd', 'umcg-gsad', 'umcg-gst']
           sudoers:
             - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
               become: ['umcg-molgenis']
@@ -306,8 +303,6 @@ all:
               become: ['umcg-gsad-ateambot', 'umcg-gsad-dm']
             - who: ['%umcg-gst']
               become: ['umcg-gst-ateambot', 'umcg-gst-dm']
-            - who: ['%umcg-vipt']
-              become: ['umcg-vipt-dm']
           ssh_client_configs:
             - logs_library
           lfs_mounts: []  # Overrule the list of network shares; we use local storage instead.

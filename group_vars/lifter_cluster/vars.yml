@@ -183,8 +183,6 @@ regular_groups:
     sponsor: umcg-mswertz
   - name: 'umcg-sysops'
     sponsor: umcg-research-it
-  - name: 'umcg-vipt'
-    sponsor: umcg-mswertz
 regular_users:
   # Note, for chaperone machines this is controlled in the static_inventories.
   - name: "{{ envsync_user }}"
@@ -205,8 +203,6 @@ regular_users:
     groups: ['umcg-gst', "{{ functional_users_group }}"]
   - name: 'umcg-sysops-dm'
     groups: ['umcg-sysops', "{{ functional_users_group }}"]
-  - name: 'umcg-vipt-dm'
-    groups: ['umcg-vipt', "{{ functional_users_group }}"]
 sudoers:
   - who: ['%umcg-atd', '%umcg-gsad', '%umcg-gst']
     become: ['umcg-molgenis']
@@ -220,8 +216,6 @@ sudoers:
     become: ['umcg-gst-ateambot', 'umcg-gst-dm']
   - who: ['%umcg-sysops']
     become: ['umcg-sysops-dm']
-  - who: ['%umcg-vipt']
-    become: ['umcg-vipt-dm']
 #
 # Shared storage related variables
 #
@@ -251,7 +245,6 @@ lfs_mounts:
       - name: umcg-gsad
       - name: umcg-gst
       - name: umcg-sysops
-      - name: umcg-vipt
     rw_machines: "{{ groups['user_interface'] + groups['deploy_admin_interface'] + groups['compute_node'] }}"
   - lfs: rsc08
     pfs: umcgst04/slice7
