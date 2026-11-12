@@ -12,6 +12,7 @@ flock -n 171 || { echo "Sync already running" >&2; exit 1; }
 
 {% raw %}
 ! test -d "${_main}/0cache" && mkdir "${_main}/0cache"
+! test -d "${_main}/1versions" && mkdir "${_main}/1versions"`
 ! test -d "${_main}/logs/cli" && mkdir "${_main}/logs/cli"
 
 print_all_repos() {
@@ -56,6 +57,28 @@ while getopts ${OPTSTRING} opt; do
   esac
 done
 
+# Check is options make sense
+if ${_cache_only}; then
+   # -0 is not compatible with -d or -r
+   if [[ -n "${_do_os_distribution}" || -n "${_do_repos}" ]]; then
+      echo "Error: -0 cannot be combined with -d or -r" >&2
+      help
+   fi
+else
+   # make sure there is distribution when not only downloading
+   if [[ -z "${_do_os_distribution}" ]]; then
+      echo "Error: -d [distribution] is required (also when using -r)" >&2
+      help
+   fi
+   # make sure the distribution is valid
+   if [[ ! -d "${_main}/dnf/repos.d/${_do_os_distribution}" ]]; then
+      echo "Error: unknown distribution '${_do_os_distribution}'" >&2
+      print_all_repos
+      exit 1
+   fi
+fi
+
+# Make a timestamp to be used for all new versions
 _time="$(date +%Y%m%d-%H%M%S)"
 
 ## A bit of logging
@@ -66,18 +89,36 @@ find 1versions/ -maxdepth 3 -type d | sed 's/^/        /g' >> "${_main}/logs/cli
 # $1 distribution
 # $2 repository
 function _download_and_version(){
-   echo ""
+   local _rc=0
    local _repo_log_dir="${_main}/logs/scripts/${1}/${2}"
-   ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
    local _repo_log="${_repo_log_dir}/${_time}"
+   ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
    echo "- Log file: ${_repo_log}"
-   if ! dnf reposync --conf "${_main}/dnf/repos.d/${1}.conf" --repo "${2}" --downloaddir="${_main}/0cache/${1}/" --download-metadata 1>"${_repo_log}" 2>&1; then
-      echo "  Error, unsuccessfull"
+   if dnf reposync \
+         --conf "${_main}/dnf/repos.d/${1}.conf" \
+         --repo "${2}" \
+         --downloaddir="${_main}/0cache/${1}/" \
+         --download-metadata \
+         1>"${_repo_log}" 2>&1; then
+      : # cannot use the ! as the rc becomes 0, so we use true here
+   else
       _errors="$(echo -e "${_errors}\n${1} ${2} returned ${?}")"
+      echo "  Error, unsuccessfull"
       return 0
    fi
+   
    ${_cache_only} && return 0 ## if only caching, don't make version
+
+   # Versioning from here onward
    mkdir -p "${_main}/1versions/${1}/${2}/"
+
+   # make sure the hardlink is actually created, or report error
+   if ! cp -a --reflink=always "${_main}/0cache/${1}/${2}/" "${_main}/1versions/${1}/${2}/${_time}/"; then
+      rm -rf -- "${_main}/1versions/${1}/${2}/${_time}/"
+      echo "  Error, creating version failed"
+      _errors+=$'\n'"${1} ${2} version creation failed"
+      return 0 # but keep on working with other
+   fi
    cp -a --reflink=always "${_main}/0cache/${1}/${2}/" "${_main}/1versions/${1}/${2}/${_time}/" || exit
    echo "  New version created:   ${_main}/1versions/${1}/${2}/${_time}"
 }
