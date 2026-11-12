@@ -165,6 +165,7 @@ yum_repos:
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
       gpgcheck: 1
       enabled: 1
+      repo_server_download: False
       priority: 20
       tags:
         - distro
@@ -210,7 +211,7 @@ yum_repos:
       name: 'Rsyslog (Adiscon for x86_64)'
       baseurl: http://rpms.adiscon.com/v8-stable/epel-8/x86_64/
       enabled: 1
-      repo_server_download: true # important, < 1 G
+      repo_server_download: True # important, < 1 G
       gpgcheck: 1
       gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
       tags:
@@ -220,7 +221,7 @@ yum_repos:
       name: AlmaLinux 9 - BaseOS
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/9/baseos
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
       tags:
@@ -230,7 +231,7 @@ yum_repos:
       name: AlmaLinux 9 - AppStream
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/9/appstream
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
       tags:
@@ -240,7 +241,7 @@ yum_repos:
       name: AlmaLinux 9 - CRB
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/$releasever/crb
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
       tags:
@@ -250,7 +251,7 @@ yum_repos:
       name: AlmaLinux 9 - Extras
       mirrorlist: https://mirrors.almalinux.org/mirrorlist/$releasever/extras
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-9
       tags:
@@ -263,7 +264,7 @@ yum_repos:
       name: 'Extra Packages for Enterprise Linux 9'
       metalink: 'https://mirrors.fedoraproject.org/metalink?repo=epel-9&arch=$basearch&infra=$infra&content=$contentdir'
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9'
       tags:
@@ -275,7 +276,7 @@ yum_repos:
       name: 'LTB (LDAP Tool Box) project OpenLDAP packages for Enterprise Linux 9'
       baseurl: 'https://ltb-project.org/rpm/openldap25/9/$basearch'
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://ltb-project.org/documentation/_static/RPM-GPG-KEY-LTB-PROJECT-SECURITY'
       tags:
@@ -287,7 +288,7 @@ yum_repos:
       name: 'rsyslog v8 (from Adiscon) for EPEL 9'
       baseurl: 'https://rpms.adiscon.com/v8-stable/epel-9/$basearch'
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: 'https://rpms.adiscon.com/RPM-GPG-KEY-Adiscon'
       tags:
@@ -301,7 +302,7 @@ yum_repos:
       gpgkeysource: https://repo.cerit-sc.cz/el-perun/repo.cerit-sc.cz.gpg.pub
       gpgcheck: 1
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       tags:
         - perun
     #
@@ -311,7 +312,7 @@ yum_repos:
       name: 'RENCI iRODS for Enterprise Linux 9'
       baseurl: 'https://packages.irods.org/yum/pool/el9/x86_64/'
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 0
       tags:
         - irods
@@ -322,7 +323,7 @@ yum_repos:
       name: "Jenkins{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
       baseurl: "https://pkg.jenkins.io/rpm{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}"
       enabled: 1
-      repo_server_download: true
+      repo_server_download: True
       gpgcheck: 1
       gpgkeysource: "https://pkg.jenkins.io/rpm{{ '-stable' if (jenkins_prefer_lts | default(true) | bool) else '' }}/repodata/repomd.xml.key"
       tags:

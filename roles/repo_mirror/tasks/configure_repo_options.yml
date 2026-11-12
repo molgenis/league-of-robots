@@ -17,88 +17,51 @@
     force: true
     mode: '0644'
   become: true
-
-- name: "Create local_temp_repo_dir variable"
+- name: "Determine which repo files should exist for {{ this_distribution }}"
   ansible.builtin.set_fact:
-    local_temp_repo_dir: "{{ playbook_dir }}/temp_repo_{{ this_distribution }}"
+    rm_expected_repo_files: >-
+      {{ yum_repos[this_distribution]
+         | selectattr('repo_server_download', 'defined')
+         | selectattr('repo_server_download', 'true')
+         | map(attribute='id')
+         | map('regex_replace', '$', '.repo')
+         | list }}
 
-- name: Run everything with a guaranteed cleanup
-  block:
-    - name: "Remove local {{ local_temp_repo_dir }} directory if it exists"
-      ansible.builtin.file:
-        path: "{{ local_temp_repo_dir }}"
-        state: absent
-      changed_when: false # local files are only temporary, the actual change occurs in next task
-      run_once: true
-      delegate_to: localhost
-      connection: local
+- name: "Configure all options for all repos in {{ this_distribution }}"
+  community.general.ini_file:
+    path: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/{{ item.0.id }}.repo"
+    section: "{{ item.0.id }}"
+    no_extra_spaces: true
+    create: true
+    option: "{{ item.1 }}"
+    value: "{{ item.0[item.1] }}"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0644'
+  loop: "{{ yum_repos[this_distribution] | product(options) | list }}"
+  loop_control:
+    label: "{{ item.0.id }} {{ item.1 }}"
+  vars:
+    options: [name, baseurl, mirrorlist, metalink]
+  when:
+    - item.0.repo_server_download | default(false) | bool
+    - item.0[item.1] is defined
+  become: true
 
-    - name: "Create the {{ local_temp_repo_dir }} if missing"
-      ansible.builtin.file:
-        path: "{{ local_temp_repo_dir }}"
-        state: directory
-        mode: '0755'
-      changed_when: false # local files are only temporary, the actual change occurs in following tasks
-      run_once: true
-      delegate_to: localhost
-      connection: local
+- name: "Get list of existing repo files for {{ this_distribution }}"
+  ansible.builtin.find:
+    paths: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
+    patterns: "*.repo"
+  register: rm_existing_repo_files
+  become: true
 
-    - name: "Configure all options for all repos in {{ this_distribution }}"
-      community.general.ini_file:
-        path: "{{ local_temp_repo_dir }}/{{ item.0.id }}.repo"
-        section: "{{ item.0.id }}"
-        no_extra_spaces: true
-        create: true
-        option: "{{ item.1 }}"
-        value: "{{ item.0[item.1] }}"
-        mode: '0644'
-      loop: "{{ yum_repos[this_distribution]
-              | product(options)
-              | list }}"
-      loop_control:
-        label: "{{ item.0.id }} {{ item.1 }}"
-      vars:
-        options:
-          - name
-          - baseurl
-          - mirrorlist
-          - metalink
-      when:
-        - item.0.repo_server_download | default(false) | bool
-        - item.0[item.1] is defined
-      delegate_to: localhost
-      connection: local
-      changed_when: false # local files are only temporary, the actual change occurs in next task
-
-    - name: "Copy repo files to repo_server machines"
-      ansible.builtin.copy:
-        src: "{{ item }}"
-        dest: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
-        owner: "{{ repo_user }}"
-        group: "{{ repo_group }}"
-        mode: '0644'
-      loop: "{{ lookup('fileglob', local_temp_repo_dir + '/*', wantlist=True) }}"
-      become: true
-
-    - name: Get list of local files
-      ansible.builtin.set_fact:
-        local_files: "{{ lookup('fileglob', local_temp_repo_dir + '/*', wantlist=True) | map('basename') | list }}"
-      delegate_to: localhost
-      connection: local
-
-    - name: "Get list of remote repo files"
-      ansible.builtin.find:
-        paths: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
-        patterns: "*.repo"
-      register: remote_repos
-      become: true
-
-  always:
-    - name: "Remove local {{ local_temp_repo_dir }} directory if it exists"
-      ansible.builtin.file:
-        path: "{{ local_temp_repo_dir }}"
-        state: absent
-      changed_when: false # local files are only temporary, the actual change occurs in next task
-      delegate_to: localhost
-      connection: local
+- name: "Delete repo files that are no longer mirrored for {{ this_distribution }}"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ rm_existing_repo_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: item.path | basename not in rm_expected_repo_files
+  become: true
 ...
