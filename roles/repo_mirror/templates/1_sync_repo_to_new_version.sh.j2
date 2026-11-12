@@ -94,6 +94,13 @@ function _download_and_version(){
    local _repo_log="${_repo_log_dir}/${_time}"
    ! test -d "${_repo_log_dir}" && mkdir -p "${_repo_log_dir}"
    echo "- Log file: ${_repo_log}"
+
+   # Skip stale cache directories if .repo files were removed
+   if ! grep -qsF "[${2}]" "${_main}/dnf/repos.d/${1}/"*.repo; then
+      echo "  Skipping: ${1}/${2} has no .repo files"
+      return 0
+    fi
+
    if dnf reposync \
          --conf "${_main}/dnf/repos.d/${1}.conf" \
          --repo "${2}" \
