@@ -6,6 +6,10 @@ _main="{{ main_repo_path }}"
 mountpoint -q "${_main}" || { echo "${_main} not mounted" >&2; exit 1; }
 cd "${_main}"
 
+_lock="/tmp/repo_download.lock"
+exec 171>"${_lock}"
+flock -n 171 || { echo "Sync already running" >&2; exit 1; }
+
 {% raw %}
 ! test -d "${_main}/0cache" && mkdir "${_main}/0cache"
 ! test -d "${_main}/logs/cli" && mkdir "${_main}/logs/cli"

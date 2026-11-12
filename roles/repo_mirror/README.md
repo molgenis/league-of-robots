@@ -2,51 +2,53 @@
 
 ## Intro
 
-This role uses `logs_library` development key as a default key for the creation of all the cryptographic communication.
+This role uses `files/patchcord_library/srm.key` key as a default key for the creation of all the cryptographic communication.
 
 ## TLDR
 
-Downloading, testing and deployment work is done on secondary server ONLY! Later, once a day, primary server automatically collects / syncronizes (can be also manually triggered) all the changes. This approach allows us to finish downloading the packages before syncronization starts.
+**! important !** Downloading, testing and deployment work is done on **primary** server ONLY!
 
-    [me@mac ~]$ ssh admin@spring+repo-secondary
+0. Login into primary server and become repo user
+
+    [me@mac ~]$ ssh admin@spring+repo-primary
     [me@repo-primary ~]$ sudo -u repo bash
     [admin@repo-primary ~]$ $ cd /mnt/repos
 
 
 1. Download packets into cache and automatically generate version with current timestamp
 
-    [admin@repo-primary /mnt/repos]$ # Option 1: for one specific repository
-    [admin@repo-primary /mnt/repos]$ ./1_sync_repo_to_new_version.sh alma9 baseos &
+    [repo@repo-primary /mnt/repos]$ # Option 1: for one specific repository
+    [repo@repo-primary /mnt/repos]$ ./1_sync_repo_to_new_version.sh -d alma9 -r baseos &
         - Log file: /mnt/repos/logs/scripts/alma9/baseos/20260804-104418
     ( press enter )
-    [admin@repo-primary /mnt/repos]$ tail /mnt/repos/logs/scripts/alm/mnt/repos/logs/scripts/alma9/baseos/20260804-104418
+    [repo@repo-primary /mnt/repos]$ tail /mnt/repos/logs/scripts/alm/mnt/repos/logs/scripts/alma9/baseos/20260804-104418
             ...
         (2297/2298): zsh-5.8-9.el9.x86_64.rpm            32 MB/s | 2.9 MB     00:00    
         (2298/2298): linux-firmware-20260411-155.5.el9_  38 MB/s | 631 MB     00:16    
           New version created:   /mnt/repos/1versions/alma9/baseos/20260804-104418
         done
     ( press CTRL+c )
-    [admin@repo-primary /mnt/repos]$ # Option 2: all repositories for entire distribution
-    [admin@repo-primary /mnt/repos]$ ./1_sync_repo_to_new_version.sh alma9 &
+    [repo@repo-primary /mnt/repos]$ # Option 2: all repositories for entire distribution
+    [repo@repo-primary /mnt/repos]$ ./1_sync_repo_to_new_version.sh -d alma9 &
 
 2. Deploy a specific repository version to a stack
 
-    [admin@repo-primary /mnt/repos]$ # Option 1: for a stack's SPECIFIC repository deploy the specific version
-    [admin@repo-primary /mnt/repos]$ ./2_new_repo_distribution.sh -s nb -d alma9 -r perun -v 20260804-112904
-    [admin@repo-primary /mnt/repos]$ # Option 2: for a stack's ALL repositories deploy the specific version
-    [admin@repo-primary /mnt/repos]$ ./2_new_repo_distribution.sh -s nb -d alma9 -r ALL -v 20260804-112904
+    [repo@repo-primary /mnt/repos]$ # Option 1: for a stack's SPECIFIC repository deploy the specific version
+    [repo@repo-primary /mnt/repos]$ ./2_new_repo_distribution.sh -s nb -d alma9 -r perun -v 20260804-112904
+    [repo@repo-primary /mnt/repos]$ # Option 2: for a stack's ALL repositories deploy the specific version
+    [repo@repo-primary /mnt/repos]$ ./2_new_repo_distribution.sh -s nb -d alma9 -r ALL -v 20260804-112904
 
 3. Cleaning up dead links
 
-    [admin@repo-primary /mnt/repos]$ ./3_clean_deploy_dead_links.sh
-    [admin@repo-primary /mnt/repos]$ ./4_clean_unused_versions.sh
+    [repo@repo-primary /mnt/repos]$ ./3_clean_deploy_dead_links.sh
+    [repo@repo-primary /mnt/repos]$ ./4_clean_unused_versions.sh
 
 4. Syncronize primary server
 
-    [admin@repo-primary /mnt/repos]$ 
-    [admin@repo-primary /mnt/repos]$ 
-    [admin@repo-primary /mnt/repos]$ 
-    [admin@repo-primary /mnt/repos]$ 
+    [repo@repo-primary /mnt/repos]$ ./5_sync_servers.sh
+    ....................Syncing 2deploy ... 
+    Successfully finished syncing servers.
+    [repo@repo-primary /mnt/repos]$ 
 
 ## Daily cache and server syncronization
 
@@ -113,7 +115,7 @@ is reduced to bare minimum.
 ### Getting size and other information for all repositories of specific distribtuion
 
 ```
-    ssh [admin-usernam]@hatch+repo-primary
+    ssh [admin-usernam]@spring+repo-primary
     sudo -u repo bash
     cd /mnt/repos
     dnf repoinfo --conf /mnt/repos/dnf/repos.d/oracle8.conf
@@ -144,19 +146,19 @@ To create and encrypt certificate
 sequenceDiagram
     participant Remote as Remote Repos of Alma, Rocky, Oracle, Lustre, irods ...
     box transparent repo-primary
-        participant POcache as  Ocache Local Mirror Full Copy
-        participant PIversions as 1versions
-        participant PZdeploy as 2deploy
+        participant P0cache as  Ocache Local Mirror Full Copy
+        participant P1versions as 1versions
+        participant P2deploy as 2deploy
     end
     box transparent repo-secondary
-        participant SOcache as  O Cache Local Mirror Full Copy
-        participant SIversions as 1versions
-        participant SZdeploy as 2deploy
+        participant S0cache as  0Cache Local Mirror Full Copy
+        participant S1versions as 1versions
+        participant S2deploy as 2deploy
     end
 
     loop hourly full dowload  (syncronize) remote repositories locally
-        Remote ->> POcache: Download all repositories every hour
-        Remote ->> SOcache: Download all repositories every hour
+        Remote ->> P0cache: Download all repositories every hour
+        Remote ->> S0cache: Download all repositories every hour
     end
     %%Note right of API: Validate items,<br/>charge payment
     %%par Notify kitchen
@@ -164,17 +166,17 @@ sequenceDiagram
     %%and Confirm to customer
     %%    API-->>App: Order accepted, ETA 30 min
     %%end
-    POcache ->>PIversions: Hardlink latest cache version into versioned repo
+    P0cache ->>P1versions: Hardlink latest cache version into versioned repo
     %%API->>Admin: Request pickup
 
     loop rsync
-        PIversions ->> SIversions: each repository version to secondary server
-        SIversions -->> SOcache: hardlinked against local 0cache
+        P1versions ->> S1versions: each repository version to secondary server
+        S1versions -->> S0cache: hardlinked against local 0cache
 
     end
-    PIversions ->> PZdeploy: make new deployment for stack
+    P1versions ->> P2deploy: make new deployment for stack
     loop rsync
-        PZdeploy ->> SZdeploy: Syncronize 2deploy to Secondary
+        P2deploy ->> S2deploy: Syncronize 2deploy to Secondary
     end
 
 ```
