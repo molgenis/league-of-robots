@@ -106,6 +106,7 @@ function _download_and_version(){
          --repo "${2}" \
          --downloaddir="${_main}/0cache/${1}/" \
          --download-metadata \
+         --delete \
          1>"${_repo_log}" 2>&1; then
       : # cannot use the ! as the rc becomes 0, so we use true here
    else

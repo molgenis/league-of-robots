@@ -50,6 +50,22 @@ This role uses `files/patchcord_library/srm.key` key as a default key for the cr
     Successfully finished syncing servers.
     [repo@repo-primary /mnt/repos]$ 
 
+## Fresh server installation
+
+### Automatic hourly download
+
+Will fail because of an empty 0cache. So in order to prepare system for production
+it must be first populated distribution and repositories of what should actually
+be downloaded.
+
+So on fresh system, run
+
+    ./1_sync_repo_to_new_version.sh -d alma9
+
+or
+
+    ./1_sync_repo_to_new_version.sh -d [OS distribution name] -r [repository name]
+
 ## Daily cache and server synchronization
 
 There is next-to-impossible to make a good synchronization of two servers that
