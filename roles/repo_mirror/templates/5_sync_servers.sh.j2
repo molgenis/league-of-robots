@@ -3,8 +3,8 @@
 set -ueo pipefail
 
 _lock="/tmp/repo_sync.lock"
-exec 9>"${_lock}"
-flock -n 9 || { echo "Sync already running" >&2; exit 1; }
+exec 169>"${_lock}"
+flock -n 169 || { echo "Sync already running" >&2; exit 1; }
 
 _main="/mnt/repos"
 _verbose=1        # 0 - quiet
