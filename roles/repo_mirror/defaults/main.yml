@@ -10,7 +10,4 @@ repo_group: "{{ repo_user }}" # group name is same as username
 local_ca_dir: "{{ playbook_dir }}/files/patchcord_library/" # local CA certificate
 local_ca_cert_file: "srm.pem" # local CA certificate
 local_ca_key_file: "srm.key"  # local CA private key
-
-# systemd unit settings
-repo_seconday_daily_download_service_name: "daily_download"
 ...

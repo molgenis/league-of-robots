@@ -50,9 +50,9 @@ This role uses `files/patchcord_library/srm.key` key as a default key for the cr
     Successfully finished syncing servers.
     [repo@repo-primary /mnt/repos]$ 
 
-## Daily cache and server syncronization
+## Daily cache and server synchronization
 
-There is next-to-impossible to make a good syncronization of two servers that
+There is next-to-impossible to make a good synchronization of two servers that
 have large versions changes, without waiting a long time for each `rsync` finish`
 (which depends on network speed, disk and memory capacity and usage).
 
@@ -65,7 +65,7 @@ while NOT all repositories that we label as 'mirror-capable' (marked with
 `repo_server_download: true` in the `groups/all/repos.yml`) should actually donwload
 only the ones on the server.
 
-Syncronization script:
+synchronization script:
  - therefore script parses only existing cached Distros and Repositories, then
    syncronizes only those (`./1_sync_repo_to_new_version.sh -0`)
  - with option `-0`
@@ -92,7 +92,7 @@ Deployment Logic
 
  - the deployment and configuration scripts are added to `/mnt/repos/` folder
    - `1_xxx.sh` script syncronizes (download) the latest packages and creates
-     a new version of this syncronization
+     a new version of this synchronization
    - `2_xxx.sh` script exposes this fresh download to the stack that will be
      using this version
    - `3_xxx.sh` script cleans all the versions that are not used by any stack
@@ -102,12 +102,12 @@ Deployment Logic
 
 The total size of the individual repositories varies, but can be easily 100GB or
 more. Therefore to save the space of the each version, the packages are downloaded
-to the `0cache/[distribution]` directory. And all the future syncronization
+to the `0cache/[distribution]` directory. And all the future synchronization
 update the entire structure every time - remove the packages which are not in
 the original repository any more.
 
 Versions are stored by making copy (on write - reflink) into `1version` folder at
-the end of each syncronization. This enforces that the actually used disk space
+the end of each synchronization. This enforces that the actually used disk space
 is reduced to bare minimum.
 
 ## Debug

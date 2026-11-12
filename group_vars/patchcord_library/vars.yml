@@ -32,7 +32,7 @@ nameservers: [
 ]
 
 #
-## repo_server user for syncronization between systems, and to hold data
+## repo_server user for synchronization between systems, and to hold data
 #
 repo_user: 'repo'
 

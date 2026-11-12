@@ -86,7 +86,7 @@
 - name: "Configure nginx on repo_server"
   ansible.builtin.include_tasks: nginx.yml
 
-- name: "Configure syncronization scripts between primary and secondary repo servers"
+- name: "Configure synchronization scripts between primary and secondary repo servers"
   ansible.builtin.include_tasks: sync.yml
 
 - name: Flush handlers
