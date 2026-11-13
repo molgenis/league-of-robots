@@ -10,7 +10,7 @@
     - jenkins
     - logs
     - repo
-    - repo_servers
+    - repo_server
   #
   # Use hard coded strategy linear to disable mitogen when present,
   # because mitogen fails to detect the ansible_python_interpreter correctly
@@ -22,7 +22,7 @@
   #
   strategy: linear
   roles:
-   - role: yum_repos
-     when: repo_manager == 'none' or
-           repo_manager == 'repo_server'
+    - role: yum_repos
+      when: repo_manager == 'none' or
+           repo_manager == 'mirror'
 ...

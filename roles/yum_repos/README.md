@@ -1,13 +1,17 @@
 # yum_repos: Manage yum/dnf repos.
 
 This role can be used to manage all `yum` / `dnf` repos on machines,
-which need to be linked to official/public repos directly.
+which need to be linked to directly to official/public server or servers that
+are hosted by us.
 
-Do **not** use this role to link a machine to self-hosted snapshots of repos
-or systems like _Pulp_, which can be used to _freeze_ repos.
-For _Pulp_ see the `pulp_client` role instead.
+**Use** this role for configuring machines to
+  - either point to public official repositories, or
+  - to point to self hosted public repositories (ones deployed with `repo_mirror` role).
 
-To make a repository locally (on the machine itself) check `yum_local` role instead.
+Do **not** use this role
+  - to link machines to self-hosted snapshots of repos on systems like _Pulp_,
+    (which can be used to _freeze_ repos) - use the `pulp_client` role instead.
+  - to make a local repository (on the machine itself) - check `yum_local` role instead.
 
 This role will manage all `yum` / `dnf` repos on hosts; This means:
  * Apply configs and GPG key files for repos whose repo ID is listed in the `yum_repos_deployed_on_clients` variable for a machine.  

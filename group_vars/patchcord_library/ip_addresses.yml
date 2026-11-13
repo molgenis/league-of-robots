@@ -1,0 +1,38 @@
+---
+ip_addresses:
+  spring:
+    pc_internal_management:
+      address: 10.10.1.89
+      netmask: /32
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
+    vlan1066:
+      address: 194.171.203.45
+      netmask: /32
+      fqdn: 'NXDOMAIN'
+  repo-primary:
+    pc_external:
+      address: 10.10.1.4
+      netmask: /32
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
+    pc_external_public:
+      address: 20.224.112.119
+      netmask: /32
+      fqdn: 'pc-repo-primary-191c.westeurope.cloudapp.azure.com'
+  repo-secondary:
+    pc_internal_management:
+      address: 10.10.1.13
+      netmask: /32
+      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
+    vlan1066:
+      address: 194.171.203.86
+      netmask: /32
+      fqdn: 'NXDOMAIN'
+  pc_internal_management-vlan1066-router:
+    pc_internal_management:
+      address: 10.10.1.1
+      netmask: /32
+    vlan1066:
+      address: 194.171.203.52
+      netmask: /32
+      fqdn: 'NXDOMAIN'
+...

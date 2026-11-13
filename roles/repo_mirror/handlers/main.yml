@@ -1,0 +1,28 @@
+---
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+  listen: rm_reload_systemd_daemon
+
+- name: Reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  become: true
+  listen: rm_nginx_reload
+
+- name: Restart rsyslog (cannot be reloaded)
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+  become: true
+  listen: rm_rsyslog_restart
+
+- name: New key fail at the end of the role
+  ansible.builtin.fail:
+    msg: >-
+      "Newly generated {{ repo_user }} public key must be added to the users.yml"
+      "Then rerun single_role_playbooks/regular_users.yml role on the SECONDARY servers!"
+  listen: rm_new_public_key
+...

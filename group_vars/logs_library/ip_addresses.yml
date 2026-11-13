@@ -63,24 +63,6 @@ ip_addresses:
       address: 40.68.146.2
       netmask: /32
       fqdn: 'logs-earl6-ad5f.westeurope.cloudapp.azure.com'
-  repo-primary:
-    logs_external:
-      address: 10.10.1.7
-      netmask: /32
-      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    logs_external_public:
-      address: 52.174.107.242
-      netmask: /32
-      fqdn: 'logs-repo-primary-ad5f.westeurope.cloudapp.azure.com'
-  repo-secondary:
-    logs_internal_management:
-      address: 10.10.1.179
-      netmask: /32
-      publicly_exposed: true  # This internal IP is linked to a public (floating) IP.
-    vlan16:
-      address: 195.169.22.186
-      netmask: /32
-      fqdn: 'NXDOMAIN'
   logs_internal_management-vlan16-router:
     logs_internal_management:
       address: 10.10.1.1

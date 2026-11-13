@@ -1,0 +1,14 @@
+module(load="imfile")
+
+input(
+    type="imfile"
+    File="/var/log/nginx/access.log"
+    Tag="nginx-access"
+)
+
+input(
+    type="imfile"
+    File="/var/log/nginx/error.log"
+    Tag="nginx-error"
+)
+

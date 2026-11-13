@@ -1,0 +1,67 @@
+---
+- name: "Create the repo folder structure for {{ this_distribution }}"
+  ansible.builtin.file:
+    path: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}"
+    state: directory
+    mode: '0750'
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+  become: true
+
+- name: "Configure main configurations for /{{ this_distribution }}"
+  ansible.builtin.template:
+    src: templates/dnf.conf.j2
+    dest: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}.conf"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    force: true
+    mode: '0644'
+  become: true
+- name: "Determine which repo files should exist for {{ this_distribution }}"
+  ansible.builtin.set_fact:
+    rm_expected_repo_files: >-
+      {{ yum_repos[this_distribution]
+         | selectattr('repo_server_download', 'defined')
+         | selectattr('repo_server_download', 'true')
+         | map(attribute='id')
+         | map('regex_replace', '$', '.repo')
+         | list }}
+
+- name: "Configure all options for all repos in {{ this_distribution }}"
+  community.general.ini_file:
+    path: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/{{ item.0.id }}.repo"
+    section: "{{ item.0.id }}"
+    no_extra_spaces: true
+    create: true
+    option: "{{ item.1 }}"
+    value: "{{ item.0[item.1] }}"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0644'
+  loop: "{{ yum_repos[this_distribution] | product(options) | list }}"
+  loop_control:
+    label: "{{ item.0.id }} {{ item.1 }}"
+  vars:
+    options: [name, baseurl, mirrorlist, metalink]
+  when:
+    - item.0.repo_server_download | default(false) | bool
+    - item.0[item.1] is defined
+  become: true
+
+- name: "Get list of existing repo files for {{ this_distribution }}"
+  ansible.builtin.find:
+    paths: "{{ main_repo_path }}/dnf/repos.d/{{ this_distribution }}/"
+    patterns: "*.repo"
+  register: rm_existing_repo_files
+  become: true
+
+- name: "Delete repo files that are no longer mirrored for {{ this_distribution }}"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ rm_existing_repo_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: item.path | basename not in rm_expected_repo_files
+  become: true
+...

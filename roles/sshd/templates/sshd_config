@@ -193,3 +193,14 @@ Match User {{ logstoprm_rsyncd_module.username }} LocalPort 22
     PermitTTY no
     ForceCommand /bin/rsync --server --daemon --config=/etc/rsyncd_logstoprm_server.conf .
 {% endif %}
+
+{% if inventory_hostname in groups['repo_server'] | default([]) %}
+#
+# On repo_server: configure rysncd module for repo_user 
+#
+Match User {{ repo_user }} LocalPort 22
+    AllowAgentForwarding no
+    AllowTcpForwarding no
+    PermitTTY no
+    ForceCommand /bin/rsync --server --daemon --config=/etc/rsyncd_repo_sync.conf .
+{% endif %}

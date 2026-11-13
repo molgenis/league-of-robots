@@ -1,0 +1,14 @@
+---
+ssh_client_jumphosts:
+  - alias: spring
+    hostname: 194.171.203.45
+
+ssh_client_known_hosts: "\
+  @cert-authority \
+  spring*,\
+  194.171.203.45,\
+  *repo-primary,\
+  *repo-secondary,\
+  *pc-* \
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ04B1UMWednWya4eZRWqbEdhIQKlIdHRIGUN3OA36lY CA key for patchcord_library"
+...

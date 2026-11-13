@@ -1,0 +1,82 @@
+---
+# On PRIMARY: install and enable the service and timer
+- name: Install service and timer on primary server
+  when: rm_repo_is_primary
+  block:
+    - name: Deploy systemd service and timer units
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - repo-sync.service
+        - repo-download_cache.timer
+        - repo-sync.timer
+        - repo-download_cache.service
+      notify: rm_reload_systemd_daemon
+
+    - name: Flush handlers
+      meta: flush_handlers
+
+    - name: Enable and start the timer
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+        daemon_reload: true
+      loop:
+        - "repo-sync.timer"
+        - "repo-download_cache.timer"
+
+    - name: Create /home/repo/.ssh
+      ansible.builtin.file:
+        path: '/home/repo/.ssh'
+        state: directory
+        owner: "{{ repo_user }}"
+        group: "{{ repo_user }}"
+        mode: '0700'
+
+    - name: Create SSH key pair
+      community.crypto.openssh_keypair:
+        path: "/home/repo/.ssh/id_ed25519"
+        type: ed25519
+        comment: "{{ repo_user }}@{{ inventory_hostname }}"
+        owner: "{{ repo_user }}"
+        group: "{{ repo_user }}"
+        mode: '0600'
+      notify: rm_new_public_key
+  become: true
+
+# On SECONDARY: remove service and timer
+- name: Deploy service and timer on SECONDARY servers
+  when: not rm_repo_is_primary
+  block:
+    - name: Deploy systemd repo-download_cache timer and service units
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - repo-download_cache.service
+        - repo-download_cache.timer
+      notify: rm_reload_systemd_daemon
+
+    - name: Flush handlers
+      meta: flush_handlers
+
+    - name: Enable and start the timer
+      ansible.builtin.systemd_service:
+        name: "repo-download_cache.timer"
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Reset failed state for removed units (ignore if none)
+      command: "systemctl reset-failed repo-sync.service repo-sync.timer"
+      changed_when: false
+      failed_when: false
+  become: true

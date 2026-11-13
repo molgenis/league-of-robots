@@ -132,6 +132,7 @@ pip3 install setuptools  # No longer part of default Python >= 3.12.x, but we ne
 pip3 install ruamel.yaml
 pip3 install netaddr
 pip3 install passlib
+pip3 install cryptography # in order to run SRM (repository management roles, which call community.crypto.x509_certificate)
 #
 # Package dnspython is required for Ansible lookup plugin community.general.dig
 #

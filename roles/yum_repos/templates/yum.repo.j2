@@ -8,6 +8,10 @@ name={{ yum_repo['name'] | default(yum_repo['id']) }}
 enabled={{ yum_repo['enabled'] | default(1) }}
 enabled_metadata={{ yum_repo['enabled'] | default(1) }}
 metadata_expire=86400
+{% if repo_manager is defined and repo_manager == 'mirror' %}
+baseurl={% for server in global_repo_servers %}https://{{ server.name }}:8443/{{ stack_prefix }}/{{ yum_repo['id'] }}/  {% endfor %}
+
+{% else %}
 {% if yum_repo['baseurl'] is defined %}
 baseurl={{ yum_repo['baseurl'] }}
 {% endif %}
@@ -16,6 +20,7 @@ mirrorlist={{ yum_repo['mirrorlist'] }}
 {% endif %}
 {% if yum_repo['metalink'] is defined %}
 metalink={{ yum_repo['metalink'] }}
+{% endif %}
 {% endif %}
 {% if yum_repo['gpgcheck'] | default(1) == 1 %}
 gpgcheck=1

@@ -1,0 +1,94 @@
+---
+- name: Determine primary repo server name
+  ansible.builtin.set_fact:
+    rm_primary_name: >-
+      {{ (global_repo_servers
+          | selectattr('primary', 'defined')
+          | selectattr('primary')
+          | map(attribute='name')
+          | list
+          | first) | default('', true) }}
+
+- name: Fail if primary is missing
+  ansible.builtin.fail:
+    msg: >-
+      No global_repo_servers has "primary: true"
+  when: rm_primary_name | length == 0
+
+- name: Determine whether this host is the primary
+  ansible.builtin.set_fact:
+    rm_repo_is_primary: "{{ rm_primary_name == inventory_hostname }}"
+
+- name: Show primary host
+  ansible.builtin.debug:
+    msg: >-
+      {{ inventory_hostname }} is {{ 'PRIMARY' if rm_repo_is_primary else 'SECONDARY' }}
+
+- name: Install SSH public key
+  ansible.posix.authorized_key:
+    user: "{{ repo_user }}"
+    key: "{{ auth_users[repo_user].pub_keys }}"
+    state: present
+    exclusive: false
+  become: true
+
+- name: "Create the folder structure for the repository configuration files"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0750'
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+  loop:
+    - "{{ main_repo_path }}"
+    - "{{ main_repo_path }}/dnf"
+    - "{{ main_repo_path }}/dnf/repos.d"
+    - "{{ main_repo_path }}/dnf/cache"
+    - "{{ main_repo_path }}/logs"
+    - "{{ main_repo_path }}/logs/dnf"
+    - "{{ main_repo_path }}/logs/scripts"
+  become: true
+
+- name: "Deploy repository management scripts to {{ main_repo_path }} on primary server"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ main_repo_path }}/{{ item }}"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0750'
+  with_items:
+    - 1_sync_repo_to_new_version.sh
+    - 2_new_repo_distribution.sh
+    - 3_clean_deploy_dead_links.sh
+    - 4_clean_unused_versions.sh
+    - 5_sync_servers.sh
+  become: true
+  when: rm_repo_is_primary
+
+- name: "Deploy download script to {{ main_repo_path }} on secondary servers"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ main_repo_path }}/{{ item }}"
+    owner: "{{ repo_user }}"
+    group: "{{ repo_group }}"
+    mode: '0750'
+  with_items:
+    - 1_sync_repo_to_new_version.sh
+  become: true
+  when: not rm_repo_is_primary
+
+- name: "Configure repo for each distribution"
+  ansible.builtin.include_tasks: configure_repo_options.yml
+  loop: "{{ yum_repos | list }}"
+  loop_control:
+    loop_var: this_distribution
+
+- name: "Configure nginx on repo_server"
+  ansible.builtin.include_tasks: nginx.yml
+
+- name: "Configure synchronization scripts between primary and secondary repo servers"
+  ansible.builtin.include_tasks: sync.yml
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+...

@@ -538,6 +538,22 @@
           port: 8443  # Repository over HTTPS
         - protocol: icmp
           port: -1  # ICMP protocol does not have any ports.
+    - name: "Add rules to {{ security_group_name }} security group: allow inbound traffic from {{ stack_prefix }}_jumphosts security group."
+      openstack.cloud.security_group_rule:
+        security_group: "{{ security_group_name }}"
+        direction: ingress
+        protocol: "{{ item.protocol }}"
+        port_range_min: "{{ item.port }}"
+        port_range_max: "{{ item.port }}"
+        remote_group: "{{ stack_prefix }}_jumphosts"
+        wait: true
+        timeout: "{{ openstack_api_timeout }}"
+      with_items:
+        - protocol: tcp
+          port: 22  # SSH
+        - protocol: icmp
+          port: -1  # ICMP protocol does not have any ports.
+      when: groups['jumphost'] | default([]) | length >= 1
     - name: "Add rules to {{ security_group_name }} security group: allow inbound SSH from external jumphosts."
       openstack.cloud.security_group_rule:
         security_group: "{{ security_group_name }}"
