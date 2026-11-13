@@ -55,7 +55,6 @@ for _each_os in $(cd 1versions/; find . -mindepth 1 -maxdepth 1 -type d -printf 
    done
 done
 
-
 if [[ "${_verbose}" -gt "0" ]]; then echo "Syncing 2deploy ... "; fi
 # With regular 'rsync ... 2deploy/ ${_remote_sys}/2deploy/" will fail, because
 # links that are pointing outside of the 2deploy, like
@@ -63,7 +62,7 @@ if [[ "${_verbose}" -gt "0" ]]; then echo "Syncing 2deploy ... "; fi
 # will be overwritten into
 #    ../1versions/alma9/...
 # 
-# So instead I rsync 2-levels deep, to allow 2 level deep links, with 
+# So instead I rsync 2-levels deep, to allow 2 level deep links, with
 #    --include='/2deploy/***' --exclude='*' ./* remote/
 #
 # eval, to correctly handle opts=() with escaped \"quotes\"

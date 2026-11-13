@@ -12,7 +12,7 @@ flock -n 171 || { echo "Sync already running" >&2; exit 1; }
 
 {% raw %}
 ! test -d "${_main}/0cache" && mkdir "${_main}/0cache"
-! test -d "${_main}/1versions" && mkdir "${_main}/1versions"`
+! test -d "${_main}/1versions" && mkdir "${_main}/1versions"
 ! test -d "${_main}/logs/cli" && mkdir "${_main}/logs/cli"
 
 print_all_repos() {
