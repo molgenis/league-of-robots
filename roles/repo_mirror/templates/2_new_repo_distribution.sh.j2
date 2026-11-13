@@ -161,6 +161,11 @@ for _each_repo in ${_reposelect:-error}; do
         { echo "Error finding latest version."; exit; }
    else                                        # version WAS provided, use it directly for this repo
       _versionselect="1versions/${_distroselect}/${_each_repo}/${_versionarg}"
+      # check that we are referring to an existing version
+      if [[ ! -d "${_versionselect}" ]]; then
+         echo "Error, version '${_versionarg}' does not exist for ${_distroselect}/${_each_repo}" >&2
+         exit 1
+      fi
    fi
 
    if [[ -z "${_versionselect:-}" ]]; then     # no version was FOUND
