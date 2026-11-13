@@ -47,6 +47,9 @@ fi
 
 _cache_only=false
 _errors=""
+_do_os_distribution""
+_do_repos=""
+
 OPTSTRING=":d:r:0"
 while getopts ${OPTSTRING} opt; do
   case ${opt} in
@@ -127,7 +130,6 @@ function _download_and_version(){
       _errors+=$'\n'"${1} ${2} version creation failed"
       return 0 # but keep on working with other
    fi
-   cp -a --reflink=always "${_main}/0cache/${1}/${2}/" "${_main}/1versions/${1}/${2}/${_time}/" || exit
    echo "  New version created:   ${_main}/1versions/${1}/${2}/${_time}"
 }
 
