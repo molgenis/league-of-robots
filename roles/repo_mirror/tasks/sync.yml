@@ -50,7 +50,8 @@
   become: true
 
 # On SECONDARY: remove service and timer
-- name: Remove service and timer from SECONDARY servers
+- name: Deploy service and timer on SECONDARY servers
+  when: not rm_repo_is_primary
   block:
     - name: Deploy systemd repo-download_cache timer and service units
       ansible.builtin.template:
@@ -66,7 +67,6 @@
 
     - name: Flush handlers
       meta: flush_handlers
-
 
     - name: Enable and start the timer
       ansible.builtin.systemd_service:
