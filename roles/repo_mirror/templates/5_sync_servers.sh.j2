@@ -16,7 +16,7 @@ _verbose=1        # 0 - quiet
        | map(attribute='name')
        | first %}
 _remote_sys="repo@{{ rm_secondary_server }}::repo"
-_opts=(-e \"ssh -o ConnectTimeout=15 -o ControlMaster=auto -o ControlPath=/dev/shm/rsync-ssh-ctl-%C -o ControlPersist=60s\")
+_ssh_opts=(-e \"ssh -o ConnectTimeout=15 -o ControlMaster=auto -o ControlPath=/dev/shm/rsync-ssh-ctl-%C -o ControlPersist=60s\")
 _opts+=(-rlpgoDH -z --delete --numeric-ids --timeout=120 --size-only --ignore-times --delay-updates)
 # Well tested, don't change!
 # - dnf/cache is excuded as the remote server is syncing
@@ -46,12 +46,18 @@ for _each_os in $(cd 1versions/; find . -mindepth 1 -maxdepth 1 -type d -printf 
       for _each_timestamp in $(cd "1versions/${_each_os}/${_each_repo}"; find . -mindepth 1 -maxdepth 1 -type d -printf '%P\n'); do
          _src="1versions/${_each_os}/${_each_repo}/${_each_timestamp}"
          _dst="${_remote_sys}/${_src}"
-         _cmd="rsync "${_opts[@]}" "${_out[@]}" "${_src}/" "${_dst}/" --link-dest="../../../../0cache/${_each_os}/${_each_repo}" --exclude=repodata/"
+         _cmd="rsync "${_ssh_opts[@]}" "${_opts[@]}" "${_out[@]}" "${_src}/" "${_dst}/" --link-dest="../../../../0cache/${_each_os}/${_each_repo}" --exclude=repodata/"
          if [[ "${_verbose}" -eq "1" ]]; then echo -n "."
-         elif [[ "${_verbose}" -gt "2" ]]; then echo -e "\t${_cmd}"
+         elif [[ "${_verbose}" -ge "2" ]]; then echo -e "\t${_cmd}"
          fi
          eval "${_cmd}"
       done
+      if [[ "${_verbose}" -ge "2" ]]; then echo -e "\t prunning unused versions ..."; fi
+      eval rsync "${_ssh_opts[@]}" \
+         -d --delete --existing --ignore-existing --numeric-ids --timeout=120 \
+         "1versions/${_each_os}/${_each_repo}/" \
+         "${_remote_sys}/1versions/${_each_os}/${_each_repo}/"
+
    done
 done
 
@@ -66,5 +72,5 @@ if [[ "${_verbose}" -gt "0" ]]; then echo "Syncing 2deploy ... "; fi
 #    --include='/2deploy/***' --exclude='*' ./* remote/
 #
 # eval, to correctly handle opts=() with escaped \"quotes\"
-eval rsync "${_opts[@]}" "${_out[@]}" --include='/2deploy/***' --exclude='*' "./" "${_remote_sys}/"
+eval rsync "${_ssh_opts[@]}" "${_opts[@]}" "${_out[@]}" --include='/2deploy/***' --exclude='*' "./" "${_remote_sys}/"
 if [[ "${_verbose}" -gt "0" ]]; then echo "Successfully finished syncing servers."; fi
