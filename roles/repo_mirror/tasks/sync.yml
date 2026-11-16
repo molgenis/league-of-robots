@@ -2,6 +2,7 @@
 # On PRIMARY: install and enable the service and timer
 - name: Install service and timer on primary server
   when: rm_repo_is_primary
+  become: true
   block:
     - name: Deploy systemd service and timer units
       ansible.builtin.template:
@@ -18,7 +19,7 @@
       notify: rm_reload_systemd_daemon
 
     - name: Flush handlers
-      meta: flush_handlers
+      ansible.builtin.meta: flush_handlers
 
     - name: Enable and start the timer
       ansible.builtin.systemd_service:
@@ -47,11 +48,11 @@
         group: "{{ repo_user }}"
         mode: '0600'
       notify: rm_new_public_key
-  become: true
 
 # On SECONDARY: remove service and timer
 - name: Deploy service and timer on SECONDARY servers
   when: not rm_repo_is_primary
+  become: true
   block:
     - name: Deploy systemd repo-download_cache timer and service units
       ansible.builtin.template:
@@ -66,7 +67,7 @@
       notify: rm_reload_systemd_daemon
 
     - name: Flush handlers
-      meta: flush_handlers
+      ansible.builtin.meta: flush_handlers
 
     - name: Enable and start the timer
       ansible.builtin.systemd_service:
@@ -76,7 +77,6 @@
         daemon_reload: true
 
     - name: Reset failed state for removed units (ignore if none)
-      command: "systemctl reset-failed repo-sync.service repo-sync.timer"
+      ansible.builtin.command: "systemctl reset-failed repo-sync.service repo-sync.timer"
       changed_when: false
       failed_when: false
-  become: true
