@@ -12,7 +12,7 @@ This role uses `files/patchcord_library/srm.key` key as a default key for the cr
 
     [me@mac ~]$ ssh admin@spring+repo-primary
     [me@repo-primary ~]$ sudo -u repo bash
-    [admin@repo-primary ~]$ $ cd /mnt/repos
+    [admin@repo-primary ~]$ cd /mnt/repos
 
 
 1. Download packets into cache and automatically generate version with current timestamp
@@ -21,7 +21,7 @@ This role uses `files/patchcord_library/srm.key` key as a default key for the cr
     [repo@repo-primary /mnt/repos]$ ./1_sync_repo_to_new_version.sh -d alma9 -r baseos &
         - Log file: /mnt/repos/logs/scripts/alma9/baseos/20260804-104418
     ( press enter )
-    [repo@repo-primary /mnt/repos]$ tail /mnt/repos/logs/scripts/alm/mnt/repos/logs/scripts/alma9/baseos/20260804-104418
+    [repo@repo-primary /mnt/repos]$ tail /mnt/repos/logs/scripts/alma9/baseos/20260804-104418
             ...
         (2297/2298): zsh-5.8-9.el9.x86_64.rpm            32 MB/s | 2.9 MB     00:00    
         (2298/2298): linux-firmware-20260411-155.5.el9_  38 MB/s | 631 MB     00:16    
@@ -43,14 +43,29 @@ This role uses `files/patchcord_library/srm.key` key as a default key for the cr
     [repo@repo-primary /mnt/repos]$ ./3_clean_deploy_dead_links.sh
     [repo@repo-primary /mnt/repos]$ ./4_clean_unused_versions.sh
 
-4. Syncronize primary server
-
-    [repo@repo-primary /mnt/repos]$ ./5_sync_servers.sh
-    ....................Syncing 2deploy ... 
-    Successfully finished syncing servers.
-    [repo@repo-primary /mnt/repos]$ 
-
 ## Fresh server installation
+
+### Prepare system
+
+The role generates an ed25519 key for `repo` user on the `primary`, then deliberately fails.
+The public key must be added to `users.yml` and `regular_users.yml` must be rerun on the
+`secondary` system.
+
+
+### Systemd services
+
+**On both primary and secondary systems:**
+
+ - systemd `repo-download_cache.timer` runs hourly `repo-download_cache.service`
+ - service executes `1_sync_repo_to_new_version.sh -0`
+ - script `1` downloads latest version of repository into `0cache`
+
+**On primary system only**
+
+ - `repo-sync.timer` runs hourly `repo-sync.service`
+ - service rung `5_sync_servers.sh` script which syncronizes the `1versions/` and
+   `2deploy/` directories between the systems (the removed versions on primary are
+   also deleted on secondary)
 
 ### Automatic hourly download
 
@@ -66,7 +81,7 @@ or
 
     ./1_sync_repo_to_new_version.sh -d [OS distribution name] -r [repository name]
 
-## Daily cache and server synchronization
+## Hourly cache and server synchronization
 
 There is next-to-impossible to make a good synchronization of two servers that
 have large versions changes, without waiting a long time for each `rsync` finish`
@@ -78,7 +93,7 @@ Therefore systems CONSTANTLY download cached rpm's from upstream storage. This e
 
 But since the download script must update existing Distributions and Repositories,
 while NOT all repositories that we label as 'mirror-capable' (marked with
-`repo_server_download: true` in the `groups/all/repos.yml`) should actually donwload
+`repo_server_download: true` in the `group_vars/all/repos.yml`) should actually donwload
 only the ones on the server.
 
 synchronization script:
@@ -86,11 +101,15 @@ synchronization script:
    syncronizes only those (`./1_sync_repo_to_new_version.sh -0`)
  - with option `-0`
 
-## Dependecies
+## Dependecies and configuration
 
 This role has dependency on _rsyncd_ role that provides rsync module configuration.
 Rsyncd role itself has a dependency on the _sshd_ role.
 
+Variables
+
+ - `global_repo_servers` need exactly one `primary: true` (the role fails otherwise)
+ - `repo_manager: 'mirror'` has to be set on client stacks, in oreder to use mirror servers
 
 ## Repository settings
 
@@ -104,15 +123,20 @@ Deployment Logic
    - All the Repo Files for specific distrubution are stored inside `/mnt/repos/dnf/repos.d/[distribution]/` (e.g. `.../repos.d/alma9/`).
 
 
-## Configurations scripts
+## Scripts in the /mnt/repos/ folders
 
- - the deployment and configuration scripts are added to `/mnt/repos/` folder
+Script deployed on both primary and secondary machines
+
    - `1_xxx.sh` script syncronizes (download) the latest packages and creates
      a new version of this synchronization
-   - `2_xxx.sh` script exposes this fresh download to the stack that will be
-     using this version
-   - `3_xxx.sh` script cleans all the versions that are not used by any stack
-     deployments
+
+Scripts deployed exclusively on the primary server
+
+   - `2_new_repo_distribution.sh` script exposes (either latest or selected) version
+     as a deployed version for specific stack
+   - `3_clean_deploy_dead_links.sh` removes dead links
+   - `4_clean_unused_versions.sh` removes the versions that are not used by any of the stacks
+   - `5_sync_servers.sh` syncronizes primary server with the secondary one`
 
 ## Server file storage
 
@@ -122,7 +146,7 @@ to the `0cache/[distribution]` directory. And all the future synchronization
 update the entire structure every time - remove the packages which are not in
 the original repository any more.
 
-Versions are stored by making copy (on write - reflink) into `1version` folder at
+Versions are stored by making copy (on write - reflink) into `1versions` folder at
 the end of each synchronization. This enforces that the actually used disk space
 is reduced to bare minimum.
 
@@ -162,17 +186,17 @@ To create and encrypt certificate
 sequenceDiagram
     participant Remote as Remote Repos of Alma, Rocky, Oracle, Lustre, irods ...
     box transparent repo-primary
-        participant P0cache as  Ocache Local Mirror Full Copy
+        participant P0cache as 0cache Local Mirror Full Copy
         participant P1versions as 1versions
         participant P2deploy as 2deploy
     end
     box transparent repo-secondary
-        participant S0cache as  0Cache Local Mirror Full Copy
+        participant S0cache as 0Cache Local Mirror Full Copy
         participant S1versions as 1versions
         participant S2deploy as 2deploy
     end
 
-    loop hourly full dowload  (syncronize) remote repositories locally
+    loop hourly full dowload (syncronize) remote repositories locally
         Remote ->> P0cache: Download all repositories every hour
         Remote ->> S0cache: Download all repositories every hour
     end
