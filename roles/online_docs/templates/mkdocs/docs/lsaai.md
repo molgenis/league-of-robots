@@ -10,7 +10,7 @@ LSAAI instructions are available in three parts
 
 It is an **identity and access management** system designed for the European Life Science research community. It enables researchers to use a single digital identity—leveraging their existing institutional or community accounts—to securely access shared data and computing resources.
 
-Users can request and manage their own access credentials.
+Users can request and manage their own access credentials. **Those accounts can be used to login into our HPC systems** (provided that group membership was also approved).
 
 Group owners and data managers can manage group membership themselves or delegate this responsibility to others.
 
