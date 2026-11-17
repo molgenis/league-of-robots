@@ -1,24 +1,25 @@
 #jinja2: trim_blocks:False
-# Generate a public/private key pair with MobaXterm on Windows
+# Generate a public/private key pair on Windows
 
-Your OS comes with a default terminal and key generator application (OpenSSH), but you can also download and install another one (we offer partial support for MobaXterm).
+There are two options to create an SSH key pair on Windows
 
-Before you decide which client you wish to use, note that different client programs support different public/private keypairs formats - *formats are noninterchangeable between clients*, without conversion.
+ 1. Either using [MobaXterm](#1-mobaxterm-option), which has a graphical user interface, but requires installation.
+ 2. Or using [OpenSSH](#2-using-windows-openssh), which is built-in, but does not have a graphical user interface.
 
-There are two options to login to clusters from Windows
-
- 1. Either by using [MobaXterm client](#1-mobaxterm-option) software which requires installation
- 2. Or simply use Windows built-in [OpenSSH](#2-using-windows-openssh) software
+Note that _OpenSSH_ and _MobaXterm_ use different file formats to store SSH key pairs.
+You will need to convert from one format into the other when switching from one SSH client to the other.
 
 ## 1. MobaXterm option
 
 ### 1.1 Get MobaXterm - a terminal and key generator application
 
-There are many options all of which have their own pros and cons; we suggest you give [MobaXterm](https://mobaxterm.mobatek.net) version >= 12.3 a try 
-as it features a key generator, terminal and graphical user interface for data transfers all-in-one.
+There are many options all of which have their own pros and cons;
+we suggest you give [MobaXterm](https://mobaxterm.mobatek.net) a try as it features a key generator,
+terminal and graphical user interface for data transfers all-in-one.
+Make sure you have version **26.5 or newer**, because older ones have known bugs and won't work or have security risks.
 The following steps use the *portable* version of *MobaXterm Home Edition*, which is free and does not need to be installed with an installer;
 just download, unpack and execute.
-If you want to use another terminal, key generator or data transfer app please consult their manuals...
+If you want to use other terminal, key generator or data transfer apps please consult their manuals...
 
 #### 1.2 Launch MobaXterm key pair generator
 
