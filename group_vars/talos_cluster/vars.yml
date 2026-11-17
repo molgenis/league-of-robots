@@ -293,18 +293,21 @@ lfs_mounts:
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
 
-nhc_journalctl_checks:
+nhc_extras:
   deploy_admin_interface:
-    - user: "root"
-      lookback_min: 15
-      tag: "CROND"
-#    - user: "umcg-atd-dm"
-#      lookback_min: 15
-#      tag: "CROND"
-#      pattern: "FAILED|exit code|backup FAILED"
-#  chaperone:
-#    - user: "umcg-ogm-dm"
-#      lookback: 10
-#      tag: "CROND"
-#      pattern: "FAILED|exit code|backup FAILED"
+   - 'check_ps_service -u root -S -f fail2ban'
+   - 'nhc_journalctl_checks "root" "15" "CROND" ""'
+#
+# You can use
+#
+#   nhc_extras:
+#     deploy_admin_interface:
+#      - 'check_ps_service -u root -S -f fail2ban'
+#      - 'nhc_journalctl_checks "root" "15" "CROND" ""'
+#
+# or any other nhc function defined in custom by us or from community
+#   https://github.com/mej/nhc
+#
+# for example
+#  check_ps_loadavg, check_fs_free, check_hw_eth, ...
 ...

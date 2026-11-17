@@ -11,7 +11,7 @@ trap 'echo "Terminated by signal SIGINT." ; exit 130' 2
 trap 'echo "Terminated by signal SIGTERM." ; exit 143' 15
 
 slack_webhook='{{ slurm_notification_slack_webhook[stack_dtap_state] }}'
-cluster_name='{{ slurm_cluster_name | capitalize }}'
+cluster_name='{% if slurm_cluster_name is defined %}{{ slurm_cluster_name | capitalize }}{% else %}{{ inventory_hostname }}{% endif%}'
 
 {% raw %}
 
