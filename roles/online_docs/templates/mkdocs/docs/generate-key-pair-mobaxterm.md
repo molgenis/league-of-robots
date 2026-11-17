@@ -3,8 +3,8 @@
 
 There are two options to create an SSH key pair on Windows
 
- 1. Either using [MobaXterm client](#1-mobaxterm-option), which has a graphical user interface, but requires installation.
- 2. Or using the built-in [OpenSSH](#2-using-windows-openssh), which does not have a graphical user interface.
+ 1. Either using [MobaXterm](#1-mobaxterm-option), which has a graphical user interface, but requires installation.
+ 2. Or using [OpenSSH](#2-using-windows-openssh), which is built-in, but does not have a graphical user interface.
 
 Note that _OpenSSH_ and _MobaXterm_ use different file formats to store SSH key pairs.
 You will need to convert from one format into the other when switching from one SSH client to the other.
@@ -19,7 +19,7 @@ terminal and graphical user interface for data transfers all-in-one.
 Make sure you have version **26.5 or newer**, because older ones have known bugs and won't work or have security risks.
 The following steps use the *portable* version of *MobaXterm Home Edition*, which is free and does not need to be installed with an installer;
 just download, unpack and execute.
-If you want to use another terminal, key generator or data transfer app please consult their manuals...
+If you want to use other terminal, key generator or data transfer apps please consult their manuals...
 
 #### 1.2 Launch MobaXterm key pair generator
 
