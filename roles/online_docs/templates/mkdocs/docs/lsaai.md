@@ -64,7 +64,7 @@ To request access to the **GGCC Virtual Organization (VO)**, you must first poss
 Please note that following steps may differ from user to user, as it depends on their previous LSAAI accounts - therfore **some users might need to skip some of the steps**.
 
 1.  **Visit the Login Portal** Navigate to the [LifeScience Login](https://perun.aai.lifescience-ri.eu/) page. ([image 1](img/lsaai_user_1.png))
-2.  **Select Organization** Choose your home institution and log in. ([image 2](img/lsaai_user_2.png))
+2.  **Select Organization** it is important to **choose your home institution** to log in. ([image 2](img/lsaai_user_2.png))
 3.  **Register New Account** If no account is found, you will see a "No user account found" message. Click **Proceed to register for an account**.   ([image 3](img/lsaai_user_3.png))
 4.  **Fill Application** Complete the application form to join the LifeScience LSAAI community. ([image 4](img/lsaai_user_4.png))
 5.  **Accept Policies** Accept the Acceptable Use Policy and click **Submit**. ([image 5](img/lsaai_user_5.png))
@@ -82,7 +82,7 @@ Once your account is created and you log in to LifeScience, you may see a messag
 
 You can request general membership by visiting the registrar
 
-* **Link:** [Request GGCC Membership](https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc) ([image 9](img/lsaai_user_9.png))
+* **Link:** to [Request GGCC Membership](https://signup.aai.lifescience-ri.eu/registrar/?vo=ggcc) ([image 9](img/lsaai_user_9.png))
 * Follow the prompts to join the VO and specific groups as needed.
 
 #### Option B: Join via Invitation Link
@@ -154,3 +154,63 @@ Note: If you lose your key or forget your passphrase, simply generate a new pair
 - Tick the checkboxes in front of the usernames you wish to remove
 - Confirm with `Remove` ([screenshot](img/lsaai_manager_7.png))
 
+### 3.5. Creating subgroups (data managers)
+
+Data managers can create **project**, **release**, and **hierarchical** subgroups.
+Perun **web interface should never used to make new subgroups**, instead the
+**command line on the cluster** can be used in order to do it properly. 
+
+User from the data-manager (`-dms`) group should run
+
+```bash
+   lsaai_subgroups.sh
+```
+
+The output lists all the groups which you can manage, and also prompts
+
+```
+Would you like to create a new [P]roject, [R]elease versioned dataset, or hierarchical [S]ubgroup?
+```
+
+where **[P]**roject
+
+1. Enter the main group name (from the list shown).
+2. Enter a project name (2–8 characters, letters/digits/underscore, not `dms`).
+3. Press Enter to accept the default membership duration, or type a different number of days (see below).
+
+==> Creates `[main group]-prj-[projectname]`
+
+**[R]**elease (dataset + version)
+
+1. Enter the main group name.
+2. Press Enter to accept the default membership duration, or type a different number of days (see below).
+3. Enter a dataset name (2–12 characters).
+4. Enter a version name (2–6 characters).
+
+==> Creates `[main group]-rel-[dataset]-[version]`
+
+Hierarchical **[S]**ubgroup
+
+1. Enter the full parent group name (must be under `[main group]-sub`, max 3 levels deep).
+2. Enter a subgroup name (2–8 characters).
+3. Press Enter to accept the default membership duration, or type a different number of days (see below).
+
+==> Creates the new group directly under the parent you entered.
+
+The **membership expiration** prompt
+
+Every member added to the subgroup gets an expiration date, set this many days from
+when they joined (default: **365 days**). When that date passes, their membership
+automatically expires and they lose access to the group — they are not removed from
+the group definition itself, but need to be renewed or reapply to regain access. This
+is a safeguard so that access to project/release data doesn't linger indefinitely
+after someone's involvement ends. You can enter a shorter or longer number of days if
+365 doesn't fit the project's expected duration.
+
+**Adding a user to a subgroup you created**
+
+The script itself does not create individual user accounts. Once a subgroup exists:
+
+- Share the group's membership link (printed at the end of the script) with the person who needs access, or use [Option A or B above](#32-adding-users-to-a-group) to add them via Perun.
+- The person must **log out and log back in** to the cluster before access takes effect.
+- Allow a few minutes for the change to propagate.

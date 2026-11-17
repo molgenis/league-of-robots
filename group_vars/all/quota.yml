@@ -26,7 +26,7 @@ lfs_quota:
       umcg-hlhs: 3072
       umcg-immunogenetics: 10240
       umcg-integralezorg: 1024
-      umcg-lifelines: 28672
+      umcg-lifelines: 38912
       umcg-lld: 15360
       umcg-llnext: 10240
       umcg-mic: 7168
@@ -169,7 +169,7 @@ lfs_quota:
       umcg-immunogenetics: 2048
       umcg-impact: 1024
       umcg-intercept: 2048
-      umcg-lifelines: 92160
+      umcg-lifelines: 112640
       umcg-lld: 1024
       umcg-llnext: 2048
       umcg-mic: 2048
