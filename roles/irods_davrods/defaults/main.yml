@@ -1,6 +1,0 @@
----
-davrods_docker_user: davrods
-davrods_docker_folder: 'davrods_docker'   # relative to the davrods_user_home
-davrods_default_resource: 'default_res'   # davrods default resource to use for uploading the files
-ir_client_server_policy: 'CS_NEG_REQUIRE'   # communicating using (default) SSL (CS_NEG_REQUIRE) or without (CS_NEG_REFUSE)
-...
