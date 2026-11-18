@@ -37,10 +37,17 @@ azure_image:
     version: 'latest'
 azure_resource_group: "{{ stack_name }}"
 
-## NHC settings for machine
+# NHC extras - you can use
+#   nhc_extras:
+#     deploy_admin_interface:
+#      - 'check_ps_service -u root -S -f fail2ban'
+#      - 'nhc_journalctl_checks "root" "15" "CROND" ""'
+# or any other nhc function defined in custom by us or from community
+#   https://github.com/mej/nhc
+# for example, functions like
+#  check_ps_loadavg, check_fs_free, check_hw_eth, ...
 nhc_extras:
   ldap_server:
-   - 'check_ps_service -u root -S -f fail2ban'
    - 'nhc_journalctl_checks "root" "15" "CROND" ""'
 
 nameservers: [

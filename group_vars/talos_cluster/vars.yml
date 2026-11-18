@@ -293,21 +293,17 @@ lfs_mounts:
     ro_machines: "{{ groups['compute_node'] + groups['user_interface'] }}"
     rw_machines: "{{ groups['deploy_admin_interface'] }}"
 
-nhc_extras:
-  deploy_admin_interface:
-   - 'check_ps_service -u root -S -f fail2ban'
-   - 'nhc_journalctl_checks "root" "15" "CROND" ""'
-#
-# You can use
-#
+# NHC extras - you can use
 #   nhc_extras:
 #     deploy_admin_interface:
 #      - 'check_ps_service -u root -S -f fail2ban'
 #      - 'nhc_journalctl_checks "root" "15" "CROND" ""'
-#
 # or any other nhc function defined in custom by us or from community
 #   https://github.com/mej/nhc
-#
-# for example
+# for example, functions like
 #  check_ps_loadavg, check_fs_free, check_hw_eth, ...
+nhc_extras:
+  deploy_admin_interface:
+   - 'nhc_journalctl_checks "root" "15" "CROND" ""'
+#
 ...
