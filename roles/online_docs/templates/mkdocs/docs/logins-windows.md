@@ -12,7 +12,7 @@ There are two options to login to clusters from Windows
 The instructions below assume:
 
  * you've already downloaded _**[MobaXterm](https://mobaxterm.mobatek.net)**_ to generate a pair of SSH keys (using the instructions for requesting accounts)
- * and verified your _**MobaXterm**_ version is **12.3 or newer** (older ones have a known bug and won't work.)
+ * and verified your _**MobaXterm**_ version is **26.5 or newer** (older ones have known bugs and won't work or have security risks.)
  * and will now use _**MobaXterm**_ to login to the cluster
  * and that you received a notification with your account name and that your account has been activated
  * and that you are on the machine from which you want to connect to the cluster.
@@ -23,7 +23,7 @@ If you prefer another terminal application consult the corresponding manual.
 
 ![launch MobaXterm](img/MobaXterm5.png)
 
- * Launch _**MobaXterm**_ version **12.3 or newer** and click the _**Session**_ button from the top left of the window.
+ * Launch _**MobaXterm**_ version **26.5 or newer** and click the _**Session**_ button from the top left of the window.
  * A _**Session settings**_ window will popup.
 
 ### 1.2 Configure a new session
