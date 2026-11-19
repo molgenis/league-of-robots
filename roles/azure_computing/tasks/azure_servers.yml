@@ -34,16 +34,12 @@
         {% endif %}
       {% endfor %}
     network_interface_names: "{{ vm_nics | from_yaml }}"
-    managed_disk_type: Standard_LRS
+    managed_disk_type: StandardSSD_LRS
     image:
       offer: "{{ azure_image[os_distribution].offer }}"
       publisher: "{{ azure_image[os_distribution].publisher }}"
       sku: "{{ azure_image[os_distribution].sku }}"
       version: "{{ azure_image[os_distribution].version }}"
-    plan:
-      name: "{{ azure_image[os_distribution].sku }}"
-      product: "{{ azure_image[os_distribution].offer }}"
-      publisher: "{{ azure_image[os_distribution].publisher }}"
     started: true
   vars:
     vm_nics: |
@@ -58,6 +54,7 @@
     resource_group: "{{ azure_resource_group }}"
     disk_size_gb: "{{ item['size'] }}"
     managed_by: "{{ inventory_hostname }}"
+    storage_account_type: StandardSSD_LRS
     attach_caching: read_only
   loop: "{{ local_volume_extra | default([]) }}"
 ...

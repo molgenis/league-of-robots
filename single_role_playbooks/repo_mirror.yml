@@ -1,0 +1,6 @@
+---
+- name: Configuring repo servers
+  hosts: repo_server
+  roles:
+    - role: repo_mirror
+...

@@ -1,0 +1,13 @@
+---
+
+# Repo server local configurations
+main_repo_path: /mnt/repos
+nginx_ssl_dir: /etc/pki/nginx/
+repo_user: repo
+repo_group: "{{ repo_user }}" # group name is same as username
+
+# CA configuration
+local_ca_dir: "{{ playbook_dir }}/files/patchcord_library/" # local CA certificate
+local_ca_cert_file: "srm.pem" # local CA certificate
+local_ca_key_file: "srm.key"  # local CA private key
+...

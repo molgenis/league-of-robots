@@ -26,6 +26,7 @@
     comment: "{{ auth_users[user['name']]['comment'] }}"
     group: "{{ user['name'] }}"
     groups: "{{ user['groups'] }}"
+    shell: "{{ auth_users[user.name].shell | default(omit) }}"
     home: "/home/{{ user['name'] }}"
     append: false
   loop: "{{ regular_users }}"

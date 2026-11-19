@@ -42,6 +42,7 @@ iptables_allow_icmp_inbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
+  - "{{ patchcord_library.ip_addresses['spring']['vlan1066'] }}"
 iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net1'] }}"
   - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -57,6 +58,7 @@ iptables_allow_ssh_inbound:
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
   - "{{ logs_library.ip_addresses['hatch']['logs_external'] }}"   # this is needed, because it is external AND internal ip interface on Azure
   - "{{ logs_library.ip_addresses['hatch']['logs_external_public'] }}"
+  - "{{ patchcord_library.ip_addresses['spring']['vlan1066'] }}"
 iptables_allow_logs_inbound:
   - ANY
 ...

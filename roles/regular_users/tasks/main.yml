@@ -28,6 +28,7 @@
       inventory_hostname in groups['data_transfer'] | default([]) or
       inventory_hostname in groups['build_server'] | default([]) or
       inventory_hostname in groups['logs'] | default([]) or
+      inventory_hostname in groups['repo_server'] | default([]) or
       inventory_hostname in groups['ldap_server'] | default([])
     - ldap_domains['stack']['replication_provider_uri'] is not defined
 

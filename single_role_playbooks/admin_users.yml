@@ -4,7 +4,7 @@
     - jumphost
     - data_transfer
     - logs
-    - repo_servers
+    - repo_server
   roles:
     - admin_users
 - name: Running > admin_users < role on second batch of machines

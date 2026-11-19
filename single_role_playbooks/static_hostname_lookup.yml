@@ -12,7 +12,7 @@
     - ldap_server
     - logs
     - repo
-    - repo_servers
+    - repo_server
     - silo_server
   #
   # Use hard coded strategy linear to disable mitogen when present,

@@ -6,6 +6,26 @@ set -ueo pipefail
 _main="{{ main_repo_path }}"
 cd ${_main}
 
+! test -d "${_main}/logs/cli" && mkdir "${_main}/logs/cli"
+
+function help(){
+    echo "Error, at least [stack_prefix] is missing. Use"
+    echo "  ${0} [-c stack] -s stack [-d string] [-r string|ALL] [-v string] [-p]"
+    echo " where"
+    echo "   -c string       copy from this stack settings, e.g. '-c hc -s nb' would copy from hc to nb"
+    echo "   -s string       is a name of the stack abbrevation, e.g. 'nb'"
+    echo "   -d string       is distribution, e.g. 'rocky9'"
+    echo "   -r string|ALL   is name of specific repository, e.g. 'ryslog7' or 'ALL' for all repositories"
+    echo "   -v string       in case of specific repository, this is a specific version to be used for a stack"
+    echo "                   Note: if no version is selected, then the last one will be used!"
+    echo "   -p              prompt"
+    echo ""
+    cd ${_main}/2deploy/
+    echo "Available stacks are: "
+    find . -mindepth 1 -maxdepth 1 -type d -printf ' %P\n'
+    exit 1
+}
+
 {% raw %}
 _prompt=false
 OPTSTRING=":s:c:d:r:v:p"
@@ -17,29 +37,23 @@ while getopts ${OPTSTRING} opt; do
     r) _repoarg=${OPTARG} && echo "repository: ${_repoarg}" ;;
     v) _versionarg=${OPTARG} && echo "version: ${_versionarg}" ;;
     p) _prompt=true ;;
-    *)
-       echo "Error, at least [stack_prefix] is missing. Use"
-       echo "  ${0} [-c stack] -s stack [-o string] [-r string|ALL] [-v string] [-p]"
-       echo " where"
-       echo "   -s string       is a name of the stack abbrevation, e.g. 'nb'"
-       echo "   -d string       is distribution, e.g. 'rocky9'"
-       echo "   -r string|ALL   is name of specific repository, e.g. 'ryslog7' or 'ALL' for all repositories"
-       echo "   -v string       in case of specific repository, this is a specific version to be used for a stack"
-       echo "                   Note: if no version is selected, then the last one will be used!"
-       echo "   -c string       copy from this stack settings, e.g. '-c hc -s nb' would copy from hc to nb"
-       echo ""
-       cd ${_main}/2deploy/
-       echo "Available stacks are: "
-       find . -mindepth 1 -maxdepth 1 -type d -printf ' %P\n'
-       cd ${_main}
-       exit 1
-       ;;
+    *) help ;;
   esac
 done
 
+
+cd ${_main}
+
 if [[ -z "${_stack:-}" ]]; then
-   echo "Stack missing, exiting ..." && exit 1
+   echo "Stack missing, exiting ..." && help
 fi
+
+_time="$(date +%Y%m%d-%H%M%S)"
+## A bit of logging
+echo "${_time} running ${0} ${*}" >> "${_main}/logs/cli/$(basename ${0}).log"
+echo "    current deployments are:" >> "${_main}/logs/cli/$(basename ${0}).log"
+ls -Rl 2deploy/ | sed 's/^/        /g' >> "${_main}/logs/cli/$(basename ${0}).log"
+
 
 if [[ -n "${_stack:-}" && -n "${_copy:-}" ]]; then
    if test -d "2deploy/${_copy}"; then
@@ -73,12 +87,12 @@ if [[ -n "${_repoarg:-}" ]]; then
          echo "Error, repository does not exist for this distribution"
          exit
       else
-	 _reposelect="${_repoarg}"
+         _reposelect="${_repoarg}"
       fi
    fi
 fi
 
-if [[ -n "${_versionselarg:-}" ]]; then
+if [[ -n "${_versionarg:-}" ]]; then
    if [[ -z "${_stack:-}" || -z "${_distroarg:-}" || -z "${_reposelect:-}" ]]; then
       echo "Stack, distribution or repository missing" && exit 1
    fi
@@ -145,6 +159,13 @@ for _each_repo in ${_reposelect:-error}; do
    if [[ -z "${_versionarg:-}" ]]; then        # no version was PROVIDED, selecting LATEST version
       _versionselect="$(find 1versions/${_distroselect}/${_each_repo} -maxdepth 1 -mindepth 1 -type d -printf '%T@ %p\n' | sort -nr | head -1 | cut -d' ' -f2-)" || \
         { echo "Error finding latest version."; exit; }
+   else                                        # version WAS provided, use it directly for this repo
+      _versionselect="1versions/${_distroselect}/${_each_repo}/${_versionarg}"
+      # check that we are referring to an existing version
+      if [[ ! -d "${_versionselect}" ]]; then
+         echo "Error, version '${_versionarg}' does not exist for ${_distroselect}/${_each_repo}" >&2
+         exit 1
+      fi
    fi
 
    if [[ -z "${_versionselect:-}" ]]; then     # no version was FOUND
@@ -163,16 +184,23 @@ for _each_repo in ${_reposelect:-error}; do
          echo "   2deploy/${_stack}/${_each_repo}  ->  ${_versionselect}"
          read -p "> press [enter] to confirm"
       fi
-      ln -f -s "../../${_versionselect}" "2deploy/${_stack}/${_each_repo}"
+      cd "${_main}/2deploy/${_stack}"
+      rm -f "./${_each_repo}"
+      ln -f -s "../../${_versionselect}/" "${_each_repo}"
+
       echo ""
    fi
 done
 
+cd "${_main}"
 if ! test -e "2deploy/all"; then
    echo "Creating missing link to all repositories ..."
-   ln -s "../1versions/" "2deploy/all"
+   ln -s "../1versions/" "./2deploy/all"
 fi
 
 
-echo "done"
+echo "Syncronizing severs ... "
+./5_sync_servers.sh -q
+
+echo "Successfully finished creating new version."
 {% endraw %}

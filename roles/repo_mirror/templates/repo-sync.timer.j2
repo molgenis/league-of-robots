@@ -1,0 +1,12 @@
+# {{ ansible_managed | default('Managed by Ansible - role: repo_mirror') }}
+[Unit]
+Description=Periodically start synchronization service between repo servers
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=0
+Persistent=true
+Unit=repo-sync.service
+
+[Install]
+WantedBy=timers.target
