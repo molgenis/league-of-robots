@@ -7,24 +7,6 @@
       - lbnl-nhc
   become: true
 
-#
-# Changing the name of the executed command is one of the ways to feed NHC a non default config.
-# The other options with either
-#   commandline argument -n custom_name
-# or
-#   NAME=custom_name
-# do not work in detached mode.
-#
-- name: 'Create an nhc_standalone -> nhc symlink.'
-  ansible.builtin.file:  # noqa risky-file-permissions
-    src: /sbin/nhc
-    dest: /sbin/nhc_standalone
-    owner: root
-    group: root
-    state: link
-    force: true
-  become: true
-
 - name: 'Deploy /etc/tmpfiles.d/nhc_standalone.conf.'
   ansible.builtin.template:
     src: templates/nhc_standalone.tmpfiles
@@ -76,6 +58,9 @@
     group: root
     mode: "{{ item.mode }}"
   loop:
+    - src: 'templates/nhc_standalone'
+      dest: '/usr/sbin/nhc_standalone'
+      mode: '0755'
     - src: 'templates/nhc_standalone.conf'
       dest: '/etc/nhc/nhc_standalone.conf'
       mode: '0644'
@@ -85,6 +70,9 @@
     - src: 'templates/nhc-wrapper'
       dest: '/usr/sbin/nhc-wrapper'
       mode: '0755'
+    - src: 'templates/slack.conf'
+      dest: '/etc/nhc/slack.conf'
+      mode: '0600'
   become: true
 
 - name: 'Deploy custom nhc file.'
