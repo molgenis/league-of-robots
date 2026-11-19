@@ -42,13 +42,17 @@ where arguments `check_journalctl` are in format
 1. `user` [username] specifies the user to filter on, can be only one user. Can be also empty to match logs of all users.
 2. `lookback_min` [number] defines how far back to search in logs.
 3. `tag` [string] specifies the journalctl tag (`journalctl -t`).
-4. `pattern` [strings|separated|by|pipe|symbol] defines the error pattern to match (all patterns are OR)
+4. `pattern` [strings|separated|by|pipe|symbol] defines the error pattern to match
+    Either of the patterns is being looked for (OR).
+    By DEFAULT if there are no patterns provided, the script will look for
+    `FAILED|status=[1-9]|exit code|segfault|fail|error` as defined in the `custom.nhc`
 
 Make sure `lookback_min` matches how often the check runs.
 
 Example
 
 ```text
+* || check_journalctl "root" 15 ldap_backup ""
 * || check_journalctl "root" 15 CROND "FAILED|error"
 * || check_journalctl "umcg-ogm-dm" 15 OGM "FAILED|exit code|backup FAILED"
 ```

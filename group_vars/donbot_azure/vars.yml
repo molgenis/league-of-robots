@@ -47,7 +47,7 @@ azure_resource_group: "{{ stack_name }}"
 # for example, functions like
 #  check_ps_loadavg, check_fs_free, check_hw_eth, ...
 nhc_extras:
-  ldap_server:
+  ladap:
    - 'check_journalctl "" "15" "CROND" ""'
    - 'check_systemctl_running slapd-ltb.service'
 
