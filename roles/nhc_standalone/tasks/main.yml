@@ -70,7 +70,7 @@
     - src: 'templates/nhc-wrapper'
       dest: '/usr/sbin/nhc-wrapper'
       mode: '0755'
-    - src: 'templates/slack.conf'
+    - src: 'templates/slack.conf.j2'
       dest: '/etc/nhc/slack.conf'
       mode: '0600'
   become: true
