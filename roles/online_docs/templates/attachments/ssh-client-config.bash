@@ -15,8 +15,11 @@ umask 0077
 LANG='en_US.UTF-8'
 LC_NUMERIC="${LANG}"
 
-SCRIPT_NAME="$(basename "${0}")"
-SCRIPT_NAME="${SCRIPT_NAME%.*sh}"
+#
+# Define custom my_script_name as SCRIPT_NAME may be overruled by the shell under certain conditions.
+#
+my_script_name="$(basename "${0}")"
+my_script_name="${my_script_name%.*sh}"
 
 #
 ##
@@ -147,7 +150,7 @@ function log4Bash() {
 		# Format message.
 		#
 		_log_timestamp=$(date "+%Y-%m-%dT%H:%M:%S") # Creates ISO 8601 compatible timestamp.
-		_log_line_prefix=$(printf "%-s %-s %-5s @ L%-s(%-s)>" "${SCRIPT_NAME}" "${_log_timestamp}" "${_log_level}" "${_problematic_line}" "${_problematic_function}")
+		_log_line_prefix=$(printf "%-s %-s %-5s @ L%-s(%-s)>" "${my_script_name}" "${_log_timestamp}" "${_log_level}" "${_problematic_line}" "${_problematic_function}")
 		_log_line="${_log_line_prefix} ${_log_message}"
 		if [[ -n "${mixed_stdouterr:-}" ]]; then
 			_log_line="${_log_line} STD[OUT+ERR]: ${mixed_stdouterr}"
@@ -208,7 +211,7 @@ function thereShallBeOnlyOne() {
 		# Note: this is always the case on macOS that has no flock installed by default :(
 		#
 		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME[0]:-main}" '0' "The flock utility is missing; will fallback to less reliable pgrep ..."
-		if [[ $(pgrep "${SCRIPT_NAME}") -gt 1 ]]; then
+		if [[ $(pgrep "${my_script_name}" | wc -l | tr -d ' ') -gt 1 ]]; then
 			log4Bash 'FATAL' "${LINENO}" "${FUNCNAME[0]:-main}" '1' 'Another instance is already running and there shall be only one.'
 		fi
 	fi
