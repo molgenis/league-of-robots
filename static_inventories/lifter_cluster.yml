@@ -130,19 +130,19 @@ all:
         cpu_r630:  # Must be item from {{ slurm_partitions }} variable defined in group_vars/{{ stack_name }}/vars.yml
           hosts:
             lt-node-a01:
-              cloud_flavor: umcg.v1.bm.28-256-0
+              cloud_flavor: gcc.v2.bm-28-256-930-r630
               host_type: baremetal
               host_networks:
                 - name: "{{ stack_prefix }}_internal_management"
                   security_group: "{{ stack_prefix }}_cluster"
                   add_hostname_to_ip_address: true
                   nmstate_interface:
-                    name: enp130s0f1
+                    name: enp130s0f0
                 - name: "{{ stack_prefix }}_umcg-1068"
                   security_group: "{{ stack_prefix }}_storage"
                   assign_floating_ip: true
                   nmstate_interface:
-                    name: enp130s0f0
+                    name: enp130s0f1
                   lnet:
                     name: tcp20
                   nmstate_route:
@@ -152,7 +152,6 @@ all:
                 - name: eno2
                 - name: eno3
                 - name: eno4
-                - name: enp130s0f1
               perc_devices: true
               local_mounts:
                 - mount_point: "{{ slurm_local_scratch_dir }}"
