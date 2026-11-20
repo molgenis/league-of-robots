@@ -32,7 +32,7 @@ build_env_dai_deps:
   - 'munge-libs'
   - 'munge-devel'
   - 'mariadb-devel'
-  - 'man2html'
+  - 'lua'
   - 'lua-devel'
   - 'lua-posix'
   - 'hwloc-devel'

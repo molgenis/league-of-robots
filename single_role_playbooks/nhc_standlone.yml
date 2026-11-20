@@ -4,6 +4,7 @@
     - sys_admin_interface
     - deploy_admin_interface
     - data_transfer
+    - chaperone
   roles:
      - nhc_standalone
 ...
