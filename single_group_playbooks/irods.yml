@@ -5,22 +5,4 @@
 - name: Import initialization playbook for all hosts.
   ansible.builtin.import_playbook: init.yml
 
-- name: 'Satisfy dependencies and install iCAT'
-  hosts: irods
-  roles:
-    - interfaces
-    - iptables
-    - ssh  # client
-    - grub
-    - locale
-    - logrotate
-    - logins
-    - sshd
-    - basic_security
-    - remove
-    - update
-    - docker
-    - irods
-    - irods_davrods
-    - modulejail  # Must come late/last after all required kernel modules are loaded.
 ...

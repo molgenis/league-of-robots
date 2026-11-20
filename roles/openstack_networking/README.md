@@ -33,7 +33,6 @@ This role contains functionality to create a limited set of _**security groups**
  *  ```{{ stack_prefix }}_ds```
  *  ```{{ stack_prefix }}_cluster```
  *  ```{{ stack_prefix }}_storage```
- *  ```{{ stack_prefix }}_irods```
  *  ```{{ stack_prefix }}_repo```
  *  ```{{ stack_prefix }}_webservers```
  *  ```{{ stack_prefix }}_logservers```

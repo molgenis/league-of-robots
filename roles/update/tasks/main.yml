@@ -17,12 +17,12 @@
 #
 # These packages are version locked using their corresponding roles and we don't want to change that.
 #
-- name: 'Update all installed packages (except Slurm and iRODS) now.'
+- name: 'Update all installed packages (except Slurm) now.'
   ansible.builtin.package:
     name: '*'
     state: latest
     update_cache: true
-    exclude: 'slurm*,irods*'
+    exclude: 'slurm*'
   become: true
 
 - name: 'Check if we need to reboot now.'

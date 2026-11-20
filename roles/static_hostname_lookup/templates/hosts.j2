@@ -17,7 +17,7 @@
 #
 # localhost
 #
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4{% if groups['irods'] is defined and inventory_hostname in groups['irods'] %} {{ hostvars[inventory_hostname]['fqdn'] | regex_replace('\..*$', '')}}.localdomain{% endif +%}
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
 #
