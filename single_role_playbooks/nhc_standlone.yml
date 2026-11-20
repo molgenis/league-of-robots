@@ -5,6 +5,7 @@
     - deploy_admin_interface
     - data_transfer
     - chaperone
+    - ldap_server
   roles:
      - nhc_standalone
 ...

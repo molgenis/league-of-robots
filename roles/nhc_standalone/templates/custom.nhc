@@ -19,69 +19,58 @@ declare PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 # Therefore, make sure the `lookback_min` matches the run freqency of your check.
 function check_journalctl()
 {
-    # Defaults 
-    local USERS="${1:-root}"
+    # Defaults
+    local USER=${1:-} # can be empty, will match all
     local LOOKBACK_MIN="${2:-15}"
     local TAG="${3:-CROND}"
-    local PATTERN="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
+    local PATTERNS="${4:-FAILED|status=[1-9]|exit code|segfault|fail|error}"
 
-    local USER
-    local USER_LOGS
     local MATCH
     local SINCE
     local LOGS
     local WARNING
 
-    local -a USER_LIST
     local -a ERRORS=()
-
-    IFS=',' read -r -a USER_LIST <<< "${USERS}"
-
-    SINCE="$(date -d "-${LOOKBACK_MIN} min" "+%Y-%m-%d %H:%M:%S")"
 
     # Fetch Logs for a specific TAG and a PATTERN
     LOGS="$(
     journalctl \
-        --since "${SINCE}" \
-        -t "${TAG}" \
-        -g "${PATTERN}" \
+        --since "${LOOKBACK_MIN} min ago" \
+        -t "${TAG}" -g "${USER}" \
         --case-sensitive=no \
         --no-pager 2>/dev/null || true
     )"
-    # filter on USER_LIST 
-    for USER in "${USER_LIST[@]}"; do
-
-        # Only fetch execution CMD's for listed user from the journalctr output in ${LOGS}.
-        USER_LOGS="$(
-            grep -iE "\(${USER}\) CMD" <<< "${LOGS}" || true
-        )"
-        # Look for error patterns in ${USER_LOGS}.
-        if [[ -n "${USER_LOGS}" ]]; then
-
-            MATCH="$(
-                grep -iE "${PATTERN}" <<< "${USER_LOGS}" || true
-                )"
-            if [[ -n "${MATCH}" ]]; then
-                ERRORS+=("${USER}: $(printf '%s\n' "${MATCH}" | head -n1)")
-            fi
-        fi
-    done
+    # Look for all PATTERNS in ${LOGS}
+    USER_LOGS=$(grep -iE "(${PATTERNS})" <<< "${LOGS}" || true)
+    UNIQUE_CLEAN_LOGS="$(sed 's/^.*://g' <<< "${USER_LOGS}" | uniq)"
 
     # Report $WARNING to logfile using 'die 1'
-    if [[ ${#ERRORS[@]} -gt 0 ]]; then
+    if [[ -n "${UNIQUE_CLEAN_LOGS}" ]]; then
 
-        WARNING="$FUNCNAME:  ${TAG}_ERRORS detected in last ${LOOKBACK_MIN} min"
-        WARNING="${WARNING};  Affected user: ${USER}"
+      for UNIQUE_ERROR in "${UNIQUE_CLEAN_LOGS}"; do
+         WARNING="${FUNCNAME}_${TAG}: ERROR - ${LOOKBACK_MIN}min (${USER}) ${UNIQUE_ERROR}"
+      done
 
-        for MATCH in "${ERRORS[@]}"; do
-            WARNING="${WARNING}; ${MATCH}"
-        done
-
-        die 1 "${WARNING}"
-        return 1
+      die 1 "${WARNING}"
+      return 1
     fi
 
     # reporting if 'OK and return 0'
-    log "$FUNCNAME:  ${TAG}_OK: no errors detected in last ${LOOKBACK_MIN} min"
+    log "${FUNCNAME}_${TAG}:  OK - no errors detected in last ${LOOKBACK_MIN} min"
     return 0
+}
+
+function check_systemctl_running() {
+   local SERVICE=${1:-}
+   if -z ${SERVICE}; then
+     return 0
+   else
+     if systemctl is-active --quiet ${SERVICE}; then
+        log "${FUNCNAME}_${SERVICE} -  OK service is running"
+        return 0
+     else
+        systemctl restart --no-block --quiet ${SERVICE}
+        die 1 "${FUNCNAME}_${SERVICE} - ERROR service is not running, sent restart request ..."
+     fi
+   fi
 }

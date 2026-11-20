@@ -2,6 +2,7 @@
 stack_prefix: 'db'
 stack_domain: 'donbot'
 stack_name: "{{ stack_domain }}_azure"  # stack_name must match the name of the folder that contains this vars.yml file.
+stack_dtap_state: development
 os_distribution: 'rocky9'
 repo_manager: 'none'
 modulejail_enforce: true  # Security hardening: block unused kernel modules from getting loaded.
@@ -35,6 +36,21 @@ azure_image:
     sku: '9-base'
     version: 'latest'
 azure_resource_group: "{{ stack_name }}"
+
+# NHC extras - you can use
+#   nhc_extras:
+#     deploy_admin_interface:
+#      - 'check_ps_service -u root -S -f fail2ban'
+#      - 'nhc_journalctl_checks "root" "15" "CROND" ""'
+# or any other nhc function defined in custom by us or from community
+#   https://github.com/mej/nhc
+# for example, functions like
+#  check_ps_loadavg, check_fs_free, check_hw_eth, ...
+nhc_extras:
+  ladap:
+   - 'check_journalctl "" "15" "CROND" ""'
+   - 'check_systemctl_running slapd-ltb.service'
+
 nameservers: [
   '8.8.4.4',  # Google DNS.
   '8.8.8.8',  # Google DNS.
