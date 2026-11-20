@@ -459,7 +459,7 @@ done
 #
 # Make sure only one copy of this script runs simultaneously to prevent messing up config files.
 #
-thereShallBeOnlyOne "${TMPDIR:-/tmp}/${SCRIPT_NAME}.lock"
+thereShallBeOnlyOne "${TMPDIR:-/tmp}/${my_script_name}.lock"
 
 #
 # Get account name and path to private key.
