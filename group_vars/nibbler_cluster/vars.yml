@@ -564,7 +564,7 @@ sudoers:
   - who: ['%umcg-nephrology-dms']
     become: ['umcg-nephrology-dm']
   - who: ['%umcg-pgx-dms']
-    become: ['umcg-pgx-dm']
+    become: ['umcg-pgx-dm', 'umcg-pgx-ateambot']
   - who: ['%umcg-pmb-dms']
     become: ['umcg-pmb-dm']
   - who: ['%umcg-radicon-dms']
