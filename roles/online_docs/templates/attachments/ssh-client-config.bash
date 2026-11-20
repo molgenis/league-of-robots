@@ -18,8 +18,7 @@ LC_NUMERIC="${LANG}"
 #
 # Define custom my_script_name as SCRIPT_NAME may be overruled by the shell under certain conditions.
 #
-my_script_name="$(basename "${0}")"
-my_script_name="${my_script_name%.*sh}"
+my_script_name="ssh-client-config-for-{{ slurm_cluster_name }}"
 
 #
 ##
