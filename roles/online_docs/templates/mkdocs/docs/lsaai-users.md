@@ -13,8 +13,8 @@ LSAAI instructions are available in three parts
 In short
 
  - Create LSAAI Account: Register for an LSAAI account if you do not already have one.
- - Request VO Access: Log in to LSAAI and request to join the designated Virtual Organization.
- - Request Group Access: Navigate to the group listing and request access to the relevant groups.
+ - Request VO Access: (will be automatically approved) Log in to LSAAI and request to join the designated Virtual Organization.
+ - Request Group Access: You should receive a link from group manager, which you can follow in order to request access to the group (the request needs to be manually approved).
  - Finalize: Upload your public SSH key. Access to the cluster will be granted automatically upon key validation.
 
 are steps needed for a regular user to do, in order to login to a cluster
@@ -75,12 +75,14 @@ You can request general membership by visiting the registrar
 
 ---
 
-## 5. Final Approval
+## 5. Request access to the Group
 
-In both cases, access to **HPC groups** is granted only after **group administrators** approve your request.
+You should receive a link from the group managers that allows you to request access; please note that requests are **approved manually**.
 
-* You will receive a notification email once your access has been provisioned.
-* You can then proceed to use the GGCC computing resources.
+* After a request, you should receive a notification email which will inform you if you access request was granted or denied.
+* You can then proceed to update your ssh keys (next step) in order to use the GGCC computing resources.
+
+Again, access to the **groups** is granted only after group managers **manually** approve your request.
 
 ## 6. Adding and managing ssh keys to access clusters
 
