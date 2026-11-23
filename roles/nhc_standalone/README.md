@@ -73,7 +73,7 @@ therefore `check_systemctl_running` function was added
 
 ```
 nhc_extras:
-  [hostname_inventory or group]:
+  [inventory_hostname or group]:
    - 'check_systemctl_running slapd-ltb.service'
 ```
 
