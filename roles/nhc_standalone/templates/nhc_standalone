@@ -1,0 +1,2 @@
+#!/bin/bash
+exec /sbin/nhc -c /etc/nhc/nhc_standalone.conf -a
