@@ -11,8 +11,8 @@ LSAAI instructions are available in three parts
 
 ## 1. Login
 
- - [Login to LSAAI](https://perun.aai.lifescience-ri.eu/)
- - Go to [GGCC Virtual Organization](https://perun.aai.lifescience-ri.eu/organizations/3363) and browse the `Groups`
+ - <a href="https://perun.aai.lifescience-ri.eu/" target="_blank" >Login to LSAAI</a>
+ - Go to <a href="https://perun.aai.lifescience-ri.eu/organizations/3363" target="_blank" >GGCC Virtual Organization</a> and browse the `Groups`
 
 ## 2. Adding users to a group
 
@@ -29,7 +29,7 @@ LSAAI instructions are available in three parts
 
 ## 3. Extending user group access
 
-- Login to the [Perun](https://perun.aai.lifescience-ri.eu/organizations/3363/)
+- Login to the <a href="https://perun.aai.lifescience-ri.eu/organizations/3363/" target="_blank" >Perun</a>
 - Use `Groups` tab, and go to the group you wish to manage membership
 - Select `Members` tab ([screenshot](img/lsaai_manager_4.png))
 - Use drop-down `Filter by group status` (default is set to `ACTIVE`) and pick `EXPIRED`
@@ -39,7 +39,7 @@ LSAAI instructions are available in three parts
 
 ## 4. Removing user from a group
 
-- Login to the [Perun](https://perun.aai.lifescience-ri.eu/organizations/3363/)
+- Login to the <a href="https://perun.aai.lifescience-ri.eu/organizations/3363/" target="_blank" >Perun</a>
 - Use `Groups` tab, and go to the group you wish to manage membership
 - Select `Members` tab ([screenshot](img/lsaai_manager_4.png))
 - Tick the checkboxes in front of the usernames you wish to remove
