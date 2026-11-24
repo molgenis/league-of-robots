@@ -1,5 +1,0 @@
----
-- hosts: irods
-  roles:
-    - role: irods
-...

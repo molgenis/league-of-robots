@@ -8,7 +8,6 @@
     - chaperone
     - cluster
     - data_transfer
-    - irods
     - ldap_server
     - logs
     - repo

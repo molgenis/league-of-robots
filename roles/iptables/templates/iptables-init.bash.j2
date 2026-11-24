@@ -449,30 +449,6 @@ for EXT_INTERFACE in "${EXTERNAL_INTERFACES[@]:-}"; do
 		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p udp -d "${IP_ADDRESS}" -m multiport --dports 32678:65535 -m state --state NEW,ESTABLISHED -j ACCEPT
 	done
 {% endif %}
-{% if iptables_allow_irods is defined and iptables_allow_irods | length > 0 %}
-	#
-	# Allow iRODS both inbound and outbound.
-	#
-	# iRODS requires:
-	#  * TCP port 1247: Handshakes and data transfers.
-	#  * TCP port 1248: Control Plane.
-	#  * TCP ports 20000-20199: Dynamically allocated for direct machine to machine connections for large data transfers.
-	#  * The iCAT requires a DataBase too, which is usually a PostgreSQL DB. Do not forget to open the corresponding port too.
-	#
-	declare -a ALLOW_IRODS=(
-	{% for ip in iptables_allow_irods %}
-		{% if ip == 'ANY'%}
-		'0.0.0.0/0'
-		{% else %}
-		'{{ ip.address }}{{ ip.netmask }}'{% if ip.fqdn is defined and ip.fqdn != "NXDOMAIN" %}	# {{ ip.fqdn }}{% elif ip.desc is defined %}	# {{ ip.desc }}{% endif +%}
-		{% endif %}
-	{% endfor %}
-	)
-	for IP_ADDRESS in "${ALLOW_IRODS[@]}"; do
-		iptables -A INPUT  -i "${EXT_INTERFACE}" -p tcp -s "${IP_ADDRESS}" -m multiport --ports 1247,1248,20000:20199 -m state --state NEW,ESTABLISHED -j ACCEPT
-		iptables -A OUTPUT -o "${EXT_INTERFACE}" -p tcp -d "${IP_ADDRESS}" -m multiport --ports 1247,1248,20000:20199 -m state --state NEW,ESTABLISHED -j ACCEPT
-	done
-{% endif %}
 	#
 	# Allow outbound logs.
 	#
