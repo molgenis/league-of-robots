@@ -1,9 +1,0 @@
----
-- name: Include tasks for installing and configuring davrods.
-  ansible.builtin.include_tasks:
-    file: davrods.yml
-  when:
-    - davrods_install is defined
-    - davrods_install == True
-
-...

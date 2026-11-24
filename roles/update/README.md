@@ -1,7 +1,7 @@
 # update role
 
 This role manages updates via `yum` or `dnf`.
-It will update all packages except for `slurm*,irods*`, which are version locked
+It will update all packages except for `slurm*`, which are version locked
 and can only be updated by dedicated roles for configuring those services.
 
 ## Reboots

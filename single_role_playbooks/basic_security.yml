@@ -9,7 +9,6 @@
     - chaperone,!mit_chaperone
     - data_transfer
     - docs
-    - irods
     - jenkins
     - logs
     - repo
