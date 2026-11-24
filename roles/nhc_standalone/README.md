@@ -18,41 +18,70 @@ nhc_standalone was extended with additional `check_journalctl` check and a custo
 NHC_standalone roles is deployed to the specified target hosts via:
      `single_role_playbooks/nhc_standalone.yml`
 
-## configuration of `check_journalctl`
+### configuration of `check_journalctl`
+
 Example stucture for `check_journalctl` configuration in `group_vars/{stack}/vars.yml`:
 
-```yaml
-nhc_journalctl_checks:
-  deploy_admin_interface:
-    - user: "root"
-      lookback_min: 15
-      tag: "CROND"
-      pattern: "FAILED|error"
-  chaperone:
-    - user: "umcg-ogm-dm"
-      lookback: 10
-      tag: "OGM"
-      pattern: "FAILED|exit code|backup FAILED"
+```
+nhc_extras:
+  [hostname_inventory or group]:
+    - '[nhc_function_name] [arguments]'
+    - ...
+```
+for example
+
+```
+nhc_extras:
+  ldap_server:
+   - 'check_journalctl "" "15" "CROND" ""'
+   - 'check_systemctl_running slapd-ltb.service'
 ```
 
-- `group` defines the Ansible inventory group.
-- `user` specifies the user to filter on. Can also be userlist: `'user1,user2'`
-- `lookback_min` defines how far back to search in logs.
-- `tag` specifies the journalctl tag (`journalctl -t`).
-- `pattern` defines the error pattern to match.
+where arguments `check_journalctl` are in format
+
+1. `user` [username] specifies the user to filter on, can be only one user. Can be also empty to match logs of all users.
+2. `lookback_min` [number] defines how far back to search in logs.
+3. `tag` [string] specifies the journalctl tag (`journalctl -t`).
+4. `pattern` [strings|separated|by|pipe|symbol] defines the error pattern to match
+    Either of the patterns is being looked for (OR).
+    By DEFAULT if there are no patterns provided, the script will look for
+    `FAILED|status=[1-9]|exit code|segfault|fail|error` as defined in the `custom.nhc`
 
 Make sure `lookback_min` matches how often the check runs.
 
-## check_journalctl in NHC config
+Example
 
- Generate NHC journalctl checks only for the machines listed in the corresponding "machines" grouping. The defined checks in the `group_vars/vars.yml` end up in the `nhc_standalone.conf` as follows:
-  
 ```text
+* || check_journalctl "root" 15 ldap_backup ""
 * || check_journalctl "root" 15 CROND "FAILED|error"
 * || check_journalctl "umcg-ogm-dm" 15 OGM "FAILED|exit code|backup FAILED"
 ```
 
-The check reports a failure when a matching error is found within the configured lookback window. Logfiles are stored in `/run/nhc/nhc_standalone.*`
+**Note: the function checks that `[user]` AND at least one of the `[PATTERNS]` match!**
+
+
+### configuration of `check_systemctl_running`
+
+
+```
+    * || check_ps_service -u root -S -m 'sshd:' sshd
+```
+
+does not work for all services, as they are not executed with the `[service_name]:` format.
+
+therefore `check_systemctl_running` function was added
+
+```
+nhc_extras:
+  [inventory_hostname or group]:
+   - 'check_systemctl_running slapd-ltb.service'
+```
+
+## NHC logs
+
+The check reports a failure when a matching error is found within the configured lookback window.
+
+Logfiles are stored in `/run/nhc/nhc_standalone.*`
 
 ## nhc-wrapper and Slack notifications
 
