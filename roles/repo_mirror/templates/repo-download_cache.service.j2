@@ -1,0 +1,11 @@
+# {{ ansible_managed | default('Managed by Ansible - role: repo_mirror') }}
+[Unit]
+Description=Syncronization service between repo servers
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User={{ repo_user }}
+Group={{ repo_group }}
+ExecStart={{ main_repo_path }}/1_sync_repo_to_new_version.sh -0

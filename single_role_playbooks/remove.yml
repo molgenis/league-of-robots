@@ -10,7 +10,7 @@
     - chaperone,!mit_chaperone
     - docs
     - logs
-    - repo_servers
+    - repo_server
     - silo
   roles:
     - remove

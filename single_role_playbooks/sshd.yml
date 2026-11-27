@@ -14,7 +14,7 @@
     - docs
     - jenkins
     - repo
-    - repo_servers
+    - repo_server
     - logs
     - silo
   roles:

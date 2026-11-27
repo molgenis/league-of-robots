@@ -72,6 +72,8 @@
     mode: '0644'
   delegate_to: localhost
   connection: local
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
 
 - name: Copy signed certificate back to remote host
   ansible.builtin.copy:

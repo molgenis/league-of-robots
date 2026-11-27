@@ -1,5 +1,7 @@
 ---
-- hosts: data_transfer
+- hosts:
+    - data_transfer
+    - repo_server
   roles:
     - rsyncd # Note: depends on sshd role, which will be included when deploying this one.
 ...

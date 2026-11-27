@@ -11,7 +11,7 @@
     - cluster
     - chaperone,!mit_chaperone
     - data_transfer
-    - repo_servers
+    - repo_server
   roles:
     - logins
 ...

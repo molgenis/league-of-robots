@@ -12,7 +12,7 @@ stack_networks:
     cidr: '10.10.1.0/24'
     router:
       next-hop-address: '10.10.1.1'
-      external_network: vlan16
+      external_network: vlan1066
     create: true
     mtu_size: '1450'
 azure_networks:
@@ -42,8 +42,8 @@ local_admin_users:
 regular_groups:
   - name: 'umcg-logstoprm'
 regular_users:
-  - name: "logstoprm"
-    groups: "umcg-logstoprm"
+  - name: 'logstoprm'
+    groups: 'umcg-logstoprm'
 #
 # Cluster classification (used by `logs` and `login` roles)
 #
@@ -63,6 +63,10 @@ use_sssd: false
 # We will restrict SSH login on port 22 to these jumphosts using OpenStack security rules.
 #
 external_jumphosts:
+  - group: patchcord_library
+    hosts:
+      - hostname: spring
+        network: vlan1066
   - group: logs_library
     hosts:
       - hostname: hatch

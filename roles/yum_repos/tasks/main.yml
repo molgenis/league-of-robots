@@ -1,12 +1,12 @@
 ---
 - name: Copy repo server certificates to repo clients.
   ansible.builtin.copy:
-    src: "{{ repo_servers_certificate }}"
+    src: "{{ global_repo_servers_certificate }}"
     dest: /etc/pki/ca-trust/source/anchors/
     owner: root
     group: root
     mode: '0600'
-  when: repo_manager == 'repo_server'
+  when: repo_manager == 'mirror'
   notify: yum_repos_update-ca-trust
   become: true
 

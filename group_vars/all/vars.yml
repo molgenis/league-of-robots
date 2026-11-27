@@ -142,12 +142,10 @@ additional_etc_hosts_for_all_stacks:
     nodes:
       - name: ladap
         network: donbot_external_network
-  - group: logs_library
+  - group: patchcord_library
     nodes:
       - name: repo-primary
-        network: logs_external_public
-  - group: logs_library
-    nodes:
+        network: pc_external_public
       - name: repo-secondary
-        network: vlan16
+        network: vlan1066
 ...

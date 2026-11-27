@@ -41,6 +41,10 @@ iptables_allow_icmp_inbound:
   - "{{ wingedhelix_cluster.ip_addresses['wh-porch']['vlan16'] }}"
   - "{{ betabarrel_cluster.ip_addresses['bb-porch']['vlan16'] }}"
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
+  - "{{ patchcord_library.ip_addresses['spring']['vlan1066'] }}"
+  - "{{ patchcord_library.ip_addresses['repo-primary']['pc_external_public'] }}"
+  - "{{ patchcord_library.ip_addresses['repo-secondary']['vlan1066'] }}"
+  - "{{ patchcord_library.ip_addresses['spring']['pc_internal_management'] }}"
 iptables_allow_ssh_inbound:
   - "{{ all.ip_addresses['umcg']['net1'] }}"
   - "{{ all.ip_addresses['umcg']['net2'] }}"
@@ -55,6 +59,14 @@ iptables_allow_ssh_inbound:
   - "{{ copperfist_cluster.ip_addresses['cf-porch']['external'] }}"
   - "{{ logs_library.ip_addresses['hatch']['logs_external'] }}"   # this is needed, because it is external AND internal ip interface on Azure
   - "{{ logs_library.ip_addresses['hatch']['logs_external_public'] }}"
+  - "{{ patchcord_library.ip_addresses['spring']['vlan1066'] }}"
+  - "{{ patchcord_library.ip_addresses['spring']['pc_internal_management'] }}"
+  - "{{ patchcord_library.ip_addresses['repo-primary']['pc_external_public'] }}"
+  - "{{ patchcord_library.ip_addresses['repo-secondary']['vlan1066'] }}"
+
+iptables_allow_ssh_outbound:
+  - ANY
+
 iptables_allow_repository_inbound:
   - ANY
 ...

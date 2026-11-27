@@ -14,7 +14,7 @@ slurm_partitions:
     default: no
     nodes: "{{ slurm_cluster_name }}"  # Must be in sync with Ansible hostnames listed in inventory.
     extra_options: 'TRESBillingWeights="CPU=1.0,Mem=1.0G" AllowQos=ds-short,ds-medium,ds-long'
-repo_manager: 'pulp'
+repo_manager: 'mirror' # can be 'none', 'pulp' or 'mirror'
 os_distribution: 'alma9'
 os_minorversion: '.8'
 figlet_font: 'lockergnome'

@@ -6,6 +6,7 @@
 
 - hosts:
     - repo
+    - repo_server
     - cluster
     - chaperone,!mit_chaperone
     - docs
