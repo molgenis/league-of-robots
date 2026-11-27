@@ -89,6 +89,14 @@
 - name: "Configure synchronization scripts between primary and secondary repo servers"
   ansible.builtin.include_tasks: sync.yml
 
+- name: Install createrepo_c
+  ansible.builtin.package:
+    name: "createrepo_c"
+    state: latest
+    update_cache: true
+  become: true
+  when: rm_repo_is_primary
+
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
 ...

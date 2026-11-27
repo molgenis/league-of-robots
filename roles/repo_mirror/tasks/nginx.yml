@@ -1,5 +1,5 @@
 ---
-- name: Install nginx and python3-cryptography
+- name: install nginx and python3-cryptography
   ansible.builtin.package:
     name: "{{ item }}"
     state: latest
