@@ -31,9 +31,9 @@
         - "repo-sync.timer"
         - "repo-download_cache.timer"
 
-    - name: Create /home/repo/.ssh
+    - name: Create .ssh folder for repo user
       ansible.builtin.file:
-        path: '/home/repo/.ssh'
+        path: "/home/{{ repo_user }}/.ssh"
         state: directory
         owner: "{{ repo_user }}"
         group: "{{ repo_user }}"
@@ -41,7 +41,7 @@
 
     - name: Create SSH key pair
       community.crypto.openssh_keypair:
-        path: "/home/repo/.ssh/id_ed25519"
+        path: "/home/{{ repo_user }}/.ssh/id_ed25519"
         type: ed25519
         comment: "{{ repo_user }}@{{ inventory_hostname }}"
         owner: "{{ repo_user }}"
