@@ -129,10 +129,6 @@ ip_addresses:
       address: '145.100.5.194'
       netmask: '/32'
       fqdn: 'ui.grid.sara.nl'
-    umcg-resc1:
-      address: '145.38.219.24'
-      netmask: '/32'
-      fqdn: 'umcg-resc1.irods.surfsara.nl'
   eriba:
     ds:
       address: '129.125.161.80'

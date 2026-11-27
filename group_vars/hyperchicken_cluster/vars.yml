@@ -34,18 +34,6 @@ subgroup_directories_auto_is_enabled: true
 use_ldap: true
 use_sssd: true
 ldap_domains:
-#  stack:
-#    uri: "ldaps://{{ stack_prefix }}-dai"
-#    base: "dc={{ stack_name }},dc=local"
-#    schema: rfc2307bis
-#    min_id: 1000
-#    max_id: 21999
-#    user_object_class: posixAccount
-#    user_name: uid
-#    user_ssh_public_key: sshPublicKey
-#    user_member_of: memberOf
-#    group_member: member
-#    create_ldap: true
   ladap:
     # must be FQDN or certificate authentication with LDAP server fails
     uri: ldaps://ladap.westeurope.cloudapp.azure.com
@@ -65,17 +53,6 @@ ldap_domains:
     # can change). Instead we use %U to make it stable, unique (/home/[uid])
     # and persistent across systems
     override_homedir: '/home/%U'
-  sram:
-    uri: ldaps://sv-sram.id.rug.nl
-    base: ou=sram-umcg,ou=users,o=id
-    schema: rfc2307bis
-    min_id: 70000000
-    max_id: 72999999
-    user_object_class: posixAccount
-    user_name: uid
-    user_ssh_public_key: sshPublicKey
-    user_member_of: groupMembership
-    group_member: member
   idvault:
     uri: ldaps://svrs.id.rug.nl
     base: ou=umcg,o=asds
@@ -89,6 +66,29 @@ ldap_domains:
     user_expiration_date: loginExpirationTime
     group_member: memberUid
     group_object_class: groupofnames
+#  stack:
+#    uri: "ldaps://{{ stack_prefix }}-dai"
+#    base: "dc={{ stack_name }},dc=local"
+#    schema: rfc2307bis
+#    min_id: 1000
+#    max_id: 21999
+#    user_object_class: posixAccount
+#    user_name: uid
+#    user_ssh_public_key: sshPublicKey
+#    user_member_of: memberOf
+#    group_member: member
+#    create_ldap: true
+#  sram:
+#    uri: ldaps://sv-sram.id.rug.nl
+#    base: ou=sram-umcg,ou=users,o=id
+#    schema: rfc2307bis
+#    min_id: 70000000
+#    max_id: 72999999
+#    user_object_class: posixAccount
+#    user_name: uid
+#    user_ssh_public_key: sshPublicKey
+#    user_member_of: groupMembership
+#    group_member: member
 cloud_image: AlmaLinux-9-GenericCloud-9.8-20260526
 availability_zone: nova
 enable_predictable_network_interface_names: true

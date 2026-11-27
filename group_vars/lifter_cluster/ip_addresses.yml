@@ -10,10 +10,6 @@ ip_addresses:
     lt_umcg-1068:
       address: 10.10.2.22
       netmask: /32
-  lt-chaperone-broken:  # Temporarily preserved for post mortem of potential Woodlark issue.
-    lt_internal_management:
-      address: 10.10.1.240
-      netmask: /32
   lt-chaperone:
     lt_internal_management:
       address: 10.10.1.222
@@ -27,6 +23,16 @@ ip_addresses:
       netmask: /32
     lt_umcg-1068:
       address: 10.10.2.42
+      netmask: /32
+  lt-node-a01:
+    lt_internal_management:
+      address: 10.10.1.99
+      netmask: /32
+    umcg-1068:
+      address: 172.23.60.246
+      netmask: /32
+    lt_umcg-1068:
+      address: 10.10.2.62
       netmask: /32
   lt-node-c01:
     lt_internal_management:

@@ -10,8 +10,8 @@ trap 'echo "Terminated by signal SIGHUP." ; exit 129' 1
 trap 'echo "Terminated by signal SIGINT." ; exit 130' 2
 trap 'echo "Terminated by signal SIGTERM." ; exit 143' 15
 
-slack_webhook='{{ slurm_notification_slack_webhook[stack_dtap_state] }}'
-cluster_name='{{ slurm_cluster_name | capitalize }}'
+slack_webhook="$(</etc/nhc/slack.conf)"
+stack_name='{{ stack_name }}'
 
 {% raw %}
 
@@ -292,11 +292,7 @@ function nhcwrap_report_results() {
 			read -r -d '\0' message <<- EOM
 				{
 					"type": "mrkdwn",
-					"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster is healthy again*:
-				\`\`\`
-				The following error(s) on ${cluster_name} have now been CLEARED:
-				${PREV_RESULTS}
-				\`\`\`"
+					"text": "${stack_name} > *$(hostname)* is now *OK*"
 				}\0
 			EOM
 			echo -n "Notifying Slack channel that the NHC error was cleared ... "
@@ -313,8 +309,7 @@ function nhcwrap_report_results() {
 			read -r -d '\0' message <<- EOM
 				{
 					"type": "mrkdwn",
-					"text": "*The _$(hostname)_ machine of the _${cluster_name}_ cluster needs help*:
-				\`\`\`
+					"text": "\`\`\`${stack_name} > ** $(hostname) ** needs HELP
 				$(tr \" \' < "${SAVEFILE}")
 				\`\`\`"
 				}\0

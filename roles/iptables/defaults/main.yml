@@ -59,10 +59,6 @@ iptables_allow_aspera_outbound: []
 #
 iptables_allow_logs_inbound: []
 #
-# iRODS: by definition both inbound and outbound.
-#
-iptables_allow_irods: []
-#
 # Globus ToolKit (only outbound).
 #
 iptables_allow_globus_outbound: []

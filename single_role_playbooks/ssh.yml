@@ -12,7 +12,6 @@
     - chaperone
     - data_transfer
     - docs
-    - irods
     - jenkins
     - repo
     - repo_server
